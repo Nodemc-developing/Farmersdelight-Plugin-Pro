@@ -26,6 +26,10 @@ dependencies:
       load: BEFORE
       required: true
       join-classpath: true
+    FluidCore:
+      load: BEFORE
+      required: false
+      join-classpath: true
     AuraSkills:
       load: BEFORE
       required: false
@@ -183,6 +187,9 @@ permissions:
   farmersdelight.use.cutting_board:
     description: Allow to use the Cutting Board
     default: true
+  farmersdelight.use.fluids:
+    description: Allow fluid filling, emptying and soaking recipes
+    default: true
   farmersdelight.admin:
     description: Admin permissions
     default: op
@@ -197,4 +204,5 @@ permissions:
       farmersdelight.use.stove: true
       farmersdelight.use.skillet: true
       farmersdelight.use.cutting_board: true
+      farmersdelight.use.fluids: true
       farmersdelight.admin: true

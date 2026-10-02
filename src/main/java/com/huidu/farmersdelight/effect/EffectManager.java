@@ -49,6 +49,8 @@ public final class EffectManager {
         final String titleKey;
         volatile BossBar.Color barColor;
         volatile BossBar.Overlay barOverlay;
+        volatile boolean enabled = true;
+        volatile long generation;
 
         BuffKind(String pdcDur, String pdcInit, String pdcLevel, String bbKey, String titleKey,
                  BossBar.Color defColor) {
@@ -68,9 +70,9 @@ public final class EffectManager {
         }
     }
 
-    private record BuffState(int duration, int initial, int level) {
+    private record BuffState(int duration, int initial, int level, long generation) {
         boolean isActive() { return duration > 0; }
-        static final BuffState EMPTY = new BuffState(0, 0, 1);
+        static final BuffState EMPTY = new BuffState(0, 0, 1, 0);
     }
 
     // Public key aliases (for external compatibility)
@@ -91,9 +93,11 @@ public final class EffectManager {
     }
 
     private static BuffState getBuff(UUID playerId, BuffKind kind) {
+        if (!kind.enabled) return BuffState.EMPTY;
         EnumMap<BuffKind, BuffState> buffs = playerBuffs.get(playerId);
         if (buffs == null) return BuffState.EMPTY;
-        return buffs.getOrDefault(kind, BuffState.EMPTY);
+        BuffState state = buffs.getOrDefault(kind, BuffState.EMPTY);
+        return state.generation() == kind.generation ? state : BuffState.EMPTY;
     }
 
     private static void putBuff(UUID playerId, BuffKind kind, BuffState state) {
@@ -101,6 +105,16 @@ public final class EffectManager {
     }
 
     // Bossbar styles
+
+    public static void configure(ConfigurationSection config) {
+        configureKind(BuffKind.COMFORT, config == null || config.getBoolean("buff.comfort.enabled", true));
+        configureKind(BuffKind.NOURISHMENT, config == null || config.getBoolean("buff.nourishment.enabled", true));
+    }
+
+    private static void configureKind(BuffKind kind, boolean enabled) {
+        if (kind.enabled && !enabled) ++kind.generation;
+        kind.enabled = enabled;
+    }
 
     public static void applyBossbarStyles(ConfigurationSection section) {
         if (section == null) return;
@@ -156,7 +170,7 @@ public final class EffectManager {
     }
 
     private static void applyBuff(Player player, BuffKind kind, int durationSeconds, int level) {
-        if (!CustomBuffRegistry.isSystemEnabled()) return;
+        if (player == null || !kind.enabled || !CustomBuffRegistry.isSystemEnabled()) return;
         UUID playerId = player.getUniqueId();
         int lvl = Math.max(1, level);
         BuffState current = getBuff(playerId, kind);
@@ -168,7 +182,7 @@ public final class EffectManager {
         } else {
             newInitial = Math.max(current.initial(), result[0]);
         }
-        putBuff(playerId, kind, new BuffState(result[0], newInitial, result[1]));
+        putBuff(playerId, kind, new BuffState(result[0], newInitial, result[1], kind.generation));
         EffectListener.trackPlayer(player);
         if (kind == BuffKind.NOURISHMENT) {
             var advMgr = FarmersDelightPlugin.getInstance().getAdvancementManager();
@@ -242,12 +256,16 @@ public final class EffectManager {
             for (BuffKind kind : BuffKind.values()) {
                 BuffState state = buffs.get(kind);
                 if (!state.isActive()) continue;
+                if (!kind.enabled || state.generation() != kind.generation) {
+                    buffs.put(kind, BuffState.EMPTY);
+                    continue;
+                }
                 if (kind == BuffKind.COMFORT) tickComfort(player, state.duration());
                 else if (kind == BuffKind.NOURISHMENT) tickNourishment(player);
                 if (!player.isValid()) break;
                 int newDuration = state.duration() - interval;
                 buffs.put(kind, newDuration > 0
-                    ? new BuffState(newDuration, state.initial(), state.level())
+                    ? new BuffState(newDuration, state.initial(), state.level(), state.generation())
                     : BuffState.EMPTY);
             }
             if (buffs.values().stream().noneMatch(BuffState::isActive)) {
@@ -338,6 +356,10 @@ public final class EffectManager {
 
     private static boolean restoreBuffFromPdc(Player player, BuffKind kind) {
         if (player == null) return false;
+        if (!kind.enabled) {
+            saveBuffToPdc(player, kind);
+            return false;
+        }
         UUID playerId = player.getUniqueId();
         if (getBuff(playerId, kind).isActive()) return true;
         PersistentDataContainer pdc = player.getPersistentDataContainer();
@@ -347,7 +369,7 @@ public final class EffectManager {
             int init = (initial != null && initial >= duration) ? initial : duration;
             Integer storedLevel = pdc.get(kind.pdcLevelKey, PersistentDataType.INTEGER);
             int level = storedLevel == null ? 1 : Math.max(1, storedLevel);
-            ensurePlayer(playerId).put(kind, new BuffState(duration, init, level));
+            ensurePlayer(playerId).put(kind, new BuffState(duration, init, level, kind.generation));
             return true;
         }
         return false;

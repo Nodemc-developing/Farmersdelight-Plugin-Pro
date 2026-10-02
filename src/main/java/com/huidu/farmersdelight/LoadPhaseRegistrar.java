@@ -42,6 +42,8 @@ final class LoadPhaseRegistrar {
         BehaviorRegistrar.registerFunctions();
         BehaviorRegistrar.registerConditions();
         BehaviorRegistrar.registerLootFunctions();
+        com.huidu.farmersdelight.registry.PapersBehaviorAliases.register();
+        com.huidu.farmersdelight.fluid.PapersFluidAliases.register();
         // Register the farmersdelight:sword settings modifier before CraftEngine parses item YAML files.
         ToolRegistry.register();
         // Register the farmersdelight:pet_food settings modifier before CraftEngine parses item YAML files.
@@ -53,6 +55,7 @@ final class LoadPhaseRegistrar {
         PackSections sections = PackSections.register();
         // Registered in onLoad because WorldGuard locks its FlagRegistry once it enables; no-op without WG.
         ProtectionCompat.registerFlags();
+        ProtectionCompat.registerCustomFlag("farmersdelight-fluids");
         return sections;
     }
 }

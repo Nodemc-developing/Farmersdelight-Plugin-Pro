@@ -165,8 +165,8 @@ public class TrayManager {
                 world.getBlockAt(pos.x(), pos.y(), pos.z()));
         if (state == null || state.isEmpty()) return null;
         CookingPotBlockBehavior behavior = CustomBlockUtils.getBehavior(state, CookingPotBlockBehavior.class);
-        if (behavior == null || behavior.getSupportProperty() == null) return null;
-        return state.getNullable(behavior.getSupportProperty());
+        if (behavior == null || !behavior.hasSupportProperty()) return null;
+        return behavior.readSupportState(state);
     }
 
     private Boolean getSupportBoolean(World world, BlockPos pos) {
@@ -183,8 +183,8 @@ public class TrayManager {
         ImmutableBlockState state = CraftEngineBlocks.getCustomBlockState(block);
         if (state == null || state.isEmpty()) return;
         CookingPotBlockBehavior behavior = CustomBlockUtils.getBehavior(state, CookingPotBlockBehavior.class);
-        if (behavior == null || behavior.getSupportProperty() == null) return;
-        ImmutableBlockState next = state.with(behavior.getSupportProperty(), value);
+        if (behavior == null || !behavior.hasSupportProperty()) return;
+        ImmutableBlockState next = behavior.withSupportState(state, value);
         CraftEngineBlocks.place(block.getLocation(), next, false);
     }
 

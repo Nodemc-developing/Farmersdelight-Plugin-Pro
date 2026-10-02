@@ -12,6 +12,7 @@ public class SpecialRecipeInfo {
 
     public static final String DISPLAY_RECIPE = "recipe";
     public static final String DISPLAY_ITEM_DESCRIPTION = "item_description";
+    public static final String DISPLAY_PAPERS_INFO = "papers_info";
 
     private final String id;
     private final String titleKey;

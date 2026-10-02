@@ -158,6 +158,7 @@ gui:
     disabled: "<red>The recipe editor is disabled in config.yml (recipe-editor.enabled)."
     feedback:
       invalid_id: "<red>Recipe id contains invalid characters."
+      invalid_value: "<red>Invalid value. Check the identity, numeric range and required fields."
       not_configured: "<red>The recipe editor GUI is not configured in gui.yml."
       no_ingredients: "<red>The recipe needs at least one ingredient."
       no_input: "<red>The recipe needs an input item."
@@ -169,6 +170,11 @@ gui:
       save_failed: "<red>Failed to save the recipe (see console)."
       delete_failed: "<red>Failed to delete the recipe (see console)."
       no_tags: "<red>This item does not belong to any tag."
+    recipe_book:
+      saving: "<yellow>Saving and reloading recipes. Please wait."
+      number_hint: "<gray>Shift click: enter a number directly"
+      number_prompt: "<yellow>Enter this field's numeric value; enter cancel to return to the editor."
+      text_hint: "<gray>Click to enter an identity; cancel returns to this editor."
     tag:
       select_hint: "<gray>Left: use this tag <dark_gray>| <gray>Right: edit exclusions"
       member_included: "<gray>Click: exclude this item from the tag"
@@ -232,6 +238,9 @@ gui:
       desc:
         "1": "A lightweight melee weapon, with fast swings and gentle damage.\n\nThey can harvest Straw from grasses, and guarantee secondary drops from animals."
 console:
+  fluid:
+    invalid_recipe: "Invalid fluid recipe {id}: {error}"
+    unavailable: "Fluid recipes are retained until FluidCore is available: {error}"
   prefix: "[Farmersdelight-Plugin-Pro]"
   recipe-discovery:
     save_failed: "Failed to save recipe discovery data: {error}"
@@ -325,6 +334,7 @@ console:
     config_missing_section: "Config file {file} is missing section {section}."
     config_invalid_key: "Config file {file} contains an invalid config path {path}."
     config_value_invalid: "Config file {file} has an invalid value at {path}: {error}"
+    config_option_unsupported: "Config option {path} in {file} is preserved but not supported by this build."
     config_empty_value: "Config file {file} has an empty value at {path}; that entry will be ignored."
     common_tag_reference_invalid: "Invalid common-tag reference ({type}): {path}; that reference will be ignored."
     config_issues_header: "Found {count} config issue(s) in file \"{file}\":"
@@ -441,6 +451,7 @@ console:
     special_recipe_backfilled: "Backfilled {count} bundled special recipes missing from the on-disk config"
     special_recipe_missing_root: "Special recipe file {file} has no 'special_recipes' section; skipping it. Add the section or delete the file to restore the bundled defaults."
     special_recipe_parse_failed: "Failed to parse special recipe '{id}': {error}"
+    papers_unsupported_type: "Unsupported recipe type '{type}' in {file} ({id}); the source file is preserved."
     special_recipe_save_failed: "Failed to write special recipe file {file}: {error}"
     special_recipe_load_failed: "Failed to read special recipe file {file} as UTF-8 YAML: {error}"
   worlddata:
@@ -638,3 +649,39 @@ compat:
       other_ingredients: "<red>The pot contains other ingredients. Clear them or choose the matching recipe."
       invalid_recipe: "<red>This book has no valid recorded ingredient list."
       wrong_region: "<yellow>Move closer to the pot and try again."
+
+fluid:
+  type:
+    fluid_filling: "<aqua>Fluid filling recipes"
+    fluid_emptying: "<aqua>Fluid emptying recipes"
+    soaking: "<aqua>Soaking recipes"
+  editor:
+    ingredient: "Ingredient"
+    fluid: "Fluid or fluid tag"
+    amount: "Fluid amount (mB)"
+    time: "Soaking time"
+    tick_unit: "ticks"
+    consume_fluid: "Consume fluid"
+    priority: "Priority"
+    enabled: "Yes"
+    disabled: "No"
+    consume_hint: "<gray>Consume fluid: 1 means yes; 0 means no."
+    native_container: "<gray>Leave the result empty to let FluidCore transform the container and preserve its fluid data."
+    fluid_prompt: "<yellow>Enter a fluid ID such as minecraft:water or a tag such as #c:water; enter cancel to return."
+    ingredient_prompt: "<yellow>Enter an item ID, #tag, advtag:group or alternatives separated with |; enter cancel to return."
+  soaking_started: "<yellow>Recipe processing started; wait {ticks} ticks."
+  cancelled: "<yellow>Processing cancelled. Items and fluid were not consumed."
+  outcome:
+    ready: "<green>This fluid recipe is ready."
+    success: "<green>Fluid recipe completed."
+    unavailable: "<red>Fluid recipes require enabled FluidCore."
+    invalid_thread: "<yellow>Move closer to the container and try again."
+    no_match: "<yellow>The item or recipe changed. Try again."
+    no_storage: "<red>No fluid storage is available here."
+    no_fluid: "<red>The fluid type or amount does not match."
+    no_capacity: "<red>The container does not have enough capacity."
+    not_a_container: "<red>This item cannot process this fluid recipe."
+    protected_data: "<red>The item's fluid data cannot be converted safely. Use a new compatible container."
+    no_inventory_space: "<red>Not enough inventory space. Items and fluid were not consumed."
+    unsupported_variant: "<red>This fixed recipe result cannot preserve the fluid's data. Operation cancelled."
+    transaction_failed: "<red>The fluid operation did not complete. Check the server log."

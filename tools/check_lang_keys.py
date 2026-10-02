@@ -108,7 +108,7 @@ def scan() -> tuple[dict[str, str], dict[str, str], list[tuple[str, str, int]]]:
             for match in pattern.finditer(text):
                 key = match.group(1)
                 # "<literal>" + something: the literal is only a prefix, the real key is composed later.
-                if text[match.end():match.end() + 3].lstrip().startswith("+"):
+                if re.match(r"\s*\+", text[match.end():]):
                     continue
                 target = static
                 if mode == "shared":

@@ -749,6 +749,9 @@ public final class CookingPotEditorGui extends AbstractInventoryGui implements E
         if (ingredient instanceof RecipeIngredient.Tag tag) {
             return named(new ItemStack(Material.NAME_TAG), RecipeSerializer.serializeIngredient(tag));
         }
+        if (ingredient instanceof RecipeIngredient.AdvancedTag advanced) {
+            return named(new ItemStack(Material.NAME_TAG), RecipeSerializer.serializeIngredient(advanced));
+        }
         if (ingredient instanceof RecipeIngredient.Choice choice) {
             return named(new ItemStack(Material.CHEST), RecipeSerializer.serializeIngredient(choice));
         }

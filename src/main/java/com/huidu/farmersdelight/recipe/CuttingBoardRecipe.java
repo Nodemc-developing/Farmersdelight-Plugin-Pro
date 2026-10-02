@@ -7,7 +7,15 @@ import java.util.List;
 import java.util.Set;
 
 public record CuttingBoardRecipe(String id, RecipeIngredient input, ItemStack inputDisplay, List<ToolRequirement> tools,
-                                 List<ResultEntry> results, String sound, int priority) {
+                                 List<ResultEntry> results, String sound, int priority, Float soundVolume, Float soundPitch) {
+    public CuttingBoardRecipe(String id, RecipeIngredient input, ItemStack inputDisplay, List<ToolRequirement> tools,
+                              List<ResultEntry> results, String sound, int priority) {
+        this(id, input, inputDisplay, tools, results, sound, priority, null, null);
+    }
+
+    public Float getSoundVolume() { return soundVolume; }
+
+    public Float getSoundPitch() { return soundPitch; }
     public String getId() {
         return id;
     }
@@ -36,7 +44,10 @@ public record CuttingBoardRecipe(String id, RecipeIngredient input, ItemStack in
         return priority;
     }
 
-    public record ToolRequirement(Key key, boolean tag, Set<Key> excludedItems, Set<Key> excludedTags) {
+    public record ToolRequirement(Key key, boolean tag, Set<Key> excludedItems, Set<Key> excludedTags, boolean advanced) {
+        public ToolRequirement(Key key, boolean tag, Set<Key> excludedItems, Set<Key> excludedTags) {
+            this(key, tag, excludedItems, excludedTags, false);
+        }
         public ToolRequirement(Key key) {
             this(key, false, Set.of(), Set.of());
         }
@@ -71,6 +82,7 @@ public record CuttingBoardRecipe(String id, RecipeIngredient input, ItemStack in
         }
 
         public RecipeIngredient asIngredient() {
+            if (advanced) return new RecipeIngredient.AdvancedTag(key);
             return tag
                     ? new RecipeIngredient.Tag(key, excludedItems, excludedTags)
                     : new RecipeIngredient.Item(key);

@@ -2,6 +2,7 @@ package com.huidu.farmersdelight.gui;
 
 import com.huidu.farmersdelight.FarmersDelightPlugin;
 import com.huidu.farmersdelight.recipe.CuttingBoardRecipe;
+import com.huidu.farmersdelight.recipe.RecipeSerializer;
 import com.huidu.farmersdelight.util.Constants;
 import com.huidu.farmersdelight.util.ItemUtils;
 import net.kyori.adventure.text.Component;
@@ -72,7 +73,7 @@ final class ToolPreviewRenderer {
         }
         if (gui.config.isShowIngredientIds()) {
             lore.add(gui.tr("gui.recipe.tag_line",
-                    Component.text("#" + tool.key()).color(NamedTextColor.WHITE)));
+                    Component.text(RecipeSerializer.serializeTool(tool)).color(NamedTextColor.WHITE)));
         }
         if (previewOptions.size() > 1) {
             gui.ingredientDisplay.appendItemPreviewLore(lore, previewOptions, 5, player, toolItem);
@@ -117,6 +118,7 @@ final class ToolPreviewRenderer {
         if (!previewOptions.isEmpty()) {
             return previewOptions;
         }
+        if (tool.advanced()) return List.of();
 
         // Action keys are predicates rather than item/tag IDs, so map them to their visible tool families.
         previewOptions = new ArrayList<>();

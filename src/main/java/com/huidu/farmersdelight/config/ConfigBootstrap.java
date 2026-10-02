@@ -163,7 +163,8 @@ public final class ConfigBootstrap {
 
     /** Validates only keys present in the operator file against the bundled value type. */
     public void validateConfigTypes() {
-        validateFile("config.yml", plugin.getConfig(), readBundledYaml("config.yml"), CONFIG_POLICY.registrySections());
+        validateFile("config.yml", plugin.getSourceConfig(), readBundledYaml("config.yml"),
+                PapersDelightConfigFormat.canonicalRegistrySections(CONFIG_POLICY.registrySections()));
         validateExternalTypes(WORLD_DATA_FILE, WORLD_DATA_REGISTRY_SECTIONS);
         validateExternalTypes(DROPS_FILE, DROPS_REGISTRY_SECTIONS);
         validateExternalTypes(DISPLAY_OVERRIDES_FILE, DISPLAY_OVERRIDES_REGISTRY_SECTIONS);
@@ -273,21 +274,52 @@ public final class ConfigBootstrap {
     }
 
     public void migrateConfigKeys() {
+        if (!PapersDelightConfigFormat.mayMigrate(plugin.getSourceConfig())) {
+            plugin.getLogger().warning("config.yml declares a newer config-version; leaving it untouched.");
+            return;
+        }
+        boolean foreign = PapersDelightConfigFormat.isForeignConfiguration(plugin.getSourceConfig());
+        int previousVersion = ConfigFileUpdater.deployedVersion(plugin.getSourceConfig());
+        if (foreign || previousVersion < PapersDelightConfigFormat.VERSION) {
+            backupQuietly(plugin.getDataFolder().toPath().resolve("config.yml"));
+        }
         boolean changed = migrateLegacyWorldData() | migrateLegacyEnchantmentGroups()
                 | migrateLegacyDisplayOverrides();
         List<ConfigKeyRename> migrated =
-                ConfigFileUpdater.applyMigrations(plugin.getConfig(), CONFIG_POLICY.migrations());
+                ConfigFileUpdater.applyMigrations(plugin.getSourceConfig(), CONFIG_POLICY.migrations());
         for (ConfigKeyRename rename : migrated) {
             I18n.logInfo("plugin.config_key_migrated", "old", rename.oldPath(), "new", rename.newPath());
             changed = true;
         }
         changed |= migrateLegacyDrops();
         changed |= removeRetiredConfigKeys();
+        changed |= PapersDelightConfigFormat.normalize(plugin.getSourceConfig());
+        if (foreign || previousVersion != PapersDelightConfigFormat.VERSION
+                || !PapersDelightConfigFormat.FORMAT.equals(plugin.getSourceConfig().getString(
+                        PapersDelightConfigFormat.FORMAT_KEY))) {
+            plugin.getSourceConfig().set(ConfigFileUpdater.CONFIG_VERSION_KEY, PapersDelightConfigFormat.VERSION);
+            plugin.getSourceConfig().set(PapersDelightConfigFormat.FORMAT_KEY, PapersDelightConfigFormat.FORMAT);
+            changed = true;
+        }
         int addedKeys = mergeMissingConfigKeys();
         if (changed || addedKeys > 0) {
-            ConfigFileUpdater.tidy(plugin.getConfig());
-            plugin.saveConfig();
+            if (!foreign && previousVersion >= PapersDelightConfigFormat.VERSION) {
+                backupQuietly(plugin.getDataFolder().toPath().resolve("config.yml"));
+            }
+            ConfigFileUpdater.tidy(plugin.getSourceConfig());
+            try {
+                ConfigFileUpdater.writeStringAtomically(plugin.getDataFolder().toPath().resolve("config.yml"),
+                        plugin.getSourceConfig().saveToString(), true);
+            } catch (IOException error) {
+                I18n.logWarning("plugin.config_merge_failed", "file", "config.yml", "error", error.getMessage());
+                plugin.invalidateConfigView();
+                return;
+            }
             plugin.reloadConfig();
+        }
+        plugin.invalidateConfigView();
+        for (String option : PapersDelightConfigFormat.unsupportedOptions(plugin.getSourceConfig())) {
+            I18n.logWarning("plugin.config_option_unsupported", "file", "config.yml", "path", option);
         }
         mergeMissingGuiKeys();
     }
@@ -337,7 +369,7 @@ public final class ConfigBootstrap {
     }
 
     private boolean migrateLegacyDrops() {
-        ConfigurationSection legacy = plugin.getConfig().getConfigurationSection("drops");
+        ConfigurationSection legacy = plugin.getSourceConfig().getConfigurationSection("drops");
         if (legacy == null) {
             return false;
         }
@@ -347,7 +379,7 @@ public final class ConfigBootstrap {
             backupQuietly(mainConfigPath);
             backupQuietly(dropsPath);
             copyLegacyDrops(legacy, dropsPath);
-            plugin.getConfig().set("drops", null);
+            plugin.getSourceConfig().set("drops", null);
             I18n.logInfo("plugin.config_key_migrated", "old", "drops", "new", DROPS_FILE);
             return true;
         } catch (Exception e) {
@@ -368,7 +400,7 @@ public final class ConfigBootstrap {
     }
 
     private boolean migrateLegacyWorldData() {
-        ConfigurationSection legacy = plugin.getConfig().getConfigurationSection("world-data");
+        ConfigurationSection legacy = plugin.getSourceConfig().getConfigurationSection("world-data");
         if (legacy == null) {
             return false;
         }
@@ -378,7 +410,7 @@ public final class ConfigBootstrap {
             backupQuietly(mainConfigPath);
             backupQuietly(worldDataPath);
             copyLegacyWorldData(legacy, worldDataPath);
-            plugin.getConfig().set("world-data", null);
+            plugin.getSourceConfig().set("world-data", null);
             I18n.logInfo("plugin.config_key_migrated", "old", "world-data", "new", WORLD_DATA_FILE);
             return true;
         } catch (Exception e) {
@@ -399,8 +431,8 @@ public final class ConfigBootstrap {
     // The two display tables used to live under cutting-board in config.yml; they move to their own file so the
     // settings there stay readable. An operator's entries are copied over, never regenerated.
     private boolean migrateLegacyDisplayOverrides() {
-        ConfigurationSection items = plugin.getConfig().getConfigurationSection("cutting-board.display-overrides");
-        ConfigurationSection tags = plugin.getConfig().getConfigurationSection("cutting-board.display-tag-overrides");
+        ConfigurationSection items = plugin.getSourceConfig().getConfigurationSection("cutting-board.display-overrides");
+        ConfigurationSection tags = plugin.getSourceConfig().getConfigurationSection("cutting-board.display-tag-overrides");
         if (items == null && tags == null) {
             return false;
         }
@@ -420,8 +452,8 @@ public final class ConfigBootstrap {
             }
             ConfigFileUpdater.tidy(overrides);
             ConfigFileUpdater.writeStringAtomically(overridesPath, overrides.saveToString(), true);
-            plugin.getConfig().set("cutting-board.display-overrides", null);
-            plugin.getConfig().set("cutting-board.display-tag-overrides", null);
+            plugin.getSourceConfig().set("cutting-board.display-overrides", null);
+            plugin.getSourceConfig().set("cutting-board.display-tag-overrides", null);
             I18n.logInfo("plugin.config_key_migrated", "old", "cutting-board.display-overrides",
                     "new", DISPLAY_OVERRIDES_FILE);
             return true;
@@ -439,16 +471,16 @@ public final class ConfigBootstrap {
 
     private boolean fanOutLegacyEnchantmentPath(String childPath) {
         String sourcePath = "enchantments." + childPath;
-        if (!plugin.getConfig().isSet(sourcePath)) {
+        if (!plugin.getSourceConfig().isSet(sourcePath)) {
             return false;
         }
         for (String group : List.of("knives", "skillet")) {
             String targetPath = "enchantments.groups." + group + "." + childPath;
-            if (ConfigFileUpdater.copyPathIfMissing(plugin.getConfig(), sourcePath, targetPath)) {
+            if (ConfigFileUpdater.copyPathIfMissing(plugin.getSourceConfig(), sourcePath, targetPath)) {
                 I18n.logInfo("plugin.config_key_migrated", "old", sourcePath, "new", targetPath);
             }
         }
-        plugin.getConfig().set(sourcePath, null);
+        plugin.getSourceConfig().set(sourcePath, null);
         return true;
     }
 
@@ -458,8 +490,8 @@ public final class ConfigBootstrap {
             return 0;
         }
         try {
-            int added = ConfigFileUpdater.copyMissingKeys(bundled, plugin.getConfig(),
-                    CONFIG_POLICY.registrySections());
+            int added = ConfigFileUpdater.copyMissingKeys(bundled, plugin.getSourceConfig(),
+                    PapersDelightConfigFormat.canonicalRegistrySections(CONFIG_POLICY.registrySections()));
             if (added > 0) {
                 backupQuietly(plugin.getDataFolder().toPath().resolve("config.yml"));
                 I18n.logInfo("plugin.config_keys_added", "file", "config.yml", "count", added);
@@ -633,7 +665,7 @@ public final class ConfigBootstrap {
     }
 
     private boolean removeRetiredConfigKeys() {
-        List<String> removed = ConfigFileUpdater.removeKeys(plugin.getConfig(), CONFIG_POLICY.retiredKeys());
+        List<String> removed = ConfigFileUpdater.removeKeys(plugin.getSourceConfig(), CONFIG_POLICY.retiredKeys());
         if (removed.isEmpty()) {
             return false;
         }

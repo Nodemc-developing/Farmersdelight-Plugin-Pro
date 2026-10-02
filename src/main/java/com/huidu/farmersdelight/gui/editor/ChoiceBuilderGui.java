@@ -43,11 +43,11 @@ public final class ChoiceBuilderGui extends AbstractInventoryGui implements Edit
                     return new IngredientEntry(ingredient, stack);
                 }
             }
-            if (ingredient instanceof RecipeIngredient.Tag tag) {
+            if (ingredient instanceof RecipeIngredient.Tag || ingredient instanceof RecipeIngredient.AdvancedTag || ingredient instanceof RecipeIngredient.Choice) {
                 ItemStack display = new ItemStack(Material.NAME_TAG);
                 var meta = display.getItemMeta();
                 if (meta != null) {
-                    meta.displayName(Component.text(RecipeSerializer.serializeIngredient(tag)));
+                    meta.displayName(Component.text(RecipeSerializer.serializeIngredient(ingredient)));
                     display.setItemMeta(meta);
                 }
                 return new IngredientEntry(ingredient, display);
@@ -74,7 +74,7 @@ public final class ChoiceBuilderGui extends AbstractInventoryGui implements Edit
         List<RecipeIngredient> sources = new ArrayList<>();
         if (current instanceof RecipeIngredient.Choice choice) {
             sources.addAll(choice.options());
-        } else if (current instanceof RecipeIngredient.Item || current instanceof RecipeIngredient.Tag) {
+        } else if (current instanceof RecipeIngredient.Item || current instanceof RecipeIngredient.Tag || current instanceof RecipeIngredient.AdvancedTag) {
             sources.add(current);
         }
         for (int i = 0; i < options.length && i < sources.size(); i++) {

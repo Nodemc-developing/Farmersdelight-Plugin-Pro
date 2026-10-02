@@ -51,6 +51,8 @@ public final class CuttingBoardEditorGui extends AbstractInventoryGui implements
     private final double[] resultChances;
     private int priority = 0;
     private String sound = Constants.SOUND_CUTTING_BOARD_KNIFE;
+    private Float soundVolume;
+    private Float soundPitch;
     private int selectedResult = -1;
 
     public CuttingBoardEditorGui(FarmersDelightPlugin plugin, Player player, String recipeId,
@@ -98,6 +100,8 @@ public final class CuttingBoardEditorGui extends AbstractInventoryGui implements
                     .color(NamedTextColor.YELLOW));
         }
         this.priority = recipe.getPriority();
+        this.soundVolume = recipe.getSoundVolume();
+        this.soundPitch = recipe.getSoundPitch();
         if (recipe.getSound() != null && !recipe.getSound().isBlank()) {
             this.sound = recipe.getSound();
         }
@@ -367,7 +371,7 @@ public final class CuttingBoardEditorGui extends AbstractInventoryGui implements
             toolList.add(new CuttingBoardRecipe.ToolRequirement(Key.of(Constants.TAG_KNIVES), true));
         }
 
-        CuttingBoardRecipe recipe = new CuttingBoardRecipe(recipeId, input, null, toolList, results, sound, priority);
+        CuttingBoardRecipe recipe = new CuttingBoardRecipe(recipeId, input, null, toolList, results, sound, priority, soundVolume, soundPitch);
         saving = true;
         finishEdit(RecipeEditorView.store().saveCuttingBoardRecipeAsync(recipe), false);
     }
@@ -619,6 +623,9 @@ public final class CuttingBoardEditorGui extends AbstractInventoryGui implements
         if (ingredient instanceof RecipeIngredient.Tag tag) {
             return named(new ItemStack(Material.NAME_TAG), RecipeSerializer.serializeIngredient(tag));
         }
+        if (ingredient instanceof RecipeIngredient.AdvancedTag advanced) {
+            return named(new ItemStack(Material.NAME_TAG), RecipeSerializer.serializeIngredient(advanced));
+        }
         if (ingredient instanceof RecipeIngredient.Choice) {
             return named(new ItemStack(Material.CHEST), RecipeSerializer.serializeIngredient(ingredient));
         }
@@ -626,7 +633,7 @@ public final class CuttingBoardEditorGui extends AbstractInventoryGui implements
     }
 
     private ItemStack displayForTool(CuttingBoardRecipe.ToolRequirement tool) {
-        if (!tool.isTag()) {
+        if (!tool.isTag() && !tool.advanced()) {
             ItemStack stack = ItemUtils.createItem(tool.getKey().toString());
             if (stack != null && !stack.getType().isAir()) {
                 return stack;

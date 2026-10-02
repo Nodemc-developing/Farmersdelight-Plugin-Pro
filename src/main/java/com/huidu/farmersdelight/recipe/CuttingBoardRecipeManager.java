@@ -42,13 +42,14 @@ public class CuttingBoardRecipeManager {
     record Snapshot(Map<String, CuttingBoardRecipe> recipes, int packRecipeCount,
                     List<CuttingBoardRecipe> sortedRecipes, Map<String, Set<String>> byInputItemId,
                     Set<String> tagInputRecipeIds, Map<String, List<CuttingBoardRecipe>> resultToRecipes,
-                    List<CuttingBoardRecipe.ToolRequirement> toolRequirements) {
+                    List<CuttingBoardRecipe.ToolRequirement> toolRequirements, Map<String, RecipeSource> sources) {
         static Snapshot empty() {
-            return new Snapshot(Map.of(), 0, List.of(), Map.of(), Set.of(), Map.of(), List.of());
+            return new Snapshot(Map.of(), 0, List.of(), Map.of(), Set.of(), Map.of(), List.of(), Map.of());
         }
     }
 
     public record ParseMetrics(int parsed, int reused) { }
+    public RecipeSource sourceOf(String id) { return snapshot.sources().get(id); }
     public ParseMetrics parseMetrics() {
         RecipeParseCache<CuttingBoardRecipe> current = parsedRecipes;
         return current == null ? new ParseMetrics(0, 0) : new ParseMetrics(current.parsed(), current.reused());
@@ -83,15 +84,19 @@ public class CuttingBoardRecipeManager {
         Map<String, CuttingBoardRecipe> newRecipes = new LinkedHashMap<>();
         // Ids whose winning definition came from a CraftEngine pack section; see getPackRecipeCount().
         Set<String> packIds = new HashSet<>();
+        Map<String, RecipeSource> sources = new LinkedHashMap<>();
         Set<String> overriddenExternalIds = externalOverrideIds(mainConfig, "cutting_board");
         RecipeFileLoader.loadRecipeSections(plugin,
                 mainConfig, "cutting_board_recipes", "cutting board", "recipes/cutting_board_recipes.yml",
-                (recipeId, section) -> newRecipes.put(recipeId, parsing.parse("file", recipeId, section, () -> parseRecipe(recipeId, section))));
+                (recipeId, section) -> {
+                    newRecipes.put(recipeId, parsing.parse("file", recipeId, section, () -> parseRecipe(recipeId, section)));
+                    sources.put(recipeId, RecipePackFiles.source(plugin, RecipePackFiles.BOARD_FILE, recipeId, null, mainConfig));
+                });
 
         // Recipes a CraftEngine pack declares under cutting_recipes. Loaded after the plugin's own file so a
         // pack can never silently replace a built-in recipe, and before the API merge below so an explicit
         // runtime registration still wins on an id clash. CraftEngine read the files; see PackSections.
-        for (PackSections.Section packSection : plugin.packSectionsOf(PackSection.CUTTING_BOARD)) {
+        for (PackSections.Section packSection : RecipePackFiles.sections(plugin, PackSection.CUTTING_BOARD)) {
             RecipeFileLoader.loadRecipeSections(plugin, packSection.yaml(), PackSection.CUTTING_BOARD.rootKey(),
                     "cutting board [" + packSection.source() + "]",
                     packSection.source(),
@@ -101,6 +106,8 @@ public class CuttingBoardRecipeManager {
                             return;
                         }
                         newRecipes.put(recipeId, parsing.parse(packSection.source(), recipeId, section, () -> parseRecipe(recipeId, section)));
+                        if (packSection.file() != null) sources.put(recipeId, new RecipeSource(packSection.file(),
+                                List.of(packSection.sectionKey(), recipeId), packSection.sectionKey().split("#", 2)[0].equals("papersdelight_recipes"), true));
                         packIds.add(recipeId);
                     });
         }
@@ -110,6 +117,7 @@ public class CuttingBoardRecipeManager {
             if (!overriddenExternalIds.contains(recipe.getId()) || !newRecipes.containsKey(recipe.getId())
                     || AddonRecipeFiles.ownerOf("cutting_board", recipe.getId()) != null) {
                 newRecipes.put(recipe.getId(), recipe);
+                sources.remove(recipe.getId());
                 packIds.remove(recipe.getId());
             }
         }
@@ -131,7 +139,7 @@ public class CuttingBoardRecipeManager {
             if (ingredient instanceof RecipeIngredient.Item itemIngredient) {
                 String key = itemIngredient.key().toString().toLowerCase(Locale.ROOT);
                 newByItemId.computeIfAbsent(key, k -> new HashSet<>()).add(recipe.getId());
-            } else if (ingredient instanceof RecipeIngredient.Tag) {
+            } else if (ingredient instanceof RecipeIngredient.Tag || ingredient instanceof RecipeIngredient.AdvancedTag) {
                 // Tag-typed: can't index by tag because vanilla tags aren't surfaced via getItemTagIds.
                 // Keep them all in tagInputRecipeIds so candidate set always includes them.
                 newTagInputRecipeIds.add(recipe.getId());
@@ -154,7 +162,7 @@ public class CuttingBoardRecipeManager {
         for (CuttingBoardRecipe recipe : newSorted) uniqueTools.addAll(recipe.getTools());
         Snapshot next = new Snapshot(RecipeCollections.freezeMap(newRecipes), packIds.size(), List.copyOf(newSorted),
                 RecipeCollections.freezeSets(frozenByItemId), Set.copyOf(newTagInputRecipeIds),
-                RecipeCollections.freezeLists(buildResultIndex(newSorted)), List.copyOf(uniqueTools));
+                RecipeCollections.freezeLists(buildResultIndex(newSorted)), List.copyOf(uniqueTools), Map.copyOf(sources));
         lastFileDocument = mainConfig;
         parsedRecipes = parsing;
         snapshot = next;
@@ -168,6 +176,8 @@ public class CuttingBoardRecipeManager {
     }
 
     private CuttingBoardRecipe parseRecipe(String id, ConfigurationSection section) {
+        section = RecipeSchemaAdapter.normalizeBoard(section,
+                plugin.getConfigStringList("cutting_board.default_tools", "cutting-board.default-tools"));
         Object rawInput = section.get("input");
         if (rawInput == null) {
             throw new IllegalArgumentException("Recipe must have an input");
@@ -176,6 +186,7 @@ public class CuttingBoardRecipeManager {
             rawInput = sectionToMap(nested);
         }
         RecipeIngredient input = RecipeParsingSupport.parseIngredientValue(rawInput);
+        AdvancedRecipeTags.requireDefined(input);
         ItemStack inputDisplay = createDisplayItem(input);
         if (inputDisplay == null) {
             throw new IllegalArgumentException("Input item or tag has no loaded items: " + rawInput);
@@ -278,7 +289,9 @@ public class CuttingBoardRecipeManager {
 
         String sound = normalizeSound(ConfigSectionReader.optionalString(section, "sound", Constants.SOUND_CUTTING_BOARD_KNIFE));
         int priority = ConfigSectionReader.optionalInt(section, "priority", 0);
-        return new CuttingBoardRecipe(id, input, inputDisplay, tools, results, sound, priority);
+        Float volume = section.isSet("sound-volume") ? (float) ConfigSectionReader.optionalDouble(section, "sound-volume", 1.0) : null;
+        Float pitch = section.isSet("sound-pitch") ? (float) ConfigSectionReader.optionalDouble(section, "sound-pitch", 1.0) : null;
+        return new CuttingBoardRecipe(id, input, inputDisplay, tools, results, sound, priority, volume, pitch);
     }
 
     private String normalizeSound(String soundStr) {
@@ -298,6 +311,9 @@ public class CuttingBoardRecipeManager {
     }
 
     static CuttingBoardRecipe.ToolRequirement parseTool(String str) {
+        if (str != null && str.trim().startsWith("advtag:")) {
+            return new CuttingBoardRecipe.ToolRequirement(Key.of(str.trim().substring("advtag:".length())), false, Set.of(), Set.of(), true);
+        }
         RecipeParsingSupport.ParsedKey parsed = RecipeParsingSupport.parseKeyWithExclusions(str, "tool");
         String key = parsed.key().toString();
         boolean tag = parsed.tag()
@@ -310,6 +326,10 @@ public class CuttingBoardRecipeManager {
     }
 
     private ItemStack createDisplayItem(RecipeIngredient ingredient) {
+        if (ingredient instanceof RecipeIngredient.AdvancedTag) {
+            List<ItemStack> displays = com.huidu.farmersdelight.gui.RecipeIngredientIcons.resolveIngredientOptions(ingredient);
+            return displays.isEmpty() ? null : displays.getFirst();
+        }
         if (ingredient instanceof RecipeIngredient.Item itemIngredient) {
             return itemIngredient.createStack();
         }
@@ -354,6 +374,7 @@ public class CuttingBoardRecipeManager {
     }
 
     private boolean toolHasMembers(CuttingBoardRecipe.ToolRequirement requirement) {
+        if (requirement.advanced()) { AdvancedRecipeTags.requireDefined(requirement.asIngredient()); return true; }
         // These are Farmersdelight-Plugin-Pro action selectors, not registry items. They are resolved by
         // ToolContext/matchesToolFallback at click time (axe strip/dig, pickaxe dig, shovel dig).
         if (!requirement.isTag() && isVirtualToolAction(requirement.key())) {
@@ -543,6 +564,7 @@ public class CuttingBoardRecipeManager {
     // Public ingredient check so API cross-reference / addons can test an item against a recipe input
     // without re-implementing item/tag/choice matching.
     public boolean matchesIngredient(ItemStack input, RecipeIngredient ingredient) {
+        if (ingredient instanceof RecipeIngredient.AdvancedTag tag) return AdvancedRecipeTags.matches(input, tag.key());
         if (input == null || input.getType().isAir() || ingredient == null) {
             return false;
         }
@@ -580,6 +602,7 @@ public class CuttingBoardRecipeManager {
     }
 
     private boolean matchesToolRequirement(CuttingBoardRecipe.ToolRequirement toolRequirement, ToolContext toolContext) {
+        if (toolRequirement.advanced()) return AdvancedRecipeTags.matches(toolContext.tool(), toolRequirement.key());
         if (!toolContext.hasTool()) {
             return false;
         }
@@ -691,7 +714,8 @@ public class CuttingBoardRecipeManager {
     }
 
     private static Set<String> externalOverrideIds(YamlConfiguration config, String station) {
-        return Set.copyOf(config.getStringList("external-overrides." + station));
+        ConfigurationSection overrides = config.getConfigurationSection("external-overrides");
+        return overrides == null ? Set.of() : Set.copyOf(overrides.getStringList(station));
     }
 
     public CuttingBoardRecipe getRecipe(String id) {

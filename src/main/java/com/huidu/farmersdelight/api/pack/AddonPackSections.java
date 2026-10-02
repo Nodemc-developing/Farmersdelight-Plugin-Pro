@@ -53,7 +53,14 @@ import java.util.Map;
 public final class AddonPackSections extends AbstractConfigParser {
 
     /** One section handed over by CraftEngine, bridged to the configuration shape Bukkit readers expect. */
-    public record Section(String sectionId, String source, String namespace, YamlConfiguration config) {
+    public record Section(String sectionId, String source, String namespace, YamlConfiguration config,
+                          Path file, String sectionKey, boolean generated) {
+        public Section(String sectionId, String source, String namespace, YamlConfiguration config) {
+            this(sectionId, source, namespace, config, null, sectionId, false);
+        }
+        public Section(String sectionId, String source, String namespace, YamlConfiguration config, Path file, String sectionKey) {
+            this(sectionId, source, namespace, config, file, sectionKey, false);
+        }
     }
 
     /**
@@ -236,10 +243,12 @@ public final class AddonPackSections extends AbstractConfigParser {
                 continue;
             }
             YamlConfiguration yaml = new YamlConfiguration();
+            if (this.type.namespace().equals("farmersdelight")) yaml.options().pathSeparator('\u0001');
             yaml.createSection(root, config.values());
             String namespace = packNamespace(cached.pack(), hash == -1 ? null : sectionKey.substring(hash + 1));
             built.computeIfAbsent(id, key -> new ArrayList<>(2))
-                    .add(new Section(id, describe(cached.pack(), cached.path()), namespace, yaml));
+                    .add(new Section(id, describe(cached.pack(), cached.path()), namespace, yaml,
+                            cached.path().toAbsolutePath().normalize(), sectionKey, cached.hasArguments()));
         }
 
         // Publish a whole map at once: readers run on tick threads while CraftEngine may load packs on its

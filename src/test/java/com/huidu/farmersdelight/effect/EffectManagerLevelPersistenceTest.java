@@ -16,6 +16,32 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class EffectManagerLevelPersistenceTest {
 
     @Test
+    void disabledEffectCannotApplyRestoreOrReappearWhenEnabledAgain() {
+        PersistentDataContainer pdc = persistentDataContainer();
+        Player player = player(UUID.randomUUID(), pdc);
+        var config = new org.bukkit.configuration.file.YamlConfiguration();
+        try {
+            EffectManager.configure(null);
+            EffectManager.applyComfort(player, 30, 3);
+            EffectManager.saveComfortToPdc(player);
+            config.set("buff.comfort.enabled", false);
+            EffectManager.configure(config);
+            assertEquals(0, EffectManager.comfortLevel(player));
+            EffectManager.applyComfort(player, 50, 4);
+            assertEquals(0, EffectManager.comfortLevel(player));
+            org.junit.jupiter.api.Assertions.assertFalse(EffectManager.restoreComfortFromPdc(player));
+            assertTrue(pdc.getKeys().isEmpty());
+            EffectManager.configure(null);
+            assertEquals(0, EffectManager.comfortLevel(player));
+            EffectManager.applyComfort(player, 30, 2);
+            assertEquals(2, EffectManager.comfortLevel(player));
+        } finally {
+            EffectManager.configure(null);
+            EffectManager.removeComfort(player);
+        }
+    }
+
+    @Test
     void comfortLevelSurvivesPdcRoundTrip() {
         PersistentDataContainer pdc = persistentDataContainer();
         Player player = player(UUID.randomUUID(), pdc);

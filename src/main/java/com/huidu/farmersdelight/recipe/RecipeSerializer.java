@@ -23,6 +23,9 @@ public final class RecipeSerializer {
         if (ingredient instanceof RecipeIngredient.Tag tag) {
             return serializeTag(tag.key(), tag.excludedItems(), tag.excludedTags());
         }
+        if (ingredient instanceof RecipeIngredient.AdvancedTag tag) {
+            return "advtag:" + tag.key();
+        }
         if (ingredient instanceof RecipeIngredient.Choice choice) {
             StringBuilder builder = new StringBuilder();
             List<RecipeIngredient> options = choice.options();
@@ -61,6 +64,7 @@ public final class RecipeSerializer {
     }
 
     public static String serializeTool(CuttingBoardRecipe.ToolRequirement tool) {
+        if (tool.advanced()) return "advtag:" + tool.getKey();
         String base = tool.isTag() ? "#" + tool.getKey() : tool.getKey().toString();
         return serializeKeyWithExclusions(base, tool.getExcludedItems(), tool.getExcludedTags());
     }

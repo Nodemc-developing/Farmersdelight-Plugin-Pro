@@ -118,12 +118,9 @@ public class StoveCookingBlockBehavior extends FarmersDelightBlockBehavior imple
         public StoveCookingBlockBehavior create(BlockDefinition block, ConfigSection section) {
             Map<String, Object> arguments = section != null ? section.values() : Map.of();
             String path = section != null ? section.path() : Constants.BEHAVIOR_STOVE;
-            // The lit state is required, not optional, and the property name is fixed to 'fire' the same way
-            // craftengine:crop_block requires 'age': every ignite/extinguish interaction below writes this
-            // property, and a block that declares the behavior without a boolean 'fire' property would load as
-            // a stove that can never be lit or put out. getProperty aborts the block's own load here, naming
-            // the config node and the property, instead of failing later at the first right-click.
-            Property<Boolean> fireProperty = BlockBehaviorFactory.getProperty(path, block, FIRE_PROPERTY, Boolean.class);
+            // Keep a typed property handle for this definition so state writes follow its configured name.
+            String firePropertyName = BehaviorArgParser.getString(arguments, "property", FIRE_PROPERTY);
+            Property<Boolean> fireProperty = BlockBehaviorFactory.getProperty(path, block, firePropertyName, Boolean.class);
             String crackleSound = BehaviorArgParser.getArgumentString(arguments, "crackle-sound", Constants.SOUND_STOVE_CRACKLE);
             // Grouped options read either as "burn: {enabled, damage}" or as the legacy flat "burn-enabled" /
             // "burn-damage" (same for ignite/extinguish and the handle-toggle-sound options elsewhere).

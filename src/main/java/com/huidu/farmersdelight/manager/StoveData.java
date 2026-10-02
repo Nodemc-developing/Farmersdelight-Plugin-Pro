@@ -30,6 +30,7 @@ public final class StoveData {
     // ticks, so progress has to be credited by elapsed time rather than once per tick-loop visit (the loop
     // only revisits a stove every STOVE_TICK_INTERVAL ticks). MIN_VALUE marks "never credited".
     volatile long lastCookingCreditTick = Long.MIN_VALUE;
+    final EffectCadence effectCadence = new EffectCadence();
 
     StoveData(Location location, int defaultCookTime) {
         this.location = location;

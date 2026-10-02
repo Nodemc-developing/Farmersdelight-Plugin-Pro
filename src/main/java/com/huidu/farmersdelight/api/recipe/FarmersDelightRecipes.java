@@ -210,6 +210,9 @@ public final class FarmersDelightRecipes {
         if (ingredient instanceof RecipeIngredient.Tag tag) {
             return "#" + tag.key();
         }
+        if (ingredient instanceof RecipeIngredient.AdvancedTag tag) {
+            return "advtag:" + tag.key();
+        }
         if (ingredient instanceof RecipeIngredient.Choice choice) {
             List<String> parts = new ArrayList<>();
             for (RecipeIngredient option : choice.options()) {

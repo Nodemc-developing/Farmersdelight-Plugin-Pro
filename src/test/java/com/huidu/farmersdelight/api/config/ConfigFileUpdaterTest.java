@@ -12,6 +12,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ConfigFileUpdaterTest {
 
     @Test
+    void newerGenerationIsRejectedBeforeAnyInMemoryMutation() {
+        YamlConfiguration bundled = new YamlConfiguration();
+        bundled.set("config-version", 3);
+        bundled.set("added", true);
+        YamlConfiguration existing = new YamlConfiguration();
+        existing.set("config-version", 4);
+        existing.set("old-key", "retained");
+        existing.set("retired-key", 12);
+        String before = existing.saveToString();
+        ConfigUpdateReport report = ConfigFileUpdater.applyTo(bundled, existing,
+                ConfigUpdatePolicy.builder().migrate("old-key", "new-key").retire("retired-key").build());
+        assertTrue(report.downgraded());
+        assertEquals(before, existing.saveToString());
+        assertTrue(report.migratedKeys().isEmpty());
+        assertTrue(report.retiredKeys().isEmpty());
+        assertEquals(0, report.addedKeys());
+    }
+
+    @Test
     void copiesOneLegacySectionToMultipleMissingTargetsWithoutRemovingTheSource() {
         YamlConfiguration config = new YamlConfiguration();
         config.set("enchantments.table.enabled", false);

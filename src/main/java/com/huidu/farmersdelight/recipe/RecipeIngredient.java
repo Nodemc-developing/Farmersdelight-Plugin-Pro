@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public sealed interface RecipeIngredient permits RecipeIngredient.Item, RecipeIngredient.Tag, RecipeIngredient.Choice {
+public sealed interface RecipeIngredient permits RecipeIngredient.Item, RecipeIngredient.Tag, RecipeIngredient.AdvancedTag, RecipeIngredient.Choice {
 
     /**
      * A key that is equal for two ingredients matching exactly the same stacks, used to memoize matching
@@ -22,6 +22,7 @@ public sealed interface RecipeIngredient permits RecipeIngredient.Item, RecipeIn
             case Tag tag -> "tag:" + tag.key()
                     + "|" + sortedKeys(tag.excludedItems())
                     + "|" + sortedKeys(tag.excludedTags());
+            case AdvancedTag tag -> "advtag:" + tag.key();
             case Choice choice -> "choice:" + choice.options().stream()
                     .map(RecipeIngredient::stableKey)
                     .sorted()
@@ -69,6 +70,13 @@ public sealed interface RecipeIngredient permits RecipeIngredient.Item, RecipeIn
 
         public boolean hasExclusions() {
             return !excludedItems.isEmpty() || !excludedTags.isEmpty();
+        }
+    }
+
+    /** A named group resolved by the advanced registry, independently of vanilla and CE tags. */
+    record AdvancedTag(Key key) implements RecipeIngredient {
+        public AdvancedTag {
+            java.util.Objects.requireNonNull(key, "Advanced ingredient tag cannot be null");
         }
     }
 

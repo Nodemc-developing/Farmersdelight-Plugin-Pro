@@ -99,6 +99,20 @@ public class PetFoodConfig {
                 continue;
             }
 
+            if ((foodId.equals("dog_food") || foodId.equals("horse_feed")) && foodSection.isList("items")) {
+                PetFoodDefinition template = petFoods.get("farmersdelight:" + foodId);
+                if (template == null) {
+                    I18n.logWarning("plugin.config_value_invalid", "file", "config.yml",
+                            "path", "pet_food." + foodId + ".items",
+                            "error", "the corresponding CraftEngine pet-food definition is missing");
+                    continue;
+                }
+                for (String alias : foodSection.getStringList("items")) {
+                    if (!alias.isBlank()) petFoods.put(alias, template);
+                }
+                continue;
+            }
+
             PetFoodDefinition definition = parseFoodDefinition(foodSection);
             if (definition != null) {
                 petFoods.put(foodId, definition);

@@ -83,8 +83,8 @@ public class RecipeViewGui extends AbstractInventoryGui {
     volatile int currentToolPreviewIndex = 0;
     // Auto-cycle drivers for the detail slots that rotate through candidates (cutting-board tool preview,
     // special-recipe catalyst items). The shared CyclicSlot keeps the per-tick advancing in one place.
-    private final CyclicSlot toolCycle = new CyclicSlot(INGREDIENT_SWITCH_CALLBACKS);
-    private final CyclicSlot catalystCycle = new CyclicSlot(INGREDIENT_SWITCH_CALLBACKS);
+    private final CyclicSlot toolCycle;
+    private final CyclicSlot catalystCycle;
     private final SpecialRecipeRenderer specialRecipeRenderer;
     // session instead of on every click on an ingredient.
     final RecipeIngredientDisplay ingredientDisplay;
@@ -96,9 +96,8 @@ public class RecipeViewGui extends AbstractInventoryGui {
     private int expandedIngredientPage;
     private DetailState ingredientOptionsOrigin;
     final RecipeDetailRenderer detailRenderer = new RecipeDetailRenderer(this);
-    // Ingredient/tool preview rotation: this many GUI tick callbacks, and each callback is
-    // GuiTickManager.TICK_INTERVAL (4) game ticks, so the preview switches every 80 ticks (4s).
-    static final int INGREDIENT_SWITCH_CALLBACKS = 20;
+    // Cached per menu session; configuration uses game ticks while GUI callbacks run every four ticks.
+    final int ingredientSwitchCallbacks;
     
     private final boolean fromCookingPot;
     private final Location cookingPotLocation;
@@ -140,6 +139,9 @@ public class RecipeViewGui extends AbstractInventoryGui {
 
     public RecipeViewGui(FarmersDelightPlugin plugin, Player player, boolean fromCookingPot, Location cookingPotLocation) {
         super(plugin, player);
+        this.ingredientSwitchCallbacks = plugin.getRecipePreviewCallbacks();
+        this.toolCycle = new CyclicSlot(ingredientSwitchCallbacks);
+        this.catalystCycle = new CyclicSlot(ingredientSwitchCallbacks);
         this.fromCookingPot = fromCookingPot;
         this.cookingPotLocation = cookingPotLocation;
         this.config = getOrCreateConfig();

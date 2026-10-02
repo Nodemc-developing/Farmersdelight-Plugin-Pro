@@ -14,6 +14,8 @@ Farmersdelight-Plugin-Pro 是基于 CraftEngine 的 Farmer's Delight Paper/Folia
 
 1.0.5 使用 bStats 3.2.1，统计 ID 为 **34448**，登记名为 **FarmersDelightPro**。标准服务器与插件统计使用 bStats 的异步发送和 Folia 适配。服主可在 `plugins/bStats/config.yml` 设置 `enabled: false`，重启后全局关闭统计；插件停用时会停止统计任务。
 
+1.1.0 采用 PapersDelight 风格的配置和配方，并从 CraftEngine 内容包加载。升级前备份旧文件，编辑器保存到配方的原始节点。支持烹饪、切割、信息卡、嵌套高级食材标签，以及接入 FluidCore 的灌装、排空和浸泡；流体分类可在配方菜单中浏览和编辑，物品与流体在所属线程内使用原子事务处理。字段支持范围、依赖和内容包差异详见[格式兼容与迁移指南](PAPERSDELIGHT-COMPAT.zh-CN.md)。
+
 ## 项目内容
 
 - CraftEngine 物品、方块、模型、资源包和战利品整合。

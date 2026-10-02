@@ -162,6 +162,8 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
     private KnifeDropHandler knifeDropHandler;
     private CookingPotRecipeManager cookingPotRecipeManager;
     private CuttingBoardRecipeManager cuttingBoardRecipeManager;
+    private com.huidu.farmersdelight.fluid.FluidRecipeManager fluidRecipeManager;
+    private com.huidu.farmersdelight.fluid.FluidRecipeListener fluidRecipeListener;
     private final com.huidu.farmersdelight.recipe.RecipeReloadCoordinator recipeReloadCoordinator =
             new com.huidu.farmersdelight.recipe.RecipeReloadCoordinator(this);
     private SpecialRecipeRegistry specialRecipeRegistry;
@@ -235,6 +237,10 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
         if (incremental) cuttingBoardRecipeManager.loadRecipesIncrementally();
         else cuttingBoardRecipeManager.loadRecipes();
         long boardNanos = System.nanoTime() - boardStart;
+        if (fluidRecipeManager != null) {
+            fluidRecipeManager.reload();
+            if (fluidRecipeListener != null) fluidRecipeListener.cancelPending();
+        }
         // Recipe set changed: drop the discovery obtain-trigger index so it rebuilds against the new recipes.
         if (recipeDiscoveryManager != null) {
             recipeDiscoveryManager.invalidateIndex();
@@ -360,6 +366,11 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
         // ensureConfigDefaults has just guaranteed config.yml exists, so the debug switch is readable this
         // early and the load-phase detail lines below can be surfaced by their category like the rest.
         loadDebugFlags();
+        try {
+            com.huidu.farmersdelight.recipe.RecipePackFiles.installAndMigrate(this);
+        } catch (Exception failure) {
+            throw new IllegalStateException("Could not migrate recipes to the CraftEngine content pack", failure);
+        }
         packSections = loadPhaseRegistrar.register();
     }
 
@@ -421,6 +432,11 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
         cookingPotRecipeManager = new CookingPotRecipeManager(this);
 
         cuttingBoardRecipeManager = new CuttingBoardRecipeManager(this);
+
+        fluidRecipeManager = new com.huidu.farmersdelight.fluid.FluidRecipeManager(this);
+        fluidRecipeListener = new com.huidu.farmersdelight.fluid.FluidRecipeListener(this, fluidRecipeManager);
+        getServer().getPluginManager().registerEvents(fluidRecipeListener, this);
+        com.huidu.farmersdelight.fluid.FluidRecipeTypes.register(fluidRecipeManager);
 
         craftEngineReadinessCoordinator.loadRecipesWhenReady("plugin.loading_recipes");
 
@@ -542,6 +558,9 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
         // Order inside ListenerRegistry#stop: event delivery is detached before any listener state is torn
         // down, then the listeners' own tasks stop, then the world/chunk handlers detach.
         runDisableStep("plugin.disable_step_unregister_listeners", listeners::stop);
+        if (fluidRecipeListener != null) fluidRecipeListener.close();
+        if (fluidRecipeManager != null) com.huidu.farmersdelight.fluid.FluidRecipeTypes.unregister();
+        if (fluidRecipeManager != null) fluidRecipeManager.close();
 
         runDisableStep("plugin.disable_step_shutdown_metrics", () -> {
             Metrics current = metrics;
@@ -875,6 +894,7 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
     }
 
     void refreshAfterCraftEngineReload() {
+        com.huidu.farmersdelight.recipe.RecipePackFiles.invalidatePreparedSections();
         ReloadCacheInvalidator.clear();
         if (specialRecipeRegistry != null) {
             specialRecipeRegistry.invalidateIndex();
@@ -907,14 +927,60 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
 
     @Override
     public FileConfiguration getConfig() {
+        FileConfiguration source = getSourceConfig();
+        FileConfiguration view = runtimeConfigView;
+        if (view == null || runtimeConfigSource != source) {
+            synchronized (this) {
+                source = getSourceConfig();
+                if (runtimeConfigView == null || runtimeConfigSource != source) {
+                    runtimeConfigView = com.huidu.farmersdelight.config.PapersDelightConfigFormat.runtimeView(source);
+                    runtimeConfigSource = source;
+                }
+                view = runtimeConfigView;
+            }
+        }
+        return view;
+    }
+
+    private volatile FileConfiguration runtimeConfigSource;
+    private volatile FileConfiguration runtimeConfigView;
+
+    /** The canonical document used for migrations and persistence, without runtime compatibility aliases. */
+    public FileConfiguration getSourceConfig() {
         FileConfiguration prepared = preparedMainConfig;
         return prepared == null ? super.getConfig() : prepared;
+    }
+
+    public void invalidateConfigView() {
+        runtimeConfigSource = null;
+        runtimeConfigView = null;
+    }
+
+    public boolean isCookingPotRecipeBookEnabled() {
+        StationSettings settings = stationSettings;
+        return settings == null || settings.cookingPotRecipeBookEnabled();
+    }
+
+    public int getRecipePreviewCallbacks() {
+        StationSettings settings = stationSettings;
+        return settings == null ? 20 : settings.recipePreviewCallbacks();
+    }
+
+    @Override
+    public void saveConfig() {
+        try {
+            com.huidu.farmersdelight.api.config.ConfigFileUpdater.writeStringAtomically(
+                    getDataFolder().toPath().resolve("config.yml"), getSourceConfig().saveToString(), true);
+        } catch (java.io.IOException error) {
+            getLogger().log(Level.SEVERE, "Could not save config.yml", error);
+        }
     }
 
     @Override
     public void reloadConfig() {
         super.reloadConfig();
         preparedMainConfig = null;
+        invalidateConfigView();
         configurationGeneration.incrementAndGet();
     }
 
@@ -923,6 +989,7 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
         CompletableFuture<Void> result = new CompletableFuture<>();
         long generation = configurationGeneration.get();
         boolean mergeRecipeDefaults = getConfigBoolean(false, "recipes.merge-missing-bundled");
+        List<Path> recipePackRoots = com.huidu.farmersdelight.recipe.RecipePackFiles.configurationRoots(this);
         boolean prepareRecipes = target == ReloadTarget.ALL || target == ReloadTarget.RECIPES;
         Path directory = getDataFolder().toPath();
         List<String> files = switch (target) {
@@ -934,10 +1001,12 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
             try {
                 PreparedYamlFiles prepared = files.isEmpty() ? null : PreparedYamlFiles.read(directory, files);
                 boolean merge = prepared != null && prepared.document(directory.resolve("config.yml")) != null
-                        ? prepared.document(directory.resolve("config.yml")).getBoolean("recipes.merge-missing-bundled", false)
+                        ? com.huidu.farmersdelight.config.ConfigLookup.booleanValue(
+                                prepared.document(directory.resolve("config.yml")), false,
+                                "recipes.merge_missing_bundled", "recipes.merge-missing-bundled")
                         : mergeRecipeDefaults;
                 com.huidu.farmersdelight.recipe.PreparedRecipeFiles recipes = prepareRecipes
-                        ? com.huidu.farmersdelight.recipe.PreparedRecipeFiles.read(this, merge) : null;
+                        ? com.huidu.farmersdelight.recipe.PreparedRecipeFiles.read(this, merge, recipePackRoots) : null;
                 if (!isEnabled()) {
                     throw new IllegalStateException("Plugin stopped during reload preparation");
                 }
@@ -1003,8 +1072,9 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
                 reloadConfig();
             } else {
                 YamlConfiguration candidate = activePreparedReload.document(getDataFolder().toPath().resolve("config.yml"));
-                candidate.setDefaults(getConfig().getDefaults());
+                candidate.setDefaults(getSourceConfig().getDefaults());
                 preparedMainConfig = candidate;
+                invalidateConfigView();
             }
             long readConfigNanos = System.nanoTime() - phase;
             phase = System.nanoTime();
@@ -1254,8 +1324,10 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
 
     public void publishEditedRecipes() {
         RecipeFileLoader.resetReportedIssues();
+        if (specialRecipeRegistry != null) SpecialRecipeLoader.load(this, specialRecipeRegistry);
         if (craftEngineReadinessCoordinator != null && craftEngineReadinessCoordinator.isReady()) {
             loadRecipeManagers("plugin.reloading_recipes", true);
+            FarmersDelightApi.get().refreshRecipeIndex();
             reportContentSummaryWhenReady();
         }
         fireReloadEvent("reloadRecipes");
@@ -1325,6 +1397,7 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
     }
 
     private void loadConfigs() {
+        com.huidu.farmersdelight.effect.EffectManager.configure(getConfig());
         YamlConfiguration worldDataConfig = configFiles.loadWorldData();
         YamlConfiguration loadedDropsConfig = configFiles.loadDrops();
         dropsConfig = loadedDropsConfig;
@@ -1363,7 +1436,7 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
         // Region-thread heat checks must not observe partially populated settings during reload.
         HeatSourceConfig newHeatSourceConfig = new HeatSourceConfig();
         HeatSourceConfig.setLogger(getLogger());
-        newHeatSourceConfig.loadDefaults();
+        if (heatSourceSection == null) newHeatSourceConfig.loadDefaults();
         if (heatSourceSection != null) {
             newHeatSourceConfig.loadFromConfig(heatSourceSection);
         }
@@ -1723,6 +1796,11 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
             throw new IllegalStateException("Plugin is not enabled");
         }
         return cuttingBoardRecipeManager;
+    }
+
+    public com.huidu.farmersdelight.fluid.FluidRecipeManager getFluidRecipes() {
+        if (fluidRecipeManager == null) throw new IllegalStateException("Plugin is not enabled");
+        return fluidRecipeManager;
     }
 
     /** Addons' cutting-board right-click handlers, tried in registration order until one consumes. */

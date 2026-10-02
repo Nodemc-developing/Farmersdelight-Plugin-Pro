@@ -158,6 +158,7 @@ gui:
     disabled: "<red>配方编辑器已在 config.yml 中停用（recipe-editor.enabled）。"
     feedback:
       invalid_id: "<red>配方 id 包含无效字符。"
+      invalid_value: "<red>输入值无效，请检查标识、数值范围和必填项。"
       not_configured: "<red>gui.yml 中未配置配方编辑器界面。"
       no_ingredients: "<red>配方至少需要一个原料。"
       no_input: "<red>配方需要一个输入物。"
@@ -169,6 +170,11 @@ gui:
       save_failed: "<red>保存配方失败(详见控制台)。"
       delete_failed: "<red>删除配方失败(详见控制台)。"
       no_tags: "<red>该物品不属于任何标签。"
+    recipe_book:
+      saving: "<yellow>正在保存并重载配方，请稍候。"
+      number_hint: "<gray>Shift 点击：直接输入数值"
+      number_prompt: "<yellow>输入此项的数值；输入 cancel 取消并返回编辑器。"
+      text_hint: "<gray>点击：输入标识；取消后返回当前编辑器。"
     tag:
       select_hint: "<gray>左键: 使用此标签 <dark_gray>| <gray>右键: 编辑排除项"
       member_included: "<gray>点击: 从该标签中排除此物品"
@@ -232,6 +238,9 @@ gui:
       desc:
         "1": "轻量近战武器，挥砍快、伤害温和。可以用小刀从草丛收割稻草，并保证动物的额外掉落。"
 console:
+  fluid:
+    invalid_recipe: "流体配方 {id} 无效：{error}"
+    unavailable: "流体配方已保留，等待可用的 FluidCore：{error}"
   prefix: "[Farmersdelight-Plugin-Pro]"
   recipe-discovery:
     save_failed: "保存配方解锁数据失败：{error}"
@@ -325,6 +334,7 @@ console:
     config_missing_section: "配置文件 {file} 缺少配置段 {section}。"
     config_invalid_key: "配置文件 {file} 包含无效配置路径 {path}。"
     config_value_invalid: "配置文件 {file} 的 {path} 值无效：{error}"
+    config_option_unsupported: "配置文件 {file} 的 {path} 已保留，但本版本暂未实现此选项。"
     config_empty_value: "配置文件 {file} 的 {path} 为空，相关条目不会生效。"
     common_tag_reference_invalid: "公共标签引用无效（{type}）：{path}，该引用将被忽略。"
     config_issues_header: "在文件“{file}”中发现 {count} 个配置问题："
@@ -441,6 +451,7 @@ console:
     special_recipe_backfilled: "已补全 {count} 个内置特殊配方（磁盘配置缺失）"
     special_recipe_missing_root: "特殊配方文件 {file} 缺少 'special_recipes' 段，已跳过。请补上该段，或删除该文件以恢复内置默认值。"
     special_recipe_parse_failed: "解析特殊配方 '{id}' 失败：{error}"
+    papers_unsupported_type: "{file} 中的配方 {id} 使用尚未支持的类型 '{type}'，原文件已保留。"
     special_recipe_save_failed: "写入特殊配方文件 {file} 失败：{error}"
     special_recipe_load_failed: "无法把特殊配方文件 {file} 按 UTF-8 YAML 读取：{error}"
   worlddata:
@@ -638,3 +649,39 @@ compat:
       other_ingredients: "<red>锅内还有其他食材，请先清空或使用对应菜谱。"
       invalid_recipe: "<red>这份菜谱没有有效的投料记录。"
       wrong_region: "<yellow>请靠近厨锅后重新投料。"
+
+fluid:
+  type:
+    fluid_filling: "<aqua>流体灌装配方"
+    fluid_emptying: "<aqua>流体抽取配方"
+    soaking: "<aqua>浸泡配方"
+  editor:
+    ingredient: "原料"
+    fluid: "流体或流体标签"
+    amount: "流体数量（mB）"
+    time: "浸泡时间"
+    tick_unit: "刻"
+    consume_fluid: "消耗流体"
+    priority: "优先级"
+    enabled: "是"
+    disabled: "否"
+    consume_hint: "<gray>消耗流体：1 为是，0 为否。"
+    native_container: "<gray>产物留空时，由 FluidCore 转换容器并保留其中的流体数据。"
+    fluid_prompt: "<yellow>输入流体 ID，例如 minecraft:water；标签使用 #c:water；输入 cancel 返回。"
+    ingredient_prompt: "<yellow>输入原料 ID、#标签、advtag:分组或用 | 分隔的可选原料；输入 cancel 返回。"
+  soaking_started: "<yellow>开始处理配方，等待 {ticks} 刻。"
+  cancelled: "<yellow>处理已取消，物品和流体未消耗。"
+  outcome:
+    ready: "<green>可以处理此流体配方。"
+    success: "<green>流体配方已完成。"
+    unavailable: "<red>流体功能需要启用 FluidCore。"
+    invalid_thread: "<yellow>请靠近容器后重试。"
+    no_match: "<yellow>物品或配方已变化，请重新操作。"
+    no_storage: "<red>这里没有可用的流体储罐。"
+    no_fluid: "<red>流体类型不匹配或数量不足。"
+    no_capacity: "<red>容器没有足够的容量。"
+    not_a_container: "<red>这个物品不能处理此流体配方。"
+    protected_data: "<red>物品含有不能安全转换的流体数据，请使用新的兼容容器。"
+    no_inventory_space: "<red>背包没有足够的空间，物品和流体未消耗。"
+    unsupported_variant: "<red>此流体的数据无法保留在固定配方产物中，操作已取消。"
+    transaction_failed: "<red>流体操作未完成，请查看控制台。"

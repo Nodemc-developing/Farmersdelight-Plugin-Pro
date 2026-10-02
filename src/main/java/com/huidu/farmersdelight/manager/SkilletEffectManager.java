@@ -37,6 +37,7 @@ public class SkilletEffectManager {
     // Written in reloadConfig (reload thread), read on Folia region tick threads — volatile for a
     // happens-before edge, matching the other reload-mutated tick-read fields.
     private volatile double effectViewerDistanceSquared = DEFAULT_EFFECT_VIEWER_DISTANCE * DEFAULT_EFFECT_VIEWER_DISTANCE;
+    private volatile int effectIntervalTicks = 4;
     private volatile boolean smokeEnabled = true;
     private volatile Particle smokeParticle = Particle.SMOKE;
     private volatile double smokeChance = DEFAULT_SMOKE_CHANCE;
@@ -79,7 +80,12 @@ public class SkilletEffectManager {
         this.effectViewerDistanceSquared = viewerDistance * viewerDistance;
         this.chunkEffectBudgetLimit = Math.max(1, plugin.getConfigInt(50,
                 "performance.budgets.chunk-effect-packet-budget"));
+        this.effectIntervalTicks = Math.max(4, plugin.getConfigInt(4, "skillet.particles.interval_ticks"));
         loadEffectsConfig();
+    }
+
+    int effectIntervalTicks() {
+        return effectIntervalTicks;
     }
 
     private void loadEffectsConfig() {

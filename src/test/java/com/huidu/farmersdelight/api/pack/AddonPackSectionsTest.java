@@ -60,6 +60,8 @@ class AddonPackSectionsTest {
         AddonPackSections.Section section = sections.get(0);
         assertEquals("corndelight/configuration/farmersdelight/sections.yml", section.source());
         assertEquals("corndelight", section.namespace());
+        assertEquals(pack.folder().resolve("configuration/farmersdelight/sections.yml").toAbsolutePath().normalize(), section.file());
+        assertEquals("cooking_recipes", section.sectionKey());
 
         ConfigurationSection recipes = section.config().getConfigurationSection("cooking_pot_recipes");
         assertNotNull(recipes);
@@ -146,5 +148,14 @@ class AddonPackSectionsTest {
         parser.loadAll();
 
         assertTrue(parser.sections("cooking_recipes").isEmpty());
+    }
+
+    @Test void papersRootsKeepTypedBodiesAndLiteralDottedRecipeIds() {
+        AddonPackSections parser = AddonPackSections.createForTesting(ROOTS);
+        feed(parser, pack("addon", "addon"), "papersdelight_recipes#addon", Map.of("addon:meal.v2", Map.of("type", "cooking")));
+        parser.loadAll();
+        var section = parser.sections("papersdelight_recipes").getFirst();
+        assertEquals("papersdelight_recipes#addon", section.sectionKey());
+        assertEquals(List.of("addon:meal.v2"), List.copyOf(section.config().getConfigurationSection("papersdelight_recipes").getKeys(false)));
     }
 }

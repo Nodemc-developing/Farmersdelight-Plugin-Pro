@@ -14,6 +14,8 @@ Version 1.0.4 opens a menu from `/fd recipe edit`: choose a station and recipe g
 
 Version 1.0.5 uses bStats 3.2.1 with plugin ID **34448**, registered as **FarmersDelightPro**. Standard server/plugin statistics use bStats' asynchronous transport and Folia support. Server owners can opt out globally by setting `enabled: false` in `plugins/bStats/config.yml` and restarting the server. Metrics tasks stop when the plugin is disabled.
 
+Version 1.1.0 adopts PapersDelight-style configuration and recipes loaded from CraftEngine content packs. Existing files are backed up and migrated; editing writes back to the original recipe node. Cooking, cutting, information cards, nested advanced ingredient groups and FluidCore filling, emptying and soaking recipes are supported. The fluid categories share the recipe editor and use atomic storage/inventory transactions on their owner thread. See the [format and migration guide (Chinese)](PAPERSDELIGHT-COMPAT.zh-CN.md) for supported fields, dependency requirements and content-pack limitations.
+
 ## Features
 
 - CraftEngine items, blocks, models, resource packs and loot integration.

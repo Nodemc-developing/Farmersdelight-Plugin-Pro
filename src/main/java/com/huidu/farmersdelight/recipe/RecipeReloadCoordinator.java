@@ -35,12 +35,16 @@ public final class RecipeReloadCoordinator {
 
     public RecipeReloadCoordinator(FarmersDelightPlugin plugin) {
         this(new Backend() {
+            private List<java.nio.file.Path> roots = List.of();
             public void onOwner(Runnable task) { plugin.scheduler().run(task); }
             public boolean onWorker(Runnable task) { return plugin.scheduler().tryRunAsync(task); }
             public boolean enabled() { return plugin.isEnabled(); }
             public long generation() { return plugin.configurationGeneration(); }
-            public boolean mergeMissing() { return plugin.getConfigBoolean(false, "recipes.merge-missing-bundled"); }
-            public Batch prepare(boolean merge) throws Exception { return PreparedRecipeFiles.read(plugin, merge); }
+            public boolean mergeMissing() {
+                roots = RecipePackFiles.configurationRoots(plugin);
+                return plugin.getConfigBoolean(false, "recipes.merge-missing-bundled");
+            }
+            public Batch prepare(boolean merge) throws Exception { return PreparedRecipeFiles.read(plugin, merge, roots); }
             public void publish() { plugin.publishEditedRecipes(); }
         });
     }

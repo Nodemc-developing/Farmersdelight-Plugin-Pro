@@ -64,6 +64,9 @@ public final class ConfigFileUpdater {
                                              ConfigUpdatePolicy policy) {
         int fromVersion = deployedVersion(existing);
         int toVersion = bundledVersion(bundled);
+        if (fromVersion > toVersion) {
+            return new ConfigUpdateReport(List.of(), List.of(), 0, null, fromVersion, toVersion);
+        }
         List<ConfigKeyRename> migrated = applyMigrations(existing, policy.migrations());
         List<String> retired = removeKeys(existing, policy.retiredKeys());
         int added = copyMissingKeys(bundled, existing, policy.registrySections());
@@ -82,7 +85,9 @@ public final class ConfigFileUpdater {
         if (bundled == null) {
             return new ConfigUpdateReport(List.of(), List.of(), 0);
         }
-        ConfigUpdateReport report = applyTo(bundled, plugin.getConfig(), policy);
+        FileConfiguration existing = plugin instanceof com.huidu.farmersdelight.FarmersDelightPlugin core
+                ? core.getSourceConfig() : plugin.getConfig();
+        ConfigUpdateReport report = applyTo(bundled, existing, policy);
         if (report.downgraded()) {
             plugin.getLogger().warning("config.yml declares config-version " + report.fromVersion()
                     + " but this build ships " + report.toVersion()
@@ -98,7 +103,7 @@ public final class ConfigFileUpdater {
         } catch (IOException e) {
             backupError = String.valueOf(e.getMessage());
         }
-        tidy(plugin.getConfig());
+        tidy(existing);
         plugin.saveConfig();
         plugin.reloadConfig();
         return new ConfigUpdateReport(report.migratedKeys(), report.retiredKeys(), report.addedKeys(),

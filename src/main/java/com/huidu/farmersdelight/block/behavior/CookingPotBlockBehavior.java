@@ -113,7 +113,8 @@ public class CookingPotBlockBehavior extends FarmersDelightBlockBehavior impleme
             String handleToggleSound,
             float handleToggleSoundVolume,
             float handleToggleSoundPitch,
-            Property<String> supportProperty
+            Property<String> supportProperty,
+            Property<Integer> integerSupportProperty
     ) {}
 
     private final FarmersDelightPlugin plugin;
@@ -341,6 +342,25 @@ public class CookingPotBlockBehavior extends FarmersDelightBlockBehavior impleme
 
     public Property<String> getSupportProperty() {
         return config.supportProperty();
+    }
+
+    public Property<Integer> getIntegerSupportProperty() { return config.integerSupportProperty(); }
+
+    public boolean hasSupportProperty() {
+        return config.supportProperty() != null || config.integerSupportProperty() != null;
+    }
+
+    public String readSupportState(ImmutableBlockState state) {
+        if (state == null) return null;
+        if (config.supportProperty() != null) return state.getNullable(config.supportProperty());
+        return config.integerSupportProperty() == null ? null
+                : CookingPotSupportState.fromInteger(state.getNullable(config.integerSupportProperty()));
+    }
+
+    public ImmutableBlockState withSupportState(ImmutableBlockState state, String value) {
+        if (config.supportProperty() != null) return state.with(config.supportProperty(), value);
+        return config.integerSupportProperty() == null ? state
+                : state.with(config.integerSupportProperty(), CookingPotSupportState.toInteger(value));
     }
 
     public boolean isSupportDisplayEnabled() {
@@ -784,8 +804,13 @@ public class CookingPotBlockBehavior extends FarmersDelightBlockBehavior impleme
         String recipeGroupResolved = normalizeBlank(customRecipeGroupId);
         String titleResolved = normalizeBlank(titleOverride);
         Property<String> supportProperty = BlockBehaviorFactory.getOptionalProperty(block, SUPPORT_PROPERTY, String.class);
+        Property<Integer> integerSupportProperty = BehaviorArgParser.getBoolean(arguments, "support-integer", false)
+                ? BlockBehaviorFactory.getOptionalProperty(block, SUPPORT_PROPERTY, Integer.class) : null;
+        if (integerSupportProperty != null && !integerSupportProperty.possibleValues().containsAll(List.of(0, 1, 2))) {
+            throw new IllegalArgumentException("Cooking pot integer support must allow 0, 1 and 2: " + block.id());
+        }
         FarmersDelightPlugin plugin = FarmersDelightPlugin.getInstance();
-        if (supportProperty == null) {
+        if (supportProperty == null && integerSupportProperty == null) {
             plugin.getLogger()
                     .warning("[Farmersdelight-Plugin-Pro] Block " + block.id() + " is missing the 'support' property"
                             + " — tray and handle entity_renderer switching is disabled for this block.");
@@ -809,7 +834,8 @@ public class CookingPotBlockBehavior extends FarmersDelightBlockBehavior impleme
                 handleToggleSound,
                 handleToggleSoundVolume,
                 handleToggleSoundPitch,
-                supportProperty
+                supportProperty,
+                integerSupportProperty
         ));
     };
 

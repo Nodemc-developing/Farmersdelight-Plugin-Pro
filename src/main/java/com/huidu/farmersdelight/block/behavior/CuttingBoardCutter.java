@@ -269,7 +269,9 @@ final class CuttingBoardCutter {
         // configured fallback. A recipe that names a sound always wins, so this only fills the gap.
         String recipeSound = recipe.getSound();
         if (recipeSound != null && !recipeSound.isBlank()) {
-            SoundUtils.play(world, effectLocation, recipeSound, Sound.BLOCK_WOOD_BREAK, 1.0f, 1.0f);
+            SoundUtils.play(world, effectLocation, recipeSound, Sound.BLOCK_WOOD_BREAK,
+                    recipe.getSoundVolume() == null ? 1.0f : recipe.getSoundVolume(),
+                    recipe.getSoundPitch() == null ? 1.0f : recipe.getSoundPitch());
         } else {
             CuttingBoardSounds sounds = plugin.getCuttingBoardSounds();
             ToolSoundTable.Entry entry = sounds.resolve(tool);

@@ -38,6 +38,7 @@ public final class SkilletData {
     // Tick stamp of the last cook-progress credit; Long.MIN_VALUE = never credited. A freshly created or
     // re-loaded entry starts here, so time spent unloaded is never credited.
     long lastCookingCreditTick = Long.MIN_VALUE;
+    final EffectCadence effectCadence = new EffectCadence();
 
     SkilletData(Location location, int defaultCookingTime) {
         this.location = location;

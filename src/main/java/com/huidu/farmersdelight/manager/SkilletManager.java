@@ -1204,7 +1204,9 @@ public class SkilletManager {
                 currentBukkitTick, PLACED_TICK_INTERVAL, MAX_ELAPSED_CREDIT_TICKS), hasHeat, coolingDecrement);
         if (!hasHeat) return;
 
-        effectManager.dispatchTickEffects(world, location, carrierState);
+        if (skillet.effectCadence.tryAcquire(currentBukkitTick, effectManager.effectIntervalTicks())) {
+            effectManager.dispatchTickEffects(world, location, carrierState);
+        }
         if (skillet.cookingProgress >= skillet.cookingDuration) {
             debug(() -> "tick finish: progress reached duration for " + formatItem(skillet.storedItem)
                     + " at " + formatLocation(location));

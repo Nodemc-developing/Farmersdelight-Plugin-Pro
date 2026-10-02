@@ -3,6 +3,7 @@ package com.huidu.farmersdelight.gui;
 import com.huidu.farmersdelight.FarmersDelightPlugin;
 import com.huidu.farmersdelight.i18n.I18n;
 import com.huidu.farmersdelight.recipe.RecipeIngredient;
+import com.huidu.farmersdelight.recipe.AdvancedRecipeTags;
 import com.huidu.farmersdelight.util.CommonTagResolver;
 import com.huidu.farmersdelight.util.ItemUtils;
 import net.momirealms.craftengine.core.util.Key;
@@ -28,6 +29,7 @@ public final class RecipeIngredientIcons {
     // Resolved tag ingredient option list (build cost O(items x excludedTags x items) plus CE item creation)
     // is fixed per tag ingredient; cache the result and clear on reload. Callers get clones.
     private static final Map<RecipeIngredient.Tag, List<ItemStack>> tagOptionsCache = new ConcurrentHashMap<>();
+    private static final Map<RecipeIngredient.AdvancedTag, List<ItemStack>> advancedOptionsCache = new ConcurrentHashMap<>();
     // Choice ingredient display options are likewise fixed. Choice is a record (value equality), safe as a key.
     private static final Map<RecipeIngredient.Choice, List<ItemStack>> choiceOptionsCache = new ConcurrentHashMap<>();
     private static final Collator DISPLAY_NAME_COLLATOR = Collator.getInstance(Locale.SIMPLIFIED_CHINESE);
@@ -38,6 +40,7 @@ public final class RecipeIngredientIcons {
     public static void clearCaches() {
         itemCache.clear();
         tagOptionsCache.clear();
+        advancedOptionsCache.clear();
         choiceOptionsCache.clear();
     }
 
@@ -141,6 +144,20 @@ public final class RecipeIngredientIcons {
 
         if (ingredient instanceof RecipeIngredient.Tag tagIngredient) {
             return resolveTagIngredientOptions(tagIngredient);
+        }
+
+        if (ingredient instanceof RecipeIngredient.AdvancedTag advanced) {
+            List<ItemStack> cached = advancedOptionsCache.computeIfAbsent(advanced, tag -> {
+                List<ItemStack> items = new ArrayList<>();
+                for (String member : AdvancedRecipeTags.members(tag.key())) {
+                    ItemStack item = ItemUtils.createItem(member);
+                    if (item != null && !item.getType().isAir() && item.getType() != Material.BARRIER) items.add(item);
+                }
+                return sortIngredientDisplayItems(items);
+            });
+            List<ItemStack> copies = new ArrayList<>(cached.size());
+            for (ItemStack item : cached) copies.add(item.clone());
+            return copies;
         }
 
         if (ingredient instanceof RecipeIngredient.Choice choiceIngredient) {

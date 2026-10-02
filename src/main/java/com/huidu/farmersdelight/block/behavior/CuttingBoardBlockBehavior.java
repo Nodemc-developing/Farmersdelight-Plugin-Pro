@@ -85,17 +85,19 @@ public class CuttingBoardBlockBehavior extends FarmersDelightBlockBehavior imple
     private final String knifeSound;
     private final int maxStackAmount;
     private final String customDataKey;
+    private final boolean comparatorEnabled;
     private final CuttingBoardToolMatcher toolMatcher;
     private final CuttingBoardCutter cutter;
     private int controllerId;
 
-    private CuttingBoardBlockBehavior(FarmersDelightPlugin plugin, BlockDefinition block, Property<?> facingProperty, List<Key> toolTags, List<Key> toolItems, String knifeSound, int maxStackAmount, String customDataKey) {
+    private CuttingBoardBlockBehavior(FarmersDelightPlugin plugin, BlockDefinition block, Property<?> facingProperty, List<Key> toolTags, List<Key> toolItems, String knifeSound, int maxStackAmount, String customDataKey, boolean comparatorEnabled) {
         super(block);
         this.plugin = plugin;
         this.facingProperty = facingProperty;
         this.knifeSound = knifeSound;
         this.maxStackAmount = maxStackAmount;
         this.customDataKey = customDataKey;
+        this.comparatorEnabled = comparatorEnabled;
         this.toolMatcher = new CuttingBoardToolMatcher(plugin, toolTags, toolItems);
         this.cutter = new CuttingBoardCutter(plugin, toolMatcher);
     }
@@ -519,7 +521,8 @@ public class CuttingBoardBlockBehavior extends FarmersDelightBlockBehavior imple
         String knifeSound = BehaviorArgParser.getArgumentString(arguments, "knife-sound", Constants.SOUND_CUTTING_BOARD_KNIFE);
         int maxStackAmount = BehaviorArgParser.getInt(arguments, "max-stack-amount", 64);
         String customDataKey = BehaviorArgParser.getArgumentString(arguments, "data-key", "farmersdelight:cutting_board");
-        return new CuttingBoardBlockBehavior(plugin, block, facingProperty, toolTags, toolItems, knifeSound, maxStackAmount, customDataKey);
+        boolean comparatorEnabled = BehaviorArgParser.getBoolean(arguments, "has_comparator", true);
+        return new CuttingBoardBlockBehavior(plugin, block, facingProperty, toolTags, toolItems, knifeSound, maxStackAmount, customDataKey, comparatorEnabled);
     };
 
     public String getKnifeSound() {
@@ -880,11 +883,12 @@ public class CuttingBoardBlockBehavior extends FarmersDelightBlockBehavior imple
 
     @Override
     public boolean hasAnalogOutputSignal(Object thisBlock, Object[] args) {
-        return true;
+        return comparatorEnabled;
     }
 
     @Override
     public int getAnalogOutputSignal(Object thisBlock, Object[] args) {
+        if (!comparatorEnabled) return 0;
         // args[1] = Level, args[2] = BlockPos. Scale comparator strength by the board's stack limit:
         // a single non-stackable tool yields 15; one item from a 64-item stack yields 1.
         World world = CraftEngineAdapter.toWorld(args[1]);

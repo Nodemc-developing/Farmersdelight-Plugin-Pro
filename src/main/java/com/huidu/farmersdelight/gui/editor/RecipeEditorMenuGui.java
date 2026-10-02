@@ -235,7 +235,8 @@ public final class RecipeEditorMenuGui implements EditorGui {
             String id = value.toLowerCase(Locale.ROOT);
             boolean pot = screen == Screen.CREATE_MODE || screen == Screen.POT_RECIPES;
             boolean duplicate = pot ? plugin.getCookingPotRecipes().getEditableRecipes(group).stream().anyMatch(recipe -> recipe.id().equals(id))
-                    : addon != null ? addon.recipe(id) != null : plugin.getCuttingBoardRecipes().getRecipe(id) != null;
+                    : addon != null ? addon.recipe(id) != null || addon.editor() instanceof AsyncRecipeEditor async && !async.canCreate(id)
+                    : plugin.getCuttingBoardRecipes().getRecipe(id) != null;
             if (!RecipeEditorView.isValidRecipeId(id) || addon != null && !id.contains(":") || duplicate) {
                 player.sendMessage(text("invalid_or_duplicate")); show(); return;
             }

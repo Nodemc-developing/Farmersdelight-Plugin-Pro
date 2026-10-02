@@ -26,12 +26,15 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 public final class RecipeEditorView implements InventoryHolder {
 
     private static final int RESULT_SLOT = 16;
     private static final int RESULT_COUNT_SLOT = 25;
     private static final int NUMERIC_START = 28;
+    private static final int TEXT_START = 37;
     private static final int SLOT_SAVE = 48;
     private static final int SLOT_CANCEL = 49;
     private static final int SLOT_DELETE = 50;
@@ -42,20 +45,25 @@ public final class RecipeEditorView implements InventoryHolder {
 
     private final RecipeEditor editor;
     private final FarmersDelightPlugin plugin;
+    private final Player viewer;
     private final EditableRecipe draft;
     private final List<String> slotLabels;
     private final List<NumericField> numericFields;
+    private final List<AsyncRecipeEditor.TextField> textFields;
     private final int[] itemSlots;
     private final Runnable back;
     private Inventory inventory;
     private boolean leaving;
+    private boolean pending;
 
-    private RecipeEditorView(FarmersDelightPlugin plugin, RecipeType type, String recipeId, Runnable back) {
+    private RecipeEditorView(FarmersDelightPlugin plugin, Player viewer, RecipeType type, String recipeId, Runnable back) {
         this.plugin = plugin;
+        this.viewer = viewer;
         this.editor = type.editor();
         this.back = back;
         this.slotLabels = editor.itemSlotLabels();
         this.numericFields = editor.numericFields();
+        this.textFields = editor instanceof AsyncRecipeEditor async ? async.textFields() : List.of();
         EditableRecipe loaded = editor.load(recipeId);
         this.draft = loaded != null ? loaded : new EditableRecipe(recipeId, slotLabels.size());
         int count = Math.min(MAX_ITEM_SLOTS, slotLabels.size());
@@ -110,7 +118,7 @@ public final class RecipeEditorView implements InventoryHolder {
         FarmersDelightPlugin plugin = FarmersDelightPlugin.getInstance();
         if (!checkAccess(plugin, player)) return;
         RecipeEditorListener.ensureRegistered(plugin);
-        RecipeEditorView view = new RecipeEditorView(plugin, type, recipeId, back == null
+        RecipeEditorView view = new RecipeEditorView(plugin, player, type, recipeId, back == null
                 ? () -> RecipeEditorMenuGui.openAddonRecipes(plugin, player, type) : back);
         view.draw();
         player.openInventory(view.inventory);
@@ -255,8 +263,11 @@ public final class RecipeEditorView implements InventoryHolder {
         for (int i = 0; i < itemSlots.length; i++) {
             // The slot label itself is supplied (and localized) by the addon's editor; only the "Slot N:"
             // chrome is translated here.
-            labelLore.add(tr("gui.editor.recipe_book.slot_line", NamedTextColor.GRAY, i + 1, slotLabels.get(i)));
+            Component label = editor instanceof AsyncRecipeEditor async
+                    ? async.itemSlotLabel(i, viewer) : Component.text(slotLabels.get(i));
+            labelLore.add(tr("gui.editor.recipe_book.slot_line", NamedTextColor.GRAY, i + 1, label));
         }
+        if (editor instanceof AsyncRecipeEditor async) labelLore.addAll(async.hints(viewer));
         inventory.setItem(4, named(new ItemStack(Material.KNOWLEDGE_BOOK),
                 tr("gui.editor.recipe_book.input_slots", NamedTextColor.AQUA), labelLore));
 
@@ -266,8 +277,11 @@ public final class RecipeEditorView implements InventoryHolder {
         inventory.setItem(RESULT_SLOT, draft.result());
         inventory.setItem(RESULT_COUNT_SLOT, countButton());
 
-        for (int i = 0; i < numericFields.size() && NUMERIC_START + i < SLOT_SAVE; i++) {
+        for (int i = 0; i < visibleNumericFields(); i++) {
             inventory.setItem(NUMERIC_START + i, numericButton(numericFields.get(i)));
+        }
+        for (int i = 0; i < textFields.size() && TEXT_START + i < SLOT_SAVE; i++) {
+            inventory.setItem(TEXT_START + i, textButton(textFields.get(i)));
         }
 
         inventory.setItem(SLOT_SAVE, named(new ItemStack(Material.LIME_CONCRETE),
@@ -292,6 +306,7 @@ public final class RecipeEditorView implements InventoryHolder {
     }
 
     public boolean isEditableSlot(int rawSlot) {
+        if (pending || leaving) return false;
         if (rawSlot == RESULT_SLOT) {
             return true;
         }
@@ -304,20 +319,44 @@ public final class RecipeEditorView implements InventoryHolder {
     }
 
     public void handleButton(Player player, int rawSlot, boolean rightClick) {
-        if (leaving || !EditorNavigation.allowed(plugin, player)) return;
+        handleButton(player, rawSlot, rightClick, false);
+    }
+
+    public void handleButton(Player player, int rawSlot, boolean rightClick, boolean shiftClick) {
+        if (pending || leaving || !EditorNavigation.allowed(plugin, player)) return;
         if (rawSlot == RESULT_COUNT_SLOT) {
             draft.setResultCount(Math.max(1, draft.resultCount() + (rightClick ? -1 : 1)));
             inventory.setItem(RESULT_COUNT_SLOT, countButton());
             return;
         }
         int numericIndex = rawSlot - NUMERIC_START;
-        if (numericIndex >= 0 && numericIndex < numericFields.size()) {
+        if (numericIndex >= 0 && numericIndex < visibleNumericFields()) {
             NumericField field = numericFields.get(numericIndex);
+            if (shiftClick && editor instanceof AsyncRecipeEditor) {
+                prompt(player, "gui.editor.recipe_book.number_prompt", value -> {
+                    java.math.BigDecimal parsed = new java.math.BigDecimal(value);
+                    double number = parsed.doubleValue();
+                    if (!Double.isFinite(number) || number < field.min() || number > field.max()
+                            || (field.decimals() <= 0 && parsed.stripTrailingZeros().scale() > 0)
+                            || java.math.BigDecimal.valueOf(number).compareTo(parsed) != 0) {
+                        throw new IllegalArgumentException("Number outside editor range");
+                    }
+                    draft.setNumber(field.key(), number);
+                });
+                return;
+            }
             double current = draft.number(field.key(), field.min());
             double next = current + (rightClick ? -field.step() : field.step());
             next = Math.max(field.min(), Math.min(field.max(), next));
             draft.setNumber(field.key(), next);
             inventory.setItem(rawSlot, numericButton(field));
+            return;
+        }
+        int textIndex = rawSlot - TEXT_START;
+        if (textIndex >= 0 && textIndex < textFields.size() && rawSlot < SLOT_SAVE
+                && editor instanceof AsyncRecipeEditor async) {
+            AsyncRecipeEditor.TextField field = textFields.get(textIndex);
+            prompt(player, field.promptKey(), value -> async.setText(draft, field.key(), value));
             return;
         }
         if (rawSlot == SLOT_SAVE) {
@@ -328,7 +367,8 @@ public final class RecipeEditorView implements InventoryHolder {
                 return;
             }
             draft.setId(id.toLowerCase(Locale.ROOT));
-            if (draft.result() == null || draft.result().getType().isAir()) {
+            boolean resultRequired = !(editor instanceof AsyncRecipeEditor async) || async.requiresResult();
+            if (resultRequired && (draft.result() == null || draft.result().getType().isAir())) {
                 player.sendMessage(tr("gui.editor.feedback.no_result", NamedTextColor.RED));
                 return;
             }
@@ -345,6 +385,10 @@ public final class RecipeEditorView implements InventoryHolder {
                     player.sendMessage(tr("gui.editor.feedback.no_input", NamedTextColor.RED));
                     return;
                 }
+            }
+            if (editor instanceof AsyncRecipeEditor async) {
+                persistAsync(player, inventory, () -> async.saveAsync(draft), false);
+                return;
             }
             boolean ok = editor.save(draft);
             player.sendMessage(ok
@@ -364,6 +408,11 @@ public final class RecipeEditorView implements InventoryHolder {
             leaving = true;
             EditorNavigation.next(plugin, player, inventory,
                     () -> new ConfirmGui(plugin, player, config, java.util.Map.of("recipe_id", draft.id()), () -> {
+                        if (editor instanceof AsyncRecipeEditor async) {
+                            persistAsync(player, player.getOpenInventory().getTopInventory(),
+                                    () -> async.deleteAsync(draft.id()), true);
+                            return;
+                        }
                         boolean ok = editor.delete(draft.id());
                         player.sendMessage(ok ? tr("gui.editor.recipe_book.deleted", NamedTextColor.GREEN, draft.id())
                                 : tr("gui.editor.recipe_book.delete_failed", NamedTextColor.RED));
@@ -371,6 +420,56 @@ public final class RecipeEditorView implements InventoryHolder {
                         else reopen(player);
                     }, () -> reopen(player)).open());
         }
+    }
+
+    private int visibleNumericFields() {
+        return Math.min(numericFields.size(), (textFields.isEmpty() ? SLOT_SAVE : TEXT_START) - NUMERIC_START);
+    }
+
+    private void prompt(Player player, String promptKey, java.util.function.Consumer<String> apply) {
+        commitItems();
+        leaving = true;
+        EditorNavigation.next(plugin, player, inventory, () -> {
+            player.closeInventory();
+            RecipeEditorListener.promptChat(player, value -> {
+                if (!EditorNavigation.allowed(plugin, player)) return;
+                if (!"cancel".equalsIgnoreCase(value.trim())) {
+                    try { apply.accept(value.trim()); }
+                    catch (RuntimeException invalid) {
+                        player.sendMessage(I18n.getComponent("gui.editor.feedback.invalid_value", player));
+                    }
+                }
+                reopen(player);
+            }, promptKey);
+        });
+    }
+
+    private void persistAsync(Player player, Inventory expected, Supplier<CompletableFuture<Boolean>> operation,
+                              boolean deleting) {
+        pending = true;
+        CompletableFuture<Boolean> future;
+        try {
+            future = java.util.Objects.requireNonNull(operation.get());
+        } catch (RuntimeException invalid) {
+            pending = false;
+            player.sendMessage(I18n.getComponent("gui.editor.feedback.invalid_value", player));
+            if (deleting) reopen(player);
+            return;
+        }
+        player.sendMessage(I18n.getComponent("gui.editor.recipe_book.saving", player));
+        AsyncEditorCompletion.await(future, action -> plugin.scheduler().runForEntity(player, action), ok -> {
+            pending = false;
+            if (!plugin.isEnabled() || !player.isOnline()) return;
+            String message = deleting ? (ok ? "deleted" : "delete_failed") : (ok ? "saved" : "save_failed");
+            player.sendMessage(tr("gui.editor.recipe_book." + message,
+                    ok ? NamedTextColor.GREEN : NamedTextColor.RED, draft.id()));
+            if (!EditorNavigation.allowed(plugin, player) || player.getOpenInventory().getTopInventory() != expected) return;
+            if (ok) {
+                leaving = true;
+                player.setItemOnCursor(null);
+                EditorNavigation.next(plugin, player, expected, back);
+            } else if (deleting) reopen(player);
+        });
     }
 
     private void returnToParent(Player player) {
@@ -406,13 +505,24 @@ public final class RecipeEditorView implements InventoryHolder {
 
     private ItemStack numericButton(NumericField field) {
         double value = draft.number(field.key(), field.min());
-        String shown = field.decimals() <= 0
+        String shown = editor instanceof AsyncRecipeEditor async ? async.numericValue(draft, field) : field.decimals() <= 0
                 ? String.valueOf((long) value)
                 : String.format("%." + field.decimals() + "f", value);
         // field.label() is the addon's own (already-localized) field name; only the +/- hint chrome is translated.
+        Component label = editor instanceof AsyncRecipeEditor async
+                ? async.numericLabel(field, viewer) : Component.text(field.label());
+        List<Component> lore = new ArrayList<>();
+        lore.add(tr("gui.editor.recipe_book.step_hint", NamedTextColor.GRAY, field.step(), field.step()));
+        if (editor instanceof AsyncRecipeEditor) lore.add(I18n.getComponent("gui.editor.recipe_book.number_hint", viewer));
         return named(new ItemStack(Material.COMPARATOR),
-                Component.text(field.label() + ": " + shown, NamedTextColor.YELLOW),
-                List.of(tr("gui.editor.recipe_book.step_hint", NamedTextColor.GRAY, field.step(), field.step())));
+                label.append(Component.text(": " + shown)).color(NamedTextColor.YELLOW), lore);
+    }
+
+    private ItemStack textButton(AsyncRecipeEditor.TextField field) {
+        AsyncRecipeEditor async = (AsyncRecipeEditor) editor;
+        return named(new ItemStack(Material.NAME_TAG), I18n.getComponent(field.labelKey(), viewer),
+                List.of(Component.text(async.text(draft, field.key()), NamedTextColor.GRAY),
+                        I18n.getComponent("gui.editor.recipe_book.text_hint", viewer)));
     }
 
     private static ItemStack named(ItemStack item, Component name, List<Component> lore) {

@@ -19,14 +19,16 @@ public final class FoodBuffFunction<CTX extends Context> extends AbstractConditi
     public enum Kind {COMFORT, NOURISHMENT}
 
     private final Kind kind;
-    private final NumberProvider duration; // seconds
+    private final NumberProvider duration; // interpreted using the selected factory's unit
     private final NumberProvider level;    // 1-based
+    private final boolean durationTicks;
 
-    private FoodBuffFunction(List<Condition<CTX>> predicates, Kind kind, NumberProvider duration, NumberProvider level) {
+    private FoodBuffFunction(List<Condition<CTX>> predicates, Kind kind, NumberProvider duration, NumberProvider level, boolean durationTicks) {
         super(predicates);
         this.kind = kind;
         this.duration = duration;
         this.level = level;
+        this.durationTicks = durationTicks;
     }
 
     @Override
@@ -35,7 +37,8 @@ public final class FoodBuffFunction<CTX extends Context> extends AbstractConditi
             if (!(cePlayer.platformPlayer() instanceof Player bukkitPlayer)) {
                 return;
             }
-            int seconds = Math.max(1, duration.getInt(ctx));
+            int configured = duration.getInt(ctx);
+            int seconds = durationTicks ? ticksToSeconds(configured) : Math.max(1, configured);
             int lvl = Math.max(1, level.getInt(ctx));
             if (kind == Kind.COMFORT) {
                 FarmersDelightFoodEffects.applyComfort(bukkitPlayer, seconds, lvl);
@@ -47,15 +50,24 @@ public final class FoodBuffFunction<CTX extends Context> extends AbstractConditi
 
     public static <CTX extends Context> FunctionFactory<CTX, FoodBuffFunction<CTX>> factory(
             Kind kind, Function<ConfigSection, Condition<CTX>> conditionFactory) {
-        return new Factory<>(kind, conditionFactory);
+        return new Factory<>(kind, conditionFactory, false);
     }
+
+    public static <CTX extends Context> FunctionFactory<CTX, FoodBuffFunction<CTX>> ticksFactory(
+            Kind kind, Function<ConfigSection, Condition<CTX>> conditionFactory) {
+        return new Factory<>(kind, conditionFactory, true);
+    }
+
+    static int ticksToSeconds(int ticks) { return (int) Math.max(1L, ((long) ticks + 19L) / 20L); }
 
     private static final class Factory<CTX extends Context> extends AbstractFactory<CTX, FoodBuffFunction<CTX>> {
         private final Kind kind;
+        private final boolean durationTicks;
 
-        Factory(Kind kind, Function<ConfigSection, Condition<CTX>> conditionFactory) {
+        Factory(Kind kind, Function<ConfigSection, Condition<CTX>> conditionFactory, boolean durationTicks) {
             super(conditionFactory);
             this.kind = kind;
+            this.durationTicks = durationTicks;
         }
 
         @Override
@@ -63,8 +75,9 @@ public final class FoodBuffFunction<CTX extends Context> extends AbstractConditi
             return new FoodBuffFunction<>(
                     getPredicates(section),
                     kind,
-                    section.getNumber("duration", ConfigConstants.CONSTANT_NINETY),
-                    section.getNumber("level", ConfigConstants.CONSTANT_ONE)
+                    section.getNumber("duration", durationTicks ? ConfigConstants.CONSTANT_TWENTY : ConfigConstants.CONSTANT_NINETY),
+                    section.getNumber("level", ConfigConstants.CONSTANT_ONE),
+                    durationTicks
             );
         }
     }

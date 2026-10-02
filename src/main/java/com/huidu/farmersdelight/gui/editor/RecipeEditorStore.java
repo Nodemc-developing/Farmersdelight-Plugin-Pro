@@ -8,6 +8,9 @@ import com.huidu.farmersdelight.recipe.RecipeItemCodec;
 import com.huidu.farmersdelight.recipe.RecipeSerializer;
 import com.huidu.farmersdelight.recipe.CookingPotRecipe;
 import com.huidu.farmersdelight.recipe.CuttingBoardRecipe;
+import com.huidu.farmersdelight.recipe.RecipePackFiles;
+import com.huidu.farmersdelight.recipe.RecipeSource;
+import com.huidu.farmersdelight.recipe.RecipeSchemaAdapter;
 import com.huidu.farmersdelight.FarmersDelightPlugin;
 import com.huidu.farmersdelight.api.recipe.AddonRecipeFiles;
 import com.huidu.farmersdelight.api.recipe.AddonRecipeFiles.RecipeOwner;
@@ -44,7 +47,8 @@ public final class RecipeEditorStore {
         this.plugin = plugin;
     }
 
-    private record Edit(File file, String localPath, YamlMutation mutation) {
+    private record Edit(File file, String localPath, YamlMutation mutation, boolean literal) {
+        private Edit(File file, String localPath, YamlMutation mutation) { this(file, localPath, mutation, false); }
     }
 
     public boolean saveCookingPotRecipe(CookingPotRecipe recipe, String customGroupId) {
@@ -58,10 +62,16 @@ public final class RecipeEditorStore {
     private Edit cookingPotEdit(CookingPotRecipe recipe, String group) {
         // CraftEngine/NMS item serialization belongs to the caller's owning thread.
         Map<String, Object> body = buildCookingPotBody(recipe);
+        RecipeSource source = plugin.getCookingPotRecipes().sourceOf(recipe.getId(), group);
+        if (source != null) return recipeEdit(source, body, true);
         if (group == null || group.isBlank()) {
             RecipeOwner owner = AddonRecipeFiles.ownerOf("cooking_pot", recipe.getId());
             if (owner != null) {
-                return external(owner, yaml -> yaml.set(owner.yamlPath(), body));
+                return external(owner, yaml -> {
+                    ConfigurationSection previous = yaml.getConfigurationSection(owner.yamlPath());
+                    com.huidu.farmersdelight.config.PlainYamlDocuments.setValue(yaml, owner.yamlPath(),
+                            mergeRecipeBody(previous == null ? Map.of() : previous.getValues(false), body));
+                });
             }
             if (plugin.getCookingPotRecipes().isExternalRecipe(recipe.getId())) {
                 return local(COOKING_POT_FILE, yaml -> {
@@ -70,8 +80,10 @@ public final class RecipeEditorStore {
                 });
             }
         }
-        String path = cookingPotPath(recipe.getId(), group);
-        return local(COOKING_POT_FILE, yaml -> yaml.set(path, body));
+        RecipeSource target = group == null || group.isBlank()
+                ? new RecipeSource(RecipePackFiles.file(plugin, COOKING_POT_FILE), List.of("papersdelight_recipes", recipe.getId()), true)
+                : new RecipeSource(RecipePackFiles.file(plugin, COOKING_POT_FILE), List.of(CUSTOM_COOKING_POT_ROOT, group, recipe.getId()), true);
+        return recipeEdit(target, body, true);
     }
 
     public boolean deleteCookingPotRecipe(String recipeId, String customGroupId) {
@@ -83,6 +95,8 @@ public final class RecipeEditorStore {
     }
 
     private Edit deleteCookingPotEdit(String id, String group) {
+        RecipeSource source = plugin.getCookingPotRecipes().sourceOf(id, group);
+        if (source != null) return recipeEdit(source, null, true);
         if (group == null || group.isBlank()) {
             RecipeOwner owner = AddonRecipeFiles.ownerOf("cooking_pot", id);
             if (owner != null) {
@@ -95,8 +109,9 @@ public final class RecipeEditorStore {
                 });
             }
         }
-        String path = cookingPotPath(id, group);
-        return local(COOKING_POT_FILE, yaml -> yaml.set(path, null));
+        List<String> keys = group == null || group.isBlank() ? List.of(COOKING_POT_ROOT, id)
+                : List.of(CUSTOM_COOKING_POT_ROOT, group, id);
+        return recipeEdit(new RecipeSource(RecipePackFiles.file(plugin, COOKING_POT_FILE), keys, false, true), null, true);
     }
 
     public boolean saveCuttingBoardRecipe(CuttingBoardRecipe recipe) {
@@ -110,9 +125,15 @@ public final class RecipeEditorStore {
     private Edit cuttingBoardEdit(CuttingBoardRecipe recipe) {
         Map<String, Object> body = buildCuttingBoardBody(recipe);
         String id = recipe.getId();
+        RecipeSource source = plugin.getCuttingBoardRecipes().sourceOf(id);
+        if (source != null) return recipeEdit(source, body, false);
         RecipeOwner owner = AddonRecipeFiles.ownerOf("cutting_board", id);
         if (owner != null) {
-            return external(owner, yaml -> yaml.set(owner.yamlPath(), body));
+            return external(owner, yaml -> {
+                ConfigurationSection previous = yaml.getConfigurationSection(owner.yamlPath());
+                com.huidu.farmersdelight.config.PlainYamlDocuments.setValue(yaml, owner.yamlPath(),
+                        mergeRecipeBody(previous == null ? Map.of() : previous.getValues(false), body));
+            });
         }
         if (plugin.getCuttingBoardRecipes().isExternalRecipe(id)) {
             return local(CUTTING_BOARD_FILE, yaml -> {
@@ -120,7 +141,7 @@ public final class RecipeEditorStore {
                 setExternalOverride(yaml, "cutting_board", id, true);
             });
         }
-        return local(CUTTING_BOARD_FILE, yaml -> yaml.set(CUTTING_BOARD_ROOT + "." + id, body));
+        return recipeEdit(new RecipeSource(RecipePackFiles.file(plugin, CUTTING_BOARD_FILE), List.of("papersdelight_recipes", id), true), body, false);
     }
 
     public boolean deleteCuttingBoardRecipe(String recipeId) {
@@ -132,6 +153,8 @@ public final class RecipeEditorStore {
     }
 
     private Edit deleteCuttingBoardEdit(String id) {
+        RecipeSource source = plugin.getCuttingBoardRecipes().sourceOf(id);
+        if (source != null) return recipeEdit(source, null, false);
         RecipeOwner owner = AddonRecipeFiles.ownerOf("cutting_board", id);
         if (owner != null) {
             return external(owner, yaml -> yaml.set(owner.yamlPath(), null));
@@ -142,35 +165,73 @@ public final class RecipeEditorStore {
                 setExternalOverride(yaml, "cutting_board", id, false);
             });
         }
-        return local(CUTTING_BOARD_FILE, yaml -> yaml.set(CUTTING_BOARD_ROOT + "." + id, null));
+        return recipeEdit(new RecipeSource(RecipePackFiles.file(plugin, CUTTING_BOARD_FILE),
+                List.of(CUTTING_BOARD_ROOT, id), false, true), null, false);
     }
 
     private Edit local(String path, YamlMutation mutation) {
-        return new Edit(new File(plugin.getDataFolder(), path), path, mutation);
+        return new Edit(RecipePackFiles.file(plugin, path).toFile(), RecipePackFiles.managed(path) ? null : path, mutation, RecipePackFiles.managed(path));
+    }
+
+    private Edit recipeEdit(RecipeSource source, Map<String, Object> body, boolean pot) {
+        Map<String, Object> formatted = body == null ? null : pot
+                ? RecipeSchemaAdapter.formatPot(body, source.papersFormat())
+                : RecipeSchemaAdapter.formatBoard(body, source.papersFormat());
+        java.nio.file.Path defaultFile = formatted == null ? RecipePackFiles.file(plugin, pot ? COOKING_POT_FILE : CUTTING_BOARD_FILE) : null;
+        return new Edit(source.file().toFile(), null, yaml -> {
+            if (formatted == null) { deleteRecipeSource(yaml, source, pot, defaultFile); return; }
+            source.put(yaml, mergeRecipeBody(source.body(yaml), formatted));
+        }, true);
+    }
+
+    static void deleteRecipeSource(YamlConfiguration yaml, RecipeSource source, boolean pot, java.nio.file.Path defaultFile) {
+        source.put(yaml, null);
+        if (!source.file().equals(defaultFile.toAbsolutePath().normalize())) return;
+        String station = pot ? "cooking_pot" : "cutting_board";
+        String id = source.keys().getLast();
+        ConfigurationSection overrides = yaml.getConfigurationSection(EXTERNAL_OVERRIDES_ROOT);
+        if (overrides != null && overrides.getStringList(station).contains(id)) {
+            setExternalOverride(yaml, station, id, false);
+        }
+    }
+
+    static Map<String, Object> mergeRecipeBody(Map<String, Object> previous, Map<String, Object> edited) {
+        Map<String, Object> result = new LinkedHashMap<>(previous);
+        // Fields represented by the editor are replaced as a unit; other extension data retains its value.
+        for (String key : List.of("type", "ingredients", "ingredient", "input", "result", "results", "result-count", "container",
+                "cook-time", "time", "experience", "category", "priority", "tool", "tools", "sound", "match-mode", "perfect",
+                "use-equivalent-foods", "use-seasonings", "minimum-score", "sound-volume", "sound-pitch",
+                "match_mode", "use_equivalent_foods", "use_seasonings", "minimum_score", "sound_volume", "sound_pitch",
+                "result_count", "cooking_time", "cooking-time", "infer_container")) result.remove(key);
+        result.putAll(edited);
+        return result;
     }
 
     private Edit external(RecipeOwner owner, YamlMutation mutation) {
         return new Edit(owner.file(), null, mutation);
     }
 
-    private String cookingPotPath(String recipeId, String customGroupId) {
-        if (customGroupId == null || customGroupId.isBlank()) {
-            return COOKING_POT_ROOT + "." + recipeId;
-        }
-        return CUSTOM_COOKING_POT_ROOT + "." + customGroupId + "." + recipeId;
-    }
-
     public CompletableFuture<Boolean> saveFoodGroupAsync(String originalId, com.huidu.farmersdelight.recipe.FoodGroupSnapshot.Group group) {
         Map<String, Object> body = Map.of("kind", group.kind().name().toLowerCase(java.util.Locale.ROOT), "items", group.items());
-        return captureAsync(() -> local(com.huidu.farmersdelight.recipe.FoodGroupStore.FILE, yaml -> {
-            if (originalId != null && !originalId.equals(group.id())) putRecipe(yaml, "groups", originalId, null);
-            putRecipe(yaml, "groups", group.id(), body);
-        }));
+        return captureAsync(() -> {
+            RecipeSource old = originalId == null ? null : com.huidu.farmersdelight.recipe.FoodGroupStore.sourceOf(originalId);
+            List<String> keys = old == null ? List.of("food_groups", group.id()) : List.of(old.keys().getFirst(), group.id());
+            RecipeSource target = new RecipeSource(old == null ? RecipePackFiles.file(plugin, RecipePackFiles.GROUP_FILE) : old.file(), keys, false);
+            return new Edit(target.file().toFile(), null, yaml -> {
+                Map<String, Object> merged = old == null ? target.body(yaml) : old.body(yaml);
+                merged.putAll(body);
+                if (old != null && !originalId.equals(group.id())) old.put(yaml, null);
+                target.put(yaml, merged);
+            }, true);
+        });
     }
 
     public CompletableFuture<Boolean> deleteFoodGroupAsync(String id) {
-        return captureAsync(() -> local(com.huidu.farmersdelight.recipe.FoodGroupStore.FILE,
-                yaml -> putRecipe(yaml, "groups", id, null)));
+        return captureAsync(() -> {
+            RecipeSource source = com.huidu.farmersdelight.recipe.FoodGroupStore.sourceOf(id);
+            if (source == null) throw new IllegalStateException("No editable food-group source: " + id);
+            return new Edit(source.file().toFile(), null, yaml -> source.put(yaml, null), true);
+        });
     }
 
     private Map<String, Object> buildCookingPotBody(CookingPotRecipe recipe) {
@@ -260,6 +321,8 @@ public final class RecipeEditorStore {
             results.add(resultMap);
         }
         body.put("results", results);
+        if (recipe.getSoundVolume() != null) body.put("sound-volume", recipe.getSoundVolume());
+        if (recipe.getSoundPitch() != null) body.put("sound-pitch", recipe.getSoundPitch());
 
         if (recipe.getSound() != null && !recipe.getSound().isBlank()
                 && !recipe.getSound().equals(Constants.SOUND_CUTTING_BOARD_KNIFE)) {
@@ -286,7 +349,10 @@ public final class RecipeEditorStore {
                     }
                 } else {
                     // Strict plain parsing keeps legacy serialization maps untouched during worker I/O.
-                    yaml = com.huidu.farmersdelight.config.PlainYamlDocuments.read(edit.file().toPath());
+                    yaml = edit.file().isFile() ? edit.literal()
+                            ? com.huidu.farmersdelight.config.PlainYamlDocuments.readLiteral(edit.file().toPath())
+                            : com.huidu.farmersdelight.config.PlainYamlDocuments.read(edit.file().toPath()) : new YamlConfiguration();
+                    if (edit.literal()) yaml.options().pathSeparator('\u0001');
                 }
                 edit.mutation().apply(yaml);
                 writeAtomically(edit.file(), yaml.saveToString());
@@ -361,17 +427,18 @@ public final class RecipeEditorStore {
         } else {
             entries.put(id, value);
         }
-        yaml.set(rootName, entries.isEmpty() ? null : entries);
+        com.huidu.farmersdelight.config.PlainYamlDocuments.setValue(yaml, rootName, entries.isEmpty() ? null : entries);
     }
 
     private static void setExternalOverride(YamlConfiguration yaml, String station, String id, boolean enabled) {
-        String path = EXTERNAL_OVERRIDES_ROOT + "." + station;
-        List<String> ids = new ArrayList<>(yaml.getStringList(path));
+        ConfigurationSection root = yaml.getConfigurationSection(EXTERNAL_OVERRIDES_ROOT);
+        List<String> ids = root == null ? new ArrayList<>() : new ArrayList<>(root.getStringList(station));
         ids.removeIf(id::equals);
         if (enabled) {
             ids.add(id);
         }
-        yaml.set(path, ids.isEmpty() ? null : ids);
+        if (root == null && !ids.isEmpty()) root = yaml.createSection(EXTERNAL_OVERRIDES_ROOT);
+        if (root != null) root.set(station, ids.isEmpty() ? null : ids);
     }
 
     static void writeAtomically(File target, String content) throws IOException {

@@ -53,7 +53,7 @@ final class RecipeIngredientDisplay {
             }
 
             int slot = entry.getKey();
-            CyclicSlot cycle = ingredientCycles.computeIfAbsent(slot, s -> new CyclicSlot(gui.INGREDIENT_SWITCH_CALLBACKS));
+            CyclicSlot cycle = ingredientCycles.computeIfAbsent(slot, s -> new CyclicSlot(gui.ingredientSwitchCallbacks));
             // tick() reports whether the frame actually advanced. On every other tick the slot would be
             // rebuilt to the item it already shows, which is the same guard the tool cycle uses.
             if (!cycle.tick()) {
@@ -87,6 +87,10 @@ final class RecipeIngredientDisplay {
 
         if (ingredient instanceof RecipeIngredient.Tag tagIngredient) {
             return createAnimatedOrStaticIngredientDisplay(slot, tagIngredient, RecipeIngredientIcons.resolveTagIngredientOptions(tagIngredient), player);
+        }
+
+        if (ingredient instanceof RecipeIngredient.AdvancedTag advanced) {
+            return createAnimatedOrStaticIngredientDisplay(slot, advanced, RecipeIngredientIcons.resolveIngredientOptions(advanced), player);
         }
 
         if (ingredient instanceof RecipeIngredient.Choice choiceIngredient) {
@@ -130,7 +134,7 @@ final class RecipeIngredientDisplay {
     ) {
         if (!options.isEmpty()) {
             animatedIngredientSlots.put(slot, options);
-            ingredientCycles.put(slot, new CyclicSlot(gui.INGREDIENT_SWITCH_CALLBACKS));
+            ingredientCycles.put(slot, new CyclicSlot(gui.ingredientSwitchCallbacks));
             animatedIngredientDefinitions.put(slot, ingredient);
             return createAnimatedIngredientDisplay(ingredient, options.getFirst(), options, player);
         }
@@ -144,6 +148,16 @@ final class RecipeIngredientDisplay {
         }
         if (ingredient instanceof RecipeIngredient.Choice choiceIngredient) {
             return createChoiceIngredientDisplay(choiceIngredient, currentDisplay, options, player);
+        }
+
+        if (ingredient instanceof RecipeIngredient.AdvancedTag advanced) {
+            List<Component> lore = new ArrayList<>();
+            lore.add(gui.tr("gui.recipe.ingredient", NamedTextColor.GRAY));
+            lore.add(gui.tr("gui.recipe.matches_line", Component.text(options.size()).color(NamedTextColor.YELLOW)));
+            appendCyclePosition(lore, currentDisplay, options, player);
+            if (gui.config.isShowIngredientIds()) lore.add(gui.tr("gui.recipe.tag_line", Component.text("advtag:" + advanced.key())));
+            appendItemPreviewLore(lore, options, 5, player, currentDisplay);
+            return createLabeledIngredientDisplay(currentDisplay, lore, player, gui.itemNameComponent(currentDisplay, player));
         }
 
         ItemStack display = currentDisplay.clone();
@@ -240,8 +254,8 @@ final class RecipeIngredientDisplay {
         if (ingredient instanceof RecipeIngredient.Item itemIngredient) {
             return List.of(gui.itemNameComponent(itemIngredient.createStack(), player));
         }
-        if (ingredient instanceof RecipeIngredient.Choice choiceIngredient) {
-            List<ItemStack> options = RecipeIngredientIcons.resolveIngredientOptions(choiceIngredient);
+        if (ingredient instanceof RecipeIngredient.Choice || ingredient instanceof RecipeIngredient.AdvancedTag) {
+            List<ItemStack> options = RecipeIngredientIcons.resolveIngredientOptions(ingredient);
             if (options.isEmpty()) {
                 return List.of(gui.tr("gui.recipe.no_matching_items", NamedTextColor.GRAY));
             }
@@ -311,6 +325,13 @@ final class RecipeIngredientDisplay {
         List<Component> lines = new ArrayList<>();
         if (ingredient instanceof RecipeIngredient.Item itemIngredient) {
             lines.add(gui.itemNameComponent(itemIngredient.createStack(), player).colorIfAbsent(NamedTextColor.WHITE));
+            return lines;
+        }
+        if (ingredient instanceof RecipeIngredient.AdvancedTag advanced) {
+            List<ItemStack> options = RecipeIngredientIcons.resolveIngredientOptions(advanced);
+            if (options.isEmpty()) lines.add(gui.tr("gui.recipe.no_matching_items", NamedTextColor.GRAY));
+            else appendItemPreviewLore(lines, options, player);
+            if (gui.config.isShowIngredientIds()) lines.add(gui.colored("&8advtag:" + advanced.key()));
             return lines;
         }
         if (ingredient instanceof RecipeIngredient.Tag tagIngredient) {

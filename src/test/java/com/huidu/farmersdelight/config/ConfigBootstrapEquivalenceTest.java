@@ -307,7 +307,7 @@ class ConfigBootstrapEquivalenceTest {
         assertTrue(Files.exists(path), "bundled config.yml not found at " + path.toAbsolutePath());
         YamlConfiguration loaded = YamlConfiguration.loadConfiguration(path.toFile());
         assertFalse(loaded.getKeys(false).isEmpty(), "bundled config.yml loaded empty");
-        return loaded;
+        return PapersDelightConfigFormat.runtimeViewOf(loaded);
     }
 
     private static YamlConfiguration copyOf(YamlConfiguration source) {

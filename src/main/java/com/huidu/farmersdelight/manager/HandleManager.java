@@ -35,7 +35,7 @@ public final class HandleManager {
         Block potBlock = world.getBlockAt(potPos.x(), potPos.y(), potPos.z());
         ImmutableBlockState state = CraftEngineBlocks.getCustomBlockState(potBlock);
         CookingPotBlockBehavior behavior = behaviorOf(state);
-        if (behavior == null || behavior.getSupportProperty() == null || !behavior.isSupportDisplayEnabled()) return;
+        if (behavior == null || !behavior.hasSupportProperty() || !behavior.isSupportDisplayEnabled()) return;
 
         // The state read for the behaviour also answers the current value, so the check does not need a
         // second CraftEngine lookup of the same block.
@@ -78,14 +78,13 @@ public final class HandleManager {
 
     @Nullable
     private static String supportValue(ImmutableBlockState state, CookingPotBlockBehavior behavior) {
-        if (behavior.getSupportProperty() == null) return null;
-        return state.getNullable(behavior.getSupportProperty());
+        return behavior.readSupportState(state);
     }
 
     private static void setSupportProperty(Block block, ImmutableBlockState state,
                                            CookingPotBlockBehavior behavior, String value) {
-        if (behavior.getSupportProperty() == null) return;
-        CraftEngineBlocks.place(block.getLocation(), state.with(behavior.getSupportProperty(), value), false);
+        if (!behavior.hasSupportProperty()) return;
+        CraftEngineBlocks.place(block.getLocation(), behavior.withSupportState(state, value), false);
     }
 
     /** Write that re-reads the block first, for callers that may have changed it since their own read. */

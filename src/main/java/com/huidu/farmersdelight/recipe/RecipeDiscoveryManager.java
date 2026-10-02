@@ -449,6 +449,8 @@ public final class RecipeDiscoveryManager {
     private static void collectExactItemIds(RecipeIngredient ingredient, List<String> out) {
         if (ingredient instanceof RecipeIngredient.Item item) {
             out.add(String.valueOf(item.key()));
+        } else if (ingredient instanceof RecipeIngredient.AdvancedTag tag) {
+            out.addAll(AdvancedRecipeTags.members(tag.key()));
         } else if (ingredient instanceof RecipeIngredient.Choice choice) {
             for (RecipeIngredient option : choice.options()) {
                 collectExactItemIds(option, out);

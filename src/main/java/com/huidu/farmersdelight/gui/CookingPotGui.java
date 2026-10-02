@@ -80,6 +80,7 @@ public class CookingPotGui extends AbstractInventoryGui {
     private int cachedRemainingSeconds = -1;
     private final Map<Integer, ItemStack> cachedDisplayItems = new HashMap<>();
     private ItemStack cachedPendingContainer;
+    private Boolean cachedRecipeBookEnabled;
     private boolean syncQueued;
     // Inventory version seen at last input-slot rescan; skip rescan if unchanged.
     private long lastSeenInventoryVersion = Long.MIN_VALUE;
@@ -192,12 +193,8 @@ public class CookingPotGui extends AbstractInventoryGui {
             }
         }
 
-        if (recipeSlot >= 0) {
-            GuiConfig.GuiItem recipeItem = config.getItem("recipe");
-            if (recipeItem != null) {
-                inventory.setItem(recipeSlot, recipeItem.createItem());
-            }
-        }
+        cachedRecipeBookEnabled = null;
+        updateRecipeBookButton();
 
         for (int ingredientSlot : ingredientSlots) {
             inventory.setItem(ingredientSlot, null);
@@ -291,6 +288,7 @@ public class CookingPotGui extends AbstractInventoryGui {
     }
 
     private void updateDisplayItems() {
+        updateRecipeBookButton();
         if (!syncQueued) {
             // Only do a full input-slot rescan when the inventory version changed; skip when pot contents are unchanged.
             long version = blockEntity.getInventoryVersion();
@@ -582,6 +580,7 @@ public class CookingPotGui extends AbstractInventoryGui {
 
         if (rawSlot == recipeSlot) {
             event.setCancelled(true);
+            if (!plugin.isCookingPotRecipeBookEnabled()) return;
             Player player = (Player) event.getWhoClicked();
             syncToBlockEntity();
             close();
@@ -648,6 +647,15 @@ public class CookingPotGui extends AbstractInventoryGui {
         }
 
         scheduleGuiSync(event.getWhoClicked() instanceof Player p ? p : null);
+    }
+
+    private void updateRecipeBookButton() {
+        if (recipeSlot < 0 || recipeSlot >= inventory.getSize() || slotMapping.containsKey(recipeSlot)) return;
+        boolean enabled = plugin.isCookingPotRecipeBookEnabled();
+        if (cachedRecipeBookEnabled != null && cachedRecipeBookEnabled == enabled) return;
+        cachedRecipeBookEnabled = enabled;
+        GuiConfig.GuiItem item = enabled ? config.getItem("recipe") : config.getItem("background");
+        inventory.setItem(recipeSlot, item == null ? null : item.createItem());
     }
 
     @Override

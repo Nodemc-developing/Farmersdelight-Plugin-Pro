@@ -51,6 +51,14 @@ public final class RecipeFileLoader {
         return REPORTED_ISSUES.size();
     }
 
+    /** Adds one source-aware loader problem to the same diagnostics used by the reload summary. */
+    public static void reportProblem(String source, String id, String error) {
+        String detail = id + " - " + (error == null || error.isBlank() ? "Invalid recipe definition" : error);
+        if (!REPORTED_ISSUES.add(source + "|" + detail)) return;
+        I18n.logWarning("plugin.recipe_issues_header", "file", source, "count", 1);
+        I18n.logWarning("plugin.recipe_issue_detail", "index", 1, "detail", detail);
+    }
+
     static void loadRecipeSections(FarmersDelightPlugin plugin,
                                    BiConsumer<String, ConfigurationSection> sectionConsumer) {
         loadRecipeSections(plugin, loadRecipeFile(plugin, "recipes/cutting_board_recipes.yml"), "cutting_board_recipes", "cutting board", sectionConsumer);
@@ -64,8 +72,20 @@ public final class RecipeFileLoader {
     // published last: an unreadable file parsed as an empty configuration would drop every bundled recipe
     // on the next reload, which is exactly what a single indentation mistake used to do.
     public static YamlConfiguration loadRecipeFile(FarmersDelightPlugin plugin, String relativePath, boolean reconcileWithBundled) {
-        YamlConfiguration prepared = PreparedRecipeFiles.currentDocument(plugin.getDataFolder().toPath().resolve(relativePath));
-        if (prepared != null) return prepared;
+        Path file = RecipePackFiles.file(plugin, relativePath);
+        YamlConfiguration prepared = PreparedRecipeFiles.currentDocument(file);
+        if (prepared != null) return RecipePackFiles.managed(relativePath) ? RecipePackFiles.bridge(prepared, relativePath) : prepared;
+        if (RecipePackFiles.managed(relativePath)) {
+            if (!RecipePackFiles.defaultPackEnabled(plugin)) return new YamlConfiguration();
+            try {
+                return YamlFileTransactions.execute(file, () -> RecipePackFiles.bridge(Files.isRegularFile(file)
+                        ? PreparedRecipeFiles.materialize(com.huidu.farmersdelight.config.PlainYamlDocuments.readLiteral(file))
+                        : new YamlConfiguration(), relativePath));
+            } catch (Exception invalid) {
+                I18n.logWarning("plugin.recipe_load_failed", "file", file.toString(), "error", invalid.getMessage());
+                return null;
+            }
+        }
         try {
             return YamlFileTransactions.execute(plugin.getDataFolder().toPath().resolve(relativePath),
                     () -> loadRecipeFileLocked(plugin, relativePath, reconcileWithBundled));

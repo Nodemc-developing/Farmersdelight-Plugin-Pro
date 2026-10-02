@@ -7,6 +7,8 @@ import com.huidu.farmersdelight.util.Constants;
 
 /** Immutable station settings published as one unit after a config reload. */
 public record StationSettings(
+        boolean cookingPotRecipeBookEnabled,
+        int recipePreviewCallbacks,
         boolean progressDisplayEnabled,
         boolean showRecipeName,
         double progressYOffset,
@@ -36,6 +38,8 @@ public record StationSettings(
                 "cooking-pot.progress-display.visibility-distance",
                 "cooking-pot-progress-display.visibility-distance"));
         return new StationSettings(
+                plugin.getConfigBoolean(true, "cooking_pot.recipe_book"),
+                previewCallbacks(plugin.getConfigInt(80, "recipe_book.tag_cycle_interval_ticks")),
                 plugin.getConfigBoolean(true, "cooking-pot.progress-display.enabled",
                         "cooking-pot-progress-display.enabled"),
                 plugin.getConfigBoolean(false, "cooking-pot.progress-display.show-recipe-name",
@@ -75,6 +79,10 @@ public record StationSettings(
 
     public boolean cookingPotHopperAllowed() {
         return hopperEnabled && cookingPotHopperEnabled;
+    }
+
+    public static int previewCallbacks(int gameTicks) {
+        return (int) Math.max(1L, ((long) gameTicks + 3L) / 4L);
     }
 
     public boolean cuttingBoardHopperAllowed() {

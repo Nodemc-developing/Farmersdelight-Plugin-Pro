@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.nio.file.Path;
 
 /**
  * Farmersdelight-Plugin-Pro's own view of the CraftEngine pack sections it claims: the cooking-pot, cutting-board,
@@ -23,7 +24,14 @@ import java.util.Map;
 public final class PackSections {
 
     /** One section handed over by CraftEngine, already bridged to the configuration shape readers expect. */
-    public record Section(PackSection section, String source, String namespace, YamlConfiguration yaml) {
+    public record Section(PackSection section, String source, String namespace, YamlConfiguration yaml,
+                          Path file, String sectionKey, boolean generated) {
+        public Section(PackSection section, String source, String namespace, YamlConfiguration yaml) {
+            this(section, source, namespace, yaml, null, section.sectionId(), false);
+        }
+        public Section(PackSection section, String source, String namespace, YamlConfiguration yaml, Path file, String sectionKey) {
+            this(section, source, namespace, yaml, file, sectionKey, false);
+        }
     }
 
     private final AddonPackSections claimed;
@@ -74,7 +82,7 @@ public final class PackSections {
         }
         List<Section> out = new ArrayList<>(found.size());
         for (AddonPackSections.Section entry : found) {
-            out.add(new Section(section, entry.source(), entry.namespace(), entry.config()));
+            out.add(new Section(section, entry.source(), entry.namespace(), entry.config(), entry.file(), entry.sectionKey(), entry.generated()));
         }
         return List.copyOf(out);
     }

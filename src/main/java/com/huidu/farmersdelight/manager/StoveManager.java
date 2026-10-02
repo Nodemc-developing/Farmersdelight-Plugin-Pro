@@ -104,6 +104,7 @@ public class StoveManager {
     // Written in reloadConfig (reload thread), read on Folia region tick threads (effect/burn) — volatile
     // for a happens-before edge, matching the other reload-mutated tick-read fields.
     private volatile double effectViewerDistance = 32.0D;
+    private volatile int effectIntervalTicks = 4;
     // Per-chunk per-tick effect context: the packet budget (hard cap so a dense pocket of stoves —
     // 60/chunk × 4 slot rolls — can't steamroll the packet queue in one Bukkit tick) plus the tick's
     // chunk-tracked player list, fetched once and shared by every stove in the chunk. World-keyed so
@@ -144,6 +145,7 @@ public class StoveManager {
                 "stove.cooking.cooling-decrement",
                 "stove.cooling-decrement"));
         this.chunkEffectBudgetLimit = Math.max(1, plugin.getConfigInt(50, "performance.budgets.chunk-effect-packet-budget"));
+        this.effectIntervalTicks = Math.max(4, plugin.getConfigInt(4, "stove.particles.interval_ticks"));
         loadEffectsConfig();
         visualManager.reloadSlotOffsets();
         visualManager.refreshAll(stoves.values());
@@ -829,18 +831,22 @@ public class StoveManager {
         // fixed tick residue, so a Bukkit.getCurrentTick()-derived stagger never rotates — it would
         // permanently silence 3/4 of chunks. The chunk was checked loaded at the top of this method and
         // cannot unload within the same region tick, so getChunkAt cannot trigger a sync load here.
-        long chunkKey = ManagerSupport.chunkKey(stoveChunkX, stoveChunkZ);
-        ChunkFxContext fx = chunkFx.computeIfAbsent(world.getUID(), w -> new ConcurrentHashMap<>())
-                .computeIfAbsent(chunkKey, k -> new ChunkFxContext());
+        boolean effectsDue = stove.effectCadence.tryAcquire(currentBukkitTick, effectIntervalTicks);
+        ChunkFxContext fx = null;
+        if (effectsDue) {
+            long chunkKey = ManagerSupport.chunkKey(stoveChunkX, stoveChunkZ);
+            fx = chunkFx.computeIfAbsent(world.getUID(), w -> new ConcurrentHashMap<>())
+                    .computeIfAbsent(chunkKey, k -> new ChunkFxContext());
+        }
         // A chunk is only ticked by the one region that owns it, so this comparison is against that
         // region's own clock and the reset happens exactly once per tick per chunk.
-        if (fx.budgetTick != currentBukkitTick) {
+        if (fx != null && fx.budgetTick != currentBukkitTick) {
             fx.budgetTick = currentBukkitTick;
             fx.budget.set(0);
             fx.seeing = null;
         }
-        List<Player> seeingPlayers = fx.seeing;
-        if (seeingPlayers == null) {
+        List<Player> seeingPlayers = fx == null ? List.of() : fx.seeing;
+        if (fx != null && seeingPlayers == null) {
             seeingPlayers = List.copyOf(world.getChunkAt(stoveChunkX, stoveChunkZ).getPlayersSeeingChunk());
             fx.seeing = seeingPlayers;
         }

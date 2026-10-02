@@ -10,23 +10,42 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import com.huidu.farmersdelight.pack.PackSection;
 
 public final class FoodGroupStore {
     public static final String FILE = "recipes/food_groups.yml";
     private static final String SOURCE = "farmersdelight:food-groups";
+    private static volatile Map<String, RecipeSource> sources = Map.of();
     private FoodGroupStore() { }
 
     public record Loaded(List<FoodGroupSnapshot.Group> local, FoodGroupSnapshot combined) { }
 
     static Loaded load(FarmersDelightPlugin plugin, List<FoodGroupSnapshot.Group> previous) {
         YamlConfiguration yaml = RecipeFileLoader.loadRecipeFile(plugin, FILE, false);
-        List<FoodGroupSnapshot.Group> local = yaml == null ? previous : read(yaml);
+        Map<String, FoodGroupSnapshot.Group> localById = new LinkedHashMap<>();
+        Map<String, RecipeSource> nextSources = new LinkedHashMap<>();
+        List<FoodGroupSnapshot.Group> original = yaml == null ? previous : read(yaml);
+        for (var group : original) {
+            localById.put(group.id(), group);
+            if (yaml != null) nextSources.put(group.id(), RecipePackFiles.source(plugin, FILE, group.id(), null, yaml));
+        }
+        for (var section : RecipePackFiles.sections(plugin, PackSection.FOOD_GROUPS)) {
+            if (RecipePackFiles.file(plugin, FILE).equals(section.file())) continue;
+            for (var group : read(section.yaml())) {
+                if (localById.putIfAbsent(group.id(), group) == null && section.file() != null) nextSources.put(group.id(),
+                        new RecipeSource(section.file(), List.of(section.sectionKey(), group.id()), false, true));
+            }
+        }
+        List<FoodGroupSnapshot.Group> local = List.copyOf(localById.values());
+        AdvancedPackGroups.load(plugin);
+        AdvancedRecipeTags.publishFoodGroups(local);
         Map<String, List<String>> tags = new LinkedHashMap<>();
         for (var group : local) tags.put(group.id(), group.items());
         CommonTagResolver.registerSource(SOURCE, tags);
         Map<String, FoodGroupSnapshot.Group> combined = new LinkedHashMap<>();
         for (var group : local) combined.put(group.id(), group);
         for (var group : KaleidoscopeCompat.refresh(plugin)) combined.putIfAbsent(group.id(), group);
+        sources = Map.copyOf(nextSources);
         return new Loaded(List.copyOf(local), FoodGroupSnapshot.of(List.copyOf(combined.values())));
     }
 
@@ -49,5 +68,6 @@ public final class FoodGroupStore {
         return List.copyOf(groups);
     }
 
-    public static void clear() { CommonTagResolver.unregisterSource(SOURCE); }
+    public static RecipeSource sourceOf(String id) { return sources.get(id); }
+    public static void clear() { sources = Map.of(); AdvancedPackGroups.clear(); AdvancedRecipeTags.clearFoodGroups(); CommonTagResolver.unregisterSource(SOURCE); }
 }

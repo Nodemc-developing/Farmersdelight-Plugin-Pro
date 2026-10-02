@@ -5,16 +5,23 @@ import net.momirealms.craftengine.core.util.Key;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-final class RecipeParsingSupport {
+public final class RecipeParsingSupport {
 
     private RecipeParsingSupport() {
     }
 
     static RecipeIngredient parseSimpleItemOrTag(String str) {
+        str = str.trim();
+        if (str.regionMatches(true, 0, "advtag:", 0, 7)) {
+            String group = str.substring(7).trim().toLowerCase(Locale.ROOT);
+            if (group.isEmpty()) throw new IllegalArgumentException("Advanced tag cannot be empty");
+            return new RecipeIngredient.AdvancedTag(Key.of(group));
+        }
         if (!str.startsWith("#")) {
             return new RecipeIngredient.Item(Key.of(str));
         }
@@ -55,21 +62,35 @@ final class RecipeParsingSupport {
     }
 
     /** Parses both the legacy string form and editor-generated item/choice maps. */
-    static RecipeIngredient parseIngredientValue(Object value) {
+    public static RecipeIngredient parseIngredientValue(Object value) {
+        return parseIngredientValue(value, 0);
+    }
+
+    private static RecipeIngredient parseIngredientValue(Object value, int depth) {
+        if (depth > 32) throw new IllegalArgumentException("Ingredient alternatives are nested too deeply");
+        if (value instanceof org.bukkit.configuration.ConfigurationSection section) {
+            value = section.getValues(false);
+        }
         if (value instanceof Map<?, ?> raw) {
-            Object choice = raw.get("choice");
+            Object choice = raw.containsKey("items") ? raw.get("items") : raw.get("choice");
             if (choice instanceof List<?> options) {
-                List<RecipeIngredient> parsed = new ArrayList<>(options.size());
+                Map<String, RecipeIngredient> parsed = new java.util.LinkedHashMap<>();
                 for (Object option : options) {
-                    RecipeIngredient ingredient = parseIngredientValue(option);
-                    if (ingredient != null) {
-                        parsed.add(ingredient);
+                    RecipeIngredient ingredient = parseIngredientValue(option, depth + 1);
+                    if (ingredient instanceof RecipeIngredient.Choice nested) {
+                        for (RecipeIngredient leaf : nested.options()) parsed.putIfAbsent(leaf.stableKey(), leaf);
+                    } else {
+                        parsed.putIfAbsent(ingredient.stableKey(), ingredient);
                     }
                 }
                 if (parsed.isEmpty()) {
                     throw new IllegalArgumentException("Choice ingredient must contain at least one option");
                 }
-                return parsed.size() == 1 ? parsed.getFirst() : new RecipeIngredient.Choice(parsed);
+                List<RecipeIngredient> optionsParsed = List.copyOf(parsed.values());
+                return optionsParsed.size() == 1 ? optionsParsed.getFirst() : new RecipeIngredient.Choice(optionsParsed);
+            }
+            if (raw.containsKey("items") || raw.containsKey("choice")) {
+                throw new IllegalArgumentException("Ingredient items or choice must be a list");
             }
             Object item = raw.get("item");
             if (item != null) {
@@ -77,7 +98,7 @@ final class RecipeParsingSupport {
                 return new RecipeIngredient.Item(Key.of(item.toString()),
                         nbt == null || nbt.toString().isBlank() ? null : nbt.toString());
             }
-            throw new IllegalArgumentException("Ingredient map must contain item or choice");
+            throw new IllegalArgumentException("Ingredient map must contain item, items or choice");
         }
         if (value == null || value.toString().isBlank()) {
             throw new IllegalArgumentException("Ingredient cannot be empty");

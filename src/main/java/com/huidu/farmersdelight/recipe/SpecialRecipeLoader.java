@@ -22,11 +22,14 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public final class SpecialRecipeLoader {
 
     private static final String FILE_NAME = "recipes/special_recipes.yml";
     private static final String ROOT_KEY = "special_recipes";
+    private static final Set<String> SUPPORTED_PAPERS_TYPES = Set.of(
+            "cooking", "cutting", "fluid_filling", "fluid_emptying", "soaking");
 
     // Cards the CraftEngine pack layer registered, with the exact instance it registered, so a later pass can
     // replace or drop them again without touching entries an addon or the plugin file owns under the same id.
@@ -42,6 +45,7 @@ public final class SpecialRecipeLoader {
     public static void load(FarmersDelightPlugin plugin, SpecialRecipeRegistry registry) {
         Map<String, SpecialRecipeInfo> fileEntries = new LinkedHashMap<>();
         YamlConfiguration config = loadConfig(plugin);
+        if (config == null) return;
         if (config != null) {
             parseInto(fileEntries, config, FILE_NAME);
             if (config.getConfigurationSection(ROOT_KEY) == null) {
@@ -106,8 +110,30 @@ public final class SpecialRecipeLoader {
      */
     private static void loadPackSections(FarmersDelightPlugin plugin, SpecialRecipeRegistry registry) {
         Map<String, SpecialRecipeInfo> current = new LinkedHashMap<>();
-        for (PackSections.Section section : plugin.packSectionsOf(PackSection.SPECIAL_RECIPE)) {
+        for (PackSections.Section section : RecipePackFiles.sections(plugin, PackSection.SPECIAL_RECIPE)) {
             parseInto(current, section.yaml(), section.source());
+        }
+        for (PackSections.Section section : RecipePackFiles.sections(plugin, PackSection.PAPERS_RECIPES)) {
+            ConfigurationSection root = section.yaml().getConfigurationSection(PackSection.PAPERS_RECIPES.rootKey());
+            if (root == null) continue;
+            for (String id : root.getKeys(false)) {
+                ConfigurationSection body = root.getConfigurationSection(id);
+                if (body == null) {
+                    I18n.logWarning("recipe.special_recipe_parse_failed", "id", id,
+                            "error", section.source() + ": expected a recipe mapping");
+                    continue;
+                }
+                String type = body.getString("type", "");
+                if ("info".equals(type)) {
+                    try { current.putIfAbsent(id, parsePapersInfo(id, body)); }
+                    catch (IllegalArgumentException invalid) {
+                        I18n.logWarning("recipe.special_recipe_parse_failed", "id", id,
+                                "error", section.source() + ": " + invalid.getMessage());
+                    }
+                } else if (!SUPPORTED_PAPERS_TYPES.contains(type)) {
+                    I18n.logWarning("recipe.papers_unsupported_type", "type", type, "id", id, "file", section.source());
+                }
+            }
         }
 
         for (Map.Entry<String, SpecialRecipeInfo> previous : PACK_REGISTERED.entrySet()) {
@@ -151,43 +177,23 @@ public final class SpecialRecipeLoader {
     }
 
     private static YamlConfiguration loadConfig(FarmersDelightPlugin plugin) {
-        File file = new File(plugin.getDataFolder(), FILE_NAME);
-        if (!file.exists()) {
-            // Carry over a server's old root-level special_recipes.yml (keeps player edits) before
-            // falling back to releasing the bundled default under recipes/.
-            File legacy = new File(plugin.getDataFolder(), "special_recipes.yml");
-            if (legacy.exists() && !legacy.isDirectory()) {
-                try {
-                    File parent = file.getParentFile();
-                    if (parent != null && !parent.exists()) {
-                        parent.mkdirs();
-                    }
-                    Files.copy(legacy.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                } catch (IOException e) {
-                    I18n.logWarning("recipe.special_recipe_save_failed",
-                            "file", FILE_NAME, "error", e.getMessage());
-                }
-            } else {
-                try {
-                    plugin.saveResource(FILE_NAME, false);
-                } catch (IllegalArgumentException e) {
-                    I18n.logWarning("recipe.special_recipe_save_failed",
-                            "file", FILE_NAME, "error", e.getMessage());
-                    return null;
-                }
+        return RecipeFileLoader.loadRecipeFile(plugin, FILE_NAME);
+    }
+
+    public static SpecialRecipeInfo parsePapersInfo(String id, ConfigurationSection section) {
+        Object item = section.get("item");
+        if (!(item instanceof String text) || text.isBlank()) throw new IllegalArgumentException("info.item must name an item");
+        Object description = section.get("description");
+        List<String> lines = new ArrayList<>();
+        if (description != null) {
+            if (!(description instanceof List<?> list)) throw new IllegalArgumentException("info.description must be a list");
+            for (Object line : list) {
+                if (!(line instanceof String textLine)) throw new IllegalArgumentException("info.description entries must be text");
+                lines.add(textLine);
             }
         }
-
-        try (Reader reader = new BufferedReader(
-                new InputStreamReader(Files.newInputStream(file.toPath()), StandardCharsets.UTF_8), 8192)) {
-            YamlConfiguration yaml = new YamlConfiguration();
-            yaml.load(reader);
-            return yaml;
-        } catch (Exception e) {
-            I18n.logWarning("recipe.special_recipe_load_failed",
-                    "file", FILE_NAME, "error", e.getMessage());
-            return null;
-        }
+        return new SpecialRecipeInfo(id, "", text, lines, List.of(), List.of(), false, false, false,
+                List.of(), SpecialRecipeInfo.DISPLAY_PAPERS_INFO);
     }
 
     private static YamlConfiguration loadBundled(FarmersDelightPlugin plugin) {

@@ -143,7 +143,7 @@ public final class RecipeEditorListener implements Listener {
                 event.getInventory().setItem(raw, template);
             }
         } else {
-            editor.handleButton(player, raw, event.isRightClick());
+            editor.handleButton(player, raw, event.isRightClick(), event.isShiftClick());
         }
     }
 

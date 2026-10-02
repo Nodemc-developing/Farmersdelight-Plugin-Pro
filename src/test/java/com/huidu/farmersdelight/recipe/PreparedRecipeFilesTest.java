@@ -84,6 +84,46 @@ class PreparedRecipeFilesTest {
         assertThrows(IOException.class, prepared::validateCurrent);
     }
 
+    @Test void literalContentPackIdentifiersRemainIntactDuringOwnerMaterialization() throws Exception {
+        var plain = PlainYamlDocuments.parse("papersdelight_recipes#addon: {addon:soup.v2: {type: cooking, result: minecraft:carrot}}\n", true);
+        var materialized = PreparedRecipeFiles.materialize(plain);
+        assertEquals(java.util.List.of("addon:soup.v2"), java.util.List.copyOf(materialized.getConfigurationSection("papersdelight_recipes#addon").getKeys(false)));
+        assertEquals("minecraft:carrot", materialized.getConfigurationSection("papersdelight_recipes#addon").getConfigurationSection("addon:soup.v2").getString("result"));
+    }
+
+    @Test void directoryRevisionsRejectFilesAddedWhilePublicationWaits() throws Exception {
+        Path folder = directory.resolve("configuration");
+        Files.createDirectories(folder);
+        Class<?> revision = Class.forName(PreparedRecipeFiles.class.getName() + "$Revision");
+        var read = revision.getDeclaredMethod("read", Path.class);
+        read.setAccessible(true);
+        var prepared = batch(Map.of(), Map.of());
+        var directories = PreparedRecipeFiles.class.getDeclaredField("directoryRevisions");
+        directories.setAccessible(true);
+        directories.set(prepared, Map.of(folder, read.invoke(null, folder)));
+        prepared.validateCurrent();
+        Files.writeString(folder.resolve("new.yml"), "papersdelight_recipes: {}\n");
+        Files.setLastModifiedTime(folder, java.nio.file.attribute.FileTime.fromMillis(System.currentTimeMillis() + 2_000));
+        assertThrows(IOException.class, prepared::validateCurrent);
+    }
+
+    @Test void preparedSourcesAreVisibleDuringPublicationAndRetainedAfterwards() throws Exception {
+        Path file = directory.resolve("configuration/addon.yml");
+        var prepared = batch(Map.of(file, PlainYamlDocuments.parse("papersdelight_recipes: {addon:soup.v2: {type: cooking, result: minecraft:carrot}}\n", true)), Map.of());
+        var defaultConfiguration = PreparedRecipeFiles.class.getDeclaredField("defaultConfiguration");
+        defaultConfiguration.setAccessible(true);
+        defaultConfiguration.set(prepared, directory.resolve("configuration"));
+        try {
+            prepared.publishWithin(() -> {
+                var sections = PreparedRecipeFiles.currentSections(com.huidu.farmersdelight.pack.PackSection.COOKING_POT);
+                assertEquals(1, sections.size());
+                assertEquals(file, sections.getFirst().file());
+                assertTrue(sections.getFirst().yaml().getConfigurationSection("cooking_pot_recipes").isConfigurationSection("addon:soup.v2"));
+            });
+            assertNull(PreparedRecipeFiles.currentDocument(file));
+        } finally { RecipePackFiles.invalidatePreparedSections(); }
+    }
+
     private PreparedRecipeFiles batch(Map<Path, YamlConfiguration> documents, Map<?, ?> revisions) throws Exception {
         var constructor = PreparedRecipeFiles.class.getDeclaredConstructor(Map.class, Map.class);
         constructor.setAccessible(true);

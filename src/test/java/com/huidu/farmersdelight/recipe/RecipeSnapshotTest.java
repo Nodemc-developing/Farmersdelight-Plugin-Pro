@@ -27,7 +27,7 @@ class RecipeSnapshotTest {
                 Map.of("group", Map.of("custom", custom)), Map.of(), Map.of(), List.of(base),
                 Map.of("group", List.of(base, custom)), Map.of("group", List.of(custom)), Map.of(), Set.of(),
                 0, generation, new HashMap<>(), new HashSet<>(),
-                FuzzyRecipeMatcher.compile(List.of(), FoodGroupSnapshot.empty()), Map.of(), List.of(), FoodGroupSnapshot.empty());
+                FuzzyRecipeMatcher.compile(List.of(), FoodGroupSnapshot.empty()), Map.of(), List.of(), FoodGroupSnapshot.empty(), Map.of(), Map.of());
     }
 
     @Test void mergedPublicViewsDoNotMixDefaultAndCustomRecipesAcrossConcurrentPublication() throws Exception {

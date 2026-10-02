@@ -51,11 +51,12 @@ public class CookingPotRecipeManager {
                     Set<String> validContainerKeys, int packRecipeCount, long generation,
                     Map<String, CookingPotRecipe> recipeCache, Set<String> recipeMisses,
                     FuzzyRecipeMatcher.Index fuzzyIndex, Map<String, FuzzyRecipeMatcher.Index> customFuzzyIndices,
-                    List<FoodGroupSnapshot.Group> localFoodGroups, FoodGroupSnapshot foodGroups) {
+                    List<FoodGroupSnapshot.Group> localFoodGroups, FoodGroupSnapshot foodGroups,
+                    Map<String, RecipeSource> sources, Map<String, Map<String, RecipeSource>> customSources) {
         static Snapshot empty() {
             return new Snapshot(Map.of(), Map.of(), Map.of(), Map.of(), List.of(), Map.of(), Map.of(),
                     Map.of(), Set.of(), 0, 0, newMatchCache(), newMissCache(),
-                    FuzzyRecipeMatcher.compile(List.of(), FoodGroupSnapshot.empty()), Map.of(), List.of(), FoodGroupSnapshot.empty());
+                    FuzzyRecipeMatcher.compile(List.of(), FoodGroupSnapshot.empty()), Map.of(), List.of(), FoodGroupSnapshot.empty(), Map.of(), Map.of());
         }
     }
 
@@ -76,6 +77,12 @@ public class CookingPotRecipeManager {
     }
 
     public long recipeGeneration() { return snapshot.generation(); }
+
+    public RecipeSource sourceOf(String id, String group) {
+        Snapshot current = snapshot;
+        return group == null || group.isBlank() ? current.sources().get(id)
+                : current.customSources().getOrDefault(group, Map.of()).get(id);
+    }
 
     public record ParseMetrics(int parsed, int reused) { }
     public ParseMetrics parseMetrics() {
@@ -126,12 +133,15 @@ public class CookingPotRecipeManager {
         // Ids whose winning definition came from a CraftEngine pack section; the registry buckets in the
         // startup summary read this, so it may only count entries that survived the merges below.
         Set<String> packIds = new HashSet<>();
+        Map<String, RecipeSource> sources = new LinkedHashMap<>();
+        Map<String, Map<String, RecipeSource>> customSources = new LinkedHashMap<>();
 
         Set<String> overriddenExternalIds = externalOverrideIds(config, "cooking_pot");
         RecipeFileLoader.loadRecipeSections(plugin, config, "cooking_pot_recipes", "cooking pot",
                 "recipes/cooking_pot_recipes.yml", (recipeId, section) -> {
                     CookingPotRecipe recipe = parsing.parse("file", recipeId, section, () -> parseRecipe(recipeId, section, 6));
                     newRecipes.put(recipeId, recipe);
+                    sources.put(recipeId, RecipePackFiles.source(plugin, RecipePackFiles.POT_FILE, recipeId, null, config));
 
                     indexDefaultRecipe(newIngredientToRecipes, recipeId, recipe);
                     indexContainer(newValidContainerKeys, recipe);
@@ -140,11 +150,16 @@ public class CookingPotRecipeManager {
                     }
                 });
         loadCustomRecipes(config, newCustomRecipes, newCustomIngredientToRecipes, newValidContainerKeys, inferredContainers, parsing, "file");
+        for (var group : newCustomRecipes.entrySet()) {
+            Map<String, RecipeSource> groupSources = new LinkedHashMap<>();
+            for (String id : group.getValue().keySet()) groupSources.put(id, RecipePackFiles.source(plugin, RecipePackFiles.POT_FILE, id, group.getKey(), config));
+            customSources.put(group.getKey(), groupSources);
+        }
 
         // Recipes a CraftEngine pack declares under cooking_recipes. Loaded after the plugin's own file so a
         // pack can never silently replace a built-in recipe, and before the API merge below so an explicit
         // runtime registration still wins on an id clash. CraftEngine read the files; see PackSections.
-        for (PackSections.Section packSection : plugin.packSectionsOf(PackSection.COOKING_POT)) {
+        for (PackSections.Section packSection : RecipePackFiles.sections(plugin, PackSection.COOKING_POT)) {
             RecipeFileLoader.loadRecipeSections(plugin, packSection.yaml(), PackSection.COOKING_POT.rootKey(),
                     "cooking pot [" + packSection.source() + "]",
                     packSection.source(),
@@ -155,6 +170,8 @@ public class CookingPotRecipeManager {
                         }
                         CookingPotRecipe recipe = parsing.parse(packSection.source(), recipeId, section, () -> parseRecipe(recipeId, section, 6));
                         newRecipes.put(recipeId, recipe);
+                        if (packSection.file() != null) sources.put(recipeId, new RecipeSource(packSection.file(),
+                                List.of(packSection.sectionKey(), recipeId), packSection.sectionKey().split("#", 2)[0].equals("papersdelight_recipes"), true));
                         packIds.add(recipeId);
                         indexDefaultRecipe(newIngredientToRecipes, recipeId, recipe);
                         indexContainer(newValidContainerKeys, recipe);
@@ -165,11 +182,29 @@ public class CookingPotRecipeManager {
             loadCustomRecipes(packSection.yaml(), newCustomRecipes, newCustomIngredientToRecipes, newValidContainerKeys, inferredContainers, parsing, packSection.source());
         }
 
+        for (PackSections.Section packSection : RecipePackFiles.sections(plugin, PackSection.CUSTOM_COOKING_POT)) {
+            if (RecipePackFiles.file(plugin, RecipePackFiles.POT_FILE).equals(packSection.file())) continue;
+            loadCustomRecipes(packSection.yaml(), newCustomRecipes, newCustomIngredientToRecipes, newValidContainerKeys, inferredContainers, parsing, packSection.source());
+            ConfigurationSection groups = packSection.yaml().getConfigurationSection("custom_cooking_pot_recipes");
+            if (groups == null || packSection.file() == null) continue;
+            for (String group : groups.getKeys(false)) {
+                ConfigurationSection entries = groups.getConfigurationSection(group);
+                if (entries == null) continue;
+                Map<String, RecipeSource> sourceGroup = customSources.computeIfAbsent(group, ignored -> new LinkedHashMap<>());
+                for (String id : entries.getKeys(false)) {
+                    ConfigurationSection body = entries.getConfigurationSection(id);
+                    if (body != null && newCustomRecipes.getOrDefault(group, Map.of()).containsKey(id)) sourceGroup.putIfAbsent(id,
+                            new RecipeSource(packSection.file(), List.of(packSection.sectionKey(), group, id), body.isSet("type"), true));
+                }
+            }
+        }
+
         // Merge addon-registered recipes last so they survive reloads; an editor override is explicit and wins.
         for (CookingPotRecipe recipe : externalRecipes.values()) {
             if (!overriddenExternalIds.contains(recipe.getId()) || !newRecipes.containsKey(recipe.getId())
                     || AddonRecipeFiles.ownerOf("cooking_pot", recipe.getId()) != null) {
                 newRecipes.put(recipe.getId(), recipe);
+                sources.remove(recipe.getId());
                 packIds.remove(recipe.getId());
                 indexDefaultRecipe(newIngredientToRecipes, recipe.getId(), recipe);
                 indexContainer(newValidContainerKeys, recipe);
@@ -207,7 +242,7 @@ public class CookingPotRecipeManager {
                 RecipeCollections.freezeLists(newSortedCustomRecipes), RecipeCollections.freezeLists(newSortedCustomOnlyRecipes),
                 RecipeCollections.freezeLists(newResultToRecipes), Set.copyOf(newValidContainerKeys), newPackRecipeCount,
                 snapshot.generation() + 1, newMatchCache(), newMissCache(), compileFuzzy(newRecipes, foodGroups.combined()),
-                Map.copyOf(customFuzzyIndices), foodGroups.local(), foodGroups.combined());
+                Map.copyOf(customFuzzyIndices), foodGroups.local(), foodGroups.combined(), Map.copyOf(sources), RecipeCollections.freezeNested(customSources));
         lastFileDocument = config;
         parsedRecipes = parsing;
         vanillaItemIdsByTagCache.clear();
@@ -330,6 +365,7 @@ public class CookingPotRecipeManager {
     }
 
     private CookingPotRecipe parseRecipe(String id, ConfigurationSection section, int maxIngredients) {
+        section = RecipeSchemaAdapter.normalizePot(section);
         FuzzyRecipeSpec fuzzy = parseFuzzy(section);
         Object rawIngredients = section.get("ingredients");
         if (fuzzy != null) rawIngredients = new ArrayList<>(fuzzy.perfect().keySet());
@@ -348,6 +384,7 @@ public class CookingPotRecipeManager {
             }
             try {
                 RecipeIngredient ingredient = RecipeParsingSupport.parseIngredientValue(rawIngredient);
+                AdvancedRecipeTags.requireDefined(ingredient);
                 if (!ingredientHasMembers(ingredient)) {
                     throw new IllegalArgumentException("Ingredient item or tag has no loaded items at ingredients[" + ingredientIndex + "]: " + rawIngredient);
                 }
@@ -378,7 +415,7 @@ public class CookingPotRecipeManager {
         if (result == null) {
             throw new IllegalArgumentException("Invalid result item: " + resultValue);
         }
-        if (!(resultValue instanceof Map)) {
+        if (!(resultValue instanceof Map) && !(resultValue instanceof ConfigurationSection)) {
             result.setAmount(Math.max(1, ConfigSectionReader.optionalInt(section, "result-count", 1)));
         }
 
@@ -507,6 +544,7 @@ public class CookingPotRecipeManager {
     }
 
     private boolean ingredientHasMembers(RecipeIngredient ingredient) {
+        if (ingredient instanceof RecipeIngredient.AdvancedTag tag) return !AdvancedRecipeTags.members(tag.key()).isEmpty();
         if (ingredient instanceof RecipeIngredient.Item item) {
             ItemStack stack = item.createStack();
             return stack != null && !stack.getType().isAir();
@@ -527,6 +565,7 @@ public class CookingPotRecipeManager {
     }
 
     private List<String> flattenIngredientKeys(RecipeIngredient ingredient) {
+        if (ingredient instanceof RecipeIngredient.AdvancedTag tag) return List.of("advtag:" + tag.key());
         if (ingredient instanceof RecipeIngredient.Item itemIngredient) {
             return List.of(itemIngredient.key().toString());
         }
@@ -791,6 +830,16 @@ public class CookingPotRecipeManager {
                 }
             }
 
+            for (String tagId : AdvancedRecipeTags.tagsForItemId(ItemUtils.resolveItemId(item))) {
+                Set<String> indexed = recipeIndex.get("advtag:" + tagId);
+                if (indexed == null || indexed.isEmpty()) continue;
+                if (recipesForItem == null) { recipesForItem = indexed; recipesForItemShared = true; }
+                else {
+                    if (recipesForItemShared) { recipesForItem = new HashSet<>(recipesForItem); recipesForItemShared = false; }
+                    recipesForItem.addAll(indexed);
+                }
+            }
+
             if (recipesForItem != null) {
                 if (candidates == null) {
                     candidates = recipesForItem;
@@ -846,6 +895,7 @@ public class CookingPotRecipeManager {
     }
 
     private boolean matchIngredient(ItemStack item, RecipeIngredient ingredient) {
+        if (ingredient instanceof RecipeIngredient.AdvancedTag tag) return AdvancedRecipeTags.matches(item, tag.key());
         if (ingredient instanceof RecipeIngredient.Item itemIngredient) {
             if (!ItemUtils.matchesItemId(item, itemIngredient.key())) {
                 return false;
@@ -995,7 +1045,8 @@ public class CookingPotRecipeManager {
     }
 
     private static Set<String> externalOverrideIds(YamlConfiguration config, String station) {
-        return Set.copyOf(config.getStringList("external-overrides." + station));
+        ConfigurationSection overrides = config.getConfigurationSection("external-overrides");
+        return overrides == null ? Set.of() : Set.copyOf(overrides.getStringList(station));
     }
 
     public int getCustomRecipeCount() {
