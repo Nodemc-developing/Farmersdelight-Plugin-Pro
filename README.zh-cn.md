@@ -4,7 +4,11 @@
 
 Farmersdelight-Plugin-Pro 是基于 CraftEngine 的 Farmer's Delight Paper/Folia 移植插件，提供作物、沃土、烹饪工作站、小刀、食物、配方发现、进度以及供附属使用的公共 API。
 
-作者：HuiDu_OwO、ydxc2009。
+本项目是在 [Farmersdelight-Plugin](https://github.com/IOVEYOUMC0/Farmersdelight-Plugin) 基础上持续维护的**优化分支**，保留原项目玩法，持续改进性能、异步调度、Folia 与新版本兼容、配方编辑体验及跨插件联动。
+
+原项目作者：HuiDu_OwO（IOVEYOUMC0）；本分支维护与优化：ydxc2009。
+
+**永久免费、完整开源。** 本项目发布的插件构建、全部功能及后续更新均永久免费提供。第三方依赖遵循各自项目的授权与发布规则。
 
 1.0.4 可通过 `/fd recipe edit` 进入菜单，选择厨具和配方组、搜索或翻页，编辑完成后返回原列表；同时包含森罗菜谱自动投料兼容、厨锅模糊配方和食材分组编辑，详见[兼容与配方指南](KALEIDOSCOPE-COMPAT.zh-CN.md)。
 
@@ -52,7 +56,7 @@ AGPL-3.0 授权；**如果把修改版作为网络服务提供给他人使用，
 第三方内容（搬运的 Farmer's Delight 素材、shade 进来的库，均为 MIT）保留各自的声明，见
 [NOTICE.md](NOTICE.md)。
 
-本仓库是本插件唯一的源码来源。其他人发布的构建产物（无论有没有加过代码）都与作者无关。
+本仓库维护本优化分支的源码与发布版本。上游项目及其他分支发布的版本由各自维护者负责。
 
 ## CraftEngine 26.10 快照
 

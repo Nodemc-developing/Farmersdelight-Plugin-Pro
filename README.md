@@ -4,7 +4,11 @@
 
 Farmersdelight-Plugin-Pro is a Paper/Folia plugin port of **Farmer's Delight**, powered by CraftEngine. It adds crops, rich soil, cooking stations, knives, food, recipe discovery, advancements and a public API for addons.
 
-Authors: HuiDu_OwO, ydxc2009.
+This project is a maintained **optimization fork** of [Farmersdelight-Plugin](https://github.com/IOVEYOUMC0/Farmersdelight-Plugin). Building on the original gameplay, it focuses on performance improvements, asynchronous scheduling, Folia and new-version compatibility, recipe editing and integrations with other plugins.
+
+Original author: HuiDu_OwO (IOVEYOUMC0). Fork maintenance and optimization: ydxc2009.
+
+**Forever free and fully open source.** This project's published builds, all features and future updates will always be available free of charge. Third-party dependencies follow their own licensing and distribution policies.
 
 Version 1.0.4 opens a menu from `/fd recipe edit`: choose a station and recipe group, search or page through recipes, and return to the same list when editing is finished. It also includes optional Kaleidoscope recipe-book filling, fuzzy cooking-pot recipes and a food-group editor. See the [integration and recipe guide (Chinese)](KALEIDOSCOPE-COMPAT.zh-CN.md).
 
@@ -49,4 +53,4 @@ The plugin is fully open source: the recipe editor, recipe-to-recipe jumps and h
 
 Third-party content (the ported Farmer's Delight assets and the bundled libraries) keeps its own notices; see [NOTICE.md](NOTICE.md) and [THIRD_PARTY.md](THIRD_PARTY.md).
 
-This repository is the only source of the plugin. Builds published by anyone else, with or without added code, are not ours.
+This repository maintains the source and releases of this optimization fork. The upstream project and other forks are maintained by their respective authors.
