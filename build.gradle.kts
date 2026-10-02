@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.huidu.farmersdelight"
-version = "1.0.4"
+version = "1.0.5"
 
 repositories {
     mavenCentral()
@@ -72,7 +72,7 @@ dependencies {
     implementation("net.momirealms:antigrieflib:1.0.11") { isTransitive = false }
     // bStats metrics (Maven Central). Relocated for the same reason, which is also what bStats itself
     // requires of every plugin that bundles it.
-    implementation("org.bstats:bstats-bukkit:3.1.0")
+    implementation("org.bstats:bstats-bukkit:3.2.1")
     implementation("net.momirealms:sparrow-yaml:1.0.22")
     implementation("net.momirealms:sparrow-ui:beta.38") { isTransitive = false }
     // UltimateAdvancementAPI: separate server plugin; vendored only for offline compile against its API.

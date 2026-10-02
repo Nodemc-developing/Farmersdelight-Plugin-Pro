@@ -397,6 +397,7 @@ console:
     disable_step_cleanup_wild_rice_blocks: "清理野生水稻方块"
     disable_step_cancel_pending_tasks: "取消待执行任务"
     disable_step_unregister_listeners: "注销监听器"
+    disable_step_shutdown_metrics: "停止 bStats 统计"
     disable_step_shutdown_scheduler: "关闭调度器"
     pack_sections_registered: "已占用 CraftEngine 数据包段：{ids}"
     pack_sections_unavailable: "CraftEngine 的数据包管理器尚未就绪，未能占用数据包段；数据包内的配方、特殊配方与进度都不会被读取。"

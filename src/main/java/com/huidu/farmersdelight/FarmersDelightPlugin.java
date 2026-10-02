@@ -367,7 +367,8 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
     private boolean enabledSuccessfully = false;
 
     // Farmersdelight-Plugin-Pro's bStats plugin id.
-    private static final int BSTATS_PLUGIN_ID = 32571;
+    private static final int BSTATS_PLUGIN_ID = 34448;
+    private Metrics metrics;
 
     // Required host platform; excluded from enchantment-conflict detection (it hooks the enchant event to manage
     // its own custom items and is always present, so it is not a competing enchantment system).
@@ -497,7 +498,7 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
         // copy stays private to this plugin instead of racing other plugins' copies for the shared name.
         if (BSTATS_PLUGIN_ID > 0) {
             try {
-                new Metrics(this, BSTATS_PLUGIN_ID);
+                metrics = new Metrics(this, BSTATS_PLUGIN_ID);
             } catch (Throwable t) {
                 I18n.logWarning("plugin.bstats_failed", "error", t.getMessage());
             }
@@ -541,6 +542,14 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
         // Order inside ListenerRegistry#stop: event delivery is detached before any listener state is torn
         // down, then the listeners' own tasks stop, then the world/chunk handlers detach.
         runDisableStep("plugin.disable_step_unregister_listeners", listeners::stop);
+
+        runDisableStep("plugin.disable_step_shutdown_metrics", () -> {
+            Metrics current = metrics;
+            metrics = null;
+            if (current != null) {
+                current.shutdown();
+            }
+        });
 
         recipeReloadCoordinator.close();
         if (particleDispatcher != null) {

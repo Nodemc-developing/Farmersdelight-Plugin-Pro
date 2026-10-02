@@ -397,6 +397,7 @@ console:
     disable_step_cleanup_wild_rice_blocks: "cleanup wild rice blocks"
     disable_step_cancel_pending_tasks: "cancel pending tasks"
     disable_step_unregister_listeners: "unregister listeners"
+    disable_step_shutdown_metrics: "stop bStats metrics"
     disable_step_shutdown_scheduler: "shutdown scheduler"
     pack_sections_registered: "Claimed the CraftEngine pack sections: {ids}"
     pack_sections_unavailable: "CraftEngine's pack manager is not ready yet, so the pack sections could not be claimed; craft-engine pack recipes, special recipes and advancements will not be read."

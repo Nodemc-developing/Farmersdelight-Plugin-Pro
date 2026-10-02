@@ -8,6 +8,8 @@ Authors: HuiDu_OwO, ydxc2009.
 
 Version 1.0.4 opens a menu from `/fd recipe edit`: choose a station and recipe group, search or page through recipes, and return to the same list when editing is finished. It also includes optional Kaleidoscope recipe-book filling, fuzzy cooking-pot recipes and a food-group editor. See the [integration and recipe guide (Chinese)](KALEIDOSCOPE-COMPAT.zh-CN.md).
 
+Version 1.0.5 uses bStats 3.2.1 with plugin ID **34448**, registered as **FarmersDelightPro**. Standard server/plugin statistics use bStats' asynchronous transport and Folia support. Server owners can opt out globally by setting `enabled: false` in `plugins/bStats/config.yml` and restarting the server. Metrics tasks stop when the plugin is disabled.
+
 ## Features
 
 - CraftEngine items, blocks, models, resource packs and loot integration.
