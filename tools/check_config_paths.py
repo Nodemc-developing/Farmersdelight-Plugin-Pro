@@ -488,7 +488,10 @@ def literal_paths(helper: str, args: str) -> list[str]:
         first = parts[0]
         if not STRING_RE.search(first):  # a numeric/boolean default, e.g. "8" or "true"
             parts = parts[1:]
-    values = [m.group(1) for part in parts for m in STRING_RE.finditer(part)]
+    # A string fragment inside a concatenation is not a complete config path.
+    # Computed paths are outside this literal checker, as documented above.
+    values = [json.loads(part.strip()) for part in parts
+              if re.fullmatch(r'"(?:[^"\\]|\\.)*"', part.strip())]
     return [v for v in values if v]
 
 
@@ -500,6 +503,10 @@ def main() -> int:
 
     root = module_root()
     if args.self_test:
+        assert literal_paths("getConfigInt", '8, "section.value", "legacy.value"') == ["section.value", "legacy.value"]
+        assert literal_paths("getConfigDouble", 'fallback, "section." + field, "legacy." + name') == []
+        assert literal_paths("getFirstConfigSection", 'computedPath, "section.literal"') == ["section.literal"]
+        assert literal_paths("getFirstConfigSection", '"section." + field') == []
         check_runtime_aliases(root)
     shipped = load_shipped_keys(root)
 

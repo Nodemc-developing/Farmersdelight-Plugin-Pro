@@ -1,4 +1,5 @@
 import java.util.zip.ZipFile
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     id("java")
@@ -7,7 +8,7 @@ plugins {
 }
 
 group = "com.huidu.farmersdelight"
-version = "1.1.0"
+version = "1.2.0"
 
 repositories {
     mavenCentral()
@@ -15,24 +16,36 @@ repositories {
     mavenLocal()
     maven("https://repo.momirealms.net/releases/")
     maven("https://repo.momirealms.net/snapshots/") {
-        content { includeModule("net.momirealms", "sparrow-ui") }
+        content { includeGroup("net.momirealms") }
     }
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
 }
 
-// CraftEngine is resolved from Maven. Overridable so a compatibility check can build the same sources
-// against another release without editing this file:  gradlew build -PceVersion=26.8.2
-val ceVersion = providers.gradleProperty("ceVersion").getOrElse("26.9.1")
-val ceJar = providers.gradleProperty("ceJar")
+// The supported host API is the pinned 26.10 snapshot; unpublished builds accept its plugin JAR.
+val ceVersion = providers.gradleProperty("ceVersion").getOrElse("26.10-SNAPSHOT")
+require(ceVersion.startsWith("26.10")) { "Farmersdelight-Plugin-Pro requires the CraftEngine 26.10 API." }
+val ceJar = providers.gradleProperty("ceJar").orElse(providers.environmentVariable("FARMERSDELIGHT_CE_JAR"))
+val fluidCoreJar = providers.gradleProperty("fluidCoreJar").orElse(
+    layout.projectDirectory.file("libs/FluidCore-0.1.0-SNAPSHOT.jar").asFile.absolutePath)
 val ceLibraries = providers.gradleProperty("ceLibraries")
 val ceSnapshotProxy = layout.buildDirectory.file("ceSnapshot/craft-engine-proxy.jar")
+val ceSnapshotPlugin = layout.buildDirectory.file("ceSnapshot/craft-engine.jar")
+val ceSnapshotLibraryDirectory = layout.buildDirectory.dir("ceSnapshot/libraries")
 val extractCraftEngineProxy = tasks.register("extractCraftEngineProxy") {
     onlyIf { ceJar.isPresent }
     if (ceJar.isPresent) inputs.file(ceJar.get())
+    if (ceLibraries.isPresent) inputs.files(fileTree(ceLibraries.get()) { include("**/*-remapped.jar") })
     outputs.file(ceSnapshotProxy)
+    outputs.file(ceSnapshotPlugin)
+    outputs.dir(ceSnapshotLibraryDirectory)
     doLast {
         val target = ceSnapshotProxy.get().asFile
         target.parentFile.mkdirs()
+        file(ceJar.get()).copyTo(ceSnapshotPlugin.get().asFile, overwrite = true)
+        if (ceLibraries.isPresent) copy {
+            from(fileTree(ceLibraries.get()) { include("**/*-remapped.jar") })
+            into(ceSnapshotLibraryDirectory)
+        }
         ZipFile(file(ceJar.get())).use { jar ->
             val entry = jar.getEntry("proxy.jarinjar")
                 ?: throw GradleException("CraftEngine snapshot is missing proxy.jarinjar")
@@ -41,8 +54,29 @@ val extractCraftEngineProxy = tasks.register("extractCraftEngineProxy") {
     }
 }
 val ceSnapshotFiles = files(ceSnapshotProxy).builtBy(extractCraftEngineProxy)
+val ceSnapshotPluginFiles = files(ceSnapshotPlugin).builtBy(extractCraftEngineProxy)
+val ceSnapshotLibraryFiles = files(fileTree(ceSnapshotLibraryDirectory) { include("**/*.jar") }).builtBy(extractCraftEngineProxy)
+// CraftEngine remaps these public libraries at startup. Build the same API namespace for
+// compilation and tests when a local remapped-library directory is not supplied.
+val ceCompileApiLibraries by configurations.creating { isTransitive = false }
+val prepareCeCompileApi by tasks.registering(ShadowJar::class) {
+    archiveFileName.set("ce-compile-api.jar")
+    destinationDirectory.set(layout.buildDirectory.dir("ceSnapshot/compile-api"))
+    configurations = listOf(ceCompileApiLibraries)
+    relocate("org.snakeyaml.engine", "net.momirealms.craftengine.libraries.snakeyaml.engine")
+    relocate("net.momirealms.sparrow.nbt", "net.momirealms.craftengine.libraries.nbt")
+    relocate("com.github.benmanes.caffeine", "net.momirealms.craftengine.libraries.caffeine")
+}
+val ceCompileApiFiles = files(prepareCeCompileApi.flatMap { it.archiveFile }).builtBy(prepareCeCompileApi)
 
 dependencies {
+    add(ceCompileApiLibraries.name, "org.snakeyaml:snakeyaml-engine:3.1.1")
+    add(ceCompileApiLibraries.name, "net.momirealms:sparrow-util:0.124")
+    add(ceCompileApiLibraries.name, "com.github.ben-manes.caffeine:caffeine:3.3.0")
+    if (!ceLibraries.isPresent) {
+        compileOnly(ceCompileApiFiles)
+        testImplementation(ceCompileApiFiles)
+    }
     compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     compileOnly("org.jetbrains:annotations:26.1.0")
     // Already provided by Paper; only the transport API is needed for per-player display packets.
@@ -51,10 +85,10 @@ dependencies {
     // CraftEngine from the official Maven repository.
     if (ceJar.isPresent) {
         // Allows compatibility checks against unpublished snapshots without bundling the server plugin.
-        compileOnly(files(ceJar.get()))
+        compileOnly(ceSnapshotPluginFiles)
         compileOnly(ceSnapshotFiles)
         if (ceLibraries.isPresent) {
-            compileOnly(fileTree(ceLibraries.get()) { include("**/*-remapped.jar") })
+            compileOnly(ceSnapshotLibraryFiles)
         }
     } else {
         compileOnly("net.momirealms:craft-engine-bukkit:$ceVersion")
@@ -73,16 +107,20 @@ dependencies {
     // bStats metrics (Maven Central). Relocated for the same reason, which is also what bStats itself
     // requires of every plugin that bundles it.
     implementation("org.bstats:bstats-bukkit:3.2.1")
+    implementation("org.xerial:sqlite-jdbc:3.53.4.0") { isTransitive = false }
     implementation("net.momirealms:sparrow-yaml:1.0.22")
     implementation("net.momirealms:sparrow-ui:beta.38") { isTransitive = false }
     // UltimateAdvancementAPI: separate server plugin; vendored only for offline compile against its API.
     compileOnly(files("libs/UltimateAdvancementAPI-Plugin-2.8.1-pro.2.jar"))
+    // FluidCore remains a separate optional plugin and owns these runtime types.
+    compileOnly(files(fluidCoreJar.get()))
+    testImplementation(files(fluidCoreJar.get()))
     testImplementation("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     if (ceJar.isPresent) {
-        testImplementation(files(ceJar.get()))
+        testImplementation(ceSnapshotPluginFiles)
         testImplementation(ceSnapshotFiles)
         if (ceLibraries.isPresent) {
-            testImplementation(fileTree(ceLibraries.get()) { include("**/*-remapped.jar") })
+            testImplementation(ceSnapshotLibraryFiles)
         }
     } else {
         testImplementation("net.momirealms:craft-engine-bukkit:$ceVersion")
@@ -110,7 +148,7 @@ val pluginArchiveBaseName = "Farmersdelight-Plugin-Pro"
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+        languageVersion.set(JavaLanguageVersion.of(25))
     }
 }
 
@@ -218,6 +256,10 @@ tasks.shadowJar {
     relocate("net.momirealms.antigrieflib", "com.huidu.farmersdelight.libs.antigrieflib")
     relocate("net.momirealms.sparrow.yaml", "com.huidu.farmersdelight.libs.sparrow.yaml")
     relocate("net.momirealms.sparrow.ui", "com.huidu.farmersdelight.libs.sparrow.ui")
+    from("LICENSE") {
+        into("META-INF/licenses")
+        rename { "Farmersdelight-Plugin-Pro-AGPL-3.0.txt" }
+    }
 }
 
 tasks.jar {
@@ -234,6 +276,10 @@ tasks.register<Jar>("apiJar") {
     archiveClassifier.set("api")
     from(sourceSets.main.get().output) {
         include("com/huidu/farmersdelight/api/**")
+    }
+    from("LICENSE") {
+        into("META-INF/licenses")
+        rename { "Farmersdelight-Plugin-Pro-AGPL-3.0.txt" }
     }
 }
 

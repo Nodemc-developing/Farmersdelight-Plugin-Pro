@@ -1,5 +1,6 @@
 package com.huidu.farmersdelight.block.behavior;
 
+import com.huidu.farmersdelight.FarmersDelightPlugin;
 import com.huidu.farmersdelight.api.util.ItemDelivery;
 import com.huidu.farmersdelight.util.BehaviorArgParser;
 import com.huidu.farmersdelight.util.Constants;
@@ -11,6 +12,7 @@ import net.momirealms.craftengine.bukkit.util.BlockStateUtils;
 import net.momirealms.craftengine.core.block.BlockDefinition;
 import net.momirealms.craftengine.core.block.ImmutableBlockState;
 import net.momirealms.craftengine.core.block.behavior.BlockBehaviorFactory;
+import net.momirealms.craftengine.core.block.behavior.RandomTickBlock;
 import net.momirealms.craftengine.core.plugin.config.ConfigSection;
 import net.momirealms.craftengine.core.block.property.Property;
 import net.momirealms.craftengine.core.entity.player.InteractionHand;
@@ -32,7 +34,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class OrganicCompostBlockBehavior extends FarmersDelightBlockBehavior implements ConfiguredBlockSetProvider {
+public class OrganicCompostBlockBehavior extends FarmersDelightBlockBehavior implements ConfiguredBlockSetProvider, RandomTickBlock {
 
     @Override
     public boolean isPathFindable(Object thisBlock, Object[] args) {
@@ -56,14 +58,17 @@ public class OrganicCompostBlockBehavior extends FarmersDelightBlockBehavior imp
             float waterBonus,
             float lightHighBonus,
             float lightLowBonus,
-            int lightThreshold
+            int lightThreshold,
+            boolean comparator
     ) {}
 
     private final Config config;
+    private final boolean randomTickEnabled;
 
-    private OrganicCompostBlockBehavior(BlockDefinition block, Config config) {
+    private OrganicCompostBlockBehavior(BlockDefinition block, Config config, boolean randomTickEnabled) {
         super(block);
         this.config = config;
+        this.randomTickEnabled = randomTickEnabled;
     }
 
     public Key getBrownMushroomColonyId() {
@@ -106,11 +111,19 @@ public class OrganicCompostBlockBehavior extends FarmersDelightBlockBehavior imp
         OrganicCompostBlockBehavior behavior = new OrganicCompostBlockBehavior(block, new Config(
                 compostingProperty, maxStage, Key.of(richSoilId),
                 Key.of(brownId), Key.of(redId),
-                activators, activatorBonus, waterBonus, lightHighBonus, lightLowBonus, lightThreshold
-        ));
+                activators, activatorBonus, waterBonus, lightHighBonus, lightLowBonus, lightThreshold,
+                BehaviorArgParser.getBoolean(arguments, "has-comparator", true)
+        ), section == null || section.getBoolean(new String[]{"random-ticking", "random_ticking"}, true));
         BlockBehaviorConfigs.register(block.id(), behavior);
         return behavior;
     };
+
+    @Override public boolean hasAnalogOutputSignal(Object nativeBlock, Object[] args) { return config.comparator(); }
+    @Override public int getAnalogOutputSignal(Object nativeBlock, Object[] args) {
+        if (!config.comparator() || args.length == 0) return 0;
+        var state = BlockStateUtils.getOptionalCustomBlockState(args[0]).orElse(null);
+        return state == null || state.isEmpty() ? 0 : IntegerComparatorBlockBehavior.signal(state.get(config.compostingProperty()), config.maxStage());
+    }
 
     @Override
     public InteractionResult useOnBlock(UseOnContext context, ImmutableBlockState state) {
@@ -185,9 +198,11 @@ public class OrganicCompostBlockBehavior extends FarmersDelightBlockBehavior imp
         return InteractionResult.SUCCESS_AND_CANCEL;
     }
 
+    @Override public boolean canRandomlyTick(ImmutableBlockState state) { return randomTickEnabled; }
+
     @Override
     public void randomTick(Object thisBlock, Object[] args) {
-        if (args.length < 3) return;
+        if (!FarmersDelightPlugin.isEnabled0() || !randomTickEnabled || args.length < 3) return;
         ImmutableBlockState state = BlockStateUtils.getOptionalCustomBlockState(args[0]).orElse(null);
         if (state == null || state.isEmpty()) return;
         Integer currentStage = state.get(config.compostingProperty());
@@ -211,6 +226,7 @@ public class OrganicCompostBlockBehavior extends FarmersDelightBlockBehavior imp
                     // load the chunk from a random tick.
                     if (!world.isChunkLoaded(nx >> 4, nz >> 4)) continue;
                     Block neighbor = world.getBlockAt(nx, ny, nz);
+                    if (!org.bukkit.Bukkit.isOwnedByCurrentRegion(neighbor)) continue;
                     if (neighbor.getType() == Material.WATER) hasWater = true;
                     // Count configured activators throughout the 3x3x3 box, including the center block.
                     // Compost contributes to its own chance when listed as an activator.

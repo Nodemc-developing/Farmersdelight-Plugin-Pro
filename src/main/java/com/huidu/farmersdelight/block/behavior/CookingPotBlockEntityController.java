@@ -77,11 +77,12 @@ public final class CookingPotBlockEntityController extends BlockEntityController
     private volatile boolean applyingPendingLoad;
     // The block pos is fixed for this controller's lifetime; cache the key so getItem/contents
     // (called per slot during container scans) need not reallocate it on every access.
-    private BlockPosKey cachedPosKey;
+    private volatile BlockPosKey cachedPosKey;
     private volatile SleepingTickerBridge<CookingPotBlockEntityController> sleepingTicker;
     private final AtomicBoolean wakeQueued = new AtomicBoolean();
     private volatile boolean tickLoaded;
     private int ticksUntilWork = 4;
+    private int ticksInWorkPass;
     private long observedInventoryVersion = Long.MIN_VALUE;
 
     public CookingPotBlockEntityController(FarmersDelightPlugin plugin, BlockEntity blockEntity, CookingPotBlockBehavior behavior) {
@@ -129,31 +130,35 @@ public final class CookingPotBlockEntityController extends BlockEntityController
 
     private void registerNativeTick() {
         if (sleepingTicker != null && plugin != null && plugin.getTickManager() != null) {
-            ticksUntilWork = 4;
-            plugin.getTickManager().registerNativePot(getBukkitWorld(), new BlockPosKey(blockEntity.pos), this);
+            ticksUntilWork = plugin.getTickManager().nativeWorkIntervalTicks();
+            ticksInWorkPass = 0;
+            plugin.getTickManager().registerNativePot(getBukkitWorld(), posKey(), this);
         }
     }
 
     private void retireNativeTick() {
         tickLoaded = false;
         if (plugin != null && plugin.getTickManager() != null) {
-            plugin.getTickManager().unregisterNativePot(getBukkitWorld(), new BlockPosKey(blockEntity.pos), this);
+            plugin.getTickManager().unregisterNativePot(getBukkitWorld(), posKey(), this);
         }
         if (sleepingTicker != null) sleepingTicker.sleep();
     }
 
     private void tickCooking() {
         if (!tickLoaded || plugin == null || plugin.getTickManager() == null) return;
+        ticksInWorkPass++;
         if (--ticksUntilWork > 0) return;
-        ticksUntilWork = 4;
+        int elapsedTicks = ticksInWorkPass;
+        ticksInWorkPass = 0;
+        ticksUntilWork = plugin.getTickManager().nativeWorkIntervalTicks();
         if (getEntityIfLoaded() == null) {
             loadPendingDataIfReady();
             getOrCreateEntity();
         }
         // Four actual awake callbacks form one work pass; sleeping time never becomes catch-up time.
-        if (!plugin.getTickManager().tickNativePot(getBukkitWorld(), new BlockPosKey(blockEntity.pos), this)) {
+        if (!plugin.getTickManager().tickNativePot(getBukkitWorld(), posKey(), this, elapsedTicks)) {
             sleepingTicker.sleep();
-            plugin.getTickManager().nativePotStateChanged(getBukkitWorld(), new BlockPosKey(blockEntity.pos), this, true);
+            plugin.getTickManager().nativePotStateChanged(getBukkitWorld(), posKey(), this, true);
         }
     }
 
@@ -166,11 +171,12 @@ public final class CookingPotBlockEntityController extends BlockEntityController
             plugin.scheduler().runAt(world, blockEntity.pos.x() >> 4, blockEntity.pos.z() >> 4, () -> {
                 wakeQueued.set(false);
                 TickManager manager = plugin.getTickManager();
-                if (!tickLoaded || manager == null || !manager.isNativePotRegistered(world, new BlockPosKey(blockEntity.pos), this)) return;
+                if (!tickLoaded || manager == null || !manager.isNativePotRegistered(world, posKey(), this)) return;
                 if (sleepingTicker.isSleeping()) {
-                    ticksUntilWork = 4;
+                    ticksUntilWork = manager.nativeWorkIntervalTicks();
+                    ticksInWorkPass = 0;
                     sleepingTicker.wakeUp();
-                    manager.nativePotStateChanged(world, new BlockPosKey(blockEntity.pos), this, false);
+                    manager.nativePotStateChanged(world, posKey(), this, false);
                 }
             });
         } catch (RuntimeException rejected) {
@@ -180,6 +186,19 @@ public final class CookingPotBlockEntityController extends BlockEntityController
     }
 
     public boolean isTickSleeping() { return sleepingTicker != null && sleepingTicker.isSleeping(); }
+    /** Used by grouped wake delivery, already scheduled on this block's owning region. */
+    public void wakeFromOwnerThread() {
+        if (sleepingTicker == null || !tickLoaded || plugin == null || !plugin.isEnabled()) return;
+        World world = getBukkitWorld();
+        TickManager manager = plugin.getTickManager();
+        if (world == null || manager == null || !manager.isNativePotRegistered(world, posKey(), this)) return;
+        if (sleepingTicker.isSleeping()) {
+            ticksUntilWork = manager.nativeWorkIntervalTicks();
+            ticksInWorkPass = 0;
+            sleepingTicker.wakeUp();
+            manager.nativePotStateChanged(world, posKey(), this, false);
+        }
+    }
     public long tickSleepCount() { return sleepingTicker == null ? 0 : sleepingTicker.sleepCount(); }
     public long tickWakeCount() { return sleepingTicker == null ? 0 : sleepingTicker.wakeCount(); }
 
@@ -356,7 +375,7 @@ public final class CookingPotBlockEntityController extends BlockEntityController
         World world = getBukkitWorld();
         if (world == null) return false;
 
-        BlockPosKey posKey = new BlockPosKey(this.blockEntity.pos);
+        BlockPosKey posKey = posKey();
         CookingPotBlockEntity entity = CookingPotBlockBehavior.getOrCreateBlockEntity(posKey.toLocation(world));
         if (entity == null) return false;
 
@@ -373,10 +392,13 @@ public final class CookingPotBlockEntityController extends BlockEntityController
     private CookingPotBlockEntity getOrCreateEntity() {
         World world = getBukkitWorld();
         if (world == null) return null;
-        if (this.cachedPosKey == null) {
-            this.cachedPosKey = new BlockPosKey(this.blockEntity.pos);
-        }
-        return CookingPotBlockBehavior.getOrCreateBlockEntity(this.cachedPosKey.toLocation(world));
+        return CookingPotBlockBehavior.getOrCreateBlockEntity(posKey().toLocation(world));
+    }
+
+    private BlockPosKey posKey() {
+        BlockPosKey key = cachedPosKey;
+        if (key == null) cachedPosKey = key = new BlockPosKey(blockEntity.pos);
+        return key;
     }
 
     void refreshFromEntity(CookingPotBlockEntity entity) {
@@ -446,7 +468,7 @@ public final class CookingPotBlockEntityController extends BlockEntityController
     private CookingPotBlockEntity getEntityIfLoaded() {
         World world = getBukkitWorld();
         if (world == null) return null;
-        return CookingPotBlockBehavior.getBlockEntity(world, new BlockPosKey(this.blockEntity.pos));
+        return CookingPotBlockBehavior.getBlockEntity(world, posKey());
     }
 
     private void writeToEntity() {
@@ -488,7 +510,7 @@ public final class CookingPotBlockEntityController extends BlockEntityController
         refreshFromEntity(entity);
 
         if (plugin != null && plugin.getTickManager() != null) {
-            plugin.getTickManager().markActive(world, new BlockPosKey(this.blockEntity.pos), TickManager.BlockType.COOKING_POT);
+            plugin.getTickManager().markActive(world, posKey(), TickManager.BlockType.COOKING_POT);
         }
 
         CustomBlockUtils.markBlockEntityDirty(this.blockEntity);

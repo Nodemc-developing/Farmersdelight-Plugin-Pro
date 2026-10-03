@@ -1,0 +1,2615 @@
+{
+  "craftengine/farmersdelight/configuration/blocks.yml": [
+    "b9b24f9cb8eb42b448cb3a1fa35d402b664d6ca3a866494d22d699e8e69b04bc"
+  ],
+  "craftengine/farmersdelight/configuration/categories.yml": [
+    "a739bed0d8b7c08d59fabf8551b0bba0c145d26b47b3f95c773d19167ff18939"
+  ],
+  "craftengine/farmersdelight/configuration/crops.yml": [
+    "eb48d7b1c768d033f6bb92928618e64fc7087c6f4db5da08d2d2225240ff8b04"
+  ],
+  "craftengine/farmersdelight/configuration/food_block.yml": [
+    "4633e70817d3fe17516685dfeb6759952d8dab68d407754d9a5aadc918f5a19b"
+  ],
+  "craftengine/farmersdelight/configuration/gui.yml": [
+    "de379ac11efa3b2ac4163d090c82b261df20f883b9e13909de271a96f279d5de"
+  ],
+  "craftengine/farmersdelight/configuration/items.yml": [
+    "a959af0df81b817059469904183f54d97fba4f17d8e26199db9e64b2b911f1e8"
+  ],
+  "craftengine/farmersdelight/configuration/knives.yml": [
+    "82a5e2a1ccfdfd0d312b1616838bb051b9352697602826349ef29aeabc58a5fd"
+  ],
+  "craftengine/farmersdelight/configuration/meal_icons.yml": [
+    "531106a164624c2c740ccfe814fdb96ed2b76013ac5066e7afc71a268b029d3a"
+  ],
+  "craftengine/farmersdelight/configuration/mushrooms.yml": [
+    "aa405f2308043d8cbd8a9a08cb432945c6d1530799b80a7306e3278860c56024"
+  ],
+  "craftengine/farmersdelight/configuration/rope.yml": [
+    "79b736c7e5a353d926b7a98b4bd6a69d4f308c66ba6aa4794b812c45ab2606a5"
+  ],
+  "craftengine/farmersdelight/configuration/translations.yml": [
+    "0e6b7bd70ab8ffd22e3f19b863a76d3e6c9cd0788e3c98c9b09f63bf0f8187b3"
+  ],
+  "craftengine/farmersdelight/configuration/vanilla_crops.yml": [
+    "18b8c6821fccdf9ac7dcc5f8ba7e13c808f06b07ac4f181ed899d4dcb7883b43"
+  ],
+  "craftengine/farmersdelight/configuration/vanilla_loots.yml": [
+    "364fae2995f5fab0fdab46567255f76e8c7da9b6b52d44665e68a1dc69773d60"
+  ],
+  "craftengine/farmersdelight/configuration/wild_plants.yml": [
+    "4e79802714a09b4b71312dd8ab59603ac45fd8506f83f970a5257bb1c28b3611"
+  ],
+  "craftengine/farmersdelight/pack.yml": [
+    "4da08d7320ca7c7e4887dc2077bc94294ce5f2464be6e963f766ecae2aee01c3"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/items/skillet_cooking.json": [
+    "4ebb4e8729c2b1292a5964a66c4dfcb718d6f957085e3c4111aac3f474e953af"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/lang/de_de.json": [
+    "303a8d245182354831ac15a90d1ac773f6fd056296c48d6a0b0a7e8866b420a5"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/lang/en_us.json": [
+    "ad612d5fa1fee8dad09746e634d658d2e3d0d5930e8cefc934061d071561b5d5"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/lang/es_es.json": [
+    "b109be048371c85a975d0e9b1ce078fa9b852ee08b72a0707c34f23fe04761f7"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/lang/es_mx.json": [
+    "0ad0d57db8530cf71be982a6ec56b89371403bc2dd1f83ff2671b534d6272de1"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/lang/fr_fr.json": [
+    "a2b3c11730192088da7b6492849711e78538616c27ac4683bbd34e6c1ba93729"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/lang/it_it.json": [
+    "72a868a79938268f4981cd5606d302c529ca41eec5bf5a8bded42314baa22f48"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/lang/ja_jp.json": [
+    "2ae79103c841430dcdeed874cd9f590c0d99d92340f860263be72df21b5fdebb"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/lang/ko_kr.json": [
+    "79ace8601f9e5cc2264300bcef6dda143693bcec71dfd863a897709b87ba1b29"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/lang/nl_nl.json": [
+    "83c65ae08f6de6cef214cf4816f8fbbfd6df658f36d07b37b1e23ed71f27c9cb"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/lang/pl_pl.json": [
+    "0801aff5eb6a620bd7d6a101ec92bd4086461e8274f41d76e557bfe9156dc6c4"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/lang/pt_br.json": [
+    "c7070a7908fc650c3487d90454d3e949a4c3cb5738e5161d6775cd4f5d0cf9b3"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/lang/ru_ru.json": [
+    "67cd642a90b288e0ddf3a1008531b1e44bbd5c53ac1ddf467ef72a87b03180f5"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/lang/tr_tr.json": [
+    "850eb0a10ca089e6470ece283c856f1ad05a825cdef822fb2b847b3e769e8edb"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/lang/uk_ua.json": [
+    "c8185d6a4bc2662a951cdf21317451c5db5cc6777a94f447cfd12ceb0dd50ed4"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/lang/zh_cn.json": [
+    "5237903b8866646b22490656912648e55091e25c9446dcdae6b176322094e7cc"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/lang/zh_hk.json": [
+    "e0f5ed011fcde2dd44ee6e94d0d87b466d9b26127bde4995a3216f37772aeefe"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/lang/zh_tw.json": [
+    "8c21f186fec42af299e547c78dcf0f43ff55faa1b5c757a73acf52b8c09b9ff9"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/acacia_cabinet.json": [
+    "13817b5974fb08c2fd6695695f0ec829dad052278db7bd5fab81f4abaaddbb26"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/acacia_cabinet_open.json": [
+    "7df7883e60573ddab2223bb4ab99970602ce76eda5f079073faadd1e3b03d63f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/apple_pie.json": [
+    "7767fde662b3e3737e8b979d139edb5a159b928435838529c84b5fdc68e22217"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/apple_pie_slice1.json": [
+    "78cbd6a92c61606a2a3c060ff65aa89201cff6e86cb26c5d93bfe894e9667e95"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/apple_pie_slice2.json": [
+    "936ef667e169d2afb5d2e70e0e98dc1a304bb9970b65c47e494aad8e7a6703fd"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/apple_pie_slice3.json": [
+    "0b9203d70c01a78176d2fdb065c681e7d192727d02a5be683d47324348a09e41"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/bamboo_cabinet.json": [
+    "f7851d3c80f67f6ec19c32f4bc8c192348683e0bc9f043b5fdaf9ef7fc699427"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/bamboo_cabinet_open.json": [
+    "f2a6eb7788a8c35f044205b50a0703ec8e9c630f113f78ec57fcc7c4c70513b0"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/basket.json": [
+    "7dfd53dad4328df5370a68d638f5ba0d992d7fd7a529091ffb41f7ba7b165de0"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/beetroot_crate.json": [
+    "5afad5298c3a51768d4d8275a4b9b5e6635a7b4fac51302e4b3dbbceed90ccf5"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/birch_cabinet.json": [
+    "19b79478bbb7a794def2b8375c9ceb1d84bea37ae0ec1cb85f85f7d2fa459915"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/birch_cabinet_open.json": [
+    "dfc8037eaad337fe386735bc5318321449b3d56e7e121c3e89b24909b5f57933"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/brown_mushroom.json": [
+    "2dd3bc0b1a205a0e73ce86f287848d0c7db555131bd9e13bc06f32851630abb0"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/brown_mushroom_colony_stage0.json": [
+    "cfe6d8d0c8fec36ecad5c1fed304f39f61d0a2895178d1024873f1982905624e"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/brown_mushroom_colony_stage1.json": [
+    "5f89aabe62aa45e465817a9152986966711a652bfa4e2bd380b976e77b2500ce"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/brown_mushroom_colony_stage2.json": [
+    "d66f9f76c929e9904406b68e4c7eaac2b7aadfc6e2d31e5d05c5060d97e8e35d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/brown_mushroom_colony_stage3.json": [
+    "756419a2ec43dd556704632fad5ce05b3512fa45396ddf6b4bd619c59fc36f1c"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/budding_tomatoes_stage0.json": [
+    "c36e755d6c0a547e3550f8a78a4e376155ebc6be9e130b60dcdf31da9fe103ca"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/budding_tomatoes_stage1.json": [
+    "e2b70da43c9f4e1f26011be93cee66bf514e76c8037f9a50322eb22996dc841f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/budding_tomatoes_stage2.json": [
+    "7d57ebf1b5b5f51903f881efeef7da51cd18e33abdde4403c7ed8de3e823f498"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/budding_tomatoes_stage3.json": [
+    "c35a694c6fe03a8c702eb88d3ee23e613091449c9d48778a464f1aaa2f033b91"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/bush_crop.json": [
+    "8c355a5eca1d1b1c6dff044110c133debaef44832b80b4134f21ac4e90313cbb"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/cabbage_crate.json": [
+    "a6743009bed3d0c744fd2178a720079f793b9e3c80cf7f44c829f3decbe8f2cc"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/cabbages_stage0.json": [
+    "810bc54a3d410a18e0eddb60e5c9b8f3aae12d9457b65414932a4f034e210fb7"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/cabbages_stage1.json": [
+    "5361a1fe58047eefab46600719ffb3f657b5723199b7657a60dcc30bde345eb4"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/cabbages_stage2.json": [
+    "8d6b51772b9cc7fc6e5817b13f7e0ea3373861587dc4084e79ec2eb5f37c3a20"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/cabbages_stage3.json": [
+    "a02d113052590031e7ff11a277671d68483d7a6f69318ffede86ee807abdbc45"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/cabbages_stage4.json": [
+    "db4bf60c9c38df5c769b9fe5b47d13a4bf60086a996fea20b0b5945a66b19d2d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/cabbages_stage5.json": [
+    "4788b5b860f79fffb7cf0bcc3fadf83a5fa69fe83d31994bcee97898eab892d2"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/cabbages_stage6.json": [
+    "1ef8500bfd3abc8551bc43faebb0bd54e833b81fa8f69283989ba1a9389a48df"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/cabbages_stage7.json": [
+    "461657e7600fc50e6da21279d7bee77c27727d5345f169de0b4e8666667168d1"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/canvas_rug.json": [
+    "b11abd2d14d6dfd19c6f51c47f2d14608e78f94e9e35fc1ab4ad9a7eeef489b1"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/canvas_rug_anchor.json": [
+    "945920306ee893cf9ee918a02d9e644fe919542c5684600b77dd868b2ace44cf"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/canvas_rug_base.json": [
+    "e7339efe0bcf082951a66fbcdb7b9ac30e65762bf44a63909beef3cb9c02cd94"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/canvas_rug_no_east.json": [
+    "fe6463a3b66fcbdd9968cde608c6171978855c91a7e93e20870703fed1ab5026"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/canvas_rug_no_east_west.json": [
+    "09c99181649982a124baaa9fd9fc757c66fe19c45e54355db452201ce9f2b425"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/canvas_rug_no_east_west_north.json": [
+    "e6b4407f54799d6ab5e534d16888d245d2cb6849e35eafac3e038c3d79f76213"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/canvas_rug_no_east_west_south.json": [
+    "673c1cb08246a2471d0155c49edba61fd46be0788979587ba269a9182e666283"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/canvas_rug_no_north.json": [
+    "44f4fdac0658e756b8da0d487c2d515226c75cda49134a6d59fa613e1d1a81d7"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/canvas_rug_no_north_east.json": [
+    "bc168e1f593177d0e21a435d45bdfb553e8a4d62e601c074ca7f477506aff489"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/canvas_rug_no_north_south.json": [
+    "0a13f6de9ec74a96e3c8dd58e6f123538ef3461423f1957f7fe1784c6258f6bc"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/canvas_rug_no_north_south_east.json": [
+    "519d19aa5a3a921d13c6cc18e028475a82a2d2493872f701f8af77f29e860314"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/canvas_rug_no_north_south_west.json": [
+    "19725f5f1463a2ed77ea979794f9d230473c10c0d6241147dbe361ddb2e27710"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/canvas_rug_no_north_west.json": [
+    "58ec9582d3c5f76b57e7d2bc822a4ed0a99b073062cc7e2004ebdc6af70f4b35"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/canvas_rug_no_south.json": [
+    "d9700c2028eb6ce0d3a84ebcaf366dc44e781f5ac20c5da852186898ec9dbfc5"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/canvas_rug_no_south_east.json": [
+    "629405788fa61bf1742dda522df1b67984eb0cad28f8e5d52e8b928a74df3a61"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/canvas_rug_no_south_west.json": [
+    "881af0ec520a8ee83e5b5e32d31aae4bae7c413e1c8a5f472934eda4a7290222"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/canvas_rug_no_west.json": [
+    "2f2e1813a2ef8f580d69e6bd2975f4db1c02d517a4162d9c873051660b24932d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/carrot_crate.json": [
+    "7128b85b5e3ae58533484aa84f66a0f0db1cf8e05520a040b4b2a6b2bd19b89d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/cherry_cabinet.json": [
+    "317b1b3a8bc7df93f99bf4404ed18fb766216e10bf344339289cdbf6ead2f55a"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/cherry_cabinet_open.json": [
+    "5980ee90d4d60b8575107dbc5e90a622eb208176c5db7101c0f247fb631d2c74"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/chocolate_pie.json": [
+    "8adfa3c7063dde315f57053d35429730a60275bfc33a81ec5fe80aa2646575bc"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/chocolate_pie_slice1.json": [
+    "588e362b1e9da942892b4026bfaa120b3a2021ba6a32e57662ac8dff39068815"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/chocolate_pie_slice2.json": [
+    "19e95fd216e0d383865fb325daff473a8104ccaeaa667e7fdab35e9ae0ce6a13"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/chocolate_pie_slice3.json": [
+    "54a92f9cacb83a074856b466a1b1f8d530b82b6951faa46ed693ec51c65231d6"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/cooking_pot.json": [
+    "ee1de42f23b285b3fc7b85927b56e781af8cbf643407bfb7d7f810562775d3b4"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/cooking_pot_bail.json": [
+    "146b036c48575154d05368e77a9cf1ddb99201720f7e4a5a364f5f20b7cf9d95"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/cooking_pot_handle.json": [
+    "9232c8a1357b74ec451453561fef3485d0e81a07b63c07b0c2cde32f12af6b38"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/cooking_pot_handle_single.json": [
+    "d299b9996e425b54d0c9053c23a5ac45428a7e26e5d982835b4bfae3cf437d5d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/cooking_pot_tray_single.json": [
+    "50b99ba5664efe3461300f2b564c69ca0ba3002afb440064aa87884961deb7aa"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/crimson_cabinet.json": [
+    "dab4febc0f795a07fbfebacdba6fe23d4c330665250b9c8054e841c03f69584f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/crimson_cabinet_open.json": [
+    "b5dc096e45d27d5a5ffe1a011161ca9f8a453a87f6590ebf7e8af2f97455921a"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/crop_cross.json": [
+    "7db761e6ec07f609abd920d7a25cfa0524b686628881b98e6735e6331834a9b3"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/crop_with_rope.json": [
+    "2b1815585a898a71c040fcaa2d2031012f1fba8bd401d0d1c745d66f1ce43fee"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/cutting_board.json": [
+    "d70fc55d3d48ea5627f069ac2d4295b8521eb1d0fd9270c46d7cdffa91a99ab7"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/dark_oak_cabinet.json": [
+    "1054a1cdb06fe984614aa0a74fe7609a8ad97331c8ac35a9e248a9b18eef64ba"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/dark_oak_cabinet_open.json": [
+    "37b763612c85db3d5da77555602869bab917736fe3f5dc91ab4bd33fdfb8b78a"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/full_tatami_mat.json": [
+    "076ed8bdcfc93644c84b735b2bd6f4a8cdc8e4ac688076fa275060f9cf49c567"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/full_tatami_mat_foot.json": [
+    "985d66b47e7f5d40d0af5abf4563884fd9c7385da08bcfcc27903d0839a0a4ea"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/full_tatami_mat_head.json": [
+    "3a1d51e6d45427598ca477045fcc661f7a635ede41eaf456155439cd0386be79"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/gleaming_salad_block_leftovers.json": [
+    "73945afe143469b99849005dba384c9137a4e6570a2b5095fc0a2c12e1eb7d9f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/gleaming_salad_block_stage0.json": [
+    "c757370a73cd4071608b9b460da12ef60a5a973f02d98b26997a40e435d4dc6f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/gleaming_salad_block_stage1.json": [
+    "beff9d65b0c4085eb9ccc69c1a4a1b9f82c15d5e4c15af476595a01977085686"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/gleaming_salad_block_stage2.json": [
+    "2cb6c39ebd619603803dbd0e1df9cebf3efa89877a9106cf7f6363666186b568"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/gleaming_salad_block_stage3.json": [
+    "e242190fa20455c5d84acdb8a1d377a37d9c5502e131e3897c6a827b1117f782"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/half_tatami_mat.json": [
+    "2e680e8d20c178029ce092caf8be31700d863f4b3b0ae77ac8b59d6802906cca"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/honey_glazed_ham_block_leftovers.json": [
+    "bc6727e689210a7d9686b40e68f1ac5fd27f804c4e00d250bffc1b042625a253"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/honey_glazed_ham_block_stage0.json": [
+    "5a8c9d2614e491b8075195897963da532ccc27c39a141e28548a29396b65a0c2"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/honey_glazed_ham_block_stage1.json": [
+    "e37f6eb08a1ac53100ef8eec8285a66ef399fbe6bd228f51aaaa7be4eec743cc"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/honey_glazed_ham_block_stage2.json": [
+    "b07d4586dc08a899a27ca10891e8bf1e32a626b6ce12604b66f106e1456e926a"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/honey_glazed_ham_block_stage3.json": [
+    "c8e1ff0085c5337fa157f554b766828aaa8615d06b01cdd33ee3a983a6645964"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/jungle_cabinet.json": [
+    "c2a9dd0f471ffc9e3548d52f95d796d5ff07f5b0aeac54b06449a8634550d753"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/jungle_cabinet_open.json": [
+    "4c63ad912b59712e1b37d28578ebd426f16788a3247534c77248d3c50e4701bc"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/mangrove_cabinet.json": [
+    "061f109709b425d697e7707222bed17462bbe085c91666765eaf1f18ab3078d7"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/mangrove_cabinet_open.json": [
+    "e972ac2ee4b623317c0b9de7a3f47867672bbaa55c6fab4e2378f56b98f79fcd"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/oak_cabinet.json": [
+    "d17be1f63e3875ce5ca0716b2bde4b1c424ae144e37c35ff53117f4817c3709a"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/oak_cabinet_open.json": [
+    "c83198566049759ad947b5abf543b6c8a983c1071a92a936827784901541cad7"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/onion_crate.json": [
+    "2ed2f72dd96af3b5392bd1730a3965e5313717117c6f5d91fe504061c931a959"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/onions_stage0.json": [
+    "9df65755f2f3b110d60a9f0a20d336911a469c8364b16fdfa18facbfa732cd22"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/onions_stage1.json": [
+    "ee631089f2f7f83c361bc6c7d4693206bfd1426d9fd1963b10609d591ad10305"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/onions_stage2.json": [
+    "8f798de2a5cc9cd2c12ef55da930e2bab6ce13bdf4ef836a03a03a3742efc349"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/onions_stage3.json": [
+    "b816dcc763d0a9b49d03046218970e3f88f3dfaf201bed9ea8b4375ed8c22f60"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/organic_compost_0.json": [
+    "20f2d1d86250c5b80b500fc7ab06f8ce8e7e377a422e55ac2eb89759fddaf338"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/organic_compost_1.json": [
+    "20f2d1d86250c5b80b500fc7ab06f8ce8e7e377a422e55ac2eb89759fddaf338"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/organic_compost_2.json": [
+    "7f0d81ea6ee6878ecc2c6edb5aa1cc2e7dda5c0a381a3005f0fec1ef60ff6d29"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/organic_compost_3.json": [
+    "7f0d81ea6ee6878ecc2c6edb5aa1cc2e7dda5c0a381a3005f0fec1ef60ff6d29"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/organic_compost_4.json": [
+    "679d79706caf1ff9dfb6c7c98ef76f04c702af9ff06438af38c94fbed654d091"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/organic_compost_5.json": [
+    "679d79706caf1ff9dfb6c7c98ef76f04c702af9ff06438af38c94fbed654d091"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/organic_compost_6.json": [
+    "bc6f3db9a62ffe77dd63fe88548c76fdc7417f46fa35fea4d8784c231c18beaa"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/organic_compost_7.json": [
+    "bc6f3db9a62ffe77dd63fe88548c76fdc7417f46fa35fea4d8784c231c18beaa"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/pale_oak_cabinet.json": [
+    "7c8fb0f3ea08b3e419b8dee1d662d31f562c26de6ab1fe8cc64d44c6379bbac4"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/pale_oak_cabinet_open.json": [
+    "5246b48d6e137beca2b451d9d1278f013123d7735711bf3ecae21a48325dfc73"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/pie.json": [
+    "afe8d036639f52fee69a46bdfc4d234abd6884c6bf21ed855d3bb1e4b4bab3aa"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/pie_slice1.json": [
+    "776ba3f5996a140e0f38295ae92c8a9487703b31f0976f0a9348b67fa625c618"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/pie_slice2.json": [
+    "3037c6c6aa93bd0bf3a4c297aa67f1533b0dc364426d3805740067bd755badc3"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/pie_slice3.json": [
+    "08b0b2a70d39bb5cff22ad9671d9c94d8fc258415d1927c17efad963345cec57"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/potato_crate.json": [
+    "9001e3c501bedfd4cb7f3b4d56e3da7ebf57e8c41513c10551b40b60d6d9fe8a"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/pumpkin_pie.json": [
+    "4fd8e5e1bd547ae53f19e301472ce406cda6001df19736c01664956db368179b"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/pumpkin_pie_slice1.json": [
+    "2e75c8047b904534880bccf33ac4d901b01e47647d7226f1a564663202a88823"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/pumpkin_pie_slice2.json": [
+    "ac5e5cad82e3eb7787a12658e3227504cf4ea1f2162d44039377e7b543915eb1"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/pumpkin_pie_slice3.json": [
+    "cc06d64898573d66a4fd179d862fecbaac1e596b7b76f1ffcee258f9c685a6ba"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/red_mushroom.json": [
+    "5decb8ae56f41a479d982da537fbc2a74177fcf793b82dda21c1a5285193b6ae"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/red_mushroom_colony_stage0.json": [
+    "f5b0a634ac9b6cbacb6a1be69a8a1eb44afac3d2c7130d4e86a36f99de32dc3d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/red_mushroom_colony_stage1.json": [
+    "2e087d22fa4d06288e32d180587ff5cf2eb1bd3567451253f99b8a07a68c0765"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/red_mushroom_colony_stage2.json": [
+    "c507a7b19afe82493291b87ebca15617adb8044f698ff8389a55d3157a1266e7"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/red_mushroom_colony_stage3.json": [
+    "9af67199ee409c54afa737462bd0f873fdac8a8af48728af27a14cb7ca62314e"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rice_bag.json": [
+    "86a6b6fbecf81a8b88dba23dcf058c22a09b6279c336c7348ad868f100eeefb8"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rice_bale.json": [
+    "273b119a547e7c056a3b870d7917308204d22b243d4315599e0d84b961036ca9"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rice_panicles_stage0.json": [
+    "eacd087cefa803fae6ce7a5bb11082f77c3e625afa35681ab2112b6e986e5e6d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rice_panicles_stage1.json": [
+    "4573ef715e3d838f81e81a9ced1bb049f2a4ae5426d1946107c83a0a2766a282"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rice_panicles_stage2.json": [
+    "2a6dbee4b6f106ff01648fb781786f1d5041cd61aeb3bed30c2a0420c3148150"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rice_panicles_stage3.json": [
+    "9cb35c9f1b588113b27527a17ed0b27e946ed5a77016a1a91a48e28a27cf499a"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rice_roll_medley_block_leftovers.json": [
+    "ee44edcdf73b3eb0efc170b6d335bac9d9b34edc9a0c107f4765bf1aeede846f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rice_roll_medley_block_stage0.json": [
+    "3cbea1a3115a5cb3f1161008ba450e2ea2931fcef015ed7d2e53aab698fcf569"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rice_roll_medley_block_stage1.json": [
+    "b63dcb3d22fb6aca586b8048d78e0daff0d92746c5bb6222c722fd46ddbc97b3"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rice_roll_medley_block_stage2.json": [
+    "17d9d41f195d57730cbb86156477cbd97a9f69b7f775f8328b49cf9d6fb9ed23"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rice_roll_medley_block_stage3.json": [
+    "85ce52640c379561769081a66f20207c0a47f32aa66792750b58a13ae3a8a978"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rice_roll_medley_block_stage4.json": [
+    "466adb0ac60cad7c24739a89279fcd946322b330e3b4f8f596339887a55af05c"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rice_roll_medley_block_stage5.json": [
+    "d5db49a748637cac98e1d6f53edd72fafbebc15813627dec73c922b9d84008d6"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rice_roll_medley_block_stage6.json": [
+    "bfa6f61592e15bd6ac660a71671e00fe7fddbf3936223d1c44892a490b4d061e"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rice_roll_medley_block_stage7.json": [
+    "79d975a8b18e01a88eaa1f2daac2846fb5986f96c99caaf4c42e2b50501fb3c0"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rice_stage0.json": [
+    "97def6ce39098a19a4e93359ff10996dab7784431b7fd276c79f2e026edd2d12"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rice_stage1.json": [
+    "815d9c734f9b0d56991d73c99f886fb6f9eead939dcf830637c5cfcb9d3c44ea"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rice_stage2.json": [
+    "98b43095148f59917253114b8055b6db8940978bf1f54c03925cb1d589eb25d8"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rice_stage3.json": [
+    "bf05adc73219cf18e72a5e48dfaa95f2ed9e32f4675b98ba233412fba9bea9ef"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rice_supporting.json": [
+    "5a3d5da7454568c8991cfd95aafd19c36deac2d613e3d47c66370877332551f4"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rich_soil.json": [
+    "f4103d016706fd3991053e023ea728225cd9479a422c021076a9d606a9ed028e"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rich_soil_farmland.json": [
+    "cee4948238c136f137755497e1d63a01af71752a7de86b80384f02659de853f2"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rich_soil_farmland_moist.json": [
+    "a77070ace325c1e181cb24bbb4f769fa8de83d779aae57e94ba585cdf77b8bd2"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/roast_chicken_block_leftovers.json": [
+    "c9c16721bcee7f0d2154a3ab38b2e8d728f3f4c52d2fb1e759512581c1c427cd"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/roast_chicken_block_stage0.json": [
+    "3c5096deddd66fa2a370499cd9fa4c7a0db8d839ec481c734c50773313eb4c5a"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/roast_chicken_block_stage1.json": [
+    "978edf4631d246da1fa63be8550ca1ac5c48c4c9f77ad5a4b419f4e4ff3b613a"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/roast_chicken_block_stage2.json": [
+    "9cb0878294834a73c7a993bf24117d055509565e46c55838d72ac042089566c0"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/roast_chicken_block_stage3.json": [
+    "d7c9a25e9fedb1e93841b805849620d616839da859194b05f89403a9ffc4e1b5"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rope_all_side.json": [
+    "3ff52717c58266e4339abb01c250be3f8dc690f574e05e9008b7a4292cf1c57c"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rope_east_north_side.json": [
+    "bb4994a410131585a665017d60683b3285f90e7d2e0f7bd5a5cfe4d1ffffb064"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rope_east_north_south_side.json": [
+    "0fb39906ba5b3e8d2cf9ec4be8e74010d429adef9a4c28431375de630e305573"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rope_east_north_west_side.json": [
+    "aacc4acb8e188ce020fe98947a9c060a926b87a523f86f49bee396a51a179faa"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rope_east_side.json": [
+    "bf7b317f069364f595f1ae1764753503d07ee05731896538e9727dd6e34cdac4"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rope_east_south_side.json": [
+    "be418ea69496c6be3ee596346bff7ffff0b20ea891d8b3430579d0388c2b3744"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rope_east_south_west_side.json": [
+    "d286237379068da0edc743880d165d140084d48e64372675513fc7b4c2c04612"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rope_east_west_side.json": [
+    "27d56b11ad599900fbb7ebd9eec3c92857c6f5be4ce07601608492113f87d25c"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rope_north_side.json": [
+    "e0caf7b881d21dfeaf901d93040929d5b25056e4891c0546f3b2788cca98d33f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rope_north_south_side.json": [
+    "d5e5fb22ee405c98b38ece249351794ef0ab1331546bdf398c32074973fff67a"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rope_north_south_west_side.json": [
+    "0a18e3d798a6bd46b4394e7e142980c9386915b50074b88eb9fad90a3a1ec233"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rope_north_west_side.json": [
+    "9468ee1788d2cf0bc8da4443dd98d6f142bd5a4fe61ded8b1a8fe82002567c3e"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rope_post.json": [
+    "2d0231e4a3158ddda7b382a363975f2db4f20d8bd38a2a680072ecd51dec6ff0"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rope_south_side.json": [
+    "c915868904a32d5b15e8ba54130b92210d460a173fd396ae72e2c8ec7fa5e853"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rope_south_west_side.json": [
+    "80cb466b1cfdc39d37f1eeafd35f366a35e710a9472f2c6d36caf79b4eb310e8"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rope_west_north_side.json": [
+    "9468ee1788d2cf0bc8da4443dd98d6f142bd5a4fe61ded8b1a8fe82002567c3e"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/rope_west_side.json": [
+    "93ba59c464aadd3545ee74c969e0f2cc16c0d94796f42acae8aa4f352bddf2a0"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/safety_net.json": [
+    "1096c91310eebcd96997f9000b4dbcbc39d945e446802fd00f2eb19a2fa973ff"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/shepherds_pie_block_leftovers.json": [
+    "fb92b2c9b386050223228776e5c4d8ecd2e6802a868681beb4ebac043ab5cfe8"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/shepherds_pie_block_stage0.json": [
+    "a7b0dea7c890e3a20dda85a2bd644b4d81001a727f6f8619ca26da63d24b7078"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/shepherds_pie_block_stage1.json": [
+    "32e268d827eef6d837d4bef395249fa73746bb6ea6ea60b62c9df464af96521d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/shepherds_pie_block_stage2.json": [
+    "091921c6e58871b7f8d2e76204762d188ef3ac735b90ff2a6a70de453e884b99"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/shepherds_pie_block_stage3.json": [
+    "cdc6d5925ed296f73dfd699d4440216ca76b8658dd2b19cc865c21acd1df3066"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/skillet.json": [
+    "dc86f802b18ab7ca41976520e3ce35c71806865b51ad3969340a8dff8e2cbcfa"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/spruce_cabinet.json": [
+    "86da55417cbb9308b51d33e30496676abf25fdb4602bb38bd5c5a1714b751e6a"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/spruce_cabinet_open.json": [
+    "8c777eed7201ee11a6b8cdc301a0eb49e53fc75c099a47539db3a6d819e5eb9b"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/stove.json": [
+    "75407e64574ee654c31b4e9399d7eb2a3918525ee20ebec31ff49845bec2da24"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/stove_on.json": [
+    "26e741a349dee797521d80c353e0bf07105e52549553047666f6197949581aeb"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/straw_bale.json": [
+    "009bdfa410f61343bacb3832ee017985fb66e9b43557ed8ada3c9bb299d081e4"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/straw_bale_horizontal.json": [
+    "7acda6d21c5dbfc1c49e39346915f74996a08b5f8f928b1ccdd95fc5df58f86e"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/stuffed_pumpkin_block_stage0.json": [
+    "087f679bd51af248774ee7ff3d4372b37d2b7466f1206a76fbf2176a09b5dd40"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/stuffed_pumpkin_block_stage1.json": [
+    "2ac6a62b51cf19a292a5dcbfdcd15ffbacc171fa77f77974bf67384bb35f1434"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/stuffed_pumpkin_block_stage2.json": [
+    "f3214b034c415d1e094eef1a57b1a7feb2cc42ac2527f2d2c1eda8f8f83f021f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/stuffed_pumpkin_block_stage3.json": [
+    "4fe2f567a21836379678a3947891604a9a9b03975241461dcf214524e0774580"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/sweet_berry_cheesecake.json": [
+    "39455c8fca3c3a879a772e8e00683f332d442279a107d4e6a1818bb8067eabf7"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/sweet_berry_cheesecake_slice1.json": [
+    "e5de77ee330b88127ac6ec452ec5525ad7a8f30c3f87294efa73a2b7a5723495"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/sweet_berry_cheesecake_slice2.json": [
+    "6e9508e23eec7135faf6a89266afdd7d59e7b2823e8561761fe30c7a5cf05142"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/sweet_berry_cheesecake_slice3.json": [
+    "ad3dac6b927f45fcfab7609384ca0aa161eed460ad566345bfd1ab554a578676"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/tatami_even.json": [
+    "4cc863d7bf427c9c690c0bb579dffc6f5acccd176d837f8c110733902706ac9d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/tatami_half.json": [
+    "f7f8ecb8d409c65a75cf47fa6468826f1ad7488ec8a0904c51f81ec269ba26ec"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/tatami_odd.json": [
+    "f33cddb4fdb8c0d9f356e3fe31d09fb4e1638cdd6deb1994318069bd2c0bda14"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/template_farmland_custom.json": [
+    "4c45e7308cc3bcb96d0f22ccb9ddcf6cc91d7158f9bf8af8603d5f40324a89b0"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/template_pie.json": [
+    "b1e23a4c4450cd50f4d6a078e36afc1447269321e5533e925362cb8113a24597"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/template_pie_slice1.json": [
+    "aa8cc1f9e6e7bb2520ecbeee76c55a818fdef8274c9e4fe8d537bc66c6f68209"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/template_pie_slice2.json": [
+    "c8b18bf729ec09c108e09d5b6fcd9ab4a35b204f62b136b18749308abc209061"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/template_pie_slice3.json": [
+    "388e3af9c9277b86d5a7702229530dbc7df8f53234650724cddd4072002cb605"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/tomato_crate.json": [
+    "7ad1b30890cda936d29248849f7716e8f6c6909737376590984057af3940659b"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/tomatoes_stage0.json": [
+    "d891ca87742a0ac15bea1c7ff1320ac57beb12e73762f146d2fb32d5ae4d1e12"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/tomatoes_stage1.json": [
+    "e8df5b470470691d9ef941f7baed77e7783e58346724f6f3ff0070429ef5d2d5"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/tomatoes_stage2.json": [
+    "7733da8433f10cd82f385b1ac2bceb33e1d974c7fe914ee6236e73ff48f13540"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/tomatoes_stage3.json": [
+    "741b91c8460356e103d1374a510c85c3c1a6d3d69f7035a5c4392da508408b47"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/tomatoes_vine_stage0.json": [
+    "efc539dfb76ab5efe2f2cc4d9aa70bbd81ef6576f294de95ed328088f19bc838"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/tomatoes_vine_stage1.json": [
+    "e6cfdc5ff9dc09bc60a74718532cb23146b56958e0aa61abbf3b6694b43fda41"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/tomatoes_vine_stage2.json": [
+    "601c8ecad56473aecdd4e18396c033319eca94da3d6042d6a3363b6ed79363c0"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/tomatoes_vine_stage3.json": [
+    "40d189049a8cd90e4a9ff31c47826b0f74bfaa117bda5882ca5cc3f3f44a86bc"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/tray.json": [
+    "d09eb164b54a40cebc655692b3f4d28728231f997ca311f01768c9c9a39660e1"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/warped_cabinet.json": [
+    "45805ed094e64176f668379c689b7b57ff9c52e0186da750fbade1753283c2ea"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/warped_cabinet_open.json": [
+    "4d0b674c75acb8d9c3f1f6a82e3508d1aecbbe4ab1ddcf34666355fe09afc3a3"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/wild_cabbages.json": [
+    "352a3a667bab498ecf7d730d30dd44cac9cbdffa389bee12c43a62e2f9b7a406"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/wild_onions.json": [
+    "28843c17ba3be2d43bf1c2b791f5a12384843e9d466605038a38ceaf537dd7c8"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/wild_rice_bottom.json": [
+    "c68d965ea93154f0919cb007d75d86a768e29e668a9d1b3b2490335d8d1d50f4"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/wild_rice_top.json": [
+    "a02978ea732a850d567543d845c6171f4c1cd87f430042957e79f44fc07bba67"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/block/wild_tomatoes.json": [
+    "e702250d6c0c9909addf9e3aa2e083450880a7ae46b80fb86d783861fa28aca2"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/apple_cider.json": [
+    "e5f7f402b718e22d29d60f72c6f91aeca86ea917780cc4fd4342cd962105adde"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/apple_pie.json": [
+    "2f06c6bd62c5ecc6cf7b4a4e76d4f2f04424f24d71908b9fa0d5454ba84584f5"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/apple_pie_slice.json": [
+    "b636014801b3d76ff2091ca6d349df988ac9113adf0229801b1d2aef7fb7b274"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/bacon.json": [
+    "b1691e326a0047b6a43e64719044906e0a8ce6fc56276146ab7f50f1af45e306"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/bacon_and_eggs.json": [
+    "7edcfc965f05a8a870d78fb635ed0c502a93a2c68cffb118e5fac66b9dbf38e0"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/bacon_sandwich.json": [
+    "6789a24972dca0a452af21b31cf2eeaba2f80db767be1f8ee6864fbc3a54420c"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/baked_cod_stew.json": [
+    "d752c147aad3c68b0a177b9e2574357b30fdf5aeb7f121d3b30b2be5d9757b15"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/barbecue_stick.json": [
+    "f03c4c9e63ee7eaf9db905dc1bf800dd38b0d33d2991f561b7549f8ab696acaa"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/beef_patty.json": [
+    "9e6776f9dc6414d81d221e9f78a2e348acac51a82469e5e7df4d4e857e5dc8af"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/beef_stew.json": [
+    "733152b5c0c27ab03d04685972050d998882644c46fa524a605cae96d832ba19"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/bone_broth.json": [
+    "8abf07f449387c5d24b6e97bda5c7fdf034ad1ef24171fc7ebfd5aabe03d650f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/brown_mushroom_colony.json": [
+    "8c4565e19d59b11bb20fd91a05267672de8d8a9e27f512195c2dee94a8532ed0"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/cabbage.json": [
+    "b69d7c98fad29ff84bc3b116bf4e3f204c6aedd19c74596053404b7181dc7bf3"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/cabbage_leaf.json": [
+    "8dcead927ceb19928aad3f5c542b2cc0e76ad7580892b0b2d5572ffc2aa8cfdf"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/cabbage_rolls.json": [
+    "09d18d1db7b3f202c5030190b222d0e16de36a2b0c04322ab196ec3adf7e474e"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/cabbage_seeds.json": [
+    "9f087fbd3d4f88e187f7be4cf6093074f9dee64b4c8280ae3b07b03aaa17ed07"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/cake_slice.json": [
+    "d588860d7bb70b8d818254406f3a07b491eb052a3b457d4627fd78fe3a4e375a"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/canvas.json": [
+    "955df0b74c0df719e75d12f7346af3ac6330770728e65e5f02532875bc1394ba"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/canvas_rug.json": [
+    "21ed4b27ac9048de0022f3b8698cf1b565b65295a3c427c17f8cc3a3ce6f213f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/chicken_cuts.json": [
+    "ab47d3bfab875546f51e0be19e92ad87ddc5941d08b5628141963d86015f9126"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/chicken_sandwich.json": [
+    "817f107b031138446f29801686f61074728409223c31b2a4db160e7e6bf95e1f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/chicken_soup.json": [
+    "c5e72ad59def565bd771363e62f2eca2bea4ab6b58dfe716a6d8b789a74c93c9"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/chocolate_pie.json": [
+    "6843fecc3e305d7da4cf82a98af76c48afd2af0d30a4f60bd6cf178f16cac8c2"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/chocolate_pie_slice.json": [
+    "93070cb4744dabae2b4ff69f4a93bfb1d8bf441a936853c1b4cfe4bc11a8b35b"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/cod_roll.json": [
+    "c1dd356bd931c8541131b28d554ea55466f9d36707aa02a7f73eacd0c4005726"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/cod_slice.json": [
+    "561cf8aecc21b202f4bfe860fa8e42b49c06df761a02a77f135b727807898de0"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/cooked_bacon.json": [
+    "2e0091631b675712208de35eba5bee0ed98109fb012cc90eeb0a391fd22b2617"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/cooked_chicken_cuts.json": [
+    "2a7402879b6f018d0a90c493c1788f746f0eebf7000f35c7e25610db22456ec4"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/cooked_cod_slice.json": [
+    "55b751724c30cf87717feaf62a921ebfcb20aee020e2813682f7d10c4f4685ec"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/cooked_mutton_chops.json": [
+    "05818a6e52a8fdfd093cb04a313204db12cc680252513adf73d4800b6a0cb26a"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/cooked_rice.json": [
+    "2cc42144d5110e8fe8d0f404c8d3844bf59434be1a713ecfad14ec8dbc4300da"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/cooked_salmon_slice.json": [
+    "da5b6eec60939e3e8565e4c40841597ae2076c7f023ed15acffa3f5f6c7d0d39"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/diamond_knife.json": [
+    "4085e12ae922000703b45d3af64b91016dff952c87b305fb12210d9ade1a0c1b"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/dog_food.json": [
+    "7594ad86c0eef9c295893ffb6bf1edce9ec1842d51ef1bea4b04b62f5173354f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/dumplings.json": [
+    "530a92ccd399dc5f3f8ffc0316a57b95ce792043ac726564361b7c8a8f72eda3"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/egg_sandwich.json": [
+    "d38dada3b5b32e42944e8779c81e6c9dfff03b0b43cf4db55ac9a7dd028425dd"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/fish_stew.json": [
+    "5cc88b970d22b1a479a9a3d88237d45f79b0cc94584378f642de4ea92238928b"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/flint_knife.json": [
+    "e52fcc6cea0ac32b9865c5d500b08fedc96f60064dce5164e5a31da9c052e5b9"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/fried_egg.json": [
+    "d0414915b88095495aa8e8fc8ad28f5baf6753f767bfeed1d5dffd7eeb16285d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/fried_rice.json": [
+    "66dfb234626af584903cf6e46aa67de6a26003a420365efb984bd06a3c0d726d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/fruit_salad.json": [
+    "8db9ed1a4fb52825ba6944fe82fdf8668ae12f3892641409f6b0efb96aa2731a"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/full_tatami_mat.json": [
+    "31f9227752faf8f5d8af8a20045e13d368e8d0047d1650619c8c0dfcbd7eda2b"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/gleaming_salad.json": [
+    "f72bffc137e57b72afff1270e457ed58c21a6c8526b4ae6b66533811e3ca8ed3"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/gleaming_salad_block.json": [
+    "9211238d647616b6c97151e7d2a3dcc5fdd11d1e32e5cbb03924d5ea2ac5b054"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/glow_berry_custard.json": [
+    "71b9639cfac672a51c9fb426217086c77a7e3979f4e1dce84bb93a6bc93051b6"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/golden_knife.json": [
+    "9cc5f9cfd78902cf172f7c69ade4558f2f30ec3c0abd4ef3c255cd94880a81e0"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/grilled_salmon.json": [
+    "e48d6a199b15cbf445977103a6c65afae660da54554a9f0c84629f64692b35b5"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/half_tatami_mat.json": [
+    "44d919c1dd3fa235828958f87b34d40f93d5f9435b1eb9fdcc6c9f70eeb468e9"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/ham.json": [
+    "ad2053ec3f4c4c41b4fbd2356e7b91741a446db5ab69b5f738b3a2f24ea25b63"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/hamburger.json": [
+    "1efc45677c2e0b15e007c0dc9b82e4fde280444d75ece4fccef6e52916dade38"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/honey_cookie.json": [
+    "66b6654d1a3288b697330a350a1ef6cedcc75ccee68b699dfdb218de03b3c7f8"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/honey_glazed_ham.json": [
+    "f369d6e931d0980efac37b1635c331632c27929c6dec5715fb81d53406aa9cae"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/honey_glazed_ham_block.json": [
+    "4b39fac1d3fc3b758f4fc5f2d886f7d0ba9b0dd5f57c6ab701aca745d867daab"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/horse_feed.json": [
+    "8b70cb68e9cea3f45fc14ae0020d0af19b751f562a555feca412e2a63b5af274"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/hot_cocoa.json": [
+    "f235e01c80195923d69f90055685f20e9b5ab3ff025bf15e924303439aa353e4"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/iron_knife.json": [
+    "289e3f19df79d1a054bcd177f40e83de60dd80dce70fc17fdc80fbf5359ced2b"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/jungle_cabinet.json": [
+    "7865b28911ee29b2fd275e54e1bcfcf124665c686f1ac0bf62dd3c1b40cfaf98"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/kelp_roll.json": [
+    "194b8d369d3771e206def75d9669d24787451031802eb5f09c523dc2ced821ee"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/kelp_roll_slice.json": [
+    "9d5fc3f737ea66856072dee9fabcea4a815db64790fa6405c4de05d8c18eb15d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/melon_juice.json": [
+    "6eb2e5f83871a9450b158d2b89fe275df88397ef487db0ab434c37f8e710387b"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/melon_popsicle.json": [
+    "eb12cbfed7dfec7f92d43f7a3ea90c87c71c220de9932292fa3f460175105b69"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/milk_bottle.json": [
+    "4e380af94d4590cb8a5f53478f8a9b3b8cbc5fe5bf2bae68440501f2f3da7ddb"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/minced_beef.json": [
+    "419a93ce7772bb2c5cddad26efe2870b84f7ce9831b79ed1bb8c2f96fb54f2eb"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/mixed_salad.json": [
+    "da9b9e77cdefd24f4520e3d048cd3080d411df5fab62d9f201c73e638d72d79d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/mug.json": [
+    "1a32e55a1c94aa640bedf0fb41787167d71385e0acd2ca611c1fb28dddab33ba"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/mushroom_rice.json": [
+    "88f5b5d785a8aebb8fb3927d0891a556437f7b8bd3a632538ff1bf6522882703"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/mutton_chops.json": [
+    "207e8c305f31d495a4e4651b00a66b20ac4b560f302585d9bf955c06e85d045c"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/mutton_wrap.json": [
+    "03586799d4dab768a899b18fac0e18dbe3e75e2ce820f270fd05bd3bf66e0cb9"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/nether_salad.json": [
+    "1d4f822c94dfcd8511ed2e28dedda414facd71318284a4bc789b79fe239dfec3"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/netherite_knife.json": [
+    "80cdae65383acd62742e6a96917824a2b898a4b29832a6ae2accf702c9bbf93e"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/noodle_soup.json": [
+    "a00c118fa6d46b4200a69e68f6d19954c586ea33f737871af5db80c399c4e5fa"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/onion.json": [
+    "94f2e46f1acea831da58811b3f3876a36ff60b4908575f9214dc1875501adc27"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/onion_soup.json": [
+    "6dd8625d2da8e56d1f6ebfa0b71629a3a41744676c65033ef1cbce30a0216e83"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/organic_compost.json": [
+    "b3e8e9a7beeb1135905d1c5cd133b610e06bf489a6ff8dc6e33c0b2a6a55321d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/pasta_with_meatballs.json": [
+    "c271fdc5aae9149427c55b8658cafa1dcfe429679484b459db18c648d0a2ac55"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/pasta_with_mutton_chop.json": [
+    "408492f88572e4cb55ba199fafda5dcfe654f3fc4c85c79c81f3182073416062"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/pie_crust.json": [
+    "d04385dc25ef10cc77ad189a314078f424713c9680464d62e0618e24adeb786b"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/pumpkin_pie_slice.json": [
+    "2de1a2bb16381167a105ac76d202fe5ba580656806c4e1c4275d20fa0ba2bcbc"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/pumpkin_slice.json": [
+    "bd9adcafbc6bb4927559789b7f933817b2b5a2f240fe453de6460fd07d9ee356"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/pumpkin_soup.json": [
+    "9389ba2db305b5429f0cd29fa5750e9f99e735a4f793e90da571983c9c664031"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/ratatouille.json": [
+    "0b84652584c6d61e1dc2ab374163cbf9bc74402e1d02cb436036de422644cfd8"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/raw_pasta.json": [
+    "950b672aabc30bb0f7d0abb71f858f2e97a6de8cd0a521befdb16a60af01ef4a"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/red_mushroom_colony.json": [
+    "a56b2eec57f89ff62c8a824406c6940b273e88f4bb182353e32bff28f360f54d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/rice.json": [
+    "fc76f7efb397847d2d3a257036e070c49451cef0216b4a5ce6f1c86b22f7bcf0"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/rice_panicle.json": [
+    "055d2956986a99fa5a38e829e3666ed68febe8a1ca8458052f6cf44c183b2df0"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/rice_roll_medley_block.json": [
+    "38cb0626f78666286c0144d975027b6015afa51975a0f17c16259d690be9219b"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/rich_soil.json": [
+    "6def16a378db587a7107937170fdbe8e743bb53febf917ba315d0ae98f325d72"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/rich_soil_farmland.json": [
+    "0de1f5667782df0c958341400d716f00ced089f86f790c356bb3c380a091385f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/roast_chicken.json": [
+    "07c75cd66774dc7fb9da7990416d2dcb8bf3f421bc8f09c46495234d8342e6e7"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/roast_chicken_block.json": [
+    "4528cf0457374bb3cb2c17ee0a74da534792297ae06ec1aa539332a7c2459ddc"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/roasted_mutton_chops.json": [
+    "36d51a04e2e56ecb27d29d74ca6879fec9f13dcd4b16516c2cc5071d4f94dafb"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/rope.json": [
+    "d1dccc5b2dd44945fd36ffffdc279de3ff7be1668460758d2320500e525b196f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/rotten_tomato.json": [
+    "76e1b55e4b7a5eaa8ca734ff2fba1073d6cb5db06bc7825df16ca34bdf274f51"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/safety_net.json": [
+    "73811728ae151cf8af76fc2dbf9986d31e8dd291087041016af51282f4d8ed7d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/salmon_roll.json": [
+    "6fc6aa88b0e4b20340b63e7e2ee0c94cf22f4ad4ae693e8e0be49af663a08267"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/salmon_slice.json": [
+    "77e36de4207311bc59b191d3f060a2e5712022faa1989888a480d4660c15ed51"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/shepherds_pie.json": [
+    "0ba1fc177109a0655f249a2b758e80cc203b8f5b460d3c5bea22d92570a0abf2"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/shepherds_pie_block.json": [
+    "d14242c62c922cb0ed2d6bfa432c60f2370182621ea9dc81f3998729ffa404f6"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/skillet.json": [
+    "b5e60926fa138775e46a3e3c4acfdb81e40f052068b4e37b46bbc780c6ae5699"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/skillet_cooking.json": [
+    "b2e6bf59e156230e80c74df05177d010477b6b104bf9ffaec1f3eac78558b7ec"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/skillet_food.json": [
+    "a5e77f45905c8b9af97b63bf8e3c6b96fc1c23ab945bd8e7904baa6bd8c15261"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/smoked_ham.json": [
+    "c93b670bc6604d146c734a8a9496aedddf3b06143f5e67990a1258bdc85a1a6e"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/spruce_cabinet.json": [
+    "88b0fd05e9346f31fd423b9f3e1fa85153435c7e4d96649ac306f982e69a1f4e"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/squid_ink_pasta.json": [
+    "2a6b57ff2345c9019438a7320291461adc08030bc395aa303bee623b8ed0ac21"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/steak_and_potatoes.json": [
+    "1cf614af2fc0ca14fc5ca266b2f8f8b91571fdb92be97e4aa1ca7c3e59934558"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/straw.json": [
+    "b57250cef3b38b917a842edbc084f329838838df39a0313961d03ddd2372d525"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/straw_bale.json": [
+    "3d8f39b8b35ed2193ca8a2af4b56a55a88bc66b43ca81b14a33ba1b9cdd9e92b"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/stuffed_potato.json": [
+    "c1c6fdac165a30ddcac584575f79ef8e8efd8bc2bdaaac60f1de70d22990df6e"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/stuffed_pumpkin.json": [
+    "c524703cc39d4241584d084ee0b247b729a29f14e3e34a6b2f7d5b578e8bd5d7"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/stuffed_pumpkin_block.json": [
+    "962f62c31f182d4855d19e0cb96871a313319e4366875519a595f1c1b7fc9a01"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/sweet_berry_cheesecake.json": [
+    "eb0108506078c17d02647c0be5c2bc26635f86071cb9577b003e6e1460cd99ed"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/sweet_berry_cheesecake_slice.json": [
+    "01cc8428363e77572f68ce41a92f49d1f59e46d7368643858fc2ddd4a391619a"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/sweet_berry_cookie.json": [
+    "f470f2e0c772313509681737fbe6579d315887a8a707cfd08fbf76321a7ab0c8"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/tatami.json": [
+    "fd63e1366230d5481cd242de7ef1313a4c08436537c3742b4db5c66ceb192a64"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/tomato.json": [
+    "8a95b4df4c8e7fbe00f61add623f8f116cd5142562b9736433dc220cb1fad8f0"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/tomato_sauce.json": [
+    "7be62e155e2fa04d6455dc9356fd993af03e352ec403b10e7843b209b8749aa2"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/tomato_seeds.json": [
+    "2d8c9862be1b7f8b6a0dae0e6fc3e11c0039ec2fa3605d6ce8a2a20060ecac22"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/tree_bark.json": [
+    "bd9a0057c61f1a45cd9cbcb80bc5c579593e1f6ee2532d5d1768fa6fe175ce19"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/vegetable_noodles.json": [
+    "f658fcc917b35541a209e35377a034a8a7b47e5d1543689056c6a44f95731b77"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/vegetable_soup.json": [
+    "07a1b6838bb7c9a5d5530b29447c9f6d2fc048c3980a841c01767b1b83e3bffe"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/models/item/wheat_dough.json": [
+    "9625bbbad17e3ade5115bf22285c896635ff2dcff2c237fdcdb8f303ab37a28c"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/sounds.json": [
+    "93b6174141f2485977263052033b0f951ccbb4b7885214713c23f047c7522055"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/sounds/block/cooking_pot/boil_soup1.ogg": [
+    "b942e2d531f6c684e43e9ae789eadad86fd2fa086fd15b6231471abe17a77d5a"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/sounds/block/cooking_pot/boil_soup2.ogg": [
+    "5fb1d7f8a0997997b22589fa48fb9e82d35f3ec7ec6948a47d3a737c120a4ee2"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/sounds/block/cooking_pot/boil_soup3.ogg": [
+    "5b7bb50d7ff33ccac57535daad4c60e5bacee6010a981a0fa3901b0e55058270"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/sounds/block/cooking_pot/boil_water1.ogg": [
+    "52d83de7d417cd77cfbe2638ff240b2a2f1412c7b2380007b3a3b24de8a4ed7c"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/sounds/block/cooking_pot/boil_water2.ogg": [
+    "2d50854202f1cd0f3cdbcc5a458efe2c172cd7643b10bc00d630d6bbed944b9b"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/sounds/block/cutting_board/knife1.ogg": [
+    "bdcc6de3746c7f063d9ca34f1ca83d8ed72895581f7fa73339d989aa228f386d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/sounds/block/cutting_board/knife2.ogg": [
+    "2c02ed6480d9d77b528e73d4f09ccef7b1d0f8b46155e2e4071f86253718d2ad"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/sounds/block/skillet/add_food1.ogg": [
+    "08298e690153b908a40806dc749d5e0ad8c457e595db94dc896013ebe31f9267"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/sounds/block/skillet/add_food2.ogg": [
+    "89f443ef8fe30c8dd0afd3d95a81a7e00047d9ec7f98b41a77a09bb06a3a8d5d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/sounds/block/skillet/attack_strong.ogg": [
+    "f223348823e3968d6026fdbe444bee956d9134bcad2d521365cabfae8224baaf"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/sounds/block/skillet/attack_weak.ogg": [
+    "559cd29d2b083bd97e662957cae4b443e82c5ccb0a6433d393e42568d0e4184f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/sounds/block/skillet/sizzle1.ogg": [
+    "13c2d8b49c067065e34363894b783272633dacde5da6e56c1c4d9fd6409b111d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/sounds/block/skillet/sizzle2.ogg": [
+    "1ad40774dbc29b1478611590229950af35ade1a6521c5044b12de7e30d4df492"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/sounds/block/skillet/sizzle3.ogg": [
+    "765977ae2f14581558619be87e132572cf31e5fe77c7faef0f49f71fca90733f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/acacia_cabinet_front.png": [
+    "364a1e6a36a3afb3e534169dba6713933aa071ac0c352cacdbe667be33f0c71b"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/acacia_cabinet_front_open.png": [
+    "4c7e5e7a5d6dce626b94bea8f4b3f88870c850015f16645a1ae4f6bddd795eb4"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/acacia_cabinet_side.png": [
+    "8115d3982562c422a695ada769c5427e5df1b12ab8941e5532c1d504b705fb41"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/acacia_cabinet_top.png": [
+    "8eb5f1931500da64ff4a652110da44207fe6c2ea4a852d7efe92135df46c564e"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/apple_pie_inner.png": [
+    "fb835ba0a54a3afb6ec415d728c66091e6a5b8ece46cce8c2e92726a8125005e"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/apple_pie_top.png": [
+    "edaf47a3038912c49163463125417762fa4c9c617e4992f12ec88087a4bb7995"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/bamboo_basket_bottom.png": [
+    "674b8d01d17230c59953c2e725a41fe72a56b17f0d14e48155ada842b999758e"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/bamboo_basket_handle.png": [
+    "4f1c529fe63c4f301be441193df83028e2ff90787a550cd0082f66f0875f5935"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/bamboo_basket_side.png": [
+    "8c6a56fac6a997efd498cbeb70684f2a313e50312f7b0ca0e7748f2a2c3408ca"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/bamboo_basket_top.png": [
+    "d6f973bb7ab6bd8bb525575e6df704eab98b38c3951a881ffe0e137310c2548a"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/bamboo_cabinet_front.png": [
+    "a66a0da2791ce254103361b72359d74cc341b08d38065cc916cc35a051eb0fd9"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/bamboo_cabinet_front_open.png": [
+    "ea557365368c31eff080d284c026c2bb02fa2bf875ceab1e90b5cfda8384f9c7"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/bamboo_cabinet_side.png": [
+    "5639835b4daee989cf8c5b105ca2a4bdd4f8edc0859f1e6a6258940109c9ff17"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/bamboo_cabinet_top.png": [
+    "75de2a184c02a527bc33d7f139d2180503dff4d0cabea25a3bdbebad2c05d1a5"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/beetroot_crate_side.png": [
+    "077e2dc6728cb77716810051a76c0f8fc48d0df80b74a9f6d0e1dcbb5ab52748"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/beetroot_crate_top.png": [
+    "0ef9edb31f722bb5720c44b3aa8f5685f96cdb99d603863701637cd9b82916a7"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/birch_cabinet_front.png": [
+    "c7ff9da409ff34ab7fac83ed13e70426adfd440da95d52057d48c0951cd1d085"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/birch_cabinet_front_open.png": [
+    "a5965145db9fde5d280d9a52e12434e6b4d678b39e2c47b8b57bc8061bda921c"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/birch_cabinet_side.png": [
+    "76f8dbeac754d1e9f954e57e22642797669f2ac038b7d0c8194b5aeccd4692c0"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/birch_cabinet_top.png": [
+    "b6ac1e21f898b6a522a76b9cef2dad60f69698743903653ef5122ec40c30a685"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/bowl.png": [
+    "e7ce38a5152c4bd35d690c9fdf071ad7be08845f4a412e7b42c627be64d7ed9f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/brown_mushroom_colony_stage0.png": [
+    "630f123c3d3f5ba31a2a9341a043623d0395b0942025a7067436d4a64c06f046"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/brown_mushroom_colony_stage1.png": [
+    "df315addc289a971a17277b28e5955a14df4406527c3ea46dc1514b43d9df6a5"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/brown_mushroom_colony_stage2.png": [
+    "dd819879094a658d830244026b187c4a331bd506634378ba2bbc103804b9735b"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/brown_mushroom_colony_stage3.png": [
+    "e607bcf997301d932749ee747808c91af9ca7dd07bd15abe0cf7c03b7f08f18f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/budding_tomatoes_stage0.png": [
+    "244232b51837a0d81b9bb9b3e50a0d1d001ef30448f9d0746459b4e02600d923"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/budding_tomatoes_stage1.png": [
+    "9841901cb80cd32365b7bc483a95d02e48f1a27568d98a2e275358edddc078df"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/budding_tomatoes_stage2.png": [
+    "98ad67303863764154eb68aa79e5e34ee5cb63f0e27f50a03e6c9689888ae3f0"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/budding_tomatoes_stage3.png": [
+    "57289f920893f31edf816e0e73ff6f48dc28b56b3076b11cdce6c546ceb8ef14"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/cabbage_crate_side.png": [
+    "01abdbd684c8453c4bbfbce2382f02435c1d637b662b9e4cc0ec7758fcef0eed"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/cabbage_crate_top.png": [
+    "2243fba889cf2f013b0edbf8180a230522e9a5b58c6f86e8643ba5663ddaf5cc"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/cabbages_stage0.png": [
+    "c333beb74daf386ddb6b86d24020a14f2f1abff3a99219188368b833c5afda82"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/cabbages_stage1.png": [
+    "e4634b064527715beb7f1c5ee70b98693857b64ee9efcf61fcec551e2895bb9a"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/cabbages_stage2.png": [
+    "718963268d3e20a2b6e4ea1468be0d45d88182bbbdcd2ab244da9e2a7fdeec8f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/cabbages_stage3.png": [
+    "a5e8b7c3072c445632c4097f950465b85c3eecdbcfb58abbb6220ad1339f71a6"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/cabbages_stage4.png": [
+    "bbcd7b3ececaafad79290e48481cdfe25a75acc3bb253b0c6745aa96d0d4c1ea"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/cabbages_stage5.png": [
+    "14c4fb8ed32fa15412d567615763c60ff69815ce98e3f66995270aab3a65a833"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/cabbages_stage6.png": [
+    "4fff6b7209c431d6d08b6c7a79cf271851d104bdf046b2fc60b76dcb70dc65cd"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/cabbages_stage7.png": [
+    "8a7030e74e1d842dbffb8a7ee032cc50f7760425aedb6ef572adddc8331c0410"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/canvas_rug.png": [
+    "0f29b570334064cdd55f737d7fd3e23456e40c05cbbe10d8c21de26703228cb2"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/canvas_rug_fraying.png": [
+    "05d16b10cb3d5fc38043e91ccd58826dd5bc0c9a8cfd235a40ab35e9c79fa22d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/carrot_crate_side.png": [
+    "ce9f99352b053b357f47fce3ca66e32c8b595c53a20554c5f43e9e1cc0cd1123"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/carrot_crate_top.png": [
+    "fd6b379cc702b3c2cd300cc65b66c6d12098b2830cf2d17c0f2a9df53f2f76d0"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/cherry_cabinet_front.png": [
+    "fa903fd98c55a1e230c6ef3a42798b22c2eeaa6f288ed51b6282ee6d8d928b22"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/cherry_cabinet_front_open.png": [
+    "79fca87aa281809b38744f29f8c6a5c4ae996b76938f7e8e355c24500f36d8a7"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/cherry_cabinet_side.png": [
+    "5a5ec843af2a4f75cdd33f93c7f994a9a30e4071f77cf95c8b235444ca187397"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/cherry_cabinet_top.png": [
+    "207e3f91b96da28792f2ee90aa36233e05ca798dc7e0b2932a6d8a4b8e3b0f27"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/chocolate_pie_inner.png": [
+    "656e720ed56b51bc90efd8f1124ee0b7b00cf72902056d1bb6610e11259c83d5"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/chocolate_pie_top.png": [
+    "7b3b36e8bf5896bd9b6aff5fb29d427e0776989c698531ebc8995c3b2bd47cc6"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/cooking_pot_bottom.png": [
+    "d5659491fe90df968153483d59cbc24e4b8bb747640b2a3da799cfaf17f8aaaf"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/cooking_pot_handle.png": [
+    "d3ce9179380c74646a4263f1a0b6fee81f3117b5fea4f620e3407bd88da782e7"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/cooking_pot_parts.png": [
+    "8808038715db9aef720af9bb5755661fb08c26a3a7585866f5fc6ee8a97e5f66"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/cooking_pot_side.png": [
+    "0df5b94407abca5f64afbb2ca5c467200cc18432f49058d265c7161295508587"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/cooking_pot_top.png": [
+    "5e3ba7c9ab08ca0595144b60685a55fe621338450c3455c43b5aaee03ee4f5b0"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/crate_bottom.png": [
+    "0548a6838339c960842ddfcc0324ef2d3f107e4fcf75cccfaa32c1edf903696d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/crimson_cabinet_front.png": [
+    "aaf7683453eaf91f72686e24a59ce23ee36e7be417b7f8cc03e28e83c2afc86b"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/crimson_cabinet_front_open.png": [
+    "2e91d99fb9c42b3ca7fffb0f910f613937cf0abd40fea50a138bf7cedae36d4d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/crimson_cabinet_side.png": [
+    "7ff08e08436fbdf2a1380c2570c870daf8a71b35e6f7ae29b65b470fe3196ede"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/crimson_cabinet_top.png": [
+    "3b3b76a9705b086adc3e76234f49b6d23f921dff41d1f20820d36a2d519379ad"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/cutting_board.png": [
+    "5f9a2c283c603ef2a015a6259422c270226a9d137d6b6dc1e9a7e3dd8eaffad1"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/dark_oak_cabinet_front.png": [
+    "729715f5a0cda1607c3c05a4ce3bbd88b421ad9fc0990c9f628f8d39f7d69ee1"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/dark_oak_cabinet_front_open.png": [
+    "c711f308885a3ec103fc3cd2d201f322496cea68b12363d0a31dc4fc475f61b6"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/dark_oak_cabinet_side.png": [
+    "a643550d3e69785708cd007954c2482006480c83d14c6b0b793ab170be0ead34"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/dark_oak_cabinet_top.png": [
+    "fefa61e777569f073175dd25a1f9ea37118ca3bd8dc7c7eca20dec8cd817d801"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/gleaming_salad.png": [
+    "d8e8846198d19e36ee1b1e6d4e4d11e394ec0ce3bcc6397717d7143a940547fd"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/gleaming_salad_details.png": [
+    "3922edc1837e7ec68f98acff5919294efa7e59492efa4b9cd6694713603789b4"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/gleaming_salad_leftovers.png": [
+    "7ab28a2c92b5985edda071d81880b4fd1212be2954e4cf9934ff622025bec9ff"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/heating_tray_side.png": [
+    "e1d0cd97627089d6b62df501e11addff1649d25e8b241202ba14d4bff4c0ec8f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/heating_tray_top.png": [
+    "48baf0e2f5911116ac9f9d6cb67f8b57f1903b8efd673f5534efc720c6b016e2"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/honey_glazed_ham.png": [
+    "661ebe32adf50d85e6e31f6f552833d8b241c99f41b2e5d75c22ae93352139dc"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/honey_glazed_ham_details.png": [
+    "3b21d8248be0a2e2da6888c71c1ae5f8c6d00534e1d63331e31fcd3270859e77"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/honey_glazed_ham_leftovers.png": [
+    "8f6df55d2e2ec2c7ff169ea4c75f39e395e0ded9a0d8923b960af263610aa752"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/honey_glazed_ham_side_dish.png": [
+    "e215d5a7495767863f4a2b29c93cf8490f5cea22fda25cb9b4262659c7d9d144"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/jungle_cabinet_front.png": [
+    "08299fecebc2b7e6b289e31e16725e1363fa521fb2298030c631a3ebaed3cf8c"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/jungle_cabinet_front_open.png": [
+    "5b3b75c6cec6477127801052c9d292a4974092c9feb12e62545c9381b6139ad6"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/jungle_cabinet_side.png": [
+    "e30ea374b0ec240d86918d9886b33edb956064738082f3d22201eaf1408f6d4d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/jungle_cabinet_top.png": [
+    "84383435cc469d8849321a77b16c6e1ed41bf440d1e98a5d0a29cb815d026037"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/mangrove_cabinet_front.png": [
+    "2df9adc2e882c67ebee01ea7805f367b4243f50d72cd474150c6920f648eba87"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/mangrove_cabinet_front_open.png": [
+    "c47b6d94cbdbde226d26e619d67806aa015e5be1cd5a2882ae9d2fdfaa2d48f4"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/mangrove_cabinet_side.png": [
+    "dae3f72c86c8216c4aeaaf3a76e888f23e682dbdb1c4a781dfa019b74f9fd426"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/mangrove_cabinet_top.png": [
+    "58194f95397d758a1e42e6eb959f9595584b6dbb41beda94c390888f8aba5b95"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/oak_cabinet_front.png": [
+    "ba00483cf781b8ec077f9292c6d86ae7f88784f03e06b7ed9846f7ef181d00af"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/oak_cabinet_front_open.png": [
+    "3a65be2411bdc4ffcf81c28c2a1d151c1213f835f87e662d08e60e671ba96bd5"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/oak_cabinet_side.png": [
+    "e4b1109982519ec208d5ca0e93c212bdcdf3886799bdeab6d1181a7e1af47750"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/oak_cabinet_top.png": [
+    "e4b1109982519ec208d5ca0e93c212bdcdf3886799bdeab6d1181a7e1af47750"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/onion_crate_side.png": [
+    "5c7c0ecc11fc7dc872be4c7450b4004b52ef4a5e7aed093065a43edc8f7eca05"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/onion_crate_top.png": [
+    "b085d4ca53b4da2ffcaa12aac272c99cd8592de230e8ffee777864661b77ce61"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/onions_stage0.png": [
+    "10775aa0ba4947009c74a90c0081592a36ea35ff706094f2823f40ffc49c6453"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/onions_stage1.png": [
+    "4dbabeed97c1edc6e8f2c741d6e8ed2740aa037396fbbe36933bd5d26c59b25d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/onions_stage2.png": [
+    "f863c9c54381b8974ba6bba3b7192bd5f0b991ed2f78f89bcab30f3a3853764c"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/onions_stage3.png": [
+    "4f35678901bc7f2f3d071d3e574079410d3a58ccf2a5a960f93ab599f8bc5348"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/organic_compost_stage0.png": [
+    "d54553600673eaf6bf48703a5da07a1aa40f4e0f33a97bf9310d020e921e8ffa"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/organic_compost_stage1.png": [
+    "42e5d9e801901b31e195d26a5e13bbd1e856d430c60aea1d263a3f0e194c7273"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/organic_compost_stage2.png": [
+    "2f1ed74f43cc7756395d535dba00f6d3798f15bc7a57069b0fc14f81bba7935b"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/organic_compost_stage3.png": [
+    "d69d4a5a32c964113cbbe2e11d06c3ff00d280d05c9a68de4228e4298bf7c60f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/pale_oak_cabinet_front.png": [
+    "d1ee3fffe32474614516bd0a4810ee5f633d8478d38a4f04a844c8380853447a"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/pale_oak_cabinet_front_open.png": [
+    "85e417e4ed9d63667c5b63c4a41fc3a9512a43f462c424e0c817a2ec7aa9cb04"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/pale_oak_cabinet_side.png": [
+    "2507abfff4e8f6328926deee10aa66f745c2ee218fab11be5ecdf46509aeaabc"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/pale_oak_cabinet_top.png": [
+    "5c0b82038bf6b582b386c6943acf2b5ef9c730bc6f6c178fb8ccf27e8aaee365"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/pie_bottom.png": [
+    "e078e3c2949f8e79d00f1bdc3f209c84b8a699bc5b7dc4a5419f2c76e025606d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/pie_side.png": [
+    "0f88aa89c706e035d94ff18dc9cb8ce3a97907f9989465930151c1bccb9f1f07"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/platter.png": [
+    "d90bdd58700aea73fe7e2fafe5302108008b1ff547ddfe8078c7f97c5efa34bc"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/potato_crate_side.png": [
+    "b0081447c6f4b989dac8c364aee06ad4ca4a4e50ca53ba1ef78442c0514a562f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/potato_crate_top.png": [
+    "570c1d53d826edad25e1c242f180ba3780a565cf0bd495888001c226fd563082"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/pumpkin_pie_inner.png": [
+    "98e4912ace7894b4b10c59a6b5581f6fc217a04449bc7d63a4e8834500efbbd2"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/pumpkin_pie_top.png": [
+    "e8350dcecd58fb0dafbda753bdc0ca784f5875440eef697c1cfbc4e0923bb1ff"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/red_mushroom_colony_stage0.png": [
+    "777e249227d25fa1417f4667205077f254c064a2e2d7989b71e3ccf41c3908be"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/red_mushroom_colony_stage1.png": [
+    "aa4a0bf50a8b85ad995f65324012d76cc76791d38445503f1b1e984b4aa19931"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/red_mushroom_colony_stage2.png": [
+    "0ff3279e2512504a3c43cd4cc5e1da8f53a421dade3f5e623e4008f3cc424f23"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/red_mushroom_colony_stage3.png": [
+    "3ce50326fd8d806666549e9e5c09fc3317522d7e957d28a9a2b1ae8c91ec286f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/rice_bag_bottom.png": [
+    "ce71cd4bd6778cbedd60790ac5885bd59b581fc088a673cc7a7a4c31a3ceac99"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/rice_bag_side.png": [
+    "f5381f0e1bdc921b4fe7fd317f2d24ca8f5c037c8bf5418022c770c6a1c01ad2"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/rice_bag_side_tied.png": [
+    "46defa03e79935efdb10cca4c525a421a951211f7e0db3dbe750a0c8c6bfcaaa"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/rice_bag_top.png": [
+    "4feb1d786fa82751c1b08b5a29b842da659045f66bbb1a96bbfeb112c8c769b3"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/rice_bale_bottom.png": [
+    "bb784d55399467d387956fd263c8d7c2da0dbcf80258c64577b21927eb028382"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/rice_bale_side.png": [
+    "1949182e473ad6c0947d983bb00486e29cbb6fd6059db3c8722d63b771ebade0"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/rice_bale_top.png": [
+    "79b5da414401a7d7d1f6b72692c6aa5c7b0b21d3f7dabaf5d376539acdbbb8c9"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/rice_panicles_stage0.png": [
+    "3a6774f35a9fdb3ada7b19eabaaab03744148e779d19dd524750072cf5f98043"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/rice_panicles_stage1.png": [
+    "b265f0df33279f476c208f91c3f0e8570ed115e009078b007c44587def4df673"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/rice_panicles_stage2.png": [
+    "67ab44b38e570e67cfacca9d837857948435a553e5c4a0f5de46d30d3c8299f6"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/rice_panicles_stage3.png": [
+    "590bd9add21b5c95867c3be67589dfccaf36037ab5f4b11dca4e3a796282aca7"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/rice_roll_medley.png": [
+    "0e03e5c55cc9ffb3ebe15a431b9394024602a29656b6788feb05294f4724b354"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/rice_stage0.png": [
+    "31c8fc5da98f08d61f7f2ad94d5405e5a55448d4ed9c8ea570b2eb4f4aecc427"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/rice_stage1.png": [
+    "d83d3b26526d3201e025c851ea301c8c904b07d582a616b62a03b40504bd6e98"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/rice_stage2.png": [
+    "5496ec2ab0a3ed55fb046aef6e885c4dfecf7c58ec171e35133b497de8a00bcf"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/rice_stage3.png": [
+    "1ecd28861bb4aeb979a5d177b5723cf33db2b2b8654341d07e38af38a1d766bf"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/rice_supporting.png": [
+    "873382a6d8d3d9e71aec5b0a0650dbdad9bddc07c1d45ff0c31595c0c23ae400"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/rich_soil.png": [
+    "ef871efc9564fde4716e00c62e0bec7094d15d8b2aaff749e317f81a874b0276"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/rich_soil_farmland.png": [
+    "6ba9dc992aaad2c6412ee49ad1343fae2a7a695fdacef5a93ff5f5f7c7a8cd19"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/rich_soil_farmland_moist.png": [
+    "d3a912b476884f7cab3674de139ac6fda87e70503a30f14b8e80cc27022a93f6"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/rich_soil_farmland_moist_side.png": [
+    "22a7fc5408f381fd3101c21a03a1b6e40e6d258b613b9b398014b6f6013bfa05"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/roast_chicken.png": [
+    "ff05bb7a71b6add5c25374ccb9b7060892a04af5711004bf97fb997f7a1565c9"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/roast_chicken_details.png": [
+    "ddb321efef45e42f2c7f56796ea4a57c5f4e9416547709885038e4c92ba279b7"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/roast_chicken_leftovers.png": [
+    "47a4d6d5d7a85e3632270bf252888a7111a7dc2f56d5f05d7d3b0a22e66675b5"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/roast_chicken_side_dish.png": [
+    "1f55b3783cb6447a1f96664e1aeed076103d76af4882ccddb532662a9a615579"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/rope.png": [
+    "2e93e9afc8d07d7a21a847c0bc08ae16235c9ab65c7b3c3520ab161838505223"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/rope_fence.png": [
+    "23f47044bb184bfdd9010bcf82398eab28de7287a3305b6da7f3f13474b4066c"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/rope_fence_gate.png": [
+    "6fb0ffcad7a2830055c72d2054016a2fd650d94f5e04e18a1beac26d36cdcb82"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/rope_fence_gate_open.png": [
+    "07e1bb680f265bf530ecc8825febadac9a387b4aa14a699e109c74eec711fe86"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/rope_fence_gate_wall.png": [
+    "883cab63866ee54fee1b0ee8f5e5eb9df3e5a6f0513dec7c7ef405b6b0c02f87"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/rope_top.png": [
+    "6e5334869c95ab452b7c9fe7c528fcaabdb3cca2f41a629fd1550d939e70a61d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/safety_net.png": [
+    "5d851bf12ccc49292cd617dd8cdd665908b47e4db16eae91c883c1961f304d4f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/shepherds_pie_inner.png": [
+    "ab9925c51964ca77f3a5894a809d7e67e8985644bb4292850eb5c3b4eb165224"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/shepherds_pie_leftovers.png": [
+    "ba3356f9db0917ac84ac4877bce3c7f1fea071f00134847f46e7d6356f41eb1c"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/shepherds_pie_side.png": [
+    "4872919cb0b5a9f7199ccfb8a06a3ee48ae17a18ea11559376adea5a61f3d2ba"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/shepherds_pie_top.png": [
+    "923e8c4ac9f1a80e8aa5fb3c1265fd4be5b3f86ad788601b5be185b78e6cdec1"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/skillet_bottom.png": [
+    "d383334177d32072684dc6e9e1ad43ce858dfacf46f13a8c54c9330e2a1b4b19"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/skillet_side.png": [
+    "c98b9318828f7c0666ab7e6b4f839d6ac5e3645fc7248abb53c2e295837d5e20"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/skillet_top.png": [
+    "c8e63e0a932b910dd86d22e1f5ed3ddec542df1f076f70386479917208f4ee33"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/spruce_cabinet_front.png": [
+    "191f77ff8fac33510a97fdf88ca9fd7535defd97df79efe25fa7fc557bac1b2b"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/spruce_cabinet_front_open.png": [
+    "5cda2d7f65099545f42c4abc10cf0b24185c380439850a46a42f2a940912bd57"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/spruce_cabinet_side.png": [
+    "424fd070a4b52ef9b43dc2fa80b1db0846d36ef425dde6829e6d9c6a78ca48ae"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/spruce_cabinet_top.png": [
+    "427d24052e3d0f4321bd7235080d1b8254913104e9ec2e68eb56e0759bfd1477"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/stove_bottom.png": [
+    "6f1632d3c08d7b00bf3b9414337f67c692bca385f199d31419e0180026b659b5"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/stove_front.png": [
+    "20294d3c09d99a4019ed4053abae09f912258e94c4d35864d4ea4336fa721f41"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/stove_front_on.png": [
+    "3e9f06ebc1ee50101f08d11562b7e61490afe9cb8d6f711646e2015f9bc8aab9"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/stove_front_on.png.mcmeta": [
+    "a47d72bdf590b573a93c3e80d5ba9802f15f635092d4baed8127dc01ef3c858c"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/stove_side.png": [
+    "cd19795da1b7955b41b32ccffe3efaff07cfd200cf230011cd37df122826aba3"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/stove_top.png": [
+    "0f08f941d1d40e73684e01a7efd8bf63c9fb53be7e6c723b7a24ee5fade4144f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/stove_top_on.png": [
+    "e4947575a8193944ae5781a74d4f19aae0641e743f3a964603d541ff706491df"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/stove_top_on.png.mcmeta": [
+    "280f6b32d03282eecff6a2d072f804c7aa06475d246c9e5a107de3019c30791d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/straw_bale_end.png": [
+    "f8ec49e6019ee48e0918dfbdc7c77b131b8d4ab060321bf95691a81346d0a890"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/straw_bale_side.png": [
+    "06655ef06bb99bf835f026c4fee198ca7843a97f15951f522410086b6bd5b7f4"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/stuffed_pumpkin_bottom.png": [
+    "7bbff80fa4f73e568646b58e28899a56c4ae3c85af866f216ae4f74ef49cbbc7"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/stuffed_pumpkin_details.png": [
+    "7db0c9f273c3826166d0881600200969330dc5cf4acbc8e4f757d2fcd5bee75e"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/stuffed_pumpkin_side.png": [
+    "32c15f5df30bbd680cf9a8c0a193e2a3de15f24ec9fa05c16e7c52ed5e7c1439"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/stuffed_pumpkin_top.png": [
+    "bc4a603cbc82ae32628cfc15447ebc1602e7805ead0251c2f7455878aca11b05"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/stuffed_pumpkin_top_eaten.png": [
+    "0ab2a5623790356c2f8840ac87155fe94b8fa92f796f3e1fc766ed27eb313cb5"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/sweet_berry_cheesecake_inner.png": [
+    "c946e61154118985005257f8a73500a369c0ec4ba3d8dd3659b8f821be6baeb3"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/sweet_berry_cheesecake_top.png": [
+    "4ecdd5514a660f97f5b5bb1070abe865fc98f56fdb2c99959d2302a17c699503"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/tatami.png": [
+    "2ca09ec2a39676bea6cbde4925e9ee65625915a679ff713fd8520416357e60af"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/tatami_even.png": [
+    "86f1cff8e132b1754d6b39eb12525791c58aa9e72d25cec3098f5428ad2b63de"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/tatami_mat_even.png": [
+    "a577622bbf4c72a5163fd988be1f5c7206fbb5ec2f53b366a1b925cd9c22d46d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/tatami_mat_half.png": [
+    "2ca09ec2a39676bea6cbde4925e9ee65625915a679ff713fd8520416357e60af"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/tatami_mat_odd.png": [
+    "6a77254ec96157edb6c4ebd78349d225c56e641b08bf5f6a5096017401a98a99"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/tatami_mat_side.png": [
+    "f9fb01e3ed985d164d90cf4fae68def5399d2f60743720ac0a4ecde8bbc34a0f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/tatami_odd.png": [
+    "d314317a54c14aa0a976203c8354006f646abac8cb802f1fc72e830979adc906"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/tomato_crate_side.png": [
+    "37550d20ccc249503ca893aab6bc435f27f253239621e6fd8edff5b1ef63dea0"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/tomato_crate_top.png": [
+    "9e7785cfc55098aec84b852549ccf66f4221456e533ac5075cde9af4297dcdfa"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/tomatoes_coiled_rope.png": [
+    "7c8997083947fd4eb6e2a8c63bf2ca9902a347dc5c19208faa1215dce0be0bd4"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/tomatoes_old_stage0.png": [
+    "76470895490ce1381d99354a288f9e37c1348f8279c1d66a3edbb8d261441f34"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/tomatoes_old_stage1.png": [
+    "f23ad2abaaa0665caf307fa703d53210fb30f760c8f67c486dbe31ac81019d56"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/tomatoes_old_stage2.png": [
+    "e822df176c54c655f77f378c71d51027928e8eb5c032437a5e724986332d5d7c"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/tomatoes_old_stage3.png": [
+    "25b8decde669044c806df9be4b4c1ba7402ad8897838fc75adf3a5574e9a8085"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/tomatoes_on_rope_stage0.png": [
+    "304001eb626c1da5b45dd3137b700fef9c14245ec24c7363a739a25cec98e1e9"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/tomatoes_on_rope_stage1.png": [
+    "bdf062f1d423e76a263ac438d93f0cb2d42610163ce14c85920b57bdb1024329"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/tomatoes_on_rope_stage2.png": [
+    "ba6e7fa7e07e57b271fa18681679af7783af6fbf906fd70d0ac848b02866732b"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/tomatoes_on_rope_stage3.png": [
+    "3ec63748223738d819d345aa241dc37014865de96475e25ad0a1f9db1f6f57b7"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/tomatoes_stage0.png": [
+    "a6e2bdecf97b009148fb9446440563365102037fe87f339683a6df2cc4fdcf2b"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/tomatoes_stage1.png": [
+    "3c13a23305562e4e8ac6958e49b2252491872affd83b5d0e5df052b465443bc2"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/tomatoes_stage2.png": [
+    "d42481349a027b8edccbd16ccd1fa133c7820b3b09d22004079db36814cd8d99"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/tomatoes_stage3.png": [
+    "5d119af98c2e73e80f2bc862537d04353488b9738b1cf5599cb439aca5a52ffd"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/tomatoes_vine_stage0.png": [
+    "304001eb626c1da5b45dd3137b700fef9c14245ec24c7363a739a25cec98e1e9"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/tomatoes_vine_stage1.png": [
+    "bdf062f1d423e76a263ac438d93f0cb2d42610163ce14c85920b57bdb1024329"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/tomatoes_vine_stage2.png": [
+    "ba6e7fa7e07e57b271fa18681679af7783af6fbf906fd70d0ac848b02866732b"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/tomatoes_vine_stage3.png": [
+    "3ec63748223738d819d345aa241dc37014865de96475e25ad0a1f9db1f6f57b7"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/tray.png": [
+    "2c861f4b178d6516d2490f0c6e82a4db95ed6ca087f255445beef159e1be5738"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/tray_bottom.png": [
+    "f9419dcbe16af0b48470c362945614b490801019c2c890afdd43a8b148cb1734"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/warped_cabinet_front.png": [
+    "7400d49141ae19c7e6468f5fb4b2dd8650eef49ff2346cd44e8c34e22db1cf7d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/warped_cabinet_front_open.png": [
+    "9c98f2bcc289ed73074ccc3c70a16993f9b0beaf178fc348a69c588cd66fd9b7"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/warped_cabinet_side.png": [
+    "6ad998bd4290b0bc3c7da088b10c54148e031738774baa5ea2661e89919b55ae"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/warped_cabinet_top.png": [
+    "39dd964a72d5d5a9ec1d8e1a35c4f98706234dccd3b52532544034f9c1902770"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/wild_cabbages.png": [
+    "b0f784b81a6ecc748345ab4ac4c393975dae0012bad003c451d5cd7441b9d41d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/wild_onions.png": [
+    "b93366fabb7b0cd66ee02656dd49e17fd3756b88702284d6712da0175acd5b02"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/wild_rice_bottom.png": [
+    "af5cf2b5fb4dcc225b497ea4b61b09ee4b251d0c761bf89dfcb5cd5525dbd9cd"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/wild_rice_top.png": [
+    "945bfd853ec7a7913429917b9265fe08d89f38071ffdae73ddcd565c51be2aff"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/wild_tomatoes.png": [
+    "d498666446ed5f1145074e505e72289fd725186cb0c21757fae1f86e4004654d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/wooden_basket_bottom.png": [
+    "07eaf5aeed56e4ed59a4ade40c01222544c888dda80622fc42949231191fec58"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/wooden_basket_handle.png": [
+    "94426512c30d61162c20d9531b78fb3aa7518cfd88f33d592ce7a708b6357aad"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/wooden_basket_side.png": [
+    "bcfeef93ce4bb86b6906dcbc096fed2bf0d35375a770bfb212924f8db21110f8"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/block/wooden_basket_top.png": [
+    "da57210bf19f686fadf19a347c254a178255c0a1f81326cabc6f4058b43361ef"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/cooking_pot.png": [
+    "7e04511c7d6e911eb7d0f9a4cf96efbb700ecfd933eb1b513ab7b646c4e77b74"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/cooking_pot_menu.png": [
+    "e50fce46ff0129e9a87912aa497b6e1bc7bda714f03ec1c7989b41bb82b4b66d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/cutting_board_menu.png": [
+    "669d5e7315827506d01a142d05b7dddd12d211309c3f4c2af2550a869ef98eac"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/decomposition.png": [
+    "06c0727624e5ecb149339a0e680f14ff28badc8adfb85b4d5c98e729d330a5ee"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/decomposition_none.png": [
+    "8d4b6423481da6603e2526e2a3172226aa6629c80763abdfe86a818d6a7060f4"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/item_info.png": [
+    "38ce3a30b2ba6a59d85d93369a917a8c5cb10750a2d0df9d3a5861f8edde5051"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/mushroom.png": [
+    "7eec77b421051a8ec37b4ebd94a81ce078a5c153bb692a0e16b99265e3b1c9fa"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/mushroom_none.png": [
+    "752c1c8b83b01b14ef2bf3f1a48c756b4aafb0931ab8427085a767c4f272ec52"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/none.png": [
+    "d5ad967c350515205405cdf181c6310b663e218545f08a8259da0b9795d11240"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/recipelist.png": [
+    "bb7f1382d1b3083b99ee7c26cefbfdd5f78f422e60b0c1d723045953aecca297"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/0.png": [
+    "96c7a27f005bd472c75b13f10c6e457fb6ddb298135530733079439e85bfdf2f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/1.png": [
+    "1eaf016440870206f05baf69e611456cd149142123950698908c3a99e251067b"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/10.png": [
+    "85074a9731b29d78fa4fa793d9e55f25d37ac29f6636498d99a92517f60f8719"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/11.png": [
+    "6c866ceef23715196314c833f028667ff3bee286e243667d8628b14818c06208"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/12.png": [
+    "5d4889c53f4f16a4430135e145e0c7111147d884cf1f1b507a07e2ba40afa175"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/13.png": [
+    "0e6f2117d7bcb7432aeef00c34d912b758a37da729de9ca6771e4204c4698d48"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/14.png": [
+    "740a01e1731909d6c774fb64d4240a095502a25a52a362e72896b8613071462a"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/15.png": [
+    "c50a6807f73d0b1908657de7dd9953b7349b617eb9b1b58cdb5d70a74e2a1319"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/16.png": [
+    "b4aa74d75e6b06af1060882fc29db121f977327d0787cf69967242d186b6cdba"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/17.png": [
+    "2fd12b48e7f58cfa197be1f8897cec97aebf1eb776cdb2550e79813d8c4ce8e1"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/18.png": [
+    "b303e48e1dbc21ca4735ff0a1a40b1a23f0ab3103ece136e55928dae341051e1"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/19.png": [
+    "eb30cb3739ea456c5c634db7b0dd2818d9dbbc2c767ab81fc23edccc1868ecb5"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/2.png": [
+    "8d8089c14fa5871818aabf79b5b7e3ade30ec4bdc9b604498fa7046bf1f6930d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/20.png": [
+    "4324a7b6839b9a014615af98e1464b70bd60a30e7759072c0dbece6065b78a77"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/3.png": [
+    "42a3b2e26d092a83676c9e43f76cd9ae0cfe63832f06ceca63daec8a168ffda3"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/4.png": [
+    "8376c5907ccb62939f3ae769b29b585a9c8642128d17972285043cc03c41b038"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/5.png": [
+    "00b02b5ec25504e1c098f7f12aafd2ce288b8ed8b2ac5b38a47e7535459f5170"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/6.png": [
+    "de6ec0366cb2f10dbe9200bfab74f1cf5ce2db8d71162ba616c29af12f768118"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/7.png": [
+    "2320cfa2eafac97cfd35a0cad99635bb4ffadba9ce86a286551fe0f2001f7c42"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/8.png": [
+    "203857efe28e8cca8b48d2b02a566f5fcb2381aed5c3d2cd150587e90f25bfd0"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/9.png": [
+    "4ea1925ca1d8974afe7c2ebd9e7cbb1f4441480939a16cad4ae5a54cc8f5a383"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/animated.png": [
+    "cde90381751587ef70895713a4f717ac53a4d79ac53cdeef77cda34aec3971f3"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/animated.png.mcmeta": [
+    "a40ac3208b3405479dd05933897dbc204b4b6013077c4e5490e96f3b98addab4"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/cannot_input_item.png": [
+    "5825f460f22e6b246dc09d761bbf4dba0a13365bcc44b3bcbb7ea603ae3dfc2b"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/cooking_pot_can_cooked_disenabled.png": [
+    "7cb59f278ebe76026ca39ea12af49dd2bdeb45b55e6ac11f25bf9cfb18bf7cae"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/cooking_pot_can_cooked_enabled.png": [
+    "66d1637bd30cd5367e9364a1a059328dbb9e408dfd2e905209fabbce5d98764f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/cooking_pot_heated.png": [
+    "efe0244ac37352597e99d3f9c0ae81d188f52cdd8b9807b0a9e0c3998fe19758"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/cooking_pot_not_heated.png": [
+    "48be60559eae934e287c2a8ece138eebfbb8b1934b63b3838dc38ca0826f4b8f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/cooking_time.png": [
+    "94288333fc5f90d41170ed8890dd3b99a14ec5311c8a2974d8e66731e1507ffc"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/input_item.png": [
+    "da6713bcca387245de75efdf06e3ac033c1200b4c391fe7dbdc30b32241df6c2"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/recipe_book.png": [
+    "06af51d0381aeff5e44ad9409ba77accb858ca74c76e62f6208222cf82bd3515"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sprites/icons/slot.png": [
+    "e46f74d3e00ddf73d778ac1750f008f92af3d6750ac084d0089f519c8ab9b9d8"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/sun.png": [
+    "d4974dbdcf0e829419516ac2db27894396ea39c9dc27d45208f10d1a019017ec"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/gui/water.png": [
+    "a0acda96bec08f3bc9b8d50a795354aa1764a14decad3b26166fc9611c5b6d6e"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/apple_cider.png": [
+    "b5de2d077829026f5df10ee11341c7d4e0088658eb3daca297bb8b81c3acc6b7"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/apple_pie.png": [
+    "c194a0d4d8abd981882705872b2ed45404235266cecf8990968a4481aafc2417"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/apple_pie_slice.png": [
+    "0d76b77e93c1d0d4f8da7b83366b34c1a2af87919842504fa232d65d81cff552"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/bacon.png": [
+    "2085420c1b8c4b52fe997784824a6e7772db8880cac23088fb89678c115536c1"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/bacon_and_eggs.png": [
+    "663c7439206e3a8bc87c7d86c7fe5f1371ab0f40d53ad9d12b2c16616f6046f4"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/bacon_sandwich.png": [
+    "712da8f3d6c20387cda2309840098a1e553c2640ddf05d615202bd2585a9c623"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/baked_cod_stew.png": [
+    "f068f50a4e4f41c6a554354b21dc244dd33ca527fd61c84432e98bd8888674cd"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/barbecue_stick.png": [
+    "10cda0016b420039780d34cf2e0caba7cd043df7f7283fbf31c7243b690e4a30"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/beef_patty.png": [
+    "3474239af6d35d1e829d139838168ba6c76477c6572d2eaf03f189dd9d1e1ff3"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/beef_stew.png": [
+    "dad7965af720a358699f339f899bc302cc576c818432be59c0ef0a83f0536aac"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/bone_broth.png": [
+    "441d0677330c73e1dfd61bbd050769ec18e5a8a747f6387f8f2e78f420a671f7"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/cabbage.png": [
+    "58a795be65df31067393c50eaee92b8fbc55303cc083c53f7c9fb102c69943ff"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/cabbage_leaf.png": [
+    "ee6bf279ac6a877a78257105c799ad29a3dac359345bc0663f739333ed2afedc"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/cabbage_rolls.png": [
+    "ac7577a9a42afac8ac95f085f3898bf8f65f98897d7728f5b9953124067b6270"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/cabbage_seeds.png": [
+    "dffc2cedaa2d01053fdd5c7f59083ca69fcc495fd6f2c8aab178de36d1cddef1"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/cake_slice.png": [
+    "e8be3d0182a2dd2ef57defabf4329e1ee9db43ab2193c40395fcbaa355b81a32"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/canvas.png": [
+    "85dd5be47efe479e2951753f89a8fe6c1219368f40ca8402f9ef195f97b011a5"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/chicken_cuts.png": [
+    "b8b97fc275e2a60911de4c29e028ab67349cbebb3486398feade5a76e6589592"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/chicken_sandwich.png": [
+    "a78503d62f1ab96fab4e4a14d5ab47d721db0227ecb24d54a2db95aabf8e4521"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/chicken_soup.png": [
+    "1653def1b202490e593100ff42ddd2cab9c41dbfe0c3506edaa6895e7a1699f7"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/chocolate_pie.png": [
+    "0cdefb53a991679bdec715f99f674944ca3cbb798e2fce2398116cf4c2625930"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/chocolate_pie_slice.png": [
+    "8327ab7d545248f207bef6237793d1f7c619d6d7871ab91d1eeb62ec771d34b5"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/cod_roll.png": [
+    "1ee581d1aa6eef4cdbe385d4dd2975d52a34d19625f4107be1d397f62fc1cce7"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/cod_slice.png": [
+    "657a11159c33c467fb45e0f64f7fb576193cb31e02617e3b59fa6308ce323f48"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/cooked_bacon.png": [
+    "80acb1949403d0cb4cb53081376a3520c72a5055f1182ef8cd4fa87161d538b2"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/cooked_chicken_cuts.png": [
+    "ff2f252b9fcb8380e8e7cc7fdaca09f1b9f66542dc7f4da1089a5bc66b15948c"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/cooked_cod_slice.png": [
+    "1061b79a13f20946fd2fe09bc6ce1c4923ce83a637b4ea34bed3af59bf27818b"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/cooked_mutton_chops.png": [
+    "799515ba81911fb3fa987f2ee6f2a73547717b0ec5d53f9618855e692bba1ec4"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/cooked_rice.png": [
+    "eeaa97bf1a102aee0aac2f075135fb7139b18793e97d68bd87fc5503357fdd39"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/cooked_salmon_slice.png": [
+    "082d89c7d4efe82a00e8327f92d1fd986065eb775e891ded57a9e4695db96a52"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/cooking_pot.png": [
+    "e33b6b4fa32db15bd28f3075c1a1cd1ad1c28acad5699ac69b6b3722ab0cc92f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/debug_pumpkin_pie.png": [
+    "1eb6fa3d17bd69ad39374b813a7840add70be33237497d5d88d3b1d2de666e9f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/diamond_knife.png": [
+    "b3170ba4f7de16d1c7009df934f06994b2085d3df89f1165c2554659805bf4f3"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/dog_food.png": [
+    "0ff68f92becf2e15ae816a2c35308c732a682d844538d87b4d7c0f2616ef8755"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/dumplings.png": [
+    "380a2014ab76c4b84edd73dde8b006eedb3bd896161183c7c07bbfe5c441b31c"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/egg_sandwich.png": [
+    "ee016a168166ca5edef63df645b7f0c2db6c8ccb031b865f42cf173a9b7d02b3"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/empty_container_slot_bowl.png": [
+    "69a633cb92a2b0062ac979df80a66fac078546ff6944c9edd79c41794b7d65eb"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/fish_stew.png": [
+    "6e740117fdc81e7dd511f902ef1ee7894ce1eb0b6c82e97a15ea000747fea565"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/flint_knife.png": [
+    "97a17e202f33a2334e30ee475d1158b14d1c4cb8940744bf657fda7b342d063d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/fried_egg.png": [
+    "e41fa9b140ae2c3e754dfdaaeddbcb68b05516eb41880996cbf611f336f74bd4"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/fried_rice.png": [
+    "108ef79628bd5557b985ca9166f9229336dea3ee04ff3a7f4375759043fdf0a4"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/fruit_salad.png": [
+    "5ffef671f1ffd0092a0301d54390b78e2444cedb59e6da37c3f021f4b86b0347"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/full_tatami_mat.png": [
+    "244ed9540c386638acefdf079facf53cd0772e1f37b4635360bfc2c656a492ca"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/gleaming_salad.png": [
+    "4158d853b8859d6527134a9bb6d7f61bb8fc91c53efa526a876dffbcfbe4a7e2"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/gleaming_salad_block.png": [
+    "211917ec12f347c27cfb486a4b7a00effa1eb50967bf9c6a063064932b3a8ce3"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/glow_berry_custard.png": [
+    "352b6711731d7e2a7227906bd19f4e9f22a05b31aaef5b7ca8f9b8e953b9382d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/golden_knife.png": [
+    "02c9a5be15dec4a74f31fd411b0758ba85fec5416d61ac295081df13b6e36a50"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/grilled_salmon.png": [
+    "56faa89f23bd956a2ec9674ec72073c8fa6a84d4332553dcbe2a119fe2ca8855"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/half_tatami_mat.png": [
+    "6f9f8c087b5be0111418b0be43f5b2b173d030a16ea03dcfa7c93adfca723821"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/ham.png": [
+    "d3ec97b7ef74343ed428aac8944427e5afb20759934f8998f98b5d841c493501"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/hamburger.png": [
+    "dfb36788c40759ba32dc9b2f1b45a9f5d400b1ef2880cccc46dc71737ba70f73"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/honey_cookie.png": [
+    "bb01f79e88373652dc115ccfcb8a99231ad61d56c1558d7f7ec017187dece313"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/honey_glazed_ham.png": [
+    "9a740bdd5c15d69024bb887fffbf8ce8e612822a5bdf0b4f66b14266d5b67f8c"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/honey_glazed_ham_block.png": [
+    "1db2094ecd6144c0329b8c6dafe061f9d3bb30926c399febee011d437f817ef5"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/horse_feed.png": [
+    "27fb1f05af831df1cdf351aa53110df8bc08fdb084305158b09accb0fb1323e9"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/hot_cocoa.png": [
+    "12a4b1f6d1c490e0c170363120fdf72e6826c96349b8d545a669f229a479c4f4"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/iron_knife.png": [
+    "17387bcb656d0a11a910d9b651dcc94dea6499914f2de7915d2e410f1aaa0caa"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/kelp_roll.png": [
+    "be0545d1aea2f0289a437b660d3ac5246f24eba067a90e57fe0869b895f88d40"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/kelp_roll_slice.png": [
+    "36ccf8df65fc1c70ee45cb975b70ee72f2d75340b88ed2c34c4646fbf6908e86"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/melon_juice.png": [
+    "ca1329709233c6c671893f4d638e045556f05e10d3e053477a67b951dbf9bdcb"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/melon_popsicle.png": [
+    "1e22f33e6cf4b02899c110d4a936c8f567e9c9b73072bdb577dd97b89e428532"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/milk_bottle.png": [
+    "d148a091357dfd4149016b0a3f77793a20360ebb70a0edcc7a1a03417a747b11"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/minced_beef.png": [
+    "058e9ab343e781e2c6ae9b83caf1e233d6e5d69147f38e8d67f691bf935adb3f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/mixed_salad.png": [
+    "b1a915079b53b33d48bdcbe50b2f618282a4aef336e74b9c88ed2e50e5f9b4f0"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/mushroom_rice.png": [
+    "773e221de4783833be16124eb4f94b56d8141f84b13c2c609acd92fdd5407271"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/mutton_chops.png": [
+    "99ee394f83b6f917c5bd014726cbf1c7de8b9c3eaeec22d25a06240757872eb3"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/mutton_wrap.png": [
+    "e3cb57312279c5f83b2c6dd7df0966f2c5fccc4913fa0bbb6b9e20760b57d72c"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/nether_salad.png": [
+    "acc70c4062f207fb689b971371f0efaf88db060c9c1e19dcbd96d91460a2a207"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/netherite_knife.png": [
+    "3630e0ba2da64a5918060485eaaf383d31ef98e4dfcc146fa572c47994547b49"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/noodle_soup.png": [
+    "911fb632a258c60300bdf33eba8c87577a5c5a069d1cfd70ccaebbddd7c53418"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/onion.png": [
+    "9c8b0f915f7f5aa7e75f96e541171e0fce8f14e24853809a244216f9e1927d6b"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/onion_soup.png": [
+    "973a0d6124d0e4aa505fb1655adea360b8ccf635ca92032574fb412f035a2bac"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/pasta_with_meatballs.png": [
+    "baa20ab24c1eaf24e4990a12efe5d884744a6756f5dec9945936e7760c5698a3"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/pasta_with_mutton_chop.png": [
+    "f0f4b1339737484d746173860a9fb68d18a92a9b957400ceed8738497c2094da"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/pie_crust.png": [
+    "1388fcb7b533fb64e30498b94ce303778abfa4689ee6abe6053009af4f82e677"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/pumpkin_pie_slice.png": [
+    "61a34e9ac5c9f247bd14a3608e1acb5f5adeb0921d10e1271006bbdbc239edde"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/pumpkin_slice.png": [
+    "e99af6c2f537a9c0f8475f21ac50bf186c6a6fce308974e73b23987514e25b2c"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/pumpkin_soup.png": [
+    "e4e1bdc6e7322ca0d947f289b6d5cecd2901d444322c8943d911d4e4b02fd7ba"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/ratatouille.png": [
+    "7232f3c324aa85a395f50db966bfa9ebb8c28dcc265418a2c30079f26f0a76f5"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/raw_pasta.png": [
+    "95b250e704773a91e8721d186b4ef2f15263181bf03d668b47b7314189e7f018"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/rice.png": [
+    "ab2834ec93e2fb8d69ee1704aab32aab8259f66a34a4933d71de5cd6a1f6dc4e"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/rice_panicle.png": [
+    "1a7a0fbcf5fd978a026263ac0e5f454e05ea9ceb35756635c8bcc87e66cc807d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/rice_roll_medley_block.png": [
+    "1b7167defc6d3c8ee5bd62821a704db8ffb9f0a22cf6f3e0f219f5b874065e1d"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/roast_chicken.png": [
+    "37af7eef50ff473a9e3ac27df460df186f1ac9a8e5fbda25f8b3868c6c380293"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/roast_chicken_block.png": [
+    "5218d60cb4c9efc1b844593c49a4e9fb0353c3ee3f5ba3f6700d4cf1ebc832f1"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/roasted_mutton_chops.png": [
+    "e0b308477851ba3e18059c9128c55c6d4fb39233d7ee3cac320dbd3dfe133030"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/rope.png": [
+    "0def0530afe986602be08072fa6fd67278c587fe95f587be645e1c7cdedba99a"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/rotten_tomato.png": [
+    "364372ddddce561ca217e33d3a8f965a1598805f493f73aad3c4ec6e503099f4"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/salmon_roll.png": [
+    "9fa6f21321c04aa831b91d4feb9d1346a5cd5edcaf143e2c1f528335e4f4c116"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/salmon_slice.png": [
+    "e335b30224ff48903250b81862f7dc991926259565b27102117890d305a16030"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/shepherds_pie.png": [
+    "cfa1edd5268ac261c8f575cd5653d0659d7a37786feb500e101b4a6f3a6cf118"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/shepherds_pie_block.png": [
+    "9e6be49b654e20179ed9a0f98fa7497062001ca070797baeaa447e740f2ca7dd"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/smoked_ham.png": [
+    "4833ba33067f6ae455002c969f259cb456664c84d0067ce57cb79aeb87106e0c"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/squid_ink_pasta.png": [
+    "54691b19e4cd624ab4e67549ac819e302c2f9beb4417837ff5bd5e46cc02db78"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/steak_and_potatoes.png": [
+    "e0a0bd431ee105acb543e826813ea6f5c32f53cb4a52d12886e61ffa8f6aff27"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/straw.png": [
+    "391870893cc608817fd8ce6231c401dc87cbe37db645e64b0f6add113a9bafb4"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/stuffed_potato.png": [
+    "99169a606d4975fd3ac430be0a43f639085a698a2deeb6436b1ee3bbf28460d6"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/stuffed_pumpkin.png": [
+    "2166d8e07b972891834174c0e25e43ca4e0b7203752f76d56df28c656513641f"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/stuffed_pumpkin_block.png": [
+    "3ad72e2a3556a4d6d370c284c84d9a8c439b58522914ccf9099f4c8818e2d1f7"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/sweet_berry_cheesecake.png": [
+    "0495869728ce06dac94385606b592e02fc78ae604ca797c7fbad67d5ece42e12"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/sweet_berry_cheesecake_slice.png": [
+    "752aeef7e3e2271ad53ab1e239f89010a0b632d1d7605c9b6649a159195eb9d1"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/sweet_berry_cookie.png": [
+    "3e231716bf141226719ae6d6fd94926cc5af8e05f2d53186d454fac3674e4e4b"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/tomato.png": [
+    "ee5dadbb7164485c9ab28b8c706c3b92a727415e444f5cd1b744874965707b36"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/tomato_sauce.png": [
+    "3fdf9c47a8dfb65af0c3570de97ee20462da4d5903b58b56a627ef113b278133"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/tomato_seeds.png": [
+    "25328b3ae0876b714ee00012d012fbda9c747c90b194188860a151d42def3020"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/tree_bark.png": [
+    "95e12600ada536999cee9b202a1584409d9262a77e82c669047a4ceba0aead11"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/vegetable_noodles.png": [
+    "426996a7fd50fbc4463ab3e8bb7d8ddd45a2f063890734b2527ac0032c48f4cc"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/vegetable_soup.png": [
+    "65dd7765aaa96cabfddbde6f65d71cff26d27ac1e30f6b7590a1c16f5b35a354"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/item/wheat_dough.png": [
+    "31bf89b730e574b8d8eeb7f8b77aee86722ff631162d1d78bd405fbcacb95b13"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/particle/sparkle_0.png": [
+    "c4d98f1d2d566a5a3d1e7246487afc827e88ab3e197213202ee75fa503bbdecc"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/particle/sparkle_1.png": [
+    "415d0faeb079cade59c6a13eb4e19e0ea3698a09ea30e43c57d94a7f15575f8b"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/particle/sparkle_2.png": [
+    "2d67aa70df727cb36234334d147f7fc8da2a424a000a4a8dda6b63039e3d74b2"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/particle/sparkle_3.png": [
+    "9f9b0f153369d134a7e574ae88be249d7d2b730def36152cbd18b26f537c7f02"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/particle/star.png": [
+    "f176d09eea98c557795af008c5008940e15157f3faac95badbed5c34f0cb45be"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/particle/steam_0.png": [
+    "63f809443402d7f2ad9cd6b1a55117dc6ab3f7fc7e3c6556871e408a93f365d8"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/particle/steam_1.png": [
+    "69928ea1141117253dd1f09c095b35d183ddf6a0ed7a1f5b0f9c4c1bb5071b77"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/particle/steam_10.png": [
+    "1a341479d00703d3857d6cba8911c0a60457b908f23b324e95db94653c97a1e7"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/particle/steam_11.png": [
+    "327cab4156dbe8d0e2ce70200b6045db57a1797b64279fe7da127cef28ca20a7"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/particle/steam_2.png": [
+    "38ea9729046aecbaaef16b0383f302c21d622de8102528a03897b667dbff2726"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/particle/steam_3.png": [
+    "4af011b611482e9857285ee69f5ec920bce39616e0c68315430921d4cfa7a28e"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/particle/steam_4.png": [
+    "68592168331ec48b461d1a0d1dd06c18613bf954071ebea4ad5e3cac16593ca7"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/particle/steam_5.png": [
+    "ee3213967472888803e7b0269229a2496e24bbf38d40e9cfe545d3d586f11130"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/particle/steam_6.png": [
+    "e57c04c0bc31a0c71cf4bc7d363db78f17117cbe962c70b928cccd4bd330c917"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/particle/steam_7.png": [
+    "b64aeff02fa01233aec3171d705769e426bee2ca62a69c3e4ab1582c5eef68a5"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/particle/steam_8.png": [
+    "dc9c2070fbc5c6c075bcfc42ad6821b842f21dc154dd3552277954297ebf1611"
+  ],
+  "craftengine/farmersdelight/resourcepack/assets/farmersdelight/textures/particle/steam_9.png": [
+    "e6e1c78c92f2bc2c49e78db60443a515b2d8ab4b1cefa82b0aec5a20a9faadb2"
+  ],
+  "craftengine/farmersdelight_fluids/ASSET-NOTICE.txt": [
+    "11c3138fcef71e74a788640746969d158ac8f1096570f2b9afac75e8fcddb5a3"
+  ],
+  "craftengine/farmersdelight_fluids/LICENSE": [
+    "8cee39125e5bcd14ed9b8ab4b5f850451eae4a33124094632557104aa7cccec0"
+  ],
+  "craftengine/farmersdelight_fluids/configuration/crafting.yml": [
+    "97490763b08f5b2f273a8ff74212aacdfa867e423b5abf84fe4fd0196c2cb5e6"
+  ],
+  "craftengine/farmersdelight_fluids/configuration/fluid_recipes.yml": [
+    "2d9a438a20bc29215413463b0e15579e81a5d3131628606ac6e3eacd633cf706"
+  ],
+  "craftengine/farmersdelight_fluids/configuration/fluid_tank.yml": [
+    "573298ca9709b5008aa5cb9c27116e97d78d46ae70f4e4a4e13f82bfd5f3458c"
+  ],
+  "craftengine/farmersdelight_fluids/pack.yml": [
+    "e1e53748190436b93876e0721c67e677499fe60bf8352a78ea4e36ed10306a26"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank.json": [
+    "1b2898241af01359e4c4a6b2c0cd37d24aa8ba56288ade26bf409c3bce876887"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/honey_01.json": [
+    "78d70439235279394c388b0001849828d1b75a903cca852f205899ae5a5eb244"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/honey_02.json": [
+    "73ef147413cc5940332584f4ecc09ab0db4a9058d37812cd334dc19c16e2987a"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/honey_03.json": [
+    "5b32af827c0879f9d97befcdd04dfd50511a52463ed67a21ec973961f463560a"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/honey_04.json": [
+    "73a7e28e0f3f561e9a9c183f7038d6b12d391a9c85626c2908da2b3aeca40de3"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/honey_05.json": [
+    "fd6c2c1e82e991c4aef3d80e19b504fcefa767d5f34aad21900f19a765bc79d6"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/honey_06.json": [
+    "220f4ac4838cc94756f9f60105b510b44388ce44fc56d587466008510b009cc1"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/honey_07.json": [
+    "7d675bdce77885b3dccac0ce3361e8f66e624f6192cb96811a1ef166318af523"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/honey_08.json": [
+    "e9a9905aa31d6f876ccc84582682f6dcedeb606ab0e8092bd0c904699a036a99"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/honey_09.json": [
+    "c49512d07b5ae022390f3a8020a196fa19bbc3f47b9a2d1b34a44e53752e4c6c"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/honey_10.json": [
+    "02cfcb26c9d443c1a363b803c75fb5fd5abfea3c56971df8207a573c09d66a2c"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/honey_11.json": [
+    "d30c9ca93c5cb42794ff8c7dd3636fee40655b11fd496a81606b2563f0700820"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/honey_12.json": [
+    "83b0346c3e856f8edec5404b5cf649f89660484437ae85b49b7948dd1db1dd2a"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/honey_13.json": [
+    "bd43833f8dc58417e025fb51fdcdfdb7205c117c99a03dd200c6452efc158c46"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/honey_14.json": [
+    "c2c64d24fb647e79c0f38613a795c5fdba2e7aa735ebb5ccd7a2374683cd165e"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/honey_15.json": [
+    "f6f31ada047b0d9612ad8a67eaf55e62c1374fbfcaa1a1cf8b53092666e2dd57"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/honey_16.json": [
+    "5ea5ca2f16bb99a59f592384f0d0bb6deb6cbd5df23662b5ef6626e5d7be5be3"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/lava_01.json": [
+    "75063a5337976f0c02ea3130cb5338cf7635c66c5cb22923476b0c8392cc8729"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/lava_02.json": [
+    "04822cac20f3f851b5bba4431426f00e121e4841a21ec504f97d610c802f85d4"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/lava_03.json": [
+    "599df1283e3b7496a37c82f6c6c83db13b50c7857298c671e333e5ab32ed3419"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/lava_04.json": [
+    "7f81e729134f184f9f803bdfa669249c078aa900b277433cdf7ec0890c879fd0"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/lava_05.json": [
+    "2f3b6906454e98bd89f422785f1d812950bd2ced5d588f36dc5b75fcbf353910"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/lava_06.json": [
+    "4aafdf8166e8b83c7bb3c1a23abd813360e61229ffece817d224635a5183fc12"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/lava_07.json": [
+    "93b136cdd0019d4833b703edd464b5173a5c4768be96b8cb883e11056b9fed5c"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/lava_08.json": [
+    "4391dd12d5785f1730528635353c9059d9fdc0bfecca137f84605a5cc6f4c470"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/lava_09.json": [
+    "5bdc0116b7aa93efd7e3e49dcdae342d95856697500f89c1a4e0f9df21a0219f"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/lava_10.json": [
+    "fed51fd818ec9a8fbd47e7fa3cc099b3484d9dd78b06391ed7b7d71242be8688"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/lava_11.json": [
+    "c729560ed9c5c0e4e306434609690e0915ed44856318401e01eb6cecdc96656d"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/lava_12.json": [
+    "107e0ad9bd4dd1e6ce34fd27c30f8072e8c79168b70a177092c8aefaaeada0e2"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/lava_13.json": [
+    "bff0f41b01144bd2ce8c040387c210c010f0428cf32999eb3fc22b53b6a7b5e3"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/lava_14.json": [
+    "58a98d7bc4dd08950a035c9841f0e89e35c02cd0b316f6af3d07f85d6e01cc0b"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/lava_15.json": [
+    "317849432aab4772dba9fd1bcacf8abba11cbc03fbffd498568568dc03f77438"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/lava_16.json": [
+    "de29cec4d19a861646a499f18dc59ebf9e233ee72741f7af8fae8c4dd8f34abe"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/milk_01.json": [
+    "a04e5d4948014c41c6237f793fc6ad30c31c9aa5ac4d538d34470cc1c1a3814f"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/milk_02.json": [
+    "98885ac55745f6728b9216a3d69d12189f05c648ee4a357c21f976ade1ab33a4"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/milk_03.json": [
+    "acda72624acc5fa78a28420e8b22e364e9bd3f104d41a7178e69ed9bb23cb430"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/milk_04.json": [
+    "e40e90ef1175e0a3c97d8e020fb9dcf4a00dc06a56a92c611844a3a354a52edf"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/milk_05.json": [
+    "b04f2566d94551f4ba8dd33165f6b9d55b25c6ca1df810f66afa576799a4a971"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/milk_06.json": [
+    "d907662e3eb67db1a4bf065682c0c56890a6ed491efdea969ebb2cbbb90b4ba3"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/milk_07.json": [
+    "76f008ba99df301a0b5ddb84ffe1f3d8ba5e851250c4ec072287b196c9c99305"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/milk_08.json": [
+    "44bc33727a6530b130ba5491c3fb239c792b4a0d77d486a5bda98fd6f658223a"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/milk_09.json": [
+    "021a0aef5aa8ea75c60426ce87dd3cd2c2b3521b0f16fb6e17f153ce1199c24b"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/milk_10.json": [
+    "c9ab2e8ec8a124b1525805173b3f7a62ca4f0195cb968700966140d60cc543e9"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/milk_11.json": [
+    "6b17a66f6943aa5f350c41d44a1e9c2edeb9f65269e354ab9c6ab4126d739878"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/milk_12.json": [
+    "05011936b7fd1edf0114d9c8dbad0e7d30e560bdf21a0fe8f7ad83f18f02bea8"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/milk_13.json": [
+    "d2e96c7000c438a66ac1ebba098b4c8b863181446b3fb8c9a70b5ca75bd03d2f"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/milk_14.json": [
+    "8fc84e5371feaeef23e367c06ecb31d8b128df76ee26be7a32babe9fae51f854"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/milk_15.json": [
+    "ba776271a3f65f718296298e59e9d520e80088d9b0f90aa911fa3fa4949f7c1f"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/milk_16.json": [
+    "005e415053131426601962349ec7a06251c0d81183a4080a4d62a90c71588a66"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/other_01.json": [
+    "e2c86bb17957142909bf42c080f4658561994f3faa6c191c8d6d3016fe338e6a"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/other_02.json": [
+    "8ddc3f104e5d5074a14653d0957a9ecee28f7bdd0b06eff97062f830a70ecfb3"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/other_03.json": [
+    "742cd98c9910accdb017ba9ec39711d0dbad92800a0471aa1c75572cc832ce51"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/other_04.json": [
+    "feac408b90a5b700f42986dc0bc8eb34dca1d59410e77c89c844bbb43f0a3293"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/other_05.json": [
+    "2909bf1e5e6b8f3eba8b12e30fed4227c2fca13cc1f579a85be6daf5ef43d98d"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/other_06.json": [
+    "92c7020dde0db098c6d82164a3c77ad74f1bc28722132aaf30ef507872f5c038"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/other_07.json": [
+    "8eac708804e054f064edeb6c9788e5f2f1d93147b14d7a75c3bd9e2fb1d40cc5"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/other_08.json": [
+    "b11b0590b20d52c529a408a12cc03a7959c94660fb9653043b0ecbf33ef4e32b"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/other_09.json": [
+    "a9a361efa33b5d0b9d332aadf19e8d6a2b46daf1a8db4d6e1e1e86361b8b3d7f"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/other_10.json": [
+    "f9d61b941953f6eadd06d68fecfca16d0e770836dd6300160fdb540cec110d92"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/other_11.json": [
+    "38a210fdd011a16dad7a9d1284fb22e9cbfc7ce043e15885bc29e3550f54858c"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/other_12.json": [
+    "5a04503772a2002a1b85b1d49ed63b19a10083d6f0382ebca5765b0d9d2f6f0f"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/other_13.json": [
+    "2c8c5bbf0042cac2aa6b88ddb78925291d42e79998c8dc3303a132c189d8ebcc"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/other_14.json": [
+    "c4b02ac4d05318286d564aa61cebdb93f1563bd59c05777524a15822b2ccef1e"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/other_15.json": [
+    "3af2b01fd3deb9bebe230528fb17a2e2f8780e8dead9d4d805332093e6a72d1b"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/other_16.json": [
+    "4f8959d41cebbf7cf5a3f5f7b279c3727e0c096443e14545bf9c5d1dc05ff2b0"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/water_01.json": [
+    "ac490d0d42fec43c52c395147be17813ec14c66c9012e0089127c630d5f8b721"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/water_02.json": [
+    "f2e89b0a503a4b4ca0e0da3ee0f0a2968ca532fe8e5b6f9e902853a02b32fa35"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/water_03.json": [
+    "30936e44721e4591c6749b61aa11cd356dcb79665270154834840ef6d61d196c"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/water_04.json": [
+    "5009e246177f364065551e75772c96398aa59706e1e9545f9f6911432a0fbe10"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/water_05.json": [
+    "988dff0de66259d40fab18d781f21a4eca51ba698cdc1a46e043c3dbf6f60562"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/water_06.json": [
+    "6c2b5490e5838c7a06fc8a638f542a3d4d628209abd6e621d7949f42c43faa98"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/water_07.json": [
+    "ba668cd06014f09a5827ce18af220a96ba3900505642f958ce8407308334d89e"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/water_08.json": [
+    "85a31e5a1c701f81335aaba76bcdbc615c5a89f0991c7eb6e8112595de4c9287"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/water_09.json": [
+    "87d20c15f4415288e2a70ab40103ea446b4523bd9dec1cfc8cced11c54d74e01"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/water_10.json": [
+    "74ee42f960f290bec1c506c7c620ab840ddb4a8777e168b58ef11491ffe1d2bd"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/water_11.json": [
+    "d3d5e812ce6715b0a484b0d22e6fb66ac73221bbc8ded0b335f8218c6d908106"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/water_12.json": [
+    "8523e26ac74bf881d58bd085c79b1dd9e288a20950d8c9a7d1e7dc4c4c6b3e95"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/water_13.json": [
+    "e9d731d1961d2a2bf109e51489c0ee9e78428fc424c26108b90a25e7dd789e67"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/water_14.json": [
+    "bd6beef92829ad540c7180a02bd35c2357fd7ed35cd99dfe65d9931c78cb5ad9"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/water_15.json": [
+    "310a0cb279104c928f0354c22828648685b4250f719b4207ac4484e8b360c67e"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/items/fluid_tank/water_16.json": [
+    "88e6c9cb7921a5d06599e5e9a7bc9d173e96ad9f1d2c56cb1e46740cde58e896"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/models/block/glass_jug.json": [
+    "92306c912ffcf8b60c2fedfeba5c5ea8eeea8673d4ed8ea8d65f25a33cb4fe53"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/models/block/jug.json": [
+    "84a3e2dc3134e93369231e140b007a81352174840e72b1fccb4efa337b57cef4"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/models/block/jug_fluid/glass_jug_fluid_model_01.json": [
+    "ff4a8a56d840cd47723c3f9c02af30eb5961877296043cd45fd7892549792d28"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/models/block/jug_fluid/glass_jug_fluid_model_02.json": [
+    "171e4186ce1646909fec4e752b23da1b439ead6dc4e15a4464f430e47f97328b"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/models/block/jug_fluid/glass_jug_fluid_model_03.json": [
+    "d788f5da2ef5e0f7342a3dd567b84abbd634afe2eb447c4e4dbdc76b371e8e69"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/models/block/jug_fluid/glass_jug_fluid_model_04.json": [
+    "19044c5f774e115f5b9cf213f83a5d84f10cdd35ea73d3ef528ade4564703fed"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/models/block/jug_fluid/glass_jug_fluid_model_05.json": [
+    "af58d4bb06430e288f5b604fa3ca11465636ea16eb273f310978ac264962b8fa"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/models/block/jug_fluid/glass_jug_fluid_model_06.json": [
+    "f5790e60418a56c25e1596e0fac07ca6425697b67139707723444a2cdc74c2f2"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/models/block/jug_fluid/glass_jug_fluid_model_07.json": [
+    "411d9574f11764b9d75fd6f5d96c29315f8117a643b128a31bd105376b1a1bbd"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/models/block/jug_fluid/glass_jug_fluid_model_08.json": [
+    "99fe5cf205369e5822cd5caabd7bb168dd671a9ba9f51f05e318130976209fe1"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/models/block/jug_fluid/glass_jug_fluid_model_09.json": [
+    "f8df4e3793ff4f43010d8637f96a6efe43ad1fed058f748b19bafe853ca2bacc"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/models/block/jug_fluid/glass_jug_fluid_model_10.json": [
+    "4d1644dec0201f2c977655a7357597ab8726e8255b868fd38048e4e5982ab608"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/models/block/jug_fluid/glass_jug_fluid_model_11.json": [
+    "e45db992152ddf451760e65f0c659e5b76ee83ef0b66d7bbfb3846b015ebe2e2"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/models/block/jug_fluid/glass_jug_fluid_model_12.json": [
+    "7f2f3c6b6359e5754ffe085e95dcb87f6ce8b911c711b97aaab6887b74b8db92"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/models/block/jug_fluid/glass_jug_fluid_model_13.json": [
+    "ac0b7fa524b330836d056ca8d02c34d4e4f29afc69a3dd03936a4d7c4d2814c2"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/models/block/jug_fluid/glass_jug_fluid_model_14.json": [
+    "e5e608b7ad96e15cedd328be9f11cbce6fb1021977f344b779d5afbb85400405"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/models/block/jug_fluid/glass_jug_fluid_model_15.json": [
+    "80c430535598b38e217a5d5beaa86832626d04e154de7624da75a270ce938784"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/models/block/jug_fluid/glass_jug_fluid_model_16.json": [
+    "0581061b5725288baadbb12f00578934e3a1f727e10413db64ecbae03d887896"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/models/item/glass_jug.json": [
+    "16a273da05f4dc72ca0b8f09c24a1a73fa54ba2e2a0220a4bee1635b8d67f02a"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/textures/block/glass_jug_bottom.png": [
+    "2dab8437738369a4e6f50a656fa8579f12b9ae8ad4243a2da4d560fc7cbdafd8"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/textures/block/glass_jug_side.png": [
+    "b4dc176accbe0cabcb66b294c2f6cb4fd90ecf912beef606f0aa41a7c4a5065f"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/textures/block/glass_jug_top.png": [
+    "93b86e77789e8c953e2cd1a20f30f229bd282d5e01590754bc87a1a2890159a0"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/textures/block/jug_bottom.png": [
+    "399757d8761230575bcb43259d9d2cad9f6221ce7e745c4190cb8bcadd49aa07"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/textures/block/jug_side.png": [
+    "d567626c2f7e56de0d63baada580ceae83c6cfc35ce01c46fd0bebdd1b89d2d9"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight/textures/block/jug_top.png": [
+    "1993041e822a678c9d70a29c562a57097177ba8c140949e197d75557ec77c5db"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight_fluids/lang/en_us.json": [
+    "c721ba564c443b698809c5a7168e970f80923fea97f7d6b4ba19f58c1264883c"
+  ],
+  "craftengine/farmersdelight_fluids/resourcepack/assets/farmersdelight_fluids/lang/zh_cn.json": [
+    "fc3f25ab835ae5015bc94c483e822c8bd5f0cd4c1273ffe947c180c336236d1d"
+  ]
+}

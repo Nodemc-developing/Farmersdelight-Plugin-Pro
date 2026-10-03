@@ -1,0 +1,28 @@
+recipes:
+  farmersdelight:fluid_tank:
+    type: shaped
+    category: misc
+    pattern:
+      - CCC
+      - G G
+      - CIC
+    ingredients:
+      C: minecraft:copper_ingot
+      G: minecraft:glass
+      I: minecraft:iron_ingot
+    result:
+      id: farmersdelight:fluid_tank
+      count: 1
+  farmersdelight:fluid_jug:
+    type: shaped
+    category: misc
+    pattern:
+      - ' C '
+      - 'C C'
+      - 'CIC'
+    ingredients:
+      C: minecraft:copper_ingot
+      I: minecraft:iron_ingot
+    result:
+      id: farmersdelight:fluid_jug
+      count: 1

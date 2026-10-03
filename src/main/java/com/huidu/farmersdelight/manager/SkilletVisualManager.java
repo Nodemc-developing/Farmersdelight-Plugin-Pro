@@ -64,10 +64,10 @@ final class SkilletVisualManager {
         }
 
         for (int i = skillet.displayEntityIds.size(); i < displayCount; i++) {
-            double spread = displayConfig.getItemSpread();
+            double spread = displayConfig.getItemSpread(skillet.storedItem);
             double offsetX = displayCount == 1 ? 0 : (random.nextDouble() - 0.5D) * spread;
             double offsetZ = displayCount == 1 ? 0 : (random.nextDouble() - 0.5D) * spread;
-            double offsetY = (i + 1) * 0.03D;
+            double offsetY = (i + 1) * displayConfig.getStackYOffset(skillet.storedItem);
             Vector3f configuredOffset = displayOverride.offset();
             if (configuredOffset != null) {
                 offsetX += configuredOffset.x();
@@ -87,7 +87,7 @@ final class SkilletVisualManager {
             float zRotation = 0.0F;
             if (displayOverride.rotationDegrees() != null) {
                 xRotation = displayOverride.rotationDegrees().x();
-                yRotation = displayOverride.rotationDegrees().y();
+                yRotation += displayOverride.rotationDegrees().y();
                 zRotation = displayOverride.rotationDegrees().z();
             }
 

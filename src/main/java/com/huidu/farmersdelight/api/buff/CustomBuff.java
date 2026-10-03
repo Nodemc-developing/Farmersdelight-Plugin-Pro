@@ -20,6 +20,11 @@ public interface CustomBuff {
         return false;
     }
 
+    /** Whether harmful-only content functions may select this buff. */
+    default boolean isHarmful() {
+        return false;
+    }
+
     default int level(Player player) {
         return isActive(player) ? 1 : 0;
     }

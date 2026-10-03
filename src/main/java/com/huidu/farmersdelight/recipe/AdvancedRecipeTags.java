@@ -19,6 +19,7 @@ public final class AdvancedRecipeTags {
     private static volatile Snapshot snapshot = new Snapshot(Map.of(), Map.of());
 
     private AdvancedRecipeTags() { }
+    private static Snapshot currentSnapshot() { return RuntimeSnapshotPublication.get(AdvancedRecipeTags.class, snapshot); }
 
     public static synchronized void publishFoodGroups(List<FoodGroupSnapshot.Group> groups) {
         Map<String, List<String>> values = new LinkedHashMap<>();
@@ -55,12 +56,25 @@ public final class AdvancedRecipeTags {
 
     public static void clearFoodGroups() { unregisterSource(FOOD_GROUP_SOURCE); }
 
+    static Runnable captureFoodGroupsRollback() { return captureSourceRollback(FOOD_GROUP_SOURCE); }
+
+    static synchronized Runnable captureSourceRollback(String source) {
+        Map<String, Set<String>> previous = SOURCES.get(source);
+        return () -> {
+            synchronized (AdvancedRecipeTags.class) {
+                if (previous == null) SOURCES.remove(source);
+                else SOURCES.put(source, previous);
+                rebuild();
+            }
+        };
+    }
+
     public static Set<String> members(Key group) {
         return group == null ? Set.of() : members(group.toString());
     }
 
     public static Set<String> members(String group) {
-        return snapshot.groups().getOrDefault(normalize(group), Set.of());
+        return currentSnapshot().groups().getOrDefault(normalize(group), Set.of());
     }
 
     public static boolean matches(ItemStack item, Key group) {
@@ -74,7 +88,7 @@ public final class AdvancedRecipeTags {
 
     /** Reverse lookup for recipe indexes; contains group IDs without the expression prefix. */
     public static Set<String> tagsForItemId(String itemId) {
-        return snapshot.reverse().getOrDefault(normalize(itemId), Set.of());
+        return currentSnapshot().reverse().getOrDefault(normalize(itemId), Set.of());
     }
 
     /** An unknown advanced group invalidates the recipe even when another choice would be usable. */
@@ -98,7 +112,9 @@ public final class AdvancedRecipeTags {
         merged.forEach((group, members) -> members.forEach(item ->
                 reverse.computeIfAbsent(item, unused -> new LinkedHashSet<>()).add(group)));
         reverse.replaceAll((item, groups) -> Collections.unmodifiableSet(groups));
-        snapshot = new Snapshot(Collections.unmodifiableMap(merged), Collections.unmodifiableMap(reverse));
+        Snapshot next = new Snapshot(Collections.unmodifiableMap(merged), Collections.unmodifiableMap(reverse));
+        RuntimeSnapshotPublication.publish(AdvancedRecipeTags.class, snapshot, next);
+        snapshot = next;
     }
 
     private static String normalize(String value) { return value == null ? "" : value.trim().toLowerCase(Locale.ROOT); }

@@ -81,16 +81,14 @@ public class CookingPotGui extends AbstractInventoryGui {
     private final Map<Integer, ItemStack> cachedDisplayItems = new HashMap<>();
     private ItemStack cachedPendingContainer;
     private Boolean cachedRecipeBookEnabled;
-    private boolean syncQueued;
+    private volatile boolean syncQueued;
     // Inventory version seen at last input-slot rescan; skip rescan if unchanged.
     private long lastSeenInventoryVersion = Long.MIN_VALUE;
     // Tracks which writable GUI slots have been mutated by a click/drag handler since the last
     // syncToBlockEntity. Sync only writes back these slots — so an unchanged GUI slot can't clobber
     // a concurrent cook tick that mutated the corresponding entity slot in the same window
     // (multi-viewer dup vector).
-    // Slots are added from the viewer's click region; syncToBlockEntity iterates and clears them on the
-    // pot's region during a break-triggered close. A concurrent set keeps that cross-region access from
-    // corrupting the backing table or throwing under iteration.
+    // Input edits are committed under the entity lock on the viewer's owner, before that lock is released.
     private final Set<Integer> dirtyWritableSlots = ConcurrentHashMap.newKeySet();
 
     public CookingPotGui(FarmersDelightPlugin plugin, CookingPotBlockEntity blockEntity,
@@ -221,7 +219,7 @@ public class CookingPotGui extends AbstractInventoryGui {
         String title = blockBehavior != null && blockBehavior.getTitleOverride() != null
                 ? blockBehavior.getTitleOverride()
                 : config.getTitle();
-        return MINI_MESSAGE.deserialize(resolveTitleLayout(title));
+        return GuiTextStyle.title(MINI_MESSAGE.deserialize(resolveTitleLayout(title)));
     }
 
     private String resolveTitleLayout(String rawTitle) {
@@ -365,6 +363,13 @@ public class CookingPotGui extends AbstractInventoryGui {
         if (display == null && (config.isBufferSlot(guiSlot) || config.isOutputSlot(guiSlot))) {
             display = placeholderItem();
         }
+        if (display != null && (config.isBufferSlot(guiSlot) || config.isOutputSlot(guiSlot))) {
+            ItemMeta meta = display.getItemMeta();
+            if (meta != null) {
+                GuiTextStyle.normalizeDisplayMeta(meta);
+                display.setItemMeta(meta);
+            }
+        }
         inventory.setItem(guiSlot, display);
         cachedDisplayItems.put(guiSlot, cloneOrNull(item));
     }
@@ -461,10 +466,10 @@ public class CookingPotGui extends AbstractInventoryGui {
                 .color(NamedTextColor.GRAY);
 
         lore.add(Component.empty());
-        lore.add(hint.decoration(TextDecoration.ITALIC, false));
+        lore.add(GuiTextStyle.lore(hint));
         List<Component> containerLore = container.getItemMeta() == null ? null : container.getItemMeta().lore();
         if (containerLore != null && !containerLore.isEmpty()) {
-            lore.addAll(containerLore);
+            lore.addAll(GuiTextStyle.loreLines(containerLore));
         }
         meta.lore(lore);
         item.setItemMeta(meta);
@@ -558,12 +563,13 @@ public class CookingPotGui extends AbstractInventoryGui {
             return;
         }
         // On a double-click of an empty slot with nothing to merge, Paper fires NOTHING + DOUBLE_CLICK.
-        // If the clicked slot is a placeable input slot, let vanilla handle it normally (drop the cursor
-        // item into the slot) by not cancelling the event, so the double-click is not interrupted.
+        // Treat a placeable input slot like a normal input click, committing the cursor transfer under
+        // the same lock as every other top-slot edit before a break/unload can snapshot the pot.
         if (action == InventoryAction.NOTHING && click == ClickType.DOUBLE_CLICK
                 && clickedTop && isPlayerInputSlot(rawSlot)
                 && !ItemUtils.isContainerNestingHazard(event.getCursor())) {
-            scheduleGuiSync(event.getWhoClicked() instanceof Player p ? p : null);
+            event.setCancelled(true);
+            handleTopInventoryInteraction(event);
             return;
         }
         // Hotbar number-key / offhand swap targeting top (GUI) slots does not fit this GUI's
@@ -584,7 +590,7 @@ public class CookingPotGui extends AbstractInventoryGui {
             Player player = (Player) event.getWhoClicked();
             syncToBlockEntity();
             close();
-            activeGuis.remove(player.getUniqueId());
+            activeGuis.remove(player.getUniqueId(), this);
             player.closeInventory();
             RecipeViewGui recipeGui = new RecipeViewGui(plugin, player, true, cookingPotLocation);
             recipeGui.open(player);
@@ -599,7 +605,11 @@ public class CookingPotGui extends AbstractInventoryGui {
                 return;
             }
 
-            ItemStack outputItem = outputTaker.takeOutputFromSlot(player, rawSlot, requestedAmount);
+            ItemStack[] taken = {null};
+            blockEntity.withInventoryLock(() -> {
+                if (!closed) taken[0] = outputTaker.takeOutputFromSlot(player, rawSlot, requestedAmount);
+            });
+            ItemStack outputItem = taken[0];
             if (outputItem != null && !outputItem.getType().isAir()) {
                 outputTaker.deliverOutputToPlayer(event, player, outputItem);
                 outputTaker.applyOutputExperienceReward(player, outputItem);
@@ -636,6 +646,7 @@ public class CookingPotGui extends AbstractInventoryGui {
                 // cannot land between the refresh and the write-back and be clobbered by the pre-cook GUI value
                 // — a Folia cross-region ingredient dupe.
                 blockEntity.withInventoryLock(() -> {
+                    if (closed) return;
                     refreshInputSlotsFromBlockEntity();
                     itemDistributor.smartMoveFromPlayerInventory(current);
                     event.setCurrentItem(current.getAmount() > 0 ? current : null);
@@ -744,7 +755,8 @@ public class CookingPotGui extends AbstractInventoryGui {
     // Runs one tick after the cancelled drag, on the player's region. Places at most what the cursor still
     // holds, then removes exactly that much from it, so the pot and the cursor can never disagree.
     private void commitDragShares(Player player, ItemStack expectedCursor,
-                                  Map<Integer, Integer> requested, int maxStack) {
+                                   Map<Integer, Integer> requested, int maxStack) {
+        if (closed || player.getOpenInventory().getTopInventory() != inventory) return;
         ItemStack cursor = player.getItemOnCursor();
         if (cursor == null || cursor.getType().isAir() || !cursor.isSimilar(expectedCursor)) {
             return; // the restored stack is gone or changed: commit nothing
@@ -752,6 +764,7 @@ public class CookingPotGui extends AbstractInventoryGui {
         int budget = cursor.getAmount();
         int[] placedTotal = {0};
         blockEntity.withInventoryLock(() -> {
+            if (closed) return;
             refreshInputSlotsFromBlockEntity();
             for (Map.Entry<Integer, Integer> entry : requested.entrySet()) {
                 int rawSlot = entry.getKey();
@@ -806,6 +819,7 @@ public class CookingPotGui extends AbstractInventoryGui {
     }
 
     private void handleTopInventoryInteractionLocked(InventoryClickEvent event, Player player, int rawSlot) {
+        if (closed) return;
         // Adopt the authoritative entity state for the mapped slots before acting, so a second viewer can't
         // take a phantom item that another viewer (or the cook tick) already removed in the ~1-tick window
         // before the periodic refresh would have corrected this GUI.
@@ -909,6 +923,7 @@ public class CookingPotGui extends AbstractInventoryGui {
 
         // Collect from input slots (under the inventory lock to stay consistent with the cook tick).
         blockEntity.withInventoryLock(() -> {
+            if (closed) return;
             refreshInputSlotsFromBlockEntity();
             for (int slot : ingredientSlots) {
                 if (slot == clickedRawSlot) continue;
@@ -1027,9 +1042,7 @@ public class CookingPotGui extends AbstractInventoryGui {
 
     public static void cleanupAll() {
         for (CookingPotGui gui : activeGuis.values()) {
-            if (!gui.closed) {
-                gui.close();
-            }
+            gui.retireExternally();
         }
         activeGuis.clear();
         GuiTickManager.cleanup();
@@ -1042,14 +1055,10 @@ public class CookingPotGui extends AbstractInventoryGui {
     public static void closeAllOpenGuis() {
         for (Map.Entry<UUID, CookingPotGui> entry : new ArrayList<>(activeGuis.entrySet())) {
             CookingPotGui gui = entry.getValue();
-            Player player = Bukkit.getPlayer(entry.getKey());
-            if (gui != null && !gui.closed) {
-                gui.close();
-            }
-            activeGuis.remove(entry.getKey());
-            if (player != null && player.isOnline()) {
-                closeViewerInventory(player);
-            }
+            if (gui == null) continue;
+            gui.retireExternally();
+            activeGuis.remove(entry.getKey(), gui);
+            gui.closeViewerInventory();
         }
     }
 
@@ -1069,15 +1078,19 @@ public class CookingPotGui extends AbstractInventoryGui {
                     || loc.getBlockX() != x || loc.getBlockY() != y || loc.getBlockZ() != z) {
                 continue;
             }
-            if (!gui.closed) {
-                gui.close();
-            }
-            activeGuis.remove(entry.getKey());
-            Player player = Bukkit.getPlayer(entry.getKey());
-            if (player != null && player.isOnline()) {
-                closeViewerInventory(player);
-            }
+            gui.retireExternally();
+            activeGuis.remove(entry.getKey(), gui);
+            gui.closeViewerInventory();
         }
+    }
+
+    private void retireExternally() {
+        // Every input transfer commits before releasing this lock. Retiring on a block/reload thread
+        // therefore needs no Bukkit inventory read, and pending owner callbacks can no longer insert.
+        blockEntity.withInventoryLock(() -> {
+            syncQueued = false;
+            super.close();
+        });
     }
 
 
@@ -1093,7 +1106,7 @@ public class CookingPotGui extends AbstractInventoryGui {
 
     @Override
     protected void removeFromActiveGuis(UUID playerId) {
-        activeGuis.remove(playerId);
+        activeGuis.remove(playerId, this);
     }
 
     @Override

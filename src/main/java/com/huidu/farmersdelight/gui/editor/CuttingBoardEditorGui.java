@@ -1,5 +1,7 @@
 package com.huidu.farmersdelight.gui.editor;
 
+import com.huidu.farmersdelight.gui.GuiTextStyle;
+
 import com.huidu.farmersdelight.FarmersDelightPlugin;
 import com.huidu.farmersdelight.gui.AbstractInventoryGui;
 import com.huidu.farmersdelight.gui.GuiConfig;
@@ -651,7 +653,7 @@ public final class CuttingBoardEditorGui extends AbstractInventoryGui implements
     private static ItemStack named(ItemStack stack, String name) {
         ItemMeta meta = stack.getItemMeta();
         if (meta != null) {
-            meta.displayName(Text.name(name));
+            meta.displayName(GuiTextStyle.name(name));
             stack.setItemMeta(meta);
         }
         return stack;

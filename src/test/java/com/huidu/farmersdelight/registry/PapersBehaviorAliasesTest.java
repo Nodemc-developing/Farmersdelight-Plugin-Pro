@@ -30,9 +30,10 @@ class PapersBehaviorAliasesTest {
         assertEquals("minecraft:block.lava.ambient", normalized.get("crackle-sound"));
     }
 
-    @Test void unsupportedMechanicsRemainExplicitAndUnregisteredByTheAliasLayer() {
-        assertTrue(PapersBehaviorAliases.unsupportedIdentifiers().contains("papersdelight:advanced_crop"));
-        assertTrue(PapersBehaviorAliases.unsupportedIdentifiers().contains("papersdelight:high_temperature"));
+    @Test void supportedMechanicsLeaveOnlyTheUnimplementedAddonExplicit() {
+        assertEquals(java.util.Set.of("dumplings_delight:garlic_effect"), PapersBehaviorAliases.unsupportedIdentifiers());
+        assertTrue(com.huidu.farmersdelight.block.behavior.CompatibilityMechanicFactories.blockFactories().containsKey("advanced_crop"));
+        assertTrue(com.huidu.farmersdelight.block.behavior.CompatibilityMechanicFactories.blockFactories().containsKey("high_temperature"));
         assertFalse(PapersBehaviorAliases.unsupportedIdentifiers().contains("papersdelight:cooking_pot"));
         assertThrows(UnsupportedOperationException.class, () -> PapersBehaviorAliases.unsupportedIdentifiers().clear());
     }

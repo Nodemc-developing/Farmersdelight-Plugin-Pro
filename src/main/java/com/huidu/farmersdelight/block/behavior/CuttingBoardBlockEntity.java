@@ -234,8 +234,9 @@ public class CuttingBoardBlockEntity {
             case ITEM -> false;
             default -> ItemUtils.shouldUseBlockStyleDisplay(visualItem);
         };
-        float baseYOffset = itemCarved ? 0.23f : (isBlockItem ? 0.27f : 0.08f);
-        float yOffset = baseYOffset + 0.03f * (index + 1);
+        CuttingBoardDisplayConfig config = plugin.getCuttingBoardDisplayConfig();
+        float baseYOffset = itemCarved ? 0.23f : config.isAbsolutePosition(storedItem) ? 0 : (isBlockItem ? 0.27f : 0.08f);
+        float yOffset = baseYOffset + config.getStackYOffset(storedItem) * (index + 1);
         float scale = isBlockItem ? 0.8f : 0.6f;
 
         float yRotation = DisplayTransformUtils.cuttingBoardYaw(facing);
@@ -274,7 +275,7 @@ public class CuttingBoardBlockEntity {
         );
 
         Random random = new Random(getDisplaySeed(visualItem) + (index * 341873128712L));
-        float spread = plugin.getCuttingBoardDisplayConfig().getItemSpread();
+        float spread = config.getItemSpread(storedItem);
         float xOffset = totalCount == 1 ? 0.0f : (random.nextFloat() * 2.0f - 1.0f) * spread * 0.5f;
         float zOffset = totalCount == 1 ? 0.0f : (random.nextFloat() * 2.0f - 1.0f) * spread * 0.5f;
         if (displayOverride.offset() != null) {

@@ -50,6 +50,10 @@ public final class PlaceholderApiHook extends PlaceholderExpansion {
             return "";
         }
         String key = params.toLowerCase(Locale.ROOT);
+        if (key.startsWith("stats_")) {
+            return com.huidu.farmersdelight.statistics.StatisticPlaceholders.resolve(
+                    plugin.statistics(), offline == null ? null : offline.getUniqueId(), key);
+        }
         if ("buff_count".equals(key)) {
             return Integer.toString(activeBuffCount(offline));
         }

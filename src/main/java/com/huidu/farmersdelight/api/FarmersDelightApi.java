@@ -104,6 +104,13 @@ public final class FarmersDelightApi {
 
     private final Map<String, RecipeType> recipeTypes = Collections.synchronizedMap(new LinkedHashMap<>());
     private volatile Map<String, List<JumpTarget>> recipeResultIndex = Map.of();
+    private Map<String, List<JumpTarget>> currentRecipeResultIndex() {
+        return com.huidu.farmersdelight.recipe.RuntimeSnapshotPublication.get(this, recipeResultIndex);
+    }
+    private void setRecipeResultIndex(Map<String, List<JumpTarget>> next) {
+        com.huidu.farmersdelight.recipe.RuntimeSnapshotPublication.publish(this, recipeResultIndex, next);
+        recipeResultIndex = next;
+    }
     // Block namespaces of registered addons (e.g. "brewinandchewin"), used by the CraftEngine block-state
     // usage report and the shared land-protection listener.
     private final Set<String> addonBlockNamespaces = ConcurrentHashMap.newKeySet();
@@ -164,8 +171,8 @@ public final class FarmersDelightApi {
      * <p>Members in the {@code minecraft:} namespace are also exported as a server-side tag data pack.
      * That export runs again once the whole server has loaded, so registering during addon enable is in
      * time; CraftEngine absorbs the written tags on the next server start. Members in other namespaces
-     * take effect immediately through FD's own matching and need no restart.
-     * When content is already loaded, registration also rebuilds tag-dependent recipes and GUI caches.
+     * take effect with the next complete recipe publication and need no restart.
+     * Registration requests that publication; existing recipes keep their current tag membership until it succeeds.
      */
     public void registerCommonTags(String source, Map<String, List<String>> tagToMemberItems) {
         CommonTagResolver.registerSource(source, tagToMemberItems);
@@ -201,7 +208,7 @@ public final class FarmersDelightApi {
             if (isContentLoaded()) {
                 rebuildRecipeResultIndex();
             } else {
-                recipeResultIndex = Map.of();
+                setRecipeResultIndex(Map.of());
             }
             invalidateRecipeDiscoveryIndex();
         }
@@ -220,9 +227,18 @@ public final class FarmersDelightApi {
         invalidateRecipeDiscoveryIndex();
     }
 
+    @ApiStatus.Internal
+    public synchronized Runnable captureRecipeIndexRollback() {
+        Map<String, List<JumpTarget>> previous = currentRecipeResultIndex();
+        return () -> {
+            synchronized (this) { setRecipeResultIndex(previous); }
+            invalidateRecipeDiscoveryIndex();
+        };
+    }
+
     private synchronized void rebuildRecipeResultIndex() {
-        recipeResultIndex = buildRecipeResultIndex(recipeTypes(),
-                recipe -> FarmersDelightItems.idOf(recipe.result()));
+        setRecipeResultIndex(buildRecipeResultIndex(recipeTypes(),
+                recipe -> FarmersDelightItems.idOf(recipe.result())));
     }
 
     static Map<String, List<JumpTarget>> buildRecipeResultIndex(
@@ -246,6 +262,12 @@ public final class FarmersDelightApi {
 
     /** Returns all registered recipes producing the item without scanning recipe collections. */
     public List<JumpTarget> findRecipesProducing(ItemStack item) {
+        try (var scope = com.huidu.farmersdelight.recipe.RuntimeSnapshotPublication.readScope()) {
+            return findRecipesProducingInScope(item);
+        }
+    }
+
+    private List<JumpTarget> findRecipesProducingInScope(ItemStack item) {
         String itemId = FarmersDelightItems.idOf(item);
         if (itemId == null) {
             return List.of();
@@ -262,15 +284,18 @@ public final class FarmersDelightApi {
                 }
             }
         }
-        targets.addAll(recipeResultIndex.getOrDefault(itemId, List.of()));
+        targets.addAll(currentRecipeResultIndex().getOrDefault(itemId, List.of()));
         return List.copyOf(targets);
     }
 
     private void invalidateRecipeDiscoveryIndex() {
-        FarmersDelightPlugin plugin = PluginAccess.pluginOrNull();
-        if (plugin != null && plugin.getRecipeDiscoveryManager() != null) {
-            plugin.getRecipeDiscoveryManager().invalidateIndex();
-        }
+        com.huidu.farmersdelight.recipe.RuntimeSnapshotPublication.afterCommit(
+                com.huidu.farmersdelight.recipe.RecipeDiscoveryManager.class, () -> {
+                    FarmersDelightPlugin plugin = PluginAccess.pluginOrNull();
+                    if (plugin != null && plugin.getRecipeDiscoveryManager() != null) {
+                        plugin.getRecipeDiscoveryManager().invalidateIndex();
+                    }
+                });
     }
 
     // Shared rule for the runtime-mutating register/unregister methods below: get the plugin and let it pass

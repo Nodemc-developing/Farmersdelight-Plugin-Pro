@@ -38,28 +38,34 @@ public class TatamiPairingBehavior extends FarmersDelightBlockBehavior {
         return false;
     }
 
-    private static volatile String tatamiBlockId = "farmersdelight:tatami";
-    private static volatile String facingPropertyName = "facing";
-    private static volatile String pairedPropertyName = "paired";
+    private final String tatamiBlockId;
+    private final String facingPropertyName;
+    private final String pairedPropertyName;
 
     private final Property<?> facingProperty;
     private final Property<Boolean> pairedProperty;
     private final boolean pairWhileSneaking;
+    private final com.huidu.farmersdelight.FarmersDelightPlugin plugin;
 
-    private TatamiPairingBehavior(BlockDefinition block, Property<?> facingProperty, Property<Boolean> pairedProperty, boolean pairWhileSneaking) {
+    private TatamiPairingBehavior(com.huidu.farmersdelight.FarmersDelightPlugin plugin, BlockDefinition block, Property<?> facingProperty, Property<Boolean> pairedProperty, boolean pairWhileSneaking) {
         super(block);
+        this.plugin = plugin;
         this.facingProperty = facingProperty;
         this.pairedProperty = pairedProperty;
         this.pairWhileSneaking = pairWhileSneaking;
+        this.tatamiBlockId = block.id().toString();
+        this.facingPropertyName = facingProperty.name();
+        this.pairedPropertyName = pairedProperty.name();
     }
 
-    public static final BlockBehaviorFactory<TatamiPairingBehavior> FACTORY = new BlockBehaviorFactory<TatamiPairingBehavior>() {
+    public static final BlockBehaviorFactory<TatamiPairingBehavior> FACTORY = factory(null);
+    public static BlockBehaviorFactory<TatamiPairingBehavior> factory(com.huidu.farmersdelight.FarmersDelightPlugin plugin) {
+        return new BlockBehaviorFactory<TatamiPairingBehavior>() {
         @Override
         public TatamiPairingBehavior create(BlockDefinition block, ConfigSection section) {
             Map<String, Object> arguments = section != null ? section.values() : Map.of();
-            tatamiBlockId = BehaviorArgParser.getString(arguments, "block-id", tatamiBlockId);
-            facingPropertyName = BehaviorArgParser.getString(arguments, "facing-property", facingPropertyName);
-            pairedPropertyName = BehaviorArgParser.getString(arguments, "pair.property", "paired-property", pairedPropertyName);
+            String facingPropertyName = BehaviorArgParser.getString(arguments, "facing-property", "facing");
+            String pairedPropertyName = BehaviorArgParser.getString(arguments, "pair.property", "paired-property", "paired");
             boolean pairWhileSneaking = BehaviorArgParser.getBoolean(arguments, "pair.while-sneaking", false);
 
             // Both properties carry the pairing, which is everything this behavior does: without either one no
@@ -79,9 +85,10 @@ public class TatamiPairingBehavior extends FarmersDelightBlockBehavior {
             Property<Boolean> pairedProperty =
                     BlockBehaviorFactory.getProperty(path, block, pairedPropertyName, Boolean.class);
 
-            return new TatamiPairingBehavior(block, facingProperty, pairedProperty, pairWhileSneaking);
+            return new TatamiPairingBehavior(plugin, block, facingProperty, pairedProperty, pairWhileSneaking);
         }
-    };
+        };
+    }
 
     @Override
     public ImmutableBlockState updateStateForPlacement(BlockPlaceContext context, ImmutableBlockState state) {
@@ -106,10 +113,7 @@ public class TatamiPairingBehavior extends FarmersDelightBlockBehavior {
                 return;
             }
 
-            if (pairWithNeighbor(world, pos, state)) {
-                // Replace the just-placed block with paired=true so both halves stay visually in sync.
-                CraftEngineBlocks.place(block.getLocation(), state.with(pairedProperty, true), false);
-            }
+            pairWithNeighbor(world, pos, state);
         }
     }
 
@@ -151,14 +155,18 @@ public class TatamiPairingBehavior extends FarmersDelightBlockBehavior {
         }
 
         Block self = world.getBlockAt(pos.x(), pos.y(), pos.z());
+        if (OwnedBlockPairTransaction.editing(self.getLocation())) return;
         ImmutableBlockState state = CraftEngineBlocks.getCustomBlockState(self);
         if (!isTatamiState(state) || !Boolean.TRUE.equals(state.get(pairedProperty))) {
             return;
         }
 
         Block partner = self.getRelative(getFacing(state));
+        if (!owned(partner)) return;
         ImmutableBlockState partnerState = CraftEngineBlocks.getCustomBlockState(partner);
-        boolean partnerGone = !(isTatamiState(partnerState) && isSameTatami(state, partnerState));
+        boolean partnerGone = !(isTatamiState(partnerState) && isSameTatami(state, partnerState)
+                && getFacing(partnerState) == getFacing(state).getOppositeFace()
+                && Boolean.TRUE.equals(partnerState.get(pairedProperty)));
         if (!partnerGone) {
             return;
         }
@@ -173,17 +181,19 @@ public class TatamiPairingBehavior extends FarmersDelightBlockBehavior {
         Block center = world.getBlockAt(brokenLocation);
         for (BlockFace face : ORTHOGONAL_FACES) {
             Block neighbor = center.getRelative(face);
+            if (!world.isChunkLoaded(neighbor.getX() >> 4, neighbor.getZ() >> 4) || !org.bukkit.Bukkit.isOwnedByCurrentRegion(neighbor)) continue;
             // A neighbour in an unloaded chunk is left alone: unpairing it would mean loading that chunk (or
             // writing into another region) from a break handler.
             ImmutableBlockState nState = CustomBlockUtils.getStateIfResident(neighbor);
-            if (!isTatamiState(nState)) {
+            TatamiPairingBehavior behavior = CustomBlockUtils.getBehavior(nState, TatamiPairingBehavior.class);
+            if (behavior == null || !behavior.isTatamiState(nState)) {
                 continue;
             }
-            Property<Boolean> paired = pairedPropertyOf(nState);
+            Property<Boolean> paired = behavior.pairedPropertyOf(nState);
             if (paired == null || !Boolean.TRUE.equals(nState.get(paired))) {
                 continue;
             }
-            Block partner = neighbor.getRelative(getFacingFromState(nState));
+            Block partner = neighbor.getRelative(behavior.getFacingFromState(nState));
             if (partner.getX() == center.getX() && partner.getY() == center.getY() && partner.getZ() == center.getZ()) {
                 CraftEngineBlocks.place(neighbor.getLocation(), nState.with(paired, false), false);
             }
@@ -207,7 +217,14 @@ public class TatamiPairingBehavior extends FarmersDelightBlockBehavior {
         return false;
     }
 
+    private boolean owned(Block block) {
+        return block.getWorld().isChunkLoaded(block.getX() >> 4, block.getZ() >> 4)
+                && (plugin == null || plugin.scheduler().isOwnedByCurrentRegion(block.getLocation()));
+    }
+
     private boolean pairWithNeighbor(World world, BlockPos pos, ImmutableBlockState state) {
+        Block self = world.getBlockAt(pos.x(), pos.y(), pos.z());
+        if (!owned(self) || OwnedBlockPairTransaction.editing(self.getLocation())) return false;
         BlockFace facing = getFacing(state);
         BlockPos neighborPos = new BlockPos(
                 pos.x() + facing.getModX(),
@@ -215,6 +232,7 @@ public class TatamiPairingBehavior extends FarmersDelightBlockBehavior {
                 pos.z() + facing.getModZ()
         );
         Block neighborBlock = world.getBlockAt(neighborPos.x(), neighborPos.y(), neighborPos.z());
+        if (!owned(neighborBlock)) return false;
         ImmutableBlockState neighborState = CraftEngineBlocks.getCustomBlockState(neighborBlock);
         if (neighborState == null || neighborState.isEmpty() || !isSameTatami(state, neighborState)) {
             return false;
@@ -225,12 +243,17 @@ public class TatamiPairingBehavior extends FarmersDelightBlockBehavior {
             return false;
         }
 
-        CraftEngineBlocks.place(
-                neighborBlock.getLocation(),
-                withFacingAndPair(neighborState, facing.getOppositeFace()),
-                false
-        );
-        return true;
+        var neighborBefore = OwnedBlockPairTransaction.cell(plugin, neighborBlock).read();
+        var selfBefore = OwnedBlockPairTransaction.cell(plugin, self).read();
+        if (neighborBefore.custom() != neighborState || selfBefore.custom() != state) return false;
+        var neighborAfter = OwnedBlockPairTransaction.custom(withFacingAndPair(neighborState, facing.getOppositeFace()));
+        var selfAfter = OwnedBlockPairTransaction.custom(state.with(pairedProperty, true));
+        var outcome = OwnedBlockPairTransaction.update(plugin, neighborBlock, neighborBefore, neighborAfter, self, selfBefore, selfAfter);
+        if (!outcome.rollbackComplete() && plugin != null && plugin.isEnabled()) plugin.scheduler().runLaterAt(self.getLocation(), () -> {
+            if (!OwnedBlockPairTransaction.compensate(plugin, neighborBlock, neighborAfter, neighborBefore, self, selfAfter, selfBefore))
+                plugin.getLogger().warning("A paired block restoration could not finish at " + self.getLocation());
+        }, 1);
+        return outcome.committed();
     }
 
     private ImmutableBlockState withFacingAndPair(ImmutableBlockState state, BlockFace facing) {
@@ -259,7 +282,7 @@ public class TatamiPairingBehavior extends FarmersDelightBlockBehavior {
         return firstId.isPresent() && firstId.equals(secondId);
     }
 
-    private static boolean isTatamiState(ImmutableBlockState state) {
+    private boolean isTatamiState(ImmutableBlockState state) {
         if (state == null || state.isEmpty()) {
             return false;
         }
@@ -270,14 +293,14 @@ public class TatamiPairingBehavior extends FarmersDelightBlockBehavior {
                 .isPresent();
     }
 
-    private static Property<Boolean> pairedPropertyOf(ImmutableBlockState state) {
+    private Property<Boolean> pairedPropertyOf(ImmutableBlockState state) {
         if (state == null || state.isEmpty()) {
             return null;
         }
         return BlockBehaviorFactory.getOptionalProperty(state.owner().value(), pairedPropertyName, Boolean.class);
     }
 
-    private static BlockFace getFacingFromState(ImmutableBlockState state) {
+    private BlockFace getFacingFromState(ImmutableBlockState state) {
         if (state == null || state.isEmpty()) {
             return BlockFace.NORTH;
         }

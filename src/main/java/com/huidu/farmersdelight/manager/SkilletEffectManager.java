@@ -2,6 +2,8 @@ package com.huidu.farmersdelight.manager;
 
 import com.huidu.farmersdelight.FarmersDelightPlugin;
 import com.huidu.farmersdelight.api.config.ConfigSectionReader;
+import com.huidu.farmersdelight.api.sound.ToolSoundTable;
+import com.huidu.farmersdelight.config.StationSound;
 import com.huidu.farmersdelight.block.behavior.SkilletBlockBehavior;
 import com.huidu.farmersdelight.util.Constants;
 import com.huidu.farmersdelight.util.CustomBlockUtils;
@@ -51,6 +53,7 @@ public class SkilletEffectManager {
     private volatile double sizzleChance = DEFAULT_SIZZLE_CHANCE;
     private volatile float sizzleVolume = 0.5F;
     private volatile float sizzlePitch = 1.0F;
+    private volatile ToolSoundTable.Entry configuredSizzle = new ToolSoundTable.Entry(null, 0.5F, 1.0F, 1.0F);
 
     // Caps effect broadcasts per chunk per owner tick. Each broadcast still fans out to its viewers.
     private volatile int chunkEffectBudgetLimit = 50;
@@ -110,13 +113,17 @@ public class SkilletEffectManager {
                 : ConfigSectionReader.optionalDouble(sizzleSection, "chance", DEFAULT_SIZZLE_CHANCE));
         sizzleVolume = (float) Math.max(0.0D, sizzleSection == null ? 0.5D : ConfigSectionReader.optionalDouble(sizzleSection, "volume", 0.5D));
         sizzlePitch = (float) Math.max(0.0D, sizzleSection == null ? 1.0D : ConfigSectionReader.optionalDouble(sizzleSection, "pitch", 1.0D));
+        configuredSizzle = StationSound.read(plugin.getFirstConfigSection("skillet.sounds.sizzle"),
+                null, sizzleVolume, sizzlePitch);
     }
 
     // Resolve effect rolls before querying viewers; most cooking ticks have nothing to send.
     public void dispatchTickEffects(World world, Location location, ImmutableBlockState carrierState) {
         ThreadLocalRandom random = ThreadLocalRandom.current();
-        boolean smoke = smokeEnabled && random.nextDouble() < smokeChance;
-        boolean sizzle = sizzleEnabled && random.nextDouble() < sizzleChance;
+        boolean smoke = smokeEnabled && smokeChance > 0 && plugin.particles().allowDensity("stove", location, false)
+                && random.nextDouble() < smokeChance;
+        boolean sizzle = sizzleEnabled && sizzleChance > 0 && plugin.particles().allowDensity("stove", location, true)
+                && random.nextDouble() < sizzleChance;
         if (!smoke && !sizzle) return;
         List<Player> nearbyViewers = NEARBY_VIEWER_SCRATCH.get();
         nearbyViewers.clear();
@@ -143,8 +150,10 @@ public class SkilletEffectManager {
                 chunkBudget.incrementAndGet();
             }
             if (sizzle && chunkBudget.get() < chunkEffectBudgetLimit) {
-                SoundUtils.play(nearbyViewers, location, getSizzleSound(carrierState),
-                        Sound.BLOCK_CAMPFIRE_CRACKLE, sizzleVolume, sizzlePitch);
+                ToolSoundTable.Entry sound = configuredSizzle;
+                SoundUtils.play(nearbyViewers, location,
+                        sound.soundKey() == null ? getSizzleSound(carrierState) : sound.soundKey(),
+                        Sound.BLOCK_CAMPFIRE_CRACKLE, sound.volume(), sound.pitch());
                 chunkBudget.incrementAndGet();
             }
         } finally {

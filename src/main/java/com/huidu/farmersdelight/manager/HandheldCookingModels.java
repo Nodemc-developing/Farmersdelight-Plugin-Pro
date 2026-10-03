@@ -48,6 +48,7 @@ import java.util.logging.Level;
 /** Generates configured food overlays during pack caching, never during player ticks. */
 public final class HandheldCookingModels implements Listener {
     private static final Gson JSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final int MAX_GENERATED_VARIANTS = 8192;
     private final FarmersDelightPlugin plugin;
     private final Path folder;
     private final BooleanSupplier enabled;
@@ -71,6 +72,7 @@ public final class HandheldCookingModels implements Listener {
                 try (var files = Files.walk(assets)) {
                     files.filter(p -> Files.isRegularFile(p) && p.toString().replace('\\', '/').contains("/items/generated/handheld/")
                                     && p.toString().endsWith(".json"))
+                            .limit(MAX_GENERATED_VARIANTS)
                             .forEach(p -> {
                                 Path relative = assets.relativize(p);
                                 String id = relative.toString().replace('\\', '/');
@@ -107,6 +109,10 @@ public final class HandheldCookingModels implements Listener {
         }
         return cooking;
     }
+    NamespacedKey flipped(NamespacedKey normal) {
+        NamespacedKey target = HandheldCookingModelPack.flippedKey(normal);
+        return target != null && available.contains(target.toString()) ? target : normal;
+    }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public synchronized void onPackCache(AsyncResourcePackCacheEvent event) {
@@ -136,7 +142,7 @@ public final class HandheldCookingModels implements Listener {
                     items.putIfAbsent(key.asString(), value.toJson(MinecraftVersion.V1_21_4)));
             Set<String> generated = new HashSet<>();
             Set<String> wantedSources = wantedSources();
-            for (var definition : manager.loadedItems().values()) {
+            generation: for (var definition : manager.loadedItems().values()) {
                 var behavior = definition.behavior();
                 SkilletItemBehavior handheld = behavior instanceof SkilletItemBehavior skillet ? skillet
                         : behavior instanceof CompositeItemBehavior composite ? composite.getFirst(SkilletItemBehavior.class) : null;
@@ -144,18 +150,32 @@ public final class HandheldCookingModels implements Listener {
                 NamespacedKey cooking = handheld.cookingModel();
                 NamespacedKey overlay = handheld.ingredientOverlayModel();
                 JsonObject base = items.get(cooking.toString());
+                if (base == null && handheld.usesDefaultCookingModel()) {
+                    base = HandheldCookingModelPack.defaultCookingDefinition(definition.id(),
+                            items.get(definition.id().asString()), models);
+                    if (base != null) {
+                        // A new client definition only; the authored item/model and its source files remain untouched.
+                        items.put(cooking.toString(), base);
+                        write(cooking, "items", base);
+                    }
+                }
                 if (base == null || !base.has("model") || !models.containsKey(overlay.toString())) {
                     I18n.logWarning("skillet.model_missing", "item", definition.id(), "model", cooking, "overlay", overlay);
                     continue;
                 }
                 for (var source : items.entrySet()) {
                     if (!wantedSources.contains(source.getKey())) continue;
+                    if (generated.size() >= MAX_GENERATED_VARIANTS) break generation;
                     String texture = HandheldCookingModelPack.flatTexture(source.getValue(), models);
                     if (texture == null) continue;
                     NamespacedKey target = HandheldCookingModelPack.generatedKey(cooking, overlay, source.getKey());
                     if (!generated.add(target.toString())) continue;
                     write(target, "models", HandheldCookingModelPack.overlayModel(overlay.toString(), texture));
                     write(target, "items", HandheldCookingModelPack.composite(base, target.toString()));
+                    NamespacedKey flipped = HandheldCookingModelPack.flippedKey(target);
+                    generated.add(flipped.toString());
+                    write(flipped, "models", HandheldCookingModelPack.flippedOverlay(overlay.toString(), texture, models));
+                    write(flipped, "items", HandheldCookingModelPack.composite(base, flipped.toString()));
                 }
             }
             // CE can fire the first cache callback before item parsing. An empty loaded-item map is

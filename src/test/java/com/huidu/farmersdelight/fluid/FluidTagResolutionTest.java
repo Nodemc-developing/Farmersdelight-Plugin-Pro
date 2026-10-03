@@ -34,6 +34,9 @@ class FluidTagResolutionTest {
         assertEquals("fluidcore:lava", FluidTagResolution.effectiveTag("c:lava", false, Set.of()));
         assertEquals("c:water", FluidTagResolution.effectiveTag("c:water", true, Set.of()));
         assertEquals("c:water", FluidTagResolution.effectiveTag("c:water", false, Set.of("example:water")));
-        assertEquals("c:honey", FluidTagResolution.effectiveTag("c:honey", false, Set.of()));
+        assertEquals("fluidcore:honey", FluidTagResolution.effectiveTag("c:honey", false, Set.of()));
+        assertEquals("c:honey", FluidTagResolution.effectiveTag("c:honey", true, Set.of()));
+        assertEquals("c:honey", FluidTagResolution.effectiveTag("c:honey", false, Set.of("minecraft:honey")));
+        assertEquals("custom:honey", FluidTagResolution.effectiveTag("custom:honey", false, Set.of()));
     }
 }

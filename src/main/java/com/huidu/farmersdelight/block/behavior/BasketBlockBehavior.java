@@ -20,12 +20,19 @@ public class BasketBlockBehavior extends FarmersDelightBlockBehavior implements 
     private final FarmersDelightPlugin plugin;
     private final int transferCooldown;
     private final boolean eject;
+    private final boolean redstoneLock;
+    private final String facingProperty;
+    private final String enabledProperty;
 
-    private BasketBlockBehavior(FarmersDelightPlugin plugin, BlockDefinition block, int transferCooldown, boolean eject) {
+    private BasketBlockBehavior(FarmersDelightPlugin plugin, BlockDefinition block, int transferCooldown, boolean eject,
+                                boolean redstoneLock, String facingProperty, String enabledProperty) {
         super(block);
         this.plugin = plugin;
         this.transferCooldown = transferCooldown;
         this.eject = eject;
+        this.redstoneLock = redstoneLock;
+        this.facingProperty = facingProperty;
+        this.enabledProperty = enabledProperty;
     }
 
     public static final BlockBehaviorFactory<BasketBlockBehavior> FACTORY = (BlockDefinition block, ConfigSection section) -> {
@@ -36,12 +43,15 @@ public class BasketBlockBehavior extends FarmersDelightBlockBehavior implements 
         // When on, the basket pushes its contents into a container it faces; when off it only collects
         // dropped items. Collection is always on. Defaults to on so an existing basket gains the behavior.
         boolean eject = BehaviorArgParser.getBoolean(arguments, "eject", true);
-        return new BasketBlockBehavior(plugin, block, cooldown, eject);
+        boolean lock = BehaviorArgParser.getBoolean(arguments, "redstone-lock", true);
+        String facing = BehaviorArgParser.getString(arguments, "facing-property", "facing");
+        String enabled = BehaviorArgParser.getString(arguments, "enabled-property", "enabled");
+        return new BasketBlockBehavior(plugin, block, cooldown, eject, lock, facing, enabled);
     };
 
     @Override
     public BlockEntityController createBlockEntityController(BlockEntity blockEntity) {
-        return new BasketVacuumController(plugin, blockEntity, transferCooldown, eject);
+        return new BasketVacuumController(plugin, blockEntity, transferCooldown, eject, redstoneLock, facingProperty, enabledProperty);
     }
 
     @Override

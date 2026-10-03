@@ -1,0 +1,21 @@
+{
+  "model": {
+    "type": "minecraft:composite",
+    "models": [
+      {
+        "type": "minecraft:model",
+        "model": "farmersdelight:block/glass_jug"
+      },
+      {
+        "type": "minecraft:model",
+        "model": "farmersdelight:block/jug_fluid/glass_jug_fluid_model_16",
+        "tints": [
+          {
+            "type": "minecraft:constant",
+            "value": 14524957
+          }
+        ]
+      }
+    ]
+  }
+}

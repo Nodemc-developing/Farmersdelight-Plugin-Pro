@@ -170,11 +170,11 @@ public final class EffectManager {
     }
 
     private static void applyBuff(Player player, BuffKind kind, int durationSeconds, int level) {
-        if (player == null || !kind.enabled || !CustomBuffRegistry.isSystemEnabled()) return;
+        if (player == null || durationSeconds <= 0 || !kind.enabled || !CustomBuffRegistry.isSystemEnabled()) return;
         UUID playerId = player.getUniqueId();
         int lvl = Math.max(1, level);
         BuffState current = getBuff(playerId, kind);
-        int[] result = stack(current.duration(), current.level(), durationSeconds * 20, lvl);
+        int[] result = stack(current.duration(), current.level(), (int) Math.min(Integer.MAX_VALUE, (long) durationSeconds * 20L), lvl);
         if (result == null) return; // Weaker dose, ignored when a stronger effect is active
         int newInitial;
         if (current.duration() <= 0 || lvl > current.level()) {
@@ -185,6 +185,7 @@ public final class EffectManager {
         putBuff(playerId, kind, new BuffState(result[0], newInitial, result[1], kind.generation));
         EffectListener.trackPlayer(player);
         if (kind == BuffKind.NOURISHMENT) {
+            NourishmentFoodListener.effectChanged(player);
             var advMgr = FarmersDelightPlugin.getInstance().getAdvancementManager();
             if (advMgr != null) advMgr.award(player, "eat_nourishing_food");
         }
@@ -225,6 +226,7 @@ public final class EffectManager {
     private static void removeBuff(Player player, BuffKind kind) {
         UUID playerId = player.getUniqueId();
         putBuff(playerId, kind, BuffState.EMPTY);
+        if (kind == BuffKind.NOURISHMENT) NourishmentFoodListener.effectChanged(player);
         if (player.isOnline()) {
             BuffBossbar.hide(FarmersDelightPlugin.getInstance(), player, kind.bossbarKey);
         }
@@ -253,6 +255,7 @@ public final class EffectManager {
                 return;
             }
             int interval = tickInterval();
+            boolean hadNourishment = hasNourishment(player);
             for (BuffKind kind : BuffKind.values()) {
                 BuffState state = buffs.get(kind);
                 if (!state.isActive()) continue;
@@ -260,7 +263,7 @@ public final class EffectManager {
                     buffs.put(kind, BuffState.EMPTY);
                     continue;
                 }
-                if (kind == BuffKind.COMFORT) tickComfort(player, state.duration());
+                if (kind == BuffKind.COMFORT) tickComfort(player, state.duration(), interval);
                 else if (kind == BuffKind.NOURISHMENT) tickNourishment(player);
                 if (!player.isValid()) break;
                 int newDuration = state.duration() - interval;
@@ -271,6 +274,7 @@ public final class EffectManager {
             if (buffs.values().stream().noneMatch(BuffState::isActive)) {
                 EffectListener.untrackPlayer(playerId);
             }
+            if (hadNourishment && !hasNourishment(player)) NourishmentFoodListener.effectChanged(player);
             pushBossbar(player, playerId);
         } catch (Exception e) {
             // Surface a buff-logic bug instead of silently hiding it: the untrack still stops repeated
@@ -385,6 +389,29 @@ public final class EffectManager {
         return remainingSeconds(player, BuffKind.NOURISHMENT);
     }
 
+    static int effectTicks(Player player, String id) {
+        BuffKind kind = builtinKind(id);
+        return player == null || kind == null ? 0 : getBuff(player.getUniqueId(), kind).duration();
+    }
+
+    /** Content upgrades replace an active effect; normal food applications retain their stacking rules. */
+    static boolean replaceEffect(Player player, String id, int ticks, int level) {
+        BuffKind kind = builtinKind(id);
+        if (player == null || kind == null || ticks <= 0 || !kind.enabled || !CustomBuffRegistry.isSystemEnabled()
+                || !getBuff(player.getUniqueId(), kind).isActive()) return false;
+        BuffState previous = getBuff(player.getUniqueId(), kind);
+        putBuff(player.getUniqueId(), kind, new BuffState(ticks, Math.max(ticks, previous.initial()), Math.max(1, level), kind.generation));
+        EffectListener.trackPlayer(player);
+        if (kind == BuffKind.NOURISHMENT) NourishmentFoodListener.effectChanged(player);
+        return true;
+    }
+
+    private static BuffKind builtinKind(String id) {
+        if ("farmersdelight:comfort".equals(id)) return BuffKind.COMFORT;
+        if ("farmersdelight:nourishment".equals(id)) return BuffKind.NOURISHMENT;
+        return null;
+    }
+
     private static int remainingSeconds(Player player, BuffKind kind) {
         if (player == null) return 0;
         int ticks = getBuff(player.getUniqueId(), kind).duration();
@@ -408,17 +435,28 @@ public final class EffectManager {
         }
     }
 
-    private static void tickComfort(Player player, int durationTicks) {
-        if (player.isDead() || player.hasPotionEffect(PotionEffectType.REGENERATION)) return;
+    private static void tickComfort(Player player, int durationTicks, int elapsedTicks) {
+        tickComfort(player, durationTicks, elapsedTicks, player.hasPotionEffect(PotionEffectType.REGENERATION));
+    }
+
+    /** The owner captures regeneration alongside its live player state before applying healing. */
+    static void tickComfort(Player player, int durationTicks, int elapsedTicks, boolean regenerating) {
+        if (player.isDead() || regenerating) return;
         if (player.getSaturation() > 0.0F) return;
         int healIntervalTicks = getComfortHealIntervalTicks();
-        if (healIntervalTicks <= 0 || durationTicks % healIntervalTicks != 0) return;
+        if (healIntervalTicks <= 0 || durationTicks <= 0 || elapsedTicks <= 0) return;
+        // Count positive period boundaries in (remaining-after-this-visit, remaining-now].
+        // This preserves aligned durations while exact replacement durations and arbitrary visit
+        // intervals cannot skip a heal merely because the remaining duration has another residue.
+        long nextRemaining = Math.max(0L, (long) durationTicks - elapsedTicks);
+        long healingPeriods = durationTicks / healIntervalTicks - nextRemaining / healIntervalTicks;
+        if (healingPeriods <= 0) return;
 
         var maxHealthAttr = player.getAttribute(CompatAttributes.MAX_HEALTH);
         if (maxHealthAttr == null) return;
         double maxHealth = maxHealthAttr.getValue();
         if (player.getHealth() < maxHealth) {
-            player.setHealth(Math.min(player.getHealth() + getComfortHealAmount(), maxHealth));
+            player.setHealth(Math.min(player.getHealth() + getComfortHealAmount() * healingPeriods, maxHealth));
         }
     }
 

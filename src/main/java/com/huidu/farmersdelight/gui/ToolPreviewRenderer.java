@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 // Renders + resolves the cutting-board tool preview: caches which items satisfy a tool requirement and
 // turns a requirement into the rotating display item used by the detail slot and the list lore. Kept as a
@@ -28,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 final class ToolPreviewRenderer {
 
     // Tool preview options include item/tag identity and exclusions, so cache by the complete requirement.
-    private static final Map<CuttingBoardRecipe.ToolRequirement, List<ItemStack>> toolPreviewCache = new ConcurrentHashMap<>();
+    private static final GenerationScopedCache<CuttingBoardRecipe.ToolRequirement, List<ItemStack>> toolPreviewCache = new GenerationScopedCache<>();
     private final RecipeViewGui gui;
     private final FarmersDelightPlugin plugin;
 
@@ -65,7 +64,7 @@ final class ToolPreviewRenderer {
         lore.add(gui.tr("gui.recipe.tool", NamedTextColor.GRAY));
         if (!previewOptions.isEmpty()) {
             lore.add(gui.tr("gui.recipe.matches_line",
-                    Component.text(previewOptions.size()).color(NamedTextColor.YELLOW)));
+                    Component.text(previewOptions.size()).color(NamedTextColor.AQUA)));
         }
         if (totalTools > 1 || previewOptions.size() > 1) {
             lore.add(gui.tr("gui.recipe.auto_cycle",
@@ -79,6 +78,7 @@ final class ToolPreviewRenderer {
             gui.ingredientDisplay.appendItemPreviewLore(lore, previewOptions, 5, player, toolItem);
         }
         toolMeta.lore(lore);
+        GuiTextStyle.normalizeDisplayMeta(toolMeta);
         toolItem.setItemMeta(toolMeta);
 
         return toolItem;

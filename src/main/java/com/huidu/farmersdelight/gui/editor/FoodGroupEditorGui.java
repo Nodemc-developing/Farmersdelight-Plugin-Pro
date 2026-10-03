@@ -1,6 +1,7 @@
 package com.huidu.farmersdelight.gui.editor;
 
 import com.huidu.farmersdelight.FarmersDelightPlugin;
+import com.huidu.farmersdelight.gui.GuiTextStyle;
 import com.huidu.farmersdelight.i18n.I18n;
 import com.huidu.farmersdelight.recipe.FoodGroupSnapshot;
 import com.huidu.farmersdelight.recipe.FuzzyRecipeSpec;
@@ -45,7 +46,7 @@ public final class FoodGroupEditorGui implements EditorGui {
         this.originalId = group == null ? null : group.id();
         this.id = group == null ? "farmersdelight:group_" + Long.toString(System.nanoTime(), 36) : group.id();
         if (group != null) { this.kind = group.kind(); this.items.addAll(group.items()); }
-        inventory = plugin.getServer().createInventory(this, 54, I18n.getComponent("gui.fuzzy.groups.title", player));
+        inventory = plugin.getServer().createInventory(this, 54, GuiTextStyle.title(I18n.getComponent("gui.fuzzy.groups.title", player)));
     }
 
     public static void open(FarmersDelightPlugin plugin, Player player, Runnable back) {
@@ -191,12 +192,12 @@ public final class FoodGroupEditorGui implements EditorGui {
     }
 
     private void message(String suffix) { player.sendMessage(I18n.getComponent("gui.fuzzy.groups." + suffix, player)); }
-    private ItemStack button(Material material, String suffix) { return icon(material, I18n.getComponent("gui.fuzzy.groups." + suffix, player)); }
+    private ItemStack button(Material material, String suffix) { return icon(material, GuiTextStyle.label(I18n.getComponent("gui.fuzzy.groups." + suffix, player), suffix)); }
     private static ItemStack icon(Material material, Component name, Component... lore) { return icon(new ItemStack(material), name, lore); }
     private static ItemStack icon(ItemStack item, Component name, Component... lore) {
         item.setAmount(1);
         var meta = item.getItemMeta();
-        if (meta != null) { meta.displayName(name); meta.lore(List.of(lore)); item.setItemMeta(meta); }
+        if (meta != null) { meta.displayName(GuiTextStyle.name(name)); meta.lore(GuiTextStyle.loreLines(List.of(lore))); item.setItemMeta(meta); }
         return item;
     }
     @Override public @NotNull Inventory getInventory() { return inventory; }

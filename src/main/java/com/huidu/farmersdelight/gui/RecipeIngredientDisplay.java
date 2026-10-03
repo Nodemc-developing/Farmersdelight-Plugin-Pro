@@ -153,7 +153,7 @@ final class RecipeIngredientDisplay {
         if (ingredient instanceof RecipeIngredient.AdvancedTag advanced) {
             List<Component> lore = new ArrayList<>();
             lore.add(gui.tr("gui.recipe.ingredient", NamedTextColor.GRAY));
-            lore.add(gui.tr("gui.recipe.matches_line", Component.text(options.size()).color(NamedTextColor.YELLOW)));
+            lore.add(gui.tr("gui.recipe.matches_line", Component.text(options.size()).color(NamedTextColor.AQUA)));
             appendCyclePosition(lore, currentDisplay, options, player);
             if (gui.config.isShowIngredientIds()) lore.add(gui.tr("gui.recipe.tag_line", Component.text("advtag:" + advanced.key())));
             appendItemPreviewLore(lore, options, 5, player, currentDisplay);
@@ -176,7 +176,7 @@ final class RecipeIngredientDisplay {
         List<Component> lore = new ArrayList<>();
         lore.add(gui.tr("gui.recipe.ingredient", NamedTextColor.GRAY));
         lore.add(gui.tr("gui.recipe.matches_line",
-                Component.text(options.size()).color(NamedTextColor.YELLOW)));
+                Component.text(options.size()).color(NamedTextColor.AQUA)));
         appendCyclePosition(lore, currentDisplay, options, player);
         if (gui.config.isShowIngredientIds()) {
             lore.add(gui.tr("gui.recipe.tag_line",
@@ -188,6 +188,7 @@ final class RecipeIngredientDisplay {
 
         meta.displayName(gui.itemNameComponent(currentDisplay, player).colorIfAbsent(NamedTextColor.AQUA));
         meta.lore(lore);
+        GuiTextStyle.normalizeDisplayMeta(meta);
         display.setItemMeta(meta);
         return display;
     }
@@ -199,14 +200,15 @@ final class RecipeIngredientDisplay {
         List<Component> lore = new ArrayList<>();
         lore.add(gui.tr("gui.recipe.ingredient", NamedTextColor.GRAY));
         lore.add(gui.tr("gui.recipe.any_of_line",
-                Component.text(choiceIngredient.options().size()).color(NamedTextColor.YELLOW)));
+                Component.text(choiceIngredient.options().size()).color(NamedTextColor.AQUA)));
         lore.add(gui.tr("gui.recipe.matches_line",
-                Component.text(options.size()).color(NamedTextColor.YELLOW)));
+                Component.text(options.size()).color(NamedTextColor.AQUA)));
         appendCyclePosition(lore, currentDisplay, options, player);
         appendIngredientPreviewLore(lore, choiceIngredient.options(), choiceIngredient.options().size(), player, currentDisplay);
 
         meta.displayName(gui.itemNameComponent(currentDisplay, player).colorIfAbsent(NamedTextColor.AQUA));
         meta.lore(lore);
+        GuiTextStyle.normalizeDisplayMeta(meta);
         display.setItemMeta(meta);
         return display;
     }
@@ -246,6 +248,7 @@ final class RecipeIngredientDisplay {
         ItemMeta meta = display.getItemMeta();
         meta.displayName(displayName.colorIfAbsent(NamedTextColor.AQUA));
         meta.lore(lore);
+        GuiTextStyle.normalizeDisplayMeta(meta);
         display.setItemMeta(meta);
         return display;
     }

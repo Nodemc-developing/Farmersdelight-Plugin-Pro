@@ -14,6 +14,7 @@ final class FluidTagResolution {
             case "c:water" -> "fluidcore:water";
             case "c:milk" -> "fluidcore:milk";
             case "c:lava" -> "fluidcore:lava";
+            case "c:honey" -> "fluidcore:honey";
             default -> requested;
         };
     }

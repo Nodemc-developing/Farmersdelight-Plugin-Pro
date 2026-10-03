@@ -2,7 +2,6 @@ package com.huidu.farmersdelight.recipe;
 
 import com.google.gson.JsonElement;
 import com.huidu.farmersdelight.util.ItemUtils;
-import com.huidu.farmersdelight.util.compat.MMOItemsCompat;
 import net.momirealms.craftengine.bukkit.item.BukkitItem;
 import net.momirealms.craftengine.bukkit.item.BukkitItemManager;
 import net.momirealms.craftengine.bukkit.util.ItemStackUtils;
@@ -13,9 +12,7 @@ import net.momirealms.craftengine.core.util.Key;
 import net.momirealms.craftengine.libraries.nbt.CompoundTag;
 import net.momirealms.craftengine.libraries.nbt.Tag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.Material;
 
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
@@ -40,10 +37,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class RecipeItemCodec {
 
-    // CE 26.8.2 exposes core.util.TagParser and its proxy artifact. Resolve the parser lazily so the
-    // plugin does not link parser classes during config bootstrap.
-    private static volatile Method snbtParseMethod;
-    private static volatile Object snbtParseTarget;
 
     private RecipeItemCodec() {
     }
@@ -61,7 +54,8 @@ public final class RecipeItemCodec {
     // on every comparison with the same constant input, and each miss is a Base64 decode plus a full
     // ItemStack deserialisation. Bounded by the number of NBT-carrying ingredients that were loaded.
     private static final Map<String, ItemStack> DECODED = new ConcurrentHashMap<>();
-    private static final ItemStack UNDECODABLE = new ItemStack(Material.AIR);
+    // Identity marker only. The protected empty constructor does not create a host item stack.
+    private static final ItemStack UNDECODABLE = new ItemStack() { };
 
     public static ItemStack itemFromBase64(String encoded) {
         if (encoded == null || encoded.isBlank()) {
@@ -71,6 +65,13 @@ public final class RecipeItemCodec {
         // The cache holds a sentinel for input that does not decode, so a bad string is not retried and
         // does not have to be representable as null in the map.
         return cached == UNDECODABLE ? null : cached.clone();
+    }
+
+    /** Compare a privately held, immutable decoded snapshot without handing it to a caller. */
+    static boolean matchesSnapshot(String encoded, ItemStack actual) {
+        if (encoded == null || encoded.isBlank() || actual == null || ResolvedRecipeInput.isAir(actual.getType())) return false;
+        ItemStack expected = DECODED.computeIfAbsent(encoded, RecipeItemCodec::decodeFromBase64);
+        return expected != UNDECODABLE && expected.isSimilar(actual);
     }
 
     /** Drops the decode cache; called when the recipe set is rebuilt. */
@@ -90,25 +91,16 @@ public final class RecipeItemCodec {
 
     /**
      * True when the item differs from a freshly built default of its own id, i.e. it carries extra data
-     * worth a snapshot. CE custom items are excluded; their data comes from the item definition, so the
-     * id alone round-trips it. MMOItems items are excluded too: their full identity is the
-     * mmoitems:<TYPE>:<ID> id and MMOItems rebuilds the item from its own data, so no NBT snapshot is kept.
+     * worth a snapshot. A freshly built custom item can use its id; modified custom items must retain
+     * their complete components, including carried tank contents and other plugins' persistent data.
      */
     public static boolean carriesExtraData(ItemStack item) {
         if (item == null || item.getType().isAir()) {
             return false;
         }
-        if (ItemUtils.isCustomItem(item)) {
-            return false;
-        }
-        if (MMOItemsCompat.getItemId(item) != null) {
-            return false;
-        }
         String id = RecipeSerializer.itemIdString(item);
         ItemStack rebuilt = ItemUtils.createItem(id);
-        if (rebuilt == null) {
-            return false;
-        }
+        if (rebuilt == null) return true;
         rebuilt.setAmount(item.getAmount());
         byte[] original = ItemStackUtils.toBytes(item);
         byte[] plain = ItemStackUtils.toBytes(rebuilt);
@@ -123,12 +115,14 @@ public final class RecipeItemCodec {
         if (!carriesExtraData(item)) {
             return null;
         }
+        String encoded = itemToBase64(item);
+        if (encoded == null || encoded.isBlank()) throw new IllegalArgumentException("Item components could not be serialized for the recipe");
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("item", RecipeSerializer.itemIdString(item));
         if (item.getAmount() > 1) {
             map.put("count", item.getAmount());
         }
-        map.put("nbt", itemToBase64(item));
+        map.put("nbt", encoded);
         return map;
     }
 
@@ -147,6 +141,7 @@ public final class RecipeItemCodec {
                 fromNbt.setAmount(Math.max(1, countOf(map, 1)));
                 return fromNbt;
             }
+            throw new IllegalArgumentException("nbt is not a valid full-item snapshot");
         }
 
         Object itemValue = map.get("item");
@@ -181,7 +176,7 @@ public final class RecipeItemCodec {
             Key type = Key.of(entry.getKey());
             Object value = parseComponentValue(entry.getValue());
             if (value == null) {
-                continue;
+                throw new IllegalArgumentException("Invalid component value: " + entry.getKey());
             }
             if (DataComponentKeys.CUSTOM_DATA.equals(type)) {
                 // custom_data carries CraftEngine's own item identity on CE items, so merge the declared
@@ -202,7 +197,7 @@ public final class RecipeItemCodec {
             return;
         }
         CompoundTag merged = new CompoundTag();
-        Tag existing = wrapped.getSparrowTag(DataComponentKeys.CUSTOM_DATA);
+        Tag existing = wrapped.getComponentAsSparrowTag(DataComponentKeys.CUSTOM_DATA);
         if (existing instanceof CompoundTag compound) {
             for (Map.Entry<String, Tag> entry : compound.entrySet()) {
                 merged.put(entry.getKey(), entry.getValue());
@@ -227,58 +222,16 @@ public final class RecipeItemCodec {
             }
             return CraftEngine.instance().platform().javaToSparrowNBT(value);
         } catch (Exception e) {
-            return null;
+            throw new IllegalArgumentException("Component value could not be decoded", e);
         }
     }
 
     private static Object parseSnbt(String snbt) {
-        Method method = snbtParseMethod;
-        Object target = snbtParseTarget;
-        if (method == null) {
-            synchronized (RecipeItemCodec.class) {
-                method = snbtParseMethod;
-                target = snbtParseTarget;
-                if (method == null) {
-                    resolveSnbtParser();
-                    method = snbtParseMethod;
-                    target = snbtParseTarget;
-                }
-            }
-        }
-        if (method == null) {
-            return null;
-        }
         try {
-            return method.invoke(target, snbt);
+            return net.momirealms.craftengine.core.util.TagParser.parseTagFully(snbt);
         } catch (Exception e) {
-            return null;
+            throw new IllegalArgumentException("Invalid SNBT component", e);
         }
-    }
-
-    private static void resolveSnbtParser() {
-        try {
-            Class<?> tagParser = Class.forName("net.momirealms.craftengine.core.util.TagParser");
-            snbtParseMethod = tagParser.getMethod("parseTagFully", String.class);
-            snbtParseTarget = null;
-            return;
-        } catch (Exception ignored) {
-            // fall through to the proxy fallback below
-        }
-        try {
-            Class<?> proxy = Class.forName("net.momirealms.craftengine.proxy.minecraft.nbt.TagParserProxy");
-            snbtParseMethod = proxy.getMethod("parseCompoundFully", String.class);
-            snbtParseTarget = proxy.getField("INSTANCE").get(null);
-            return;
-        } catch (Exception ignored) {
-            // no supported parser: silence here would make every "(snbt)" recipe fail with no trace
-        }
-        snbtParseMethod = null;
-        snbtParseTarget = null;
-        throw new IllegalStateException(
-                "Unsupported CraftEngine build: no SNBT TagParser found (" +
-                "net.momirealms.craftengine.core.util.TagParser / " +
-                "net.momirealms.craftengine.proxy.minecraft.nbt.TagParserProxy missing). " +
-                "Refusing to run with silently broken recipe decoding.");
     }
 
     private static int countOf(Map<String, Object> map, int fallback) {

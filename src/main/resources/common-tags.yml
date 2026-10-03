@@ -3,6 +3,10 @@
 # the member list below; a member matching a slot's item satisfies the tag for recipe lookup, matching
 # and the recipe-book ingredient icon. The recipe's excluded-items/tags still apply on top.
 tags:
+  # This independent group supplies the leaf ingredients used by bundled crafting recipes.
+  "farmersdelight:leafs":
+    - "farmersdelight:cabbage"
+    - "farmersdelight:cabbage_leaf"
   "c:rods/wooden":
     - "minecraft:stick"
   "c:drinks/milk":

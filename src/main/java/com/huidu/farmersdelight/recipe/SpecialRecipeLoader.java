@@ -42,6 +42,21 @@ public final class SpecialRecipeLoader {
     private SpecialRecipeLoader() {
     }
 
+    @org.jetbrains.annotations.ApiStatus.Internal
+    public static Runnable captureReloadRollback() {
+        Map<String, SpecialRecipeInfo> packs = new LinkedHashMap<>(PACK_REGISTERED);
+        Map<String, SpecialRecipeInfo> files = new LinkedHashMap<>(FILE_REGISTERED);
+        Map<String, SpecialRecipeInfo> bundled = new LinkedHashMap<>(BACKFILL_REGISTERED);
+        return () -> {
+            PACK_REGISTERED.clear();
+            PACK_REGISTERED.putAll(packs);
+            FILE_REGISTERED.clear();
+            FILE_REGISTERED.putAll(files);
+            BACKFILL_REGISTERED.clear();
+            BACKFILL_REGISTERED.putAll(bundled);
+        };
+    }
+
     public static void load(FarmersDelightPlugin plugin, SpecialRecipeRegistry registry) {
         Map<String, SpecialRecipeInfo> fileEntries = new LinkedHashMap<>();
         YamlConfiguration config = loadConfig(plugin);

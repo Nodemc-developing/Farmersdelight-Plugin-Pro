@@ -21,6 +21,21 @@ import static org.junit.jupiter.api.Assertions.*;
 class SkilletHandheldModelTest {
     private static final Path PACK = Path.of("src/main/resources/craftengine/farmersdelight");
 
+    @Test void minimallyConfiguredItemPreservesItsExternalBaseAndUsesAnAuthoredCookingPose() {
+        JsonObject authored = json("{\"oversized_in_gui\":true,\"swap_animation_scale\":0.5,\"model\":{\"type\":\"minecraft:condition\",\"property\":\"minecraft:using_item\",\"on_true\":{\"type\":\"minecraft:model\",\"model\":\"addon:item/active\"},\"on_false\":{\"type\":\"minecraft:model\",\"model\":\"addon:item/pan\"}}}");
+        JsonObject original = authored.deepCopy();
+        var fallback = HandheldCookingModelPack.defaultCookingDefinition(Key.of("addon:pan"), authored, Map.of());
+        assertEquals(original.get("model"), fallback.get("model"));
+        assertTrue(fallback.get("oversized_in_gui").getAsBoolean());
+        assertEquals(.5, fallback.get("swap_animation_scale").getAsDouble());
+        var posed = HandheldCookingModelPack.defaultCookingDefinition(Key.of("addon:pan"), authored,
+                Map.of("addon:item/pan_cooking", json("{\"parent\":\"addon:block/pan\"}")));
+        assertEquals("addon:item/pan_cooking", posed.getAsJsonObject("model").get("model").getAsString());
+        assertEquals(original, authored, "Neither authored item nor model may be mutated");
+        assertNull(HandheldCookingModelPack.defaultCookingDefinition(Key.of("addon:pan"), null, Map.of()));
+        assertNull(HandheldCookingModelPack.defaultCookingDefinition(Key.of("addon:pan"), json("{}"), Map.of()));
+    }
+
     @Test
     void vanillaPresetNamesResolveToFullModelPathsAndAllowPackOverrides() {
         var models = new HashMap<String, JsonObject>();

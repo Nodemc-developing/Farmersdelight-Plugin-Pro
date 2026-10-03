@@ -45,9 +45,19 @@ public final class ParticleDispatcher implements Listener {
     private final LongAdder sentBundles = new LongAdder();
     private final LongAdder sentFallback = new LongAdder();
     private final LongAdder discarded = new LongAdder();
+    private final LongAdder builtPackets = new LongAdder();
+    private final LongAdder admissionRejected = new LongAdder();
+    private final java.util.concurrent.atomic.AtomicInteger connectionQueuePeak = new java.util.concurrent.atomic.AtomicInteger();
     private final AtomicBoolean warned = new AtomicBoolean();
     private volatile ParticlePacketFactory factory;
     private volatile boolean stopped;
+    private volatile int connectionPacketBudget = 64;
+    private record DensityKey(UUID world, int x, int z, String kind) { }
+    private record SourceKey(int x, int y, int z) { }
+    private record DensitySettings(int stoveThreshold, double stoveFloor, int potThreshold, double potFloor,
+                                   int soundThreshold, double soundFloor) { }
+    private volatile DensitySettings densitySettings;
+    private final Map<DensityKey, DensityThrottle<SourceKey>> density = new ConcurrentHashMap<>();
     private final PluginTask refreshTask;
     private final java.util.Set<UUID> refreshing = ConcurrentHashMap.newKeySet();
 
@@ -65,6 +75,8 @@ public final class ParticleDispatcher implements Listener {
     private final class FallbackDelivery {
         final Player player;
         final BoundedPacketMailbox<FallbackEmission> mailbox;
+        final ConnectionPacketBudget budget = new ConnectionPacketBudget(200_000_000L);
+        final ConnectionPacketBudget admission = new ConnectionPacketBudget(200_000_000L);
 
         FallbackDelivery(Player player) {
             this.player = player;
@@ -89,7 +101,7 @@ public final class ParticleDispatcher implements Listener {
                     location.getWorld().getUID(), location.getX(), location.getY(), location.getZ());
             long now = System.nanoTime();
             for (FallbackEmission emission : batch) {
-                if (!emission.gate().visible(current, now)) { discarded.increment(); continue; }
+                if (!emission.gate().visible(current, now) || !budget.acquire(now, connectionPacketBudget)) { discarded.increment(); continue; }
                 try {
                     player.spawnParticle(emission.particle(), emission.x(), emission.y(), emission.z(),
                             emission.count(), emission.ox(), emission.oy(), emission.oz(), emission.speed(), null, false);
@@ -107,6 +119,8 @@ public final class ParticleDispatcher implements Listener {
         final NetWorkUser user;
         final Channel channel;
         final BoundedPacketMailbox<Emission> mailbox;
+        final ConnectionPacketBudget budget = new ConnectionPacketBudget(200_000_000L);
+        final ConnectionPacketBudget admission = new ConnectionPacketBudget(200_000_000L);
 
         Delivery(UUID player, NetWorkUser user) {
             this.user = user;
@@ -116,7 +130,7 @@ public final class ParticleDispatcher implements Listener {
                 List<Object> packets = new ArrayList<>(batch.size());
                 long now = System.nanoTime();
                 EffectAudience.Position position = audience.get(player);
-                for (Emission emission : batch) if (emission.visible(position, now)) packets.add(emission.packet());
+                for (Emission emission : batch) if (emission.visible(position, now) && budget.acquire(now, connectionPacketBudget)) packets.add(emission.packet());
                 discarded.add(batch.size() - packets.size());
                 if (packets.isEmpty()) return;
                 try {
@@ -136,6 +150,7 @@ public final class ParticleDispatcher implements Listener {
 
     public ParticleDispatcher(FarmersDelightPlugin plugin) {
         this.plugin = plugin;
+        reloadConfig();
         BukkitCraftEngine craftEngine = BukkitCraftEngine.instance();
         this.network = craftEngine == null ? null : craftEngine.networkManager();
         try {
@@ -164,6 +179,41 @@ public final class ParticleDispatcher implements Listener {
         }, 10L, 10L);
     }
 
+    public void reloadConfig() {
+        connectionPacketBudget = Math.max(1, plugin.getConfigInt(64, "performance.connection-particle-packet-budget"));
+        densitySettings = new DensitySettings(
+                plugin.getConfigInt(8, "particle-throttle.stove-threshold", "particle_throttle.stove_threshold"),
+                plugin.getConfigDouble(.1, "particle-throttle.stove-max-rate", "particle_throttle.stove_max_rate"),
+                plugin.getConfigInt(4, "particle-throttle.cooking-pot-threshold", "particle_throttle.cooking_pot_threshold"),
+                plugin.getConfigDouble(.05, "particle-throttle.cooking-pot-max-rate", "particle_throttle.cooking_pot_max_rate"),
+                plugin.getConfigInt(4, "particle-throttle.ambient-sound-threshold", "particle_throttle.ambient_sound_threshold"),
+                plugin.getConfigDouble(.001, "particle-throttle.ambient-sound-max-rate", "particle_throttle.ambient_sound_max_rate"));
+        density.clear();
+    }
+
+    public double potDensityRate(int count, boolean ambientSound) {
+        DensitySettings settings = densitySettings;
+        return DensityThrottle.rate(count, ambientSound ? settings.soundThreshold() : settings.potThreshold(),
+                ambientSound ? settings.soundFloor() : settings.potFloor());
+    }
+
+    public boolean allowDensity(String station, Location source, boolean ambientSound) {
+        if (source == null || source.getWorld() == null || stopped) return false;
+        DensitySettings settings = densitySettings;
+        int threshold = ambientSound ? settings.soundThreshold() : settings.stoveThreshold();
+        double floor = ambientSound ? settings.soundFloor() : settings.stoveFloor();
+        DensityKey key = new DensityKey(source.getWorld().getUID(), source.getBlockX() >> 4, source.getBlockZ() >> 4,
+                ambientSound ? "ambient" : station);
+        double rate = density.computeIfAbsent(key, ignored -> new DensityThrottle<>()).observe(
+                new SourceKey(source.getBlockX(), source.getBlockY(), source.getBlockZ()), System.nanoTime(), threshold, floor);
+        return java.util.concurrent.ThreadLocalRandom.current().nextDouble() < rate;
+    }
+
+    public void cleanupDensityChunk(UUID world, int chunkX, int chunkZ) {
+        density.keySet().removeIf(key -> key.world().equals(world) && key.x() == chunkX && key.z() == chunkZ);
+    }
+    public void cleanupDensityWorld(UUID world) { density.keySet().removeIf(key -> key.world().equals(world)); }
+
     public boolean isNearby(Player player, Location source, double rangeSquared) {
         EffectAudience.Position position = audience.get(player.getUniqueId());
         return position != null && source.getWorld() != null && position.inRange(source.getWorld().getUID(),
@@ -178,22 +228,17 @@ public final class ParticleDispatcher implements Listener {
             fallback(viewers, source, rangeSquared, particle, x, y, z, count, offsetX, offsetY, offsetZ, speed);
             return;
         }
-        Object packet;
-        try {
-            packet = current.create(particle, x, y, z, count, offsetX, offsetY, offsetZ, speed);
-        } catch (ReflectiveOperationException | RuntimeException | LinkageError unsupported) {
-            factory = null;
-            warn(unsupported);
-            fallback(viewers, source, rangeSquared, particle, x, y, z, count, offsetX, offsetY, offsetZ, speed);
-            return;
-        }
         UUID world = source.getWorld().getUID();
         long now = System.nanoTime();
+        record Destination(Delivery delivery, long session) { }
+        List<Destination> admitted = null;
         for (Player player : viewers) {
             UUID id = player.getUniqueId();
             EffectAudience.Position position = audience.get(id);
             NetWorkUser user = network.getOnlineUser(id);
-            if (position == null || user == null || user.isFakePlayer() || user.nettyChannel() == null) continue;
+            if (position == null || !position.inRange(world, source.getX(), source.getY(), source.getZ(), rangeSquared)
+                    || user == null || user.isFakePlayer() || user.nettyChannel() == null
+                    || !user.nettyChannel().isActive() || !user.nettyChannel().isWritable()) continue;
             Delivery delivery = deliveries.compute(id, (key, existing) -> {
                 if (stopped || audience.get(id) == null) {
                     if (existing != null) existing.mailbox.close();
@@ -203,8 +248,27 @@ public final class ParticleDispatcher implements Listener {
                 if (existing != null) existing.mailbox.close();
                 return new Delivery(id, user);
             });
-            if (!stopped && delivery != null) countOffer(delivery.mailbox.offer(new Emission(packet, world, source.getX(), source.getY(),
-                    source.getZ(), rangeSquared, position.session(), now)));
+            if (stopped || delivery == null) continue;
+            if (!delivery.admission.acquire(now, connectionPacketBudget)) { admissionRejected.increment(); continue; }
+            if (admitted == null) admitted = new ArrayList<>();
+            admitted.add(new Destination(delivery, position.session()));
+        }
+        if (admitted == null) return;
+        Object packet;
+        try {
+            packet = current.create(particle, x, y, z, count, offsetX, offsetY, offsetZ, speed);
+            builtPackets.increment();
+        } catch (ReflectiveOperationException | RuntimeException | LinkageError unsupported) {
+            factory = null;
+            warn(unsupported);
+            fallback(viewers, source, rangeSquared, particle, x, y, z, count, offsetX, offsetY, offsetZ, speed);
+            return;
+        }
+        for (Destination recipient : admitted) {
+            Delivery delivery = recipient.delivery();
+            countOffer(delivery.mailbox.offer(new Emission(packet, world, source.getX(), source.getY(),
+                    source.getZ(), rangeSquared, recipient.session(), now)));
+            connectionQueuePeak.accumulateAndGet(delivery.mailbox.peak(), Math::max);
         }
     }
 
@@ -217,7 +281,7 @@ public final class ParticleDispatcher implements Listener {
         for (Player player : viewers) {
             UUID id = player.getUniqueId();
             EffectAudience.Position position = audience.get(id);
-            if (stopped || position == null) continue;
+            if (stopped || position == null || !position.inRange(world, source.getX(), source.getY(), source.getZ(), rangeSquared)) continue;
             FallbackDelivery delivery = fallbacks.compute(id, (key, previous) -> {
                 if (stopped || audience.get(id) == null) {
                     if (previous != null) previous.retire();
@@ -227,18 +291,24 @@ public final class ParticleDispatcher implements Listener {
                 if (previous != null) previous.retire();
                 return new FallbackDelivery(player);
             });
-            if (delivery != null && !stopped) countOffer(delivery.mailbox.offer(new FallbackEmission(
+            if (delivery != null && !stopped) {
+                if (!delivery.admission.acquire(now, connectionPacketBudget)) { admissionRejected.increment(); continue; }
+                countOffer(delivery.mailbox.offer(new FallbackEmission(
                     new Emission(null, world, source.getX(), source.getY(), source.getZ(), rangeSquared,
                             position.session(), now), particle, x, y, z, count, ox, oy, oz, speed)));
+                connectionQueuePeak.accumulateAndGet(delivery.mailbox.peak(), Math::max);
+            }
         }
     }
 
     public record Snapshot(long accepted, long rejected, long packets, long bundles, long fallbackEmissions,
-                           long discarded, int connections, int fallbackConnections, boolean packetBinding) { }
+                           long discarded, int connections, int fallbackConnections, boolean packetBinding,
+                           long builtPackets, long admissionRejected, int connectionQueuePeak) { }
 
     public Snapshot snapshot() {
         return new Snapshot(accepted.sum(), rejected.sum(), sentPackets.sum(), sentBundles.sum(), sentFallback.sum(),
-                discarded.sum(), deliveries.size(), fallbacks.size(), factory != null);
+                discarded.sum(), deliveries.size(), fallbacks.size(), factory != null,
+                builtPackets.sum(), admissionRejected.sum(), connectionQueuePeak.get());
     }
 
     private void countOffer(boolean offered) {
@@ -295,6 +365,7 @@ public final class ParticleDispatcher implements Listener {
     public void onQuit(PlayerQuitEvent event) { invalidate(event.getPlayer().getUniqueId()); }
 
     public void close() {
+        density.clear();
         stopped = true;
         refreshTask.cancel();
         HandlerList.unregisterAll(this);

@@ -3,6 +3,8 @@ package com.huidu.farmersdelight.manager;
 import com.huidu.farmersdelight.FarmersDelightPlugin;
 import com.huidu.farmersdelight.api.event.ProfessionCookingExperienceEvent;
 import com.huidu.farmersdelight.api.util.ItemDelivery;
+import com.huidu.farmersdelight.api.sound.ToolSoundTable;
+import com.huidu.farmersdelight.config.StationSound;
 import com.huidu.farmersdelight.tool.ToolRegistry;
 import com.huidu.farmersdelight.util.CampfireRecipeCache;
 import com.huidu.farmersdelight.util.Constants;
@@ -21,6 +23,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -43,7 +46,9 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Cooking a skillet held in a player's hand: the per-player session, its tick task and the display
@@ -74,6 +79,7 @@ final class SkilletHandheldCooking {
     private final FarmersDelightPlugin plugin;
     private final CampfireRecipeCache campfireRecipes;
     private final HandheldCookingModels handheldModels;
+    private final Predicate<Player> heatAvailable = this::hasNearbyHeatSource;
     private final Map<UUID, HandheldSession> handheldSessions = new ConcurrentHashMap<>();
     // Awarding the use_skillet advancement stays with SkilletManager: the placed path awards it too, so the
     // advancement bookkeeping has one owner and this class just calls back into it.
@@ -81,12 +87,18 @@ final class SkilletHandheldCooking {
     private volatile PluginTask handheldTickTask;
     private volatile boolean handheldCookingEnabled = true;
     private volatile boolean handheldProgressDisplayEnabled = true;
+    private volatile boolean jumpFlipEnabled = true;
     // Cooking-time settings, pushed from SkilletManager#reloadConfig. The hand-held path scales cook time
     // exactly like the placed path does, so it holds its own copy instead of reaching back into the manager.
     private volatile int defaultCookingTime;
     private volatile int minCookingTime;
     private volatile double cookTimeMultiplier;
     private volatile double fireAspectBonus;
+    private volatile FireAspectParticles fireParticles = new FireAspectParticles(.6, .3, .8, .3, .5, .3, .5);
+    private volatile ToolSoundTable.Entry addFoodSound = new ToolSoundTable.Entry(Constants.SOUND_SKILLET_ADD_FOOD, .7F, 1, 1);
+
+    private record FireAspectParticles(double spread, double yBase, double yExtra, double xzVelocity,
+                                      double originX, double originY, double originZ) { }
 
     SkilletHandheldCooking(FarmersDelightPlugin plugin, CampfireRecipeCache campfireRecipes,
                            HandheldCookingModels handheldModels, Consumer<Player> advancementAward,
@@ -100,6 +112,26 @@ final class SkilletHandheldCooking {
         this.minCookingTime = minCookingTime;
         this.cookTimeMultiplier = cookTimeMultiplier;
         this.fireAspectBonus = fireAspectBonus;
+        reloadParticleSettings();
+    }
+
+    private void reloadParticleSettings() {
+        fireParticles = new FireAspectParticles(
+                particleSetting("xz-spread", "xz_spread", .6),
+                particleSetting("velocity-y-base", "velocity_y_base", .3),
+                particleSetting("velocity-y-extra", "velocity_y_extra", .8),
+                particleSetting("velocity-xz", "velocity_xz", .3),
+                particleSetting("origin-x", "origin_x", .5),
+                particleSetting("origin-y", "origin_y", .3),
+                particleSetting("origin-z", "origin_z", .5));
+        addFoodSound = StationSound.read(plugin.getFirstConfigSection("skillet.sounds.add-food", "skillet.sounds.add_food"),
+                Constants.SOUND_SKILLET_ADD_FOOD, .7F, 1);
+    }
+
+    private double particleSetting(String normalized, String canonical, double fallback) {
+        double value = plugin.getConfigDouble(fallback, "skillet.fire-aspect-particle." + normalized,
+                "skillet.fire_aspect_particle." + canonical);
+        return Double.isFinite(value) ? Math.max(0, Math.min(16, value)) : fallback;
     }
 
     /**
@@ -111,10 +143,12 @@ final class SkilletHandheldCooking {
                      double fireAspectBonus) {
         this.handheldCookingEnabled = cookingEnabled;
         this.handheldProgressDisplayEnabled = progressDisplayEnabled;
+        this.jumpFlipEnabled = plugin.getConfigBoolean(true, "skillet.handheld.jump-flip.enabled", "skillet.handheld-jump-flip.enabled");
         this.defaultCookingTime = defaultCookingTime;
         this.minCookingTime = minCookingTime;
         this.cookTimeMultiplier = cookTimeMultiplier;
         this.fireAspectBonus = fireAspectBonus;
+        reloadParticleSettings();
     }
 
     /**
@@ -224,7 +258,9 @@ final class SkilletHandheldCooking {
             }
         }
         ensureHandheldTask();
-        player.getWorld().playSound(player.getLocation(), Constants.SOUND_SKILLET_ADD_FOOD, 0.7f, 1.0f);
+        ToolSoundTable.Entry sound = addFoodSound;
+        com.huidu.farmersdelight.util.SoundUtils.play(player.getWorld(), player.getLocation(), sound.soundKey(),
+                Sound.BLOCK_LANTERN_PLACE, sound.volume(), sound.pitch());
         return true;
     }
 
@@ -246,6 +282,11 @@ final class SkilletHandheldCooking {
 
     public boolean isHandheldCooking(Player player) {
         return player != null && handheldSessions.containsKey(player.getUniqueId());
+    }
+    public void markJump(Player player) {
+        if (!jumpFlipEnabled || player == null) return;
+        HandheldSession session = handheldSessions.get(player.getUniqueId());
+        if (session != null && session.matches(player.getInventory())) session.flip.jump();
     }
 
     private void ensureHandheldTask() {
@@ -323,11 +364,22 @@ final class SkilletHandheldCooking {
     private void advanceHandheldCooking(Player player, HandheldSession session) {
         UUID playerId = player.getUniqueId();
         if (!handheldCookingEnabled || player.isDead() || !session.matches(player.getInventory())
-                || !isHandheldInputActive(player, session)) {
+                || !isHandheldInputActive(player, session) || !session.heatValid(player, heatAvailable)) {
             stopHandheldUse(player, null);
             return;
         }
+        if (jumpFlipEnabled && session.flip.sample(player.isOnGround())) {
+            session.displayedProgress = null;
+            if (session.display != null) updateHandheldDisplay(player, session);
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, .3f, 1.4f);
+        } else if (!jumpFlipEnabled && session.flip.flipped()) {
+            session.flip.reset();
+            session.displayedProgress = null;
+            if (session.display != null) updateHandheldDisplay(player, session);
+        }
         if (++session.progress < session.duration) {
+            if (session.progress % 4 == 0 && session.skillet.getEnchantmentLevel(Enchantment.FIRE_ASPECT) > 0)
+                emitFireAspectParticles(player);
             // Progress updates stay at five packets per second. Normal inventory sync uses the
             // same display snapshot, so it cannot alternate real damage with cooking progress.
             if (session.display != null && session.progress % 4 == 0) {
@@ -366,6 +418,27 @@ final class SkilletHandheldCooking {
         player.getWorld().playSound(player.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, 0.5f, 1.0f);
     }
 
+    private void emitFireAspectParticles(Player player) {
+        Location center = player.getLocation();
+        if (!plugin.particles().allowDensity("stove", center, false)) return;
+        World world = center.getWorld();
+        int chunkX = center.getBlockX() >> 4, chunkZ = center.getBlockZ() >> 4;
+        if (world == null || !world.isChunkLoaded(chunkX, chunkZ)) return;
+        List<Player> viewers = new ArrayList<>();
+        for (Player viewer : world.getChunkAt(chunkX, chunkZ).getPlayersSeeingChunk())
+            if (plugin.particles().isNearby(viewer, center, 576)) viewers.add(viewer);
+        if (viewers.isEmpty()) return;
+        FireAspectParticles settings = fireParticles;
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+        plugin.particles().spawn(viewers, center, 576, Particle.FLAME,
+                center.getBlockX() + settings.originX() + (random.nextDouble() - .5) * settings.spread(),
+                center.getY() + settings.originY(),
+                center.getBlockZ() + settings.originZ() + (random.nextDouble() - .5) * settings.spread(),
+                0, (random.nextDouble() * 2 - 1) * settings.xzVelocity(),
+                settings.yBase() + random.nextDouble() * settings.yExtra(),
+                (random.nextDouble() * 2 - 1) * settings.xzVelocity(), 1);
+    }
+
     private static boolean isUsingOtherHand(Player player, EquipmentSlot cookingHand) {
         return player.isHandRaised() && player.getHandRaised() != cookingHand;
     }
@@ -399,6 +472,7 @@ final class SkilletHandheldCooking {
 
     private void refreshHandheldDisplay(Player player, HandheldSession session) {
         NamespacedKey model = session.model;
+        if (jumpFlipEnabled && session.flip.flipped()) model = handheldModels.flipped(model);
         if (model != null) {
             var key = Key.of(model.toString());
             model = NamespacedKey.fromString(CraftEngineModelMappings.get()
@@ -540,6 +614,7 @@ final class SkilletHandheldCooking {
         final int duration;
         final NamespacedKey model;
         final AtomicBoolean scheduled = new AtomicBoolean();
+        final HandheldFlipState flip = new HandheldFlipState();
         HandheldCookingDisplay display;
         Boolean displayedProgress;
         NamespacedKey displayedModel;
@@ -585,6 +660,12 @@ final class SkilletHandheldCooking {
                 food.setAmount(food.getAmount() - 1);
             }
             return true;
+        }
+
+        boolean heatValid(Player player, Predicate<Player> available) {
+            if (player.isUnderWater()) return false;
+            // A final check prevents a short recipe from committing between the regular 20-tick visits.
+            return progress % 20 != 0 && progress < duration - 1 || available.test(player);
         }
     }
 }

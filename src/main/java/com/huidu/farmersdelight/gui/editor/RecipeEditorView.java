@@ -2,6 +2,7 @@ package com.huidu.farmersdelight.gui.editor;
 
 import com.huidu.farmersdelight.gui.recipebook.RecipeBookGui;
 import com.huidu.farmersdelight.FarmersDelightPlugin;
+import com.huidu.farmersdelight.gui.GuiTextStyle;
 import com.huidu.farmersdelight.api.recipe.EditableRecipe;
 import com.huidu.farmersdelight.api.recipe.NumericField;
 import com.huidu.farmersdelight.api.recipe.RecipeEditor;
@@ -256,8 +257,8 @@ public final class RecipeEditorView implements InventoryHolder {
 
     private void draw() {
         inventory = Bukkit.createInventory(this, 54,
-                tr("gui.editor.recipe_book.title", NamedTextColor.DARK_GRAY,
-                        Component.text(String.valueOf(draft.id()), NamedTextColor.DARK_AQUA)));
+                GuiTextStyle.title(tr("gui.editor.recipe_book.title", NamedTextColor.GOLD,
+                        Component.text(String.valueOf(draft.id()), NamedTextColor.AQUA))));
 
         List<Component> labelLore = new ArrayList<>();
         for (int i = 0; i < itemSlots.length; i++) {
@@ -293,7 +294,7 @@ public final class RecipeEditorView implements InventoryHolder {
     }
 
     private static Component tr(String key, NamedTextColor color) {
-        return Component.translatable(key).color(color);
+        return GuiTextStyle.upright(Component.translatable(key).color(color));
     }
 
     private static Component tr(String key, NamedTextColor color, Object... args) {
@@ -302,7 +303,7 @@ public final class RecipeEditorView implements InventoryHolder {
             Object a = args[i];
             components[i] = a instanceof Component c ? c : Component.text(String.valueOf(a));
         }
-        return Component.translatable(key, components).color(color);
+        return GuiTextStyle.upright(Component.translatable(key, components).color(color));
     }
 
     public boolean isEditableSlot(int rawSlot) {
@@ -515,7 +516,7 @@ public final class RecipeEditorView implements InventoryHolder {
         lore.add(tr("gui.editor.recipe_book.step_hint", NamedTextColor.GRAY, field.step(), field.step()));
         if (editor instanceof AsyncRecipeEditor) lore.add(I18n.getComponent("gui.editor.recipe_book.number_hint", viewer));
         return named(new ItemStack(Material.COMPARATOR),
-                label.append(Component.text(": " + shown)).color(NamedTextColor.YELLOW), lore);
+                label.append(Component.text(": " + shown, NamedTextColor.AQUA)).colorIfAbsent(NamedTextColor.WHITE), lore);
     }
 
     private ItemStack textButton(AsyncRecipeEditor.TextField field) {

@@ -1,6 +1,7 @@
 package com.huidu.farmersdelight.gui.recipebook;
 
 import com.huidu.farmersdelight.FarmersDelightPlugin;
+import com.huidu.farmersdelight.gui.GuiTextStyle;
 import net.kyori.adventure.text.Component;
 import net.momirealms.sparrow.ui.SparrowUI;
 import net.momirealms.sparrow.ui.item.Item;
@@ -83,7 +84,7 @@ public final class ReadOnlyRecipeWindows {
         for (int slot = 0; slot < 36; slot++) {
             ItemStack item = player.getInventory().getItem((slot + 9) % 36);
             if (item != null && !item.getType().isAir()) {
-                lower.setItem(slot, Item.simple(item));
+                lower.setItem(slot, Item.simple(GuiTextStyle.displayCopy(item)));
             }
         }
         Window window = Window.builder(upper).setLowerPane(lower).setTitle(title)

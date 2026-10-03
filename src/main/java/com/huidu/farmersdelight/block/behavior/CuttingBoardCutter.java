@@ -30,9 +30,6 @@ import java.util.concurrent.ThreadLocalRandom;
 // separate from the block behavior so the interaction flow stays lean.
 final class CuttingBoardCutter {
 
-    // Increase each output unit's keep chance by this amount per Fortune level.
-    private static final double FORTUNE_BONUS_PER_LEVEL = 0.1d;
-
     private final FarmersDelightPlugin plugin;
     private final CuttingBoardToolMatcher toolMatcher;
 
@@ -104,7 +101,7 @@ final class CuttingBoardCutter {
         Location location = player.getLocation();
         int fortuneLevel = tool.getEnchantmentLevel(Enchantment.FORTUNE);
         // Fortune raises the chance of keeping each unit without exceeding the configured result count.
-        double fortuneBonus = FORTUNE_BONUS_PER_LEVEL * fortuneLevel;
+        double fortuneBonus = plugin.getCuttingBoardSounds().fortuneBonus() * fortuneLevel;
 
         ItemStack firstResult = null;
         boolean hasPossibleResult = false;
@@ -211,7 +208,7 @@ final class CuttingBoardCutter {
             // Output rolling mirrors processCuttingLocked (one roll per output unit; Fortune raises the keep
             // chance). Kept as its own path so the dispenser cut carries none of the player-side effects
             // (action bar, swing, advancement, profession experience) that the manual cut adds.
-            double fortuneBonus = FORTUNE_BONUS_PER_LEVEL
+            double fortuneBonus = plugin.getCuttingBoardSounds().fortuneBonus()
                     * tool.getEnchantmentLevel(Enchantment.FORTUNE);
             boolean hasPossibleResult = false;
             for (CuttingBoardRecipe.ResultEntry resultEntry : recipe.getResults()) {

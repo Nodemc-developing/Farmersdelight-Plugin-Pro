@@ -66,11 +66,27 @@ class HeatSourceConfigTest {
         assertFalse(config.isHeatSource(campfire(false)));
     }
 
+    @Test
+    void trayFollowsTheFirstStateAwareRuleAndKeepsLegacyUnspecified() {
+        HeatSourceConfig config = new HeatSourceConfig();
+        addEntry(config, Material.CAMPFIRE, Map.of("lit", "false"), false, false);
+        addEntry(config, Material.CAMPFIRE, Map.of(), true, true);
+        assertFalse(config.trayRequirement(campfire(false)));
+        assertTrue(config.trayRequirement(campfire(true)));
+        assertNull(config.trayRequirement(stone()));
+    }
+
     // The entry types are private implementation details, so the test builds them reflectively instead of
     // widening their visibility. A rename or signature change surfaces here as a clear failure.
     @SuppressWarnings("unchecked")
     private static void addEntry(HeatSourceConfig config, Material material, Map<String, String> states,
                                  boolean heatSource) {
+        addEntry(config, material, states, heatSource, false);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void addEntry(HeatSourceConfig config, Material material, Map<String, String> states,
+                                 boolean heatSource, boolean tray) {
         try {
             Class<?> matcherType = Class.forName(
                     "com.huidu.farmersdelight.config.HeatSourceConfig$VanillaBlockMatcher");
@@ -82,9 +98,9 @@ class HeatSourceConfigTest {
                     "com.huidu.farmersdelight.config.HeatSourceConfig$EntryMatcher");
             Class<?> entryType = Class.forName("com.huidu.farmersdelight.config.HeatSourceConfig$HeatEntry");
             Constructor<?> entryConstructor = entryType.getDeclaredConstructor(
-                    entryMatcherType, boolean.class, boolean.class);
+                    entryMatcherType, boolean.class, boolean.class, boolean.class);
             entryConstructor.setAccessible(true);
-            Object entry = entryConstructor.newInstance(matcher, heatSource, false);
+            Object entry = entryConstructor.newInstance(matcher, heatSource, false, tray);
 
             Field entries = HeatSourceConfig.class.getDeclaredField("entries");
             entries.setAccessible(true);

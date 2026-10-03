@@ -48,6 +48,7 @@ final class RecipeDetailRenderer {
                     List<Component> lore = meta.lore() == null ? new ArrayList<>() : new ArrayList<>(meta.lore());
                     lore.add(com.huidu.farmersdelight.i18n.I18n.getComponent("gui.fuzzy.weight", player, Map.of("weight", String.valueOf(weight))));
                     meta.lore(lore);
+                    GuiTextStyle.normalizeDisplayMeta(meta);
                     displayed.setItemMeta(meta);
                 }
             }
@@ -58,6 +59,7 @@ final class RecipeDetailRenderer {
             ItemMeta containerMeta = containerItem.getItemMeta();
             containerMeta.displayName(gui.itemNameComponent(recipe.getContainer(), player).colorIfAbsent(NamedTextColor.AQUA));
             containerMeta.lore(List.of(gui.tr("gui.recipe.container", NamedTextColor.GRAY)));
+            GuiTextStyle.normalizeDisplayMeta(containerMeta);
             containerItem.setItemMeta(containerMeta);
             gui.inventory.setItem(detailConfig.getContainerSlot(), containerItem);
         }
@@ -79,7 +81,7 @@ final class RecipeDetailRenderer {
         ItemMeta meta = processItem.getItemMeta();
         if (meta != null) {
             if (configured == null) {
-                meta.displayName(gui.tr("gui.recipe.cook_time", NamedTextColor.YELLOW));
+                meta.displayName(gui.tr("gui.recipe.cook_time", NamedTextColor.AQUA));
             }
             if (meta.lore() == null || meta.lore().isEmpty()) {
                 meta.lore(List.of(
@@ -89,6 +91,7 @@ final class RecipeDetailRenderer {
                                 Component.text(placeholders.get("experience")).color(NamedTextColor.GREEN))
                 ));
             }
+            GuiTextStyle.normalizeDisplayMeta(meta);
             processItem.setItemMeta(meta);
         }
         gui.inventory.setItem(arrowSlot, processItem);
@@ -142,6 +145,7 @@ final class RecipeDetailRenderer {
         if (meta != null) {
             meta.displayName(Component.text(" "));
             meta.lore(List.of());
+            GuiTextStyle.normalizeDisplayMeta(meta);
             item.setItemMeta(meta);
         }
         if (resolved) {
@@ -226,6 +230,7 @@ final class RecipeDetailRenderer {
                                     .color(NamedTextColor.YELLOW)));
                 }
                 resultMeta.lore(lore);
+                GuiTextStyle.normalizeDisplayMeta(resultMeta);
                 resultDisplay.setItemMeta(resultMeta);
                 gui.inventory.setItem(slots.get(i), resultDisplay);
             } else {

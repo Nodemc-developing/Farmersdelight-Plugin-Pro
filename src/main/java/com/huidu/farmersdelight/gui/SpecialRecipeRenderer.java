@@ -47,6 +47,7 @@ final class SpecialRecipeRenderer {
             lore.add(gui.tr("gui.recipe.click_to_view", NamedTextColor.YELLOW));
         }
         meta.lore(lore);
+        GuiTextStyle.normalizeDisplayMeta(meta);
         icon.setItemMeta(meta);
         return icon;
     }
@@ -122,6 +123,7 @@ final class SpecialRecipeRenderer {
         lore.add(Component.text(""));
         lore.add(gui.tr("gui.recipe.auto_cycle", currentIndex + 1, total));
         meta.lore(lore);
+        GuiTextStyle.normalizeDisplayMeta(meta);
         copy.setItemMeta(meta);
         return copy;
     }
@@ -135,12 +137,14 @@ final class SpecialRecipeRenderer {
         if (translationKeys.isEmpty()) {
             meta.displayName(Component.text(""));
             meta.lore(List.of());
+            GuiTextStyle.normalizeDisplayMeta(meta);
             item.setItemMeta(meta);
             return item;
         }
         meta.displayName(translatable(translationKeys.get(0), NamedTextColor.WHITE));
         List<Component> lore = translatableKeys(translationKeys.subList(1, translationKeys.size()), NamedTextColor.GRAY);
         meta.lore(lore);
+        GuiTextStyle.normalizeDisplayMeta(meta);
         item.setItemMeta(meta);
         return item;
     }
@@ -159,6 +163,7 @@ final class SpecialRecipeRenderer {
         if (!entry.loreKeys().isEmpty()) {
             meta.lore(translatableKeys(entry.loreKeys(), NamedTextColor.GRAY));
         }
+        GuiTextStyle.normalizeDisplayMeta(meta);
         item.setItemMeta(meta);
         return item;
     }
@@ -205,6 +210,7 @@ final class SpecialRecipeRenderer {
         meta.setItemModel(new NamespacedKey("minecraft", "air"));
         meta.displayName(translatable(nameKey, nameColor));
         meta.lore(translatableLore(loreKey, NamedTextColor.GRAY));
+        GuiTextStyle.normalizeDisplayMeta(meta);
         item.setItemMeta(meta);
         return item;
     }
@@ -217,6 +223,7 @@ final class SpecialRecipeRenderer {
         ItemMeta meta = item.getItemMeta();
         meta.displayName(translatable(nameKey, nameColor));
         meta.lore(translatableLore(loreKey, NamedTextColor.GRAY));
+        GuiTextStyle.normalizeDisplayMeta(meta);
         item.setItemMeta(meta);
         return item;
     }

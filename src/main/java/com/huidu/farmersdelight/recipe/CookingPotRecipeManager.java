@@ -26,9 +26,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiPredicate;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import com.huidu.farmersdelight.api.recipe.AddonRecipeFiles;
-import com.huidu.farmersdelight.gui.RecipeViewGui;
 import com.huidu.farmersdelight.util.CommonTagResolver;
 
 public class CookingPotRecipeManager {
@@ -39,6 +41,35 @@ public class CookingPotRecipeManager {
     private volatile Snapshot snapshot = Snapshot.empty();
     private volatile YamlConfiguration lastFileDocument;
     private volatile RecipeParseCache<CookingPotRecipe> parsedRecipes;
+    private long publicationGeneration;
+    private volatile long matchCacheEpoch;
+
+    private Snapshot currentSnapshot() { return RuntimeSnapshotPublication.get(this, snapshot); }
+
+    private void setSnapshot(Snapshot next) {
+        RuntimeSnapshotPublication.publish(this, snapshot, next);
+        snapshot = next;
+    }
+
+    @org.jetbrains.annotations.ApiStatus.Internal
+    public synchronized Runnable captureReloadRollback() {
+        Snapshot previous = currentSnapshot();
+        YamlConfiguration document = lastFileDocument;
+        RecipeParseCache<CookingPotRecipe> parsing = parsedRecipes;
+        return () -> {
+            synchronized (this) {
+                synchronized (previous.recipeCache()) {
+                    ++matchCacheEpoch;
+                    previous.recipeCache().clear();
+                    previous.recipeMisses().clear();
+                    lastFileDocument = document;
+                    parsedRecipes = parsing;
+                    setSnapshot(previous.withGeneration(++publicationGeneration));
+                }
+                afterPublication();
+            }
+        };
+    }
 
     record Snapshot(Map<String, CookingPotRecipe> recipes,
                     Map<String, Map<String, CookingPotRecipe>> customRecipes,
@@ -52,11 +83,20 @@ public class CookingPotRecipeManager {
                     Map<String, CookingPotRecipe> recipeCache, Set<String> recipeMisses,
                     FuzzyRecipeMatcher.Index fuzzyIndex, Map<String, FuzzyRecipeMatcher.Index> customFuzzyIndices,
                     List<FoodGroupSnapshot.Group> localFoodGroups, FoodGroupSnapshot foodGroups,
-                    Map<String, RecipeSource> sources, Map<String, Map<String, RecipeSource>> customSources) {
+                    Map<String, RecipeSource> sources, Map<String, Map<String, RecipeSource>> customSources,
+                    NbtMatchDependencies nbtDependencies) {
+        boolean nbtSensitive() { return nbtDependencies.any(); }
+        Snapshot withGeneration(long nextGeneration) {
+            return new Snapshot(recipes, customRecipes, ingredientToRecipes, customIngredientToRecipes,
+                    sortedRecipes, sortedCustomRecipes, sortedCustomOnlyRecipes, resultToRecipes,
+                    validContainerKeys, packRecipeCount, nextGeneration, recipeCache, recipeMisses,
+                    fuzzyIndex, customFuzzyIndices, localFoodGroups, foodGroups, sources, customSources, nbtDependencies);
+        }
+
         static Snapshot empty() {
             return new Snapshot(Map.of(), Map.of(), Map.of(), Map.of(), List.of(), Map.of(), Map.of(),
                     Map.of(), Set.of(), 0, 0, newMatchCache(), newMissCache(),
-                    FuzzyRecipeMatcher.compile(List.of(), FoodGroupSnapshot.empty()), Map.of(), List.of(), FoodGroupSnapshot.empty(), Map.of(), Map.of());
+                    FuzzyRecipeMatcher.compile(List.of(), FoodGroupSnapshot.empty()), Map.of(), List.of(), FoodGroupSnapshot.empty(), Map.of(), Map.of(), new NbtMatchDependencies(Set.of(), Map.of()));
         }
     }
 
@@ -76,10 +116,10 @@ public class CookingPotRecipeManager {
         });
     }
 
-    public long recipeGeneration() { return snapshot.generation(); }
+    public long recipeGeneration() { return currentSnapshot().generation(); }
 
     public RecipeSource sourceOf(String id, String group) {
-        Snapshot current = snapshot;
+        Snapshot current = currentSnapshot();
         return group == null || group.isBlank() ? current.sources().get(id)
                 : current.customSources().getOrDefault(group, Map.of()).get(id);
     }
@@ -94,7 +134,7 @@ public class CookingPotRecipeManager {
     // /fd reload (which rebuilds the file-backed maps); merged into the published maps in loadRecipes().
     private final Map<String, CookingPotRecipe> externalRecipes = new ConcurrentHashMap<>();
     // Republishing after an external (un)register is coalesced to the next tick, so registering a batch
-    // of addon recipes triggers a single loadRecipes() instead of one full file reload per recipe.
+    // of addon recipes requests one complete catalog publication instead of reloading for each recipe.
     private final java.util.concurrent.atomic.AtomicBoolean externalRepublishScheduled = new java.util.concurrent.atomic.AtomicBoolean();
 
     public CookingPotRecipeManager(FarmersDelightPlugin plugin) {
@@ -111,13 +151,18 @@ public class CookingPotRecipeManager {
     }
 
     private synchronized void loadRecipes(YamlConfiguration config, boolean incremental) {
+        RecipePublicationTransaction.run(() -> loadRecipesInTransaction(config, incremental),
+                captureReloadRollback(), FoodGroupStore.captureReloadRollback());
+    }
+
+    private void loadRecipesInTransaction(YamlConfiguration config, boolean incremental) {
         if (config == null) return;
         FoodGroupStore.Loaded foodGroups;
         try {
-            foodGroups = FoodGroupStore.load(plugin, snapshot.localFoodGroups());
+            foodGroups = FoodGroupStore.load(plugin, currentSnapshot().localFoodGroups());
         } catch (IllegalArgumentException invalid) {
             plugin.getLogger().log(java.util.logging.Level.WARNING, "Food groups were not published; previous recipes remain active", invalid);
-            return;
+            throw invalid;
         }
         RecipeParseCache<CookingPotRecipe> parsing = new RecipeParseCache<>(incremental ? parsedRecipes : null);
         // Build everything into fresh local collections first, then publish atomically (below), so readers
@@ -241,19 +286,24 @@ public class CookingPotRecipeManager {
                 RecipeCollections.freezeNestedSets(newCustomIngredientToRecipes), List.copyOf(newSortedRecipes),
                 RecipeCollections.freezeLists(newSortedCustomRecipes), RecipeCollections.freezeLists(newSortedCustomOnlyRecipes),
                 RecipeCollections.freezeLists(newResultToRecipes), Set.copyOf(newValidContainerKeys), newPackRecipeCount,
-                snapshot.generation() + 1, newMatchCache(), newMissCache(), compileFuzzy(newRecipes, foodGroups.combined()),
-                Map.copyOf(customFuzzyIndices), foodGroups.local(), foodGroups.combined(), Map.copyOf(sources), RecipeCollections.freezeNested(customSources));
+                ++publicationGeneration, newMatchCache(), newMissCache(), compileFuzzy(newRecipes, foodGroups.combined()),
+                Map.copyOf(customFuzzyIndices), foodGroups.local(), foodGroups.combined(), Map.copyOf(sources), RecipeCollections.freezeNested(customSources),
+                NbtMatchDependencies.compile(newSortedRecipes, newCustomRecipes));
         lastFileDocument = config;
         parsedRecipes = parsing;
-        vanillaItemIdsByTagCache.clear();
-        snapshot = next;
-        if (plugin.getTickManager() != null) plugin.getTickManager().wakeAllNativePots();
-        // Invalidate the recipe-list GUI display cache: this republish path (incl. addon register/
-        // unregister) bypasses RecipeViewGui.clearConfigCache.
-        RecipeViewGui.clearRecipeDisplayCache();
-        // The decoded-snapshot cache is keyed by strings owned by the recipes being replaced, so it is
-        // dropped with them rather than being left to hold entries no recipe references any more.
-        RecipeItemCodec.clearDecodeCache();
+        ++matchCacheEpoch;
+        setSnapshot(next);
+        afterPublication();
+    }
+
+    private void afterPublication() {
+        RuntimeSnapshotPublication.afterCommit(vanillaItemIdsByTagCache, vanillaItemIdsByTagCache::clear);
+        RuntimeSnapshotPublication.afterCommit(com.huidu.farmersdelight.gui.GuiCacheInvalidator.class,
+                com.huidu.farmersdelight.gui.GuiCacheInvalidator::clearRecipeDisplayCaches);
+        RuntimeSnapshotPublication.afterCommit(RecipeItemCodec.class, RecipeItemCodec::clearDecodeCache);
+        RuntimeSnapshotPublication.afterCommit(this, () -> {
+            if (plugin != null && plugin.getTickManager() != null) plugin.getTickManager().wakeAllNativePots();
+        });
     }
 
     private void loadCustomRecipes(YamlConfiguration config,
@@ -356,7 +406,7 @@ public class CookingPotRecipeManager {
 
     /** Recipes (default + external, excluding custom-group duplicates) that produce this item. */
     public List<CookingPotRecipe> getRecipesProducing(ItemStack item) {
-        Snapshot view = snapshot;
+        Snapshot view = currentSnapshot();
         if (item == null || item.getType().isAir()) {
             return List.of();
         }
@@ -366,6 +416,7 @@ public class CookingPotRecipeManager {
 
     private CookingPotRecipe parseRecipe(String id, ConfigurationSection section, int maxIngredients) {
         section = RecipeSchemaAdapter.normalizePot(section);
+        RecipeParsingSupport.requireKnownSemantics(section, Set.of("match-mode"));
         FuzzyRecipeSpec fuzzy = parseFuzzy(section);
         Object rawIngredients = section.get("ingredients");
         if (fuzzy != null) rawIngredients = new ArrayList<>(fuzzy.perfect().keySet());
@@ -479,8 +530,8 @@ public class CookingPotRecipeManager {
         return FuzzyRecipeMatcher.compile(definitions, groups);
     }
 
-    public List<FoodGroupSnapshot.Group> getLocalFoodGroups() { return snapshot.localFoodGroups(); }
-    public FoodGroupSnapshot getFoodGroups() { return snapshot.foodGroups(); }
+    public List<FoodGroupSnapshot.Group> getLocalFoodGroups() { return currentSnapshot().localFoodGroups(); }
+    public FoodGroupSnapshot getFoodGroups() { return currentSnapshot().foodGroups(); }
 
     /**
      * Values of the {@code container} field that explicitly declare "this recipe needs no container", so a
@@ -618,30 +669,44 @@ public class CookingPotRecipeManager {
     }
 
     public CookingPotRecipe matchRecipe(List<ItemStack> inputItems, ItemStack container, String customRecipeGroupId) {
+        try (var scope = RuntimeSnapshotPublication.readScope()) {
+            return matchRecipeInScope(inputItems, container, customRecipeGroupId);
+        }
+    }
+
+    private CookingPotRecipe matchRecipeInScope(List<ItemStack> inputItems, ItemStack container, String customRecipeGroupId) {
         if (inputItems == null || inputItems.isEmpty()) {
             return null;
         }
         
-        List<ItemStack> nonEmptyInputs = new ArrayList<>();
-        for (ItemStack item : inputItems) {
-            if (item != null && item.getType() != Material.AIR) {
-                nonEmptyInputs.add(item);
-            }
-        }
+        List<ResolvedRecipeInput> nonEmptyInputs = ResolvedRecipeInput.resolve(inputItems, this::getItemKey);
         
         if (nonEmptyInputs.isEmpty()) {
             return null;
         }
 
         String normalizedGroupId = normalizeRecipeGroupId(customRecipeGroupId);
-        String cacheKey = buildCacheKey(nonEmptyInputs, container, normalizedGroupId);
-        // One capture binds matching, indices and cache entries to the same recipe version.
-        Snapshot view = snapshot;
-        CookingPotRecipe cached;
-        boolean cachedMiss;
-        synchronized (view.recipeCache()) {
-            cached = view.recipeCache().get(cacheKey);
-            cachedMiss = cached == null && view.recipeMisses().contains(cacheKey);
+        // Capture the epoch first so a rollback that restores the same snapshot cannot admit an old scan.
+        long cacheEpoch = matchCacheEpoch;
+        Snapshot view = currentSnapshot();
+        // NBT predicates distinguish stacks with the same item ID; ordinary recipes retain the compact key.
+        boolean nbtDependent = false;
+        if (view.nbtDependencies().any(normalizedGroupId)) {
+            for (ResolvedRecipeInput input : nonEmptyInputs) {
+                if (view.nbtDependencies().dependsOn(input.identity(), normalizedGroupId)) {
+                    nbtDependent = true;
+                    break;
+                }
+            }
+        }
+        String cacheKey = nbtDependent ? null : buildCacheKey(nonEmptyInputs, container, normalizedGroupId);
+        CookingPotRecipe cached = null;
+        boolean cachedMiss = false;
+        if (cacheKey != null) synchronized (view.recipeCache()) {
+            if (currentSnapshot() == view && matchCacheEpoch == cacheEpoch) {
+                cached = view.recipeCache().get(cacheKey);
+                cachedMiss = cached == null && view.recipeMisses().contains(cacheKey);
+            }
         }
         if (cachedMiss) {
             return null;
@@ -659,22 +724,31 @@ public class CookingPotRecipeManager {
             result = matchDefaultRecipe(nonEmptyInputs, container, view);
         }
 
-        synchronized (view.recipeCache()) {
-            // A retired snapshot may finish matching, but its cache cannot populate the current snapshot.
-            if (snapshot == view) {
-                if (result != null) {
-                    view.recipeCache().put(cacheKey, result);
-                } else {
-                    // Negative cache so an unchanged incomplete pot won't re-scan every recipe next tick.
-                    view.recipeMisses().add(cacheKey);
-                }
-            }
-        }
-
+        cacheMatch(view, cacheEpoch, cacheKey, result);
         return result;
     }
 
-    private CookingPotRecipe matchCustomRecipe(List<ItemStack> nonEmptyInputs, ItemStack container, String customRecipeGroupId, Snapshot view) {
+    void cacheMatch(Snapshot view, long epoch, String key, CookingPotRecipe result) {
+        if (key == null) return;
+        synchronized (view.recipeCache()) {
+            if (currentSnapshot() != view || matchCacheEpoch != epoch) return;
+            if (result != null) view.recipeCache().put(key, result);
+            else view.recipeMisses().add(key);
+        }
+    }
+
+    static boolean hasNbtSensitiveIngredients(java.util.Collection<CookingPotRecipe> recipes) {
+        return recipes.stream().anyMatch(recipe -> recipe.ingredients().stream()
+                .anyMatch(CookingPotRecipeManager::hasNbtSensitiveIngredient));
+    }
+
+    private static boolean hasNbtSensitiveIngredient(RecipeIngredient ingredient) {
+        if (ingredient instanceof RecipeIngredient.Item item) return item.nbt() != null;
+        return ingredient instanceof RecipeIngredient.Choice choice && choice.options().stream()
+                .anyMatch(CookingPotRecipeManager::hasNbtSensitiveIngredient);
+    }
+
+    private CookingPotRecipe matchCustomRecipe(List<ResolvedRecipeInput> nonEmptyInputs, ItemStack container, String customRecipeGroupId, Snapshot view) {
         Map<String, CookingPotRecipe> groupRecipes = view.customRecipes().get(customRecipeGroupId);
         if (groupRecipes == null || groupRecipes.isEmpty()) {
             return null;
@@ -692,7 +766,7 @@ public class CookingPotRecipeManager {
         return matchFuzzy(nonEmptyInputs, view.customFuzzyIndices().get(customRecipeGroupId), groupRecipes);
     }
 
-    private CookingPotRecipe matchDefaultRecipe(List<ItemStack> nonEmptyInputs, ItemStack container, Snapshot view) {
+    private CookingPotRecipe matchDefaultRecipe(List<ResolvedRecipeInput> nonEmptyInputs, ItemStack container, Snapshot view) {
         Set<String> candidateRecipes = findCandidateRecipes(nonEmptyInputs, view.ingredientToRecipes());
 
         CookingPotRecipe matched = matchFirstRecipe(view.sortedRecipes(), candidateRecipes, container, nonEmptyInputs);
@@ -706,10 +780,14 @@ public class CookingPotRecipeManager {
         return matchFuzzy(nonEmptyInputs, view.fuzzyIndex(), view.recipes());
     }
 
-    private CookingPotRecipe matchFuzzy(List<ItemStack> inputs, FuzzyRecipeMatcher.Index index,
+    private CookingPotRecipe matchFuzzy(List<ResolvedRecipeInput> inputs, FuzzyRecipeMatcher.Index index,
                                         Map<String, CookingPotRecipe> definitions) {
         if (index == null || index.isEmpty()) return null;
-        Map<String, Integer> counts = fuzzyCounts(inputs);
+        Map<String, Integer> counts = new HashMap<>();
+        for (ResolvedRecipeInput input : inputs) {
+            if (input.stack().getAmount() > 0) counts.merge(input.identity(), 1, Integer::sum);
+        }
+        counts = Map.copyOf(counts);
         FuzzyRecipeMatcher.Match match = index.match(counts);
         if (match == null) return null;
         CookingPotRecipe source = definitions.get(match.id());
@@ -727,7 +805,7 @@ public class CookingPotRecipeManager {
     }
 
     private CookingPotRecipe matchFirstRecipe(List<CookingPotRecipe> orderedRecipes, Set<String> candidateRecipeIds,
-                                              ItemStack container, List<ItemStack> nonEmptyInputs) {
+                                              ItemStack container, List<ResolvedRecipeInput> nonEmptyInputs) {
         if (orderedRecipes == null || orderedRecipes.isEmpty()) {
             return null;
         }
@@ -743,7 +821,7 @@ public class CookingPotRecipeManager {
     }
 
     private CookingPotRecipe matchPass(List<CookingPotRecipe> orderedRecipes, Set<String> candidateRecipeIds,
-                                       List<ItemStack> nonEmptyInputs, boolean exactSlots) {
+                                       List<ResolvedRecipeInput> nonEmptyInputs, boolean exactSlots) {
         for (CookingPotRecipe recipe : orderedRecipes) {
             if (recipe.isFuzzy()) continue;
             if (candidateRecipeIds != null && !candidateRecipeIds.contains(recipe.getId())) {
@@ -759,7 +837,7 @@ public class CookingPotRecipeManager {
         return null;
     }
 
-    private String buildCacheKey(List<ItemStack> inputs, ItemStack container, String customRecipeGroupId) {
+    private String buildCacheKey(List<ResolvedRecipeInput> inputs, ItemStack container, String customRecipeGroupId) {
         List<String> keys = new ArrayList<>();
         // Clamp the per-slot amount that goes into the key. IngredientMatching caps each slot at
         // min(amount, ingredientCount) interchangeable units, and only recipes with
@@ -767,8 +845,8 @@ public class CookingPotRecipeManager {
         // inputs.size() is indistinguishable to the matcher. Collapsing it keeps a hopper-fed pot
         // whose stacks keep growing on one cache entry instead of evicting the whole LRU each tick.
         int amountCap = inputs.size();
-        for (ItemStack item : inputs) {
-            keys.add(getItemKey(item) + ":" + Math.min(item.getAmount(), amountCap));
+        for (ResolvedRecipeInput input : inputs) {
+            keys.add(input.identity() + ":" + Math.min(input.stack().getAmount(), amountCap));
         }
         Collections.sort(keys);
 
@@ -777,13 +855,16 @@ public class CookingPotRecipeManager {
             sb.append(key).append(";");
         }
         sb.append("|container=").append(getItemKey(container));
+        // Standalone tag-source APIs can publish without changing this manager's own snapshot.
+        // The read scope pins this value, so late old readers keep separate bounded LRU entries.
+        sb.append("|catalog=").append(RuntimeSnapshotPublication.generation());
         if (customRecipeGroupId != null) {
             sb.append("|group=").append(customRecipeGroupId);
         }
         return sb.toString();
     }
 
-    private Set<String> findCandidateRecipes(List<ItemStack> inputs, Map<String, Set<String>> recipeIndex) {
+    private Set<String> findCandidateRecipes(List<ResolvedRecipeInput> inputs, Map<String, Set<String>> recipeIndex) {
         if (recipeIndex == null || recipeIndex.isEmpty()) {
             return null;
         }
@@ -793,11 +874,17 @@ public class CookingPotRecipeManager {
         Set<String> candidates = null;
         boolean candidatesShared = false;
 
-        for (ItemStack item : inputs) {
+        for (ResolvedRecipeInput input : inputs) {
+            ItemStack item = input.stack();
             Set<String> recipesForItem = null;
             boolean recipesForItemShared = false;
 
-            for (String itemId : ItemUtils.getItemIds(item)) {
+            // The material alias is only a broad index hint; actual Item predicates use the
+            // authoritative identity below and cannot accept a custom item as vanilla.
+            String vanillaId = ItemUtils.getVanillaMaterialItemId(item);
+            for (int hint = 0; hint < 2; ++hint) {
+                String itemId = hint == 0 ? input.identity() : vanillaId;
+                if (itemId == null || (hint == 1 && itemId.equals(input.identity()))) continue;
                 Set<String> indexed = recipeIndex.get(itemId);
                 if (indexed == null || indexed.isEmpty()) {
                     continue;
@@ -813,7 +900,7 @@ public class CookingPotRecipeManager {
                     recipesForItem.addAll(indexed);
                 }
             }
-            for (String tagId : ItemUtils.getItemTagIds(item)) {
+            for (String tagId : ItemUtils.getItemTagIds(item, input.identity())) {
                 Set<String> indexed = recipeIndex.get("#" + tagId);
                 if (indexed == null || indexed.isEmpty()) {
                     continue;
@@ -830,7 +917,7 @@ public class CookingPotRecipeManager {
                 }
             }
 
-            for (String tagId : AdvancedRecipeTags.tagsForItemId(ItemUtils.resolveItemId(item))) {
+            for (String tagId : AdvancedRecipeTags.tagsForItemId(input.identity())) {
                 Set<String> indexed = recipeIndex.get("advtag:" + tagId);
                 if (indexed == null || indexed.isEmpty()) continue;
                 if (recipesForItem == null) { recipesForItem = indexed; recipesForItemShared = true; }
@@ -863,21 +950,16 @@ public class CookingPotRecipeManager {
     }
 
     private boolean matchRecipe(CookingPotRecipe recipe, List<ItemStack> inputs, boolean exactSlots) {
-        List<ItemStack> nonEmpty = new ArrayList<>();
-        for (ItemStack input : inputs) {
-            if (input != null && !input.getType().isAir()) {
-                nonEmpty.add(input);
-            }
-        }
+        List<ResolvedRecipeInput> nonEmpty = ResolvedRecipeInput.resolve(inputs, this::getItemKey);
         return matchRecipePrefiltered(recipe, nonEmpty, exactSlots);
     }
 
-    private boolean matchRecipePrefiltered(CookingPotRecipe recipe, List<ItemStack> nonEmptyInputs, boolean exactSlots) {
+    private boolean matchRecipePrefiltered(CookingPotRecipe recipe, List<ResolvedRecipeInput> nonEmptyInputs, boolean exactSlots) {
         // Exact matching gives each filled slot a budget of one unit so every slot matches one ingredient.
         // Using stack amounts here could satisfy several ingredients from one slot and leave another unused.
         // Lenient matching uses stack amounts to support ingredients spread across slots,
         // while separately requiring every filled slot to contain a usable ingredient.
-        ToIntFunction<ItemStack> unitBudget = exactSlots ? slot -> 1 : ItemStack::getAmount;
+        ToIntFunction<ResolvedRecipeInput> unitBudget = exactSlots ? slot -> 1 : slot -> slot.stack().getAmount();
         return IngredientMatching.matchesIngredients(
                 recipe.getIngredients(), nonEmptyInputs, exactSlots,
                 this::matchIngredient, unitBudget);
@@ -890,24 +972,103 @@ public class CookingPotRecipeManager {
         return recipe != null && matchRecipe(recipe, inputs);
     }
 
+    /** Validates and assigns one cook; the caller must hold its inventory lock until applying the plan. */
+    @org.jetbrains.annotations.ApiStatus.Internal
+    public int[] prepareConsumption(CookingPotRecipe recipe, List<ItemStack> inputs) {
+        if (recipe == null || inputs == null || recipe.isFuzzy() && recipe.matchedInputs() == null) return null;
+        try (var scope = RuntimeSnapshotPublication.readScope()) {
+            return consumptionAssignment(inputs, recipe.getIngredients(), recipe.isFuzzy(), recipe.matchedInputs(),
+                    item -> item == null || item.getType().isAir() || recipe.isFuzzy() && item.getAmount() <= 0,
+                    item -> new ResolvedRecipeInput(item, getItemKey(item)),
+                    input -> input.stack().getAmount(), ResolvedRecipeInput::identity, this::matchIngredient);
+        }
+    }
+
+    // Operation-local resolution preserves the existing lenient slot gate and the consumption preference:
+    // use each filled slot once when possible, then allow stacked units for overlapping ingredients.
+    // Returned indices refer to the original input list, including its empty slots. Nothing is cached across cooks.
+    static <Input, Resolved, Ingredient> int[] consumptionAssignment(
+            List<Input> inputs, List<Ingredient> required, boolean fuzzy, Map<String, Integer> expectedCounts,
+            Predicate<Input> empty, Function<Input, Resolved> resolve, ToIntFunction<Resolved> amount,
+            Function<Resolved, String> identity, BiPredicate<Resolved, Ingredient> matcher) {
+        if (fuzzy && expectedCounts == null) return null;
+        if (!fuzzy && required.size() == 1) {
+            Ingredient ingredient = required.getFirst();
+            int sourceSlot = -1;
+            for (int slot = 0; slot < inputs.size(); slot++) {
+                Input input = inputs.get(slot);
+                if (empty.test(input)) continue;
+                Resolved resolved = resolve.apply(input);
+                // Even zero-amount non-air extras must be usable under the existing lenient slot rule.
+                if (!matcher.test(resolved, ingredient)) return null;
+                if (sourceSlot < 0 && amount.applyAsInt(resolved) > 0) sourceSlot = slot;
+            }
+            // A single ingredient has no overlapping assignment to solve: the normal unit preference
+            // selects the first positive slot after every filled slot has passed the same predicate.
+            return sourceSlot < 0 ? null : new int[]{sourceSlot};
+        }
+        List<Resolved> filled = new ArrayList<>(inputs.size());
+        int[] originalSlots = new int[inputs.size()];
+        for (int slot = 0; slot < inputs.size(); slot++) {
+            Input input = inputs.get(slot);
+            if (empty.test(input)) continue;
+            originalSlots[filled.size()] = slot;
+            filled.add(resolve.apply(input));
+        }
+        if (fuzzy) {
+            Map<String, Integer> counts = new HashMap<>();
+            int[] assignment = new int[filled.size()];
+            int used = 0;
+            for (int slot = 0; slot < filled.size(); slot++) {
+                Resolved input = filled.get(slot);
+                if (amount.applyAsInt(input) <= 0) continue;
+                String key = identity.apply(input);
+                if (key == null) return null;
+                counts.merge(key, 1, Integer::sum);
+                assignment[used++] = originalSlots[slot];
+            }
+            if (!expectedCounts.equals(counts)) return null;
+            return used == assignment.length ? assignment : java.util.Arrays.copyOf(assignment, used);
+        }
+        if (filled.size() < required.size()) return null;
+        for (Resolved input : filled) {
+            boolean usable = false;
+            for (Ingredient ingredient : required) {
+                if (matcher.test(input, ingredient)) { usable = true; break; }
+            }
+            if (!usable) return null;
+        }
+        int[] assignment = IngredientMatching.assignIngredients(required, filled, matcher,
+                input -> amount.applyAsInt(input) > 0 ? 1 : 0);
+        if (assignment == null) assignment = IngredientMatching.assignIngredients(required, filled, matcher, amount);
+        if (assignment == null) return null;
+        for (int index = 0; index < assignment.length; index++) assignment[index] = originalSlots[assignment[index]];
+        return assignment;
+    }
+
     public boolean matchesIngredient(ItemStack item, RecipeIngredient ingredient) {
         return matchIngredient(item, ingredient);
     }
 
     private boolean matchIngredient(ItemStack item, RecipeIngredient ingredient) {
-        if (ingredient instanceof RecipeIngredient.AdvancedTag tag) return AdvancedRecipeTags.matches(item, tag.key());
+        if (item == null || item.getType().isAir()) return false;
+        return matchIngredient(new ResolvedRecipeInput(item, getItemKey(item)), ingredient);
+    }
+
+    private boolean matchIngredient(ResolvedRecipeInput input, RecipeIngredient ingredient) {
+        ItemStack item = input.stack();
+        if (ingredient instanceof RecipeIngredient.AdvancedTag tag) return AdvancedRecipeTags.matchesItemId(input.identity(), tag.key());
         if (ingredient instanceof RecipeIngredient.Item itemIngredient) {
-            if (!ItemUtils.matchesItemId(item, itemIngredient.key())) {
+            if (!input.matches(itemIngredient.key().toString())) {
                 return false;
             }
             if (itemIngredient.nbt() == null) {
                 return true;
             }
-            ItemStack expected = RecipeItemCodec.itemFromBase64(itemIngredient.nbt());
-            return expected != null && expected.isSimilar(item);
+            return RecipeItemCodec.matchesSnapshot(itemIngredient.nbt(), item);
         } else if (ingredient instanceof RecipeIngredient.Choice choiceIngredient) {
             for (RecipeIngredient option : choiceIngredient.options()) {
-                if (matchIngredient(item, option)) {
+                if (matchIngredient(input, option)) {
                     return true;
                 }
             }
@@ -915,11 +1076,11 @@ public class CookingPotRecipeManager {
         } else if (ingredient instanceof RecipeIngredient.Tag tagIngredient) {
             String vanillaId = ItemUtils.getVanillaMaterialItemId(item);
 
-            if (tagIngredient.excludedItems().stream().anyMatch(excluded -> ItemUtils.matchesItemId(item, excluded))) {
-                return false;
+            for (Key excluded : tagIngredient.excludedItems()) {
+                if (input.matches(excluded.toString())) return false;
             }
 
-            Set<String> itemTags = ItemUtils.getItemTagIds(item);
+            Set<String> itemTags = ItemUtils.getItemTagIds(item, input.identity());
             if (itemTags.contains(tagIngredient.key().toString())) {
                 for (Key excludedTag : tagIngredient.excludedTags()) {
                     if (itemTags.contains(excludedTag.toString())) {
@@ -962,7 +1123,7 @@ public class CookingPotRecipeManager {
         }
         // Distinct MMOItems items can share a base material; key on their identity so different
         // mmoitems:<TYPE>:<ID> items never collide in the recipe cache.
-        String mmoId = MMOItemsCompat.getItemId(item);
+        String mmoId = MMOItemsCompat.getNonCraftEngineItemId(item);
         if (mmoId != null) {
             return mmoId;
         }
@@ -970,23 +1131,23 @@ public class CookingPotRecipeManager {
     }
 
     public Map<String, CookingPotRecipe> getRecipes() {
-        Snapshot view = snapshot;
+        Snapshot view = currentSnapshot();
         return Collections.unmodifiableMap(view.recipes());
     }
 
     /** Local group contents for editing, without inheriting the default recipes. */
     public Map<String, Map<String, CookingPotRecipe>> getCustomRecipeGroups() {
-        return snapshot.customRecipes();
+        return currentSnapshot().customRecipes();
     }
 
     public List<CookingPotRecipe> getEditableRecipes(String customRecipeGroupId) {
-        Snapshot view = snapshot;
+        Snapshot view = currentSnapshot();
         String group = normalizeRecipeGroupId(customRecipeGroupId);
         return group == null ? view.sortedRecipes() : view.sortedCustomOnlyRecipes().getOrDefault(group, List.of());
     }
 
     public List<CookingPotRecipe> getAllRecipes() {
-        Snapshot view = snapshot;
+        Snapshot view = currentSnapshot();
         Map<String, CookingPotRecipe> defaultRecipes = view.recipes();
         Map<String, Map<String, CookingPotRecipe>> groupedRecipes = view.customRecipes();
         List<CookingPotRecipe> all = new ArrayList<>(defaultRecipes.values());
@@ -997,7 +1158,7 @@ public class CookingPotRecipeManager {
     }
 
     public Map<String, CookingPotRecipe> getRecipes(String customRecipeGroupId) {
-        Snapshot view = snapshot;
+        Snapshot view = currentSnapshot();
         String normalizedGroupId = normalizeRecipeGroupId(customRecipeGroupId);
         if (normalizedGroupId == null) {
             return view.recipes();
@@ -1012,7 +1173,7 @@ public class CookingPotRecipeManager {
     }
 
     public List<CookingPotRecipe> getSortedRecipes(String customRecipeGroupId) {
-        Snapshot view = snapshot;
+        Snapshot view = currentSnapshot();
         String normalizedGroupId = normalizeRecipeGroupId(customRecipeGroupId);
         if (normalizedGroupId == null) {
             return view.sortedRecipes();
@@ -1021,12 +1182,12 @@ public class CookingPotRecipeManager {
     }
 
     public Set<String> getValidContainerKeys() {
-        Snapshot view = snapshot;
+        Snapshot view = currentSnapshot();
         return view.validContainerKeys();
     }
 
     public int getRecipeCount() {
-        Snapshot view = snapshot;
+        Snapshot view = currentSnapshot();
         return view.recipes().size();
     }
 
@@ -1036,7 +1197,7 @@ public class CookingPotRecipeManager {
 
     /** Recipes that reached this manager through a CraftEngine pack section, not the plugin's own file. */
     public int getPackRecipeCount() {
-        Snapshot view = snapshot;
+        Snapshot view = currentSnapshot();
         return view.packRecipeCount();
     }
 
@@ -1050,7 +1211,7 @@ public class CookingPotRecipeManager {
     }
 
     public int getCustomRecipeCount() {
-        Snapshot view = snapshot;
+        Snapshot view = currentSnapshot();
         int count = 0;
         for (Map<String, CookingPotRecipe> groupRecipes : view.customRecipes().values()) {
             count += groupRecipes.size();
@@ -1059,12 +1220,12 @@ public class CookingPotRecipeManager {
     }
 
     public CookingPotRecipe getRecipe(String id) {
-        Snapshot view = snapshot;
+        Snapshot view = currentSnapshot();
         return view.recipes().get(id);
     }
 
     public CookingPotRecipe getRecipe(String customRecipeGroupId, String id) {
-        Snapshot view = snapshot;
+        Snapshot view = currentSnapshot();
         String normalizedGroupId = normalizeRecipeGroupId(customRecipeGroupId);
         if (normalizedGroupId == null) {
             return view.recipes().get(id);
@@ -1116,12 +1277,10 @@ public class CookingPotRecipeManager {
         try {
             plugin.scheduler().runLater(() -> {
                 externalRepublishScheduled.set(false);
-                loadRecipes(lastFileDocument, true);
-                // This republish runs after the CraftEngine readiness pass already printed the summary, so
-                // without re-reporting the cooking pot count on the console stays one batch behind whatever
-                // addons registered. The summary dedupes on its counts digest, making this a no-op when the
-                // batch did not move a count.
-                plugin.requestContentSummary();
+                plugin.reloadEditedRecipeFilesAsync().whenComplete((ignored, failure) -> {
+                    if (failure != null && plugin.isEnabled()) plugin.getLogger().log(java.util.logging.Level.WARNING,
+                            "External recipe catalog publication failed; previous recipes remain active", failure);
+                });
             }, 1L);
         } catch (RuntimeException stoppedScheduler) {
             externalRepublishScheduled.set(false);
@@ -1130,7 +1289,7 @@ public class CookingPotRecipeManager {
     }
     
     public void clearCache() {
-        Snapshot view = snapshot;
+        Snapshot view = currentSnapshot();
         synchronized (view.recipeCache()) {
             view.recipeCache().clear();
             view.recipeMisses().clear();

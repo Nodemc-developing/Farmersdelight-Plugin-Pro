@@ -769,7 +769,7 @@ public final class ItemUtils {
 
         // A custom item may use a vanilla material as its render/base type, but that does not make
         // it a member of the material's vanilla tags. Custom tags are checked by getItemTagIds().
-        if (getCustomItemId(item) != null || MMOItemsCompat.getItemId(item) != null) {
+        if (getCustomItemId(item) != null || MMOItemsCompat.getNonCraftEngineItemId(item) != null) {
             return false;
         }
 
@@ -813,7 +813,7 @@ public final class ItemUtils {
             // base vanilla material, so they cannot match the base material's vanilla id.
             return customId.equalsIgnoreCase(normalized);
         }
-        String mmoId = MMOItemsCompat.getItemId(item);
+        String mmoId = MMOItemsCompat.getNonCraftEngineItemId(item);
         if (mmoId != null) {
             // MMOItems items carry their identity in custom_data; only their mmoitems id matches,
             // so a vanilla id cannot be satisfied by an MMOItems item of the same base material.
@@ -832,7 +832,7 @@ public final class ItemUtils {
             return Set.of();
         }
         String customId = getCustomItemId(item);
-        String mmoId = customId == null ? MMOItemsCompat.getItemId(item) : null;
+        String mmoId = customId == null ? MMOItemsCompat.getNonCraftEngineItemId(item) : null;
         String vanillaId = getVanillaMaterialItemId(item);
         if (customId == null && mmoId == null) {
             return vanillaId == null ? Set.of() : Set.of(vanillaId);
@@ -854,23 +854,20 @@ public final class ItemUtils {
         if (item == null || item.getType().isAir()) {
             return Set.of();
         }
-        LinkedHashSet<String> tags = new LinkedHashSet<>();
-        // CE-declared tags (self-identifying, e.g. a knife declaring farmersdelight:tools/knives).
+        return getItemTagIds(item, resolveItemId(item));
+    }
+
+    /** Reuses an identity already read from this stack in the same owner operation. */
+    public static Set<String> getItemTagIds(ItemStack item, String identity) {
+        if (item == null || item.getType().isAir() || identity == null) return Set.of();
+        Set<String> registered = CommonTagResolver.getTagsForItemId(identity);
+        // A loaded definition with the same ID is insufficient: the real stack must carry its CE marker.
         String customId = getCustomItemId(item);
-        if (customId != null) {
-            tags.addAll(customItemTagIds(Key.of(customId)));
-        }
-        // Registered tags (c:... conventions plus any addon-registered tags) are resolved against
-        // the item's authoritative identity. Do not include the base material for custom items: a CE
-        // custom apple rendered as cooked beef must not inherit cooked-beef recipe tags.
-        String identity = customId;
-        if (identity == null) {
-            identity = MMOItemsCompat.getItemId(item);
-        }
-        if (identity == null) {
-            identity = getVanillaMaterialItemId(item);
-        }
-        tags.addAll(CommonTagResolver.getTagsForItemId(identity));
+        Set<String> declared = customId == null ? Set.of() : customItemTagIds(Key.of(customId));
+        if (declared.isEmpty()) return registered;
+        if (registered.isEmpty()) return declared;
+        LinkedHashSet<String> tags = new LinkedHashSet<>(declared);
+        tags.addAll(registered);
         return Set.copyOf(tags);
     }
 
@@ -984,7 +981,7 @@ public final class ItemUtils {
         }
         // MMOItems items have no CraftEngine id; resolve their identity so station matching and
         // display keys can use the same mmoitems:<TYPE>:<ID> id the recipes are written with.
-        String mmoId = MMOItemsCompat.getItemId(item);
+        String mmoId = MMOItemsCompat.getNonCraftEngineItemId(item);
         if (mmoId != null) {
             return mmoId;
         }

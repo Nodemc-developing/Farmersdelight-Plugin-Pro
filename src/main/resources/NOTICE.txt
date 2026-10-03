@@ -43,5 +43,9 @@ Plugin licence
 --------------------------------------------------------------------------------
 
 The plugin's own code is released under the GNU Affero General Public License v3.0 only.
-The full text is in the LICENSE file at the root of the source repository:
+The full text is included at META-INF/licenses/Farmersdelight-Plugin-Pro-AGPL-3.0.txt.
+Original plugin authorship and source: HuiDu_OwO
 https://github.com/IOVEYOUMC0/Farmersdelight
+Modified plugin authorship and corresponding source: HuiDu_OwO, ydxc2009
+https://github.com/Nodemc-developing/Farmersdelight-Plugin-Pro
+The matching source archive and artifact manifest accompany local review builds.

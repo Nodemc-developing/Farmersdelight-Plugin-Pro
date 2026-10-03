@@ -48,15 +48,19 @@ public final class BehaviorRegistrar {
     }
 
     public static void registerBlockBehaviors() {
+        registerBlockBehaviors(null);
+    }
+
+    public static void registerBlockBehaviors(com.huidu.farmersdelight.FarmersDelightPlugin plugin) {
         registerBehavior(Constants.BEHAVIOR_CONNECTED_RUG, ConnectedRugBlockBehavior.FACTORY);
-        registerBehavior(Constants.BEHAVIOR_DOUBLE_BLOCK, DoubleBlockRugBlockBehavior.FACTORY);
+        registerBehavior(Constants.BEHAVIOR_DOUBLE_BLOCK, DoubleBlockRugBlockBehavior.factory(plugin));
         registerBehavior(Constants.BEHAVIOR_BASKET, BasketBlockBehavior.FACTORY);
         registerBehavior(Constants.BEHAVIOR_COOKING_POT, CookingPotBlockBehavior.FACTORY);
         registerBehavior(Constants.BEHAVIOR_CUTTING_BOARD, CuttingBoardBlockBehavior.FACTORY);
         registerBehavior(Constants.BEHAVIOR_SKILLET, SkilletBlockBehavior.FACTORY);
         registerBehavior(Constants.BEHAVIOR_STOVE, StoveCookingBlockBehavior.FACTORY);
         registerBehavior(Constants.BEHAVIOR_TALL_CROP, TallCropBlockBehavior.FACTORY);
-        registerBehavior(Constants.BEHAVIOR_TATAMI, TatamiPairingBehavior.FACTORY);
+        registerBehavior(Constants.BEHAVIOR_TATAMI, TatamiPairingBehavior.factory(plugin));
         registerBehavior(Constants.BEHAVIOR_WILD_RICE, WildRiceBlockBehavior.FACTORY);
         registerBehavior(Constants.BEHAVIOR_ROPE, RopeBlockBehavior.FACTORY);
         registerBehavior(Constants.BEHAVIOR_MUSHROOM_COLONY, MushroomColonyBehavior.FACTORY);
@@ -64,7 +68,7 @@ public final class BehaviorRegistrar {
         registerBehavior(Constants.BEHAVIOR_TOMATO_VINE, TomatoVineBlockBehavior.FACTORY);
         registerBehavior(Constants.BEHAVIOR_ORGANIC_COMPOST, OrganicCompostBlockBehavior.FACTORY);
         registerBehavior(Constants.BEHAVIOR_RICH_SOIL, RichSoilBlockBehavior.FACTORY);
-        registerBehavior(Constants.BEHAVIOR_RICH_SOIL_FARMLAND, RichSoilFarmlandBlockBehavior.FACTORY);
+        registerBehavior(Constants.BEHAVIOR_RICH_SOIL_FARMLAND, RichSoilFarmlandBlockBehavior.factory(plugin));
 
         // Census line, not news on a healthy boot: routed through the startup detail channel so it is
         // recorded at FINE normally and raised to INFO only for an operator debugging the load phase.
@@ -77,10 +81,14 @@ public final class BehaviorRegistrar {
     }
 
     public static void registerFunctions() {
+        registerFunctions(null);
+    }
+
+    public static void registerFunctions(com.huidu.farmersdelight.FarmersDelightPlugin plugin) {
         registerFunction("farmersdelight:comfort",
-                FoodBuffFunction.factory(FoodBuffFunction.Kind.COMFORT, CommonConditions::fromConfig));
+                FoodBuffFunction.factory(plugin, FoodBuffFunction.Kind.COMFORT, CommonConditions::fromConfig));
         registerFunction("farmersdelight:nourishment",
-                FoodBuffFunction.factory(FoodBuffFunction.Kind.NOURISHMENT, CommonConditions::fromConfig));
+                FoodBuffFunction.factory(plugin, FoodBuffFunction.Kind.NOURISHMENT, CommonConditions::fromConfig));
     }
 
     // Conditions and loot functions the bundled drop packs use, so a rule that needs plugin knowledge (what

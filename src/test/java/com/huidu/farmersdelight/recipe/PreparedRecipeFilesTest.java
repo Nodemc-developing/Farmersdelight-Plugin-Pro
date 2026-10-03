@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -57,6 +58,64 @@ class PreparedRecipeFilesTest {
             assertEquals("outer", PreparedRecipeFiles.currentDocument(path).getString("value"));
         });
         assertNull(PreparedRecipeFiles.currentDocument(path));
+    }
+
+    @Test void commandAcknowledgementFollowsTheCompletePreparedCatalogWithoutReadingTheFileAgain() throws Exception {
+        Path file = directory.resolve("prepared.yml").toAbsolutePath().normalize();
+        Files.writeString(file, "value: captured\n");
+        var prepared = batch(Map.of(file, PlainYamlDocuments.read(file)), Map.of());
+        Object recipes = new Object(), index = new Object(), notification = new Object();
+        RuntimeSnapshotPublication.publish(recipes, "old", "old");
+        RuntimeSnapshotPublication.publish(index, "old", "old");
+        CompletableFuture<Void> result = new CompletableFuture<>();
+        AtomicBoolean notified = new AtomicBoolean();
+        var observed = result.thenRun(() -> {
+            assertFalse(RuntimeSnapshotPublication.isStaging());
+            assertEquals("captured", RuntimeSnapshotPublication.get(recipes, "missing"));
+            assertEquals("captured", RuntimeSnapshotPublication.get(index, "missing"));
+            assertTrue(notified.get(), "Post-commit observers must complete before the command succeeds");
+        });
+        try {
+            prepared.publishWithin(() -> {
+                assertTrue(PreparedRecipeFiles.isPublishing());
+                assertFalse(result.isDone());
+                try { Files.delete(file); } catch (IOException failure) { throw new IllegalStateException(failure); }
+                String captured = PreparedRecipeFiles.currentDocument(file).getString("value");
+                RuntimeSnapshotPublication.publish(recipes, "old", captured);
+                RuntimeSnapshotPublication.afterCommit(notification, () -> notified.set(true));
+                assertFalse(notified.get());
+                RuntimeSnapshotPublication.publish(index, "old", PreparedRecipeFiles.currentDocument(file).getString("value"));
+            }, result);
+            result.join();
+            observed.join();
+            assertTrue(notified.get());
+            assertFalse(PreparedRecipeFiles.isPublishing());
+        } finally { RuntimeSnapshotPublication.remove(recipes); RuntimeSnapshotPublication.remove(index); }
+    }
+
+    @Test void failedPreparedCommandDoesNotAcknowledgeSuccessOrPublishItsPartialCatalog() throws Exception {
+        Path file = directory.resolve("prepared.yml").toAbsolutePath().normalize();
+        var prepared = batch(Map.of(file, PlainYamlDocuments.parse("value: candidate\n")), Map.of());
+        Object recipes = new Object(), index = new Object(), notification = new Object();
+        RuntimeSnapshotPublication.publish(recipes, "old", "old");
+        RuntimeSnapshotPublication.publish(index, "old", "old");
+        CompletableFuture<Void> result = new CompletableFuture<>();
+        AtomicBoolean succeeded = new AtomicBoolean(), notified = new AtomicBoolean();
+        result.thenRun(() -> succeeded.set(true));
+        IllegalStateException failure = new IllegalStateException("Index decoding rejected");
+        try {
+            assertSame(failure, assertThrows(IllegalStateException.class, () -> prepared.publishWithin(() -> {
+                RuntimeSnapshotPublication.publish(recipes, "old", "candidate");
+                RuntimeSnapshotPublication.afterCommit(notification, () -> notified.set(true));
+                throw failure;
+            }, result)));
+            assertTrue(result.isCompletedExceptionally());
+            assertSame(failure, assertThrows(java.util.concurrent.CompletionException.class, result::join).getCause());
+            assertFalse(succeeded.get()); assertFalse(notified.get());
+            assertEquals("old", RuntimeSnapshotPublication.get(recipes, "missing"));
+            assertEquals("old", RuntimeSnapshotPublication.get(index, "missing"));
+            assertFalse(PreparedRecipeFiles.isPublishing());
+        } finally { RuntimeSnapshotPublication.remove(recipes); RuntimeSnapshotPublication.remove(index); }
     }
 
     @Test void invalidLegacyValuesAbortTheWholeBatchBeforeAnyManagerPublishes() throws Exception {

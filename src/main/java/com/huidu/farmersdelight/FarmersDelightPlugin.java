@@ -147,6 +147,14 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
     private volatile PackSections packSections;
 
     private SchedulerAdapter scheduler;
+    private com.huidu.farmersdelight.pack.compat.ExternalContentCoordinator externalContentCoordinator;
+    private com.huidu.farmersdelight.statistics.StatisticsService statistics;
+    private com.huidu.farmersdelight.effect.NourishmentFoodListener nourishmentFoodListener;
+    private com.huidu.farmersdelight.manager.SkewerCookingService skewerCookingService;
+    private com.huidu.farmersdelight.villager.VillagerAutomationService villagerAutomationService;
+    public com.huidu.farmersdelight.manager.SkewerCookingService getSkewerCookingService() { return skewerCookingService; }
+
+    public com.huidu.farmersdelight.statistics.StatisticsService statistics() { return statistics; }
     private ReadOnlyRecipeWindows recipeWindows;
     private volatile FileConfiguration preparedMainConfig;
     private PreparedYamlFiles activePreparedReload;
@@ -224,9 +232,37 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
         return getFile();
     }
 
-    void loadRecipeManagers(String logKey) { loadRecipeManagers(logKey, false); }
+    void loadRecipeManagers(String logKey) {
+        if (com.huidu.farmersdelight.recipe.PreparedRecipeFiles.isPublishing()) {
+            publishEditedRecipes();
+            return;
+        }
+        requestRecipeManagerReload().whenComplete((ignored, failure) -> {
+            if (failure != null && isEnabled()) getLogger().log(Level.WARNING, "Recipe loading failed; previous runtime remains active", failure);
+        });
+    }
+
+    CompletableFuture<Void> requestRecipeManagerReload() {
+        CompletableFuture<Void> committed = recipeReloadCoordinator.request();
+        committed.thenRun(() -> {
+            try {
+                if (isEnabled() && villagerAutomationService != null) {
+                    villagerAutomationService.start();
+                    villagerAutomationService.reload();
+                }
+            } catch (RuntimeException | LinkageError failure) {
+                getLogger().log(Level.WARNING, "Recipe catalog committed; villager refresh failed", failure);
+            }
+        });
+        return committed;
+    }
 
     private void loadRecipeManagers(String logKey, boolean incremental) {
+        com.huidu.farmersdelight.recipe.RecipePublicationTransaction.run(
+                () -> loadRecipeManagersWithinPublication(logKey, incremental));
+    }
+
+    private void loadRecipeManagersWithinPublication(String logKey, boolean incremental) {
         I18n.logDetail("recipe", logKey);
         // Prepared command/edit batches provide plain documents; item conversion and publication stay here.
         long start = System.nanoTime();
@@ -239,7 +275,8 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
         long boardNanos = System.nanoTime() - boardStart;
         if (fluidRecipeManager != null) {
             fluidRecipeManager.reload();
-            if (fluidRecipeListener != null) fluidRecipeListener.cancelPending();
+            if (fluidRecipeListener != null) com.huidu.farmersdelight.recipe.RuntimeSnapshotPublication.afterCommit(
+                    fluidRecipeListener, fluidRecipeListener::cancelPending);
         }
         // Recipe set changed: drop the discovery obtain-trigger index so it rebuilds against the new recipes.
         if (recipeDiscoveryManager != null) {
@@ -348,8 +385,11 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
         }
     }
 
+    private boolean loadInitialized;
+
     @Override
     public void onLoad() {
+        com.huidu.farmersdelight.util.compat.CraftEngineBaseline.verify(this);
         try {
             java.nio.file.Path dataFolder = getDataFolder().toPath();
             if (com.huidu.farmersdelight.config.LegacyPluginDataMigration.migrate(
@@ -371,7 +411,11 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
         } catch (Exception failure) {
             throw new IllegalStateException("Could not migrate recipes to the CraftEngine content pack", failure);
         }
+        com.huidu.farmersdelight.villager.VillagerFoodSetting.register();
         packSections = loadPhaseRegistrar.register();
+        CommonTagResolver.prepareHostReloadAsync(this).join();
+        externalContentCoordinator = com.huidu.farmersdelight.pack.compat.ExternalContentCoordinator.install(this);
+        loadInitialized = true;
     }
 
     private static final String RELOAD_GUARD_PROPERTY = "farmersdelight.enabled.in.this.jvm";
@@ -387,6 +431,7 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
+        if (!loadInitialized) throw new IllegalStateException("Load-phase initialization did not complete; enabling was refused");
         if (System.getProperty(RELOAD_GUARD_PROPERTY) != null) {
             I18n.logSevere("plugin.no_hot_reload", "name", "Farmersdelight-Plugin-Pro");
             getServer().getPluginManager().disablePlugin(this);
@@ -423,6 +468,14 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
         ProtectionCompat.init(this);
 
         loadConfigs();
+        statistics = new com.huidu.farmersdelight.statistics.StatisticsService(
+                getDataFolder().toPath().resolve("statistics.sqlite"), getConfigBoolean(true, "stats.enabled"),
+                getConfigInt(30, "stats.flush-interval-seconds"), getLogger());
+        statistics.cachePlayerLimit(getConfigInt(2048, "stats.cache-player-limit"));
+        getServer().getPluginManager().registerEvents(
+                new com.huidu.farmersdelight.statistics.StatisticsListener(this, statistics), this);
+        nourishmentFoodListener = new com.huidu.farmersdelight.effect.NourishmentFoodListener(this);
+        getServer().getPluginManager().registerEvents(nourishmentFoodListener, this);
         ToolRegistry.refresh();
         logStartupSummary();
 
@@ -477,6 +530,11 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
 
         stoveManager = new StoveManager(this);
         skilletManager = new SkilletManager(this);
+        skewerCookingService = new com.huidu.farmersdelight.manager.SkewerCookingService(this);
+        villagerAutomationService = new com.huidu.farmersdelight.villager.VillagerAutomationService(this);
+        getServer().getPluginManager().registerEvents(skewerCookingService, this);
+        getServer().getPluginManager().registerEvents(
+                new com.huidu.farmersdelight.manager.HandheldSkilletFlipListener(skilletManager::markHandheldJump), this);
         trayManager = new TrayManager(this);
         handleManager = new HandleManager(this);
         buffBossbarManager = new BuffBossbarManager(this);
@@ -553,7 +611,14 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
         // instead of hanging the server. Structural teardown (listeners, tasks, caches) is NOT budgeted:
         // it is in-memory, cheap, and skipping it would leave dangling state behind.
         disableBudget = ShutdownBudget.ofMillis(
-                getConfigInt(DEFAULT_SHUTDOWN_WAIT_MILLIS, "performance.shutdown-wait-millis"), getLogger());
+                getConfigInt(DEFAULT_SHUTDOWN_WAIT_MILLIS, "performance.shutdown-wait-millis", "stats.shutdown-wait-millis"), getLogger());
+        if (externalContentCoordinator != null) externalContentCoordinator.close();
+        loadPhaseRegistrar.close();
+        if (nourishmentFoodListener != null) nourishmentFoodListener.close();
+        if (skewerCookingService != null) skewerCookingService.close();
+        if (villagerAutomationService != null) villagerAutomationService.close();
+        com.huidu.farmersdelight.block.behavior.ManagedCropBlockBehavior.clear();
+        if (statistics != null) statistics.shutdown(disableBudget);
 
         // Order inside ListenerRegistry#stop: event delivery is detached before any listener state is torn
         // down, then the listeners' own tasks stop, then the world/chunk handlers detach.
@@ -693,6 +758,9 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
             advancementManager.dispose();
         }
         advancementManager = null;
+
+        CommonTagResolver.clear();
+        com.huidu.farmersdelight.recipe.RuntimeSnapshotPublication.clear();
 
         I18n.logInfo("plugin.disabled");
         I18n.cleanup();
@@ -898,9 +966,7 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
         ReloadCacheInvalidator.clear();
         if (specialRecipeRegistry != null) {
             specialRecipeRegistry.invalidateIndex();
-            // Re-apply the special-recipe sources: a CraftEngine pack reload may have changed the cards it
-            // declares, and this is the only pass that sees the fresh pack sections.
-            SpecialRecipeLoader.load(this, specialRecipeRegistry);
+            // Special definitions are published with all recipe managers from the prepared batch.
         }
 
         // Pet food is declared as a CraftEngine item setting, so the scan in loadConfigs() only sees anything
@@ -1020,6 +1086,9 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
                             prepared.validateCurrent();
                         }
                         if (recipes != null) recipes.validateCurrent();
+                        if (recipes != null && (craftEngineReadinessCoordinator == null || !craftEngineReadinessCoordinator.isReady())) {
+                            throw new IllegalStateException("CraftEngine content is not ready for recipe publication");
+                        }
                         activePreparedReload = prepared;
                         Runnable publication = () -> { switch (target) {
                             case ALL -> reloadAll();
@@ -1033,7 +1102,7 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
                             case DAMAGE -> reloadDamageTypeDatapack();
                             case TAGS -> reloadTags();
                         } };
-                        if (recipes == null) publication.run(); else recipes.publishWithin(publication);
+                        if (recipes == null) publication.run(); else recipes.publishWithin(publication, result);
                         if (!target.isAll() && target != ReloadTarget.RECIPES) {
                             notifyAddonsOfReload(target.eventReason());
                         }
@@ -1166,15 +1235,10 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
         reloadCommon(true);
         RecipeFileLoader.resetReportedIssues();
         reloadRecipesWhenReady("plugin.reloading_recipes");
-        // The per-type recipe line is on the recipe detail channel, so the reloaded counts would otherwise
-        // never reach the operator who just edited a recipe file. The summary dedupes on its counts digest,
-        // so a reload that changed nothing stays silent.
-        reportContentSummaryWhenReady();
-
-        // Addons rebuild their own content off this event, synchronously. It runs on the next tick so their work
-        // does not stack onto this command's tick; see notifyAddonsOfReload for why that is safe.
-        notifyAddonsOfReload("reloadAll");
-        I18n.logInfo("plugin.configuration_reloaded");
+        com.huidu.farmersdelight.recipe.RuntimeSnapshotPublication.afterCommit(ReloadTarget.ALL, () -> {
+            notifyAddonsOfReload("reloadAll");
+            I18n.logInfo("plugin.configuration_reloaded");
+        });
     }
 
     public void reloadMainConfigOnly() {
@@ -1320,29 +1384,42 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
 
     public long configurationGeneration() { return configurationGeneration.get(); }
 
+    void invalidateRecipePreparationForCraftEngineReload() { configurationGeneration.incrementAndGet(); }
+
     public CompletableFuture<Void> reloadEditedRecipeFilesAsync() { return recipeReloadCoordinator.request(); }
 
     public void publishEditedRecipes() {
-        RecipeFileLoader.resetReportedIssues();
-        if (specialRecipeRegistry != null) SpecialRecipeLoader.load(this, specialRecipeRegistry);
-        if (craftEngineReadinessCoordinator != null && craftEngineReadinessCoordinator.isReady()) {
-            loadRecipeManagers("plugin.reloading_recipes", true);
-            FarmersDelightApi.get().refreshRecipeIndex();
-            reportContentSummaryWhenReady();
-        }
-        fireReloadEvent("reloadRecipes");
-        I18n.logInfo("plugin.recipe_files_reloaded");
+        Runnable noOp = () -> { };
+        com.huidu.farmersdelight.recipe.RecipePublicationTransaction.run(() -> {
+            RecipeFileLoader.resetReportedIssues();
+            if (specialRecipeRegistry != null) SpecialRecipeLoader.load(this, specialRecipeRegistry);
+            if (craftEngineReadinessCoordinator != null && craftEngineReadinessCoordinator.isReady()) {
+                loadRecipeManagers("plugin.reloading_recipes", true);
+                FarmersDelightApi.get().refreshRecipeIndex();
+            }
+        }, FarmersDelightApi.get().captureRecipeIndexRollback(), SpecialRecipeLoader.captureReloadRollback(),
+                specialRecipeRegistry == null ? noOp : specialRecipeRegistry.captureReloadRollback(),
+                fluidRecipeManager == null ? noOp : fluidRecipeManager.captureReloadRollback(),
+                cuttingBoardRecipeManager == null ? noOp : cuttingBoardRecipeManager.captureReloadRollback(),
+                cookingPotRecipeManager == null ? noOp : cookingPotRecipeManager.captureReloadRollback(),
+                com.huidu.farmersdelight.recipe.FoodGroupStore.captureReloadRollback());
+        com.huidu.farmersdelight.recipe.RuntimeSnapshotPublication.afterCommit(
+                com.huidu.farmersdelight.recipe.RecipeReloadCoordinator.class, () -> {
+                    listeners.refreshTagDatapack();
+                    reportContentSummaryWhenReady();
+                    fireReloadEvent("reloadRecipes");
+                    I18n.logInfo("plugin.recipe_files_reloaded");
+                });
     }
 
     public void reloadRecipeFiles() {
+        if (com.huidu.farmersdelight.recipe.PreparedRecipeFiles.isPublishing()) {
+            publishEditedRecipes();
+            return;
+        }
         refreshAfterCraftEngineReload();
         RecipeFileLoader.resetReportedIssues();
         reloadRecipesWhenReady("plugin.reloading_recipes");
-        // Same reason as reloadAll: the reloaded per-type counts are the only evidence the edited files
-        // actually parsed, and the summary suppresses itself when they are unchanged.
-        reportContentSummaryWhenReady();
-        fireReloadEvent("reloadRecipes");
-        I18n.logInfo("plugin.recipe_files_reloaded");
     }
 
     public void reloadAdvancements() {
@@ -1352,6 +1429,14 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
 
     public void reloadTags() {
         CommonTagResolver.reload(this);
+        if (particleDispatcher != null) particleDispatcher.reloadConfig();
+        if (skewerCookingService != null) skewerCookingService.reload();
+        if (villagerAutomationService != null) villagerAutomationService.reload();
+        if (statistics != null) {
+            statistics.cachePlayerLimit(getConfigInt(2048, "stats.cache-player-limit"));
+            statistics.configure(getConfigBoolean(true, "stats.enabled"), getConfigInt(30, "stats.flush-interval-seconds"));
+        }
+        com.huidu.farmersdelight.effect.NourishmentFoodListener.configurationChanged();
         refreshTagDependentRecipes();
         // Refresh the exported vanilla-member tag data pack; Bukkit/Paper reloads it automatically.
         listeners.refreshTagDatapack();
@@ -1493,6 +1578,14 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
         WorldDataConfig.reload(this, worldDataConfig);
         // Load the c: common-tag mapping before recipes load; it feeds recipe tag matching/indexing.
         CommonTagResolver.reload(this);
+        if (particleDispatcher != null) particleDispatcher.reloadConfig();
+        if (skewerCookingService != null) skewerCookingService.reload();
+        if (villagerAutomationService != null) villagerAutomationService.reload();
+        if (statistics != null) {
+            statistics.cachePlayerLimit(getConfigInt(2048, "stats.cache-player-limit"));
+            statistics.configure(getConfigBoolean(true, "stats.enabled"), getConfigInt(30, "stats.flush-interval-seconds"));
+        }
+        com.huidu.farmersdelight.effect.NourishmentFoodListener.configurationChanged();
     }
 
     public ConfigurationSection getFirstConfigSection(String... paths) {

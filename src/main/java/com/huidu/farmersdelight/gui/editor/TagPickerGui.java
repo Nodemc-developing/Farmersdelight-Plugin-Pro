@@ -1,5 +1,7 @@
 package com.huidu.farmersdelight.gui.editor;
 
+import com.huidu.farmersdelight.gui.GuiTextStyle;
+
 import com.huidu.farmersdelight.FarmersDelightPlugin;
 import com.huidu.farmersdelight.gui.AbstractInventoryGui;
 import com.huidu.farmersdelight.gui.GuiConfig;
@@ -448,7 +450,7 @@ public final class TagPickerGui extends AbstractInventoryGui implements EditorGu
     private static void lore(ItemStack stack, String line) {
         ItemMeta meta = stack.getItemMeta();
         if (meta != null) {
-            meta.lore(List.of(Text.lore(line)));
+            meta.lore(List.of(GuiTextStyle.lore(line)));
             stack.setItemMeta(meta);
         }
     }
@@ -456,7 +458,7 @@ public final class TagPickerGui extends AbstractInventoryGui implements EditorGu
     private static void lore(ItemStack stack, List<String> lines) {
         ItemMeta meta = stack.getItemMeta();
         if (meta != null) {
-            meta.lore(Text.loreLines(lines));
+            meta.lore(lines.stream().map(GuiTextStyle::lore).toList());
             stack.setItemMeta(meta);
         }
     }
@@ -464,7 +466,7 @@ public final class TagPickerGui extends AbstractInventoryGui implements EditorGu
     private static void named(ItemStack stack, String name) {
         ItemMeta meta = stack.getItemMeta();
         if (meta != null) {
-            meta.displayName(Text.name(name));
+            meta.displayName(GuiTextStyle.name(name));
             stack.setItemMeta(meta);
         }
     }

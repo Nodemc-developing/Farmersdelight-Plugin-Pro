@@ -16,7 +16,12 @@ import java.util.Objects;
 /** Immutable recipe data. Fluid amounts use mB; delay is applied by the owning entity scheduler. */
 public record FluidRecipeSpec(String id, String type, RecipeIngredient ingredient, Map<String, Object> result,
                               String fluidId, boolean fluidTag, long amount, long timeTicks,
-                              boolean consumeFluid, int priority) {
+                              boolean consumeFluid, int priority, Object fluidExpression) {
+    public FluidRecipeSpec(String id, String type, RecipeIngredient ingredient, Map<String, Object> result,
+                           String fluidId, boolean fluidTag, long amount, long timeTicks, boolean consumeFluid, int priority) {
+        this(id, type, ingredient, result, fluidId, fluidTag, amount, timeTicks, consumeFluid, priority,
+                (fluidTag ? "#" : "") + fluidId);
+    }
     public FluidRecipeSpec {
         id = Objects.requireNonNull(id, "recipe id");
         type = Objects.requireNonNull(type, "recipe type").trim().toLowerCase(Locale.ROOT);
@@ -26,7 +31,9 @@ public record FluidRecipeSpec(String id, String type, RecipeIngredient ingredien
         Objects.requireNonNull(ingredient, "ingredient");
         result = immutableMap(result == null ? Map.of() : result);
         fluidId = canonicalId(fluidId);
+        fluidExpression = FluidExpression.capture(fluidExpression);
         if (amount <= 0) throw new IllegalArgumentException("Fluid recipe amount must be positive mB");
+        FluidExpression.requireAmount(fluidExpression, amount);
         if (timeTicks < 0) throw new IllegalArgumentException("Fluid recipe time cannot be negative ticks");
         if (type.equals("soaking") && result.isEmpty()) {
             throw new IllegalArgumentException("Soaking recipe requires result");
@@ -54,31 +61,46 @@ public record FluidRecipeSpec(String id, String type, RecipeIngredient ingredien
         Object output = body.containsKey(outputKey) ? body.get(outputKey) : body.get("result");
         Object fluidValue = body.get("fluid");
         long amount = exactLong(body.get("amount"), 1000, "amount");
-        boolean tag;
-        String fluid;
-        if (fluidValue instanceof ConfigurationSection section) fluidValue = section.getValues(false);
-        if (fluidValue instanceof Map<?, ?> raw) {
-            if (raw.containsKey("tag") && (raw.containsKey("id") || raw.containsKey("fluid"))) {
-                throw new IllegalArgumentException("Fluid must declare either id or tag");
-            }
-            tag = raw.containsKey("tag");
-            Object identity = tag ? raw.get("tag") : raw.getOrDefault("id", null);
-            if (identity == null) identity = raw.get("fluid");
-            fluid = Objects.toString(identity, "");
-            if (raw.containsKey("amount")) amount = exactLong(raw.get("amount"), amount, "fluid.amount");
-        } else {
-            fluid = Objects.toString(fluidValue, "").trim();
-            tag = fluid.startsWith("#");
-        }
+        fluidValue = FluidExpression.capture(fluidValue);
+        amount = FluidExpression.amount(fluidValue, amount);
+        String fluid = FluidExpression.primary(fluidValue);
+        boolean tag = fluid.startsWith("#");
         if (fluid.startsWith("#")) { tag = true; fluid = fluid.substring(1); }
         boolean consume = bool(body.get("consume_fluid"), true, "consume_fluid");
         // Filling/emptying must conserve fluid even when an unrelated option is present.
         if (!type.equals("soaking") && !consume) {
             throw new IllegalArgumentException("consume_fluid: false is only valid for soaking");
         }
-        return new FluidRecipeSpec(id, type, RecipeParsingSupport.parseIngredientValue(input), resultMap(output),
-                fluid, tag, amount, exactLong(body.get("time"), type.equals("soaking") ? 200 : 0, "time"),
-                consume, Math.toIntExact(exactLong(body.get("priority"), 0, "priority")));
+        return new FluidRecipeSpec(id, type, RecipeParsingSupport.parseIngredientValue(input(input, 0)), resultMap(output),
+                fluid, tag, amount, exactLong(body.get("time"), 0, "time"),
+                consume, Math.toIntExact(exactLong(body.get("priority"), 0, "priority")), fluidValue);
+    }
+    private static Object input(Object raw, int depth) {
+        if (depth > 32) throw new IllegalArgumentException("Input ingredient is nested too deeply");
+        if (raw instanceof ConfigurationSection section) raw = section.getValues(false);
+        if (!(raw instanceof Map<?, ?> source)) return raw;
+        Map<String, Object> map = new LinkedHashMap<>();
+        for (var entry : source.entrySet()) {
+            String key = String.valueOf(entry.getKey());
+            if (key.startsWith("x-") || key.equals("extensions")) continue;
+            if (!List.of("id", "item", "nbt", "items", "choice", "count").contains(key))
+                throw new IllegalArgumentException("Unsupported input matching field: " + key);
+            map.put(key, entry.getValue());
+        }
+        if (map.containsKey("count") && exactLong(map.remove("count"), 1, "input.count") != 1)
+            throw new IllegalArgumentException("Fluid recipes process one input item; input.count must be one");
+        if (map.containsKey("id")) {
+            if (map.containsKey("item")) throw new IllegalArgumentException("Input requires id or item, not both");
+            map.put("item", map.remove("id"));
+        }
+        if (map.containsKey("items") && map.containsKey("choice")) throw new IllegalArgumentException("Input requires items or choice, not both");
+        String choices = map.containsKey("items") ? "items" : "choice";
+        if (map.containsKey(choices)) {
+            if (map.containsKey("item") || map.containsKey("nbt")) throw new IllegalArgumentException("Input choice cannot also specify an item or NBT");
+            if (!(map.get(choices) instanceof List<?> values) || values.isEmpty() || values.size() > 256) throw new IllegalArgumentException("Input choices require 1..256 entries");
+            map.put(choices, values.stream().map(value -> input(value, depth + 1)).toList());
+        }
+        return map;
     }
 
     private static Map<String, Object> resultMap(Object raw) {

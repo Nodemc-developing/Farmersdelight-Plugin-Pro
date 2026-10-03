@@ -1,0 +1,1499 @@
+items:
+  farmersdelight:fluid_tank_visual/empty:
+    material: minecraft:paper
+    model:
+      type: minecraft:model
+      path: farmersdelight:block/glass_jug_tinted
+      tints:
+      - type: minecraft:custom_model_data
+        index: 0
+        default: 16777215
+  farmersdelight:fluid_tank_visual/waterlogged/empty:
+    material: minecraft:paper
+    model:
+      type: minecraft:model
+      path: farmersdelight:block/glass_jug_tinted
+      tints:
+      - type: minecraft:custom_model_data
+        index: 0
+        default: 16777215
+  farmersdelight:fluid_tank_visual/level_01:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_01
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/waterlogged/level_01:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_01
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/level_02:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_02
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/waterlogged/level_02:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_02
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/level_03:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_03
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/waterlogged/level_03:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_03
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/level_04:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_04
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/waterlogged/level_04:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_04
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/level_05:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_05
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/waterlogged/level_05:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_05
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/level_06:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_06
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/waterlogged/level_06:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_06
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/level_07:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_07
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/waterlogged/level_07:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_07
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/level_08:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_08
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/waterlogged/level_08:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_08
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/level_09:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_09
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/waterlogged/level_09:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_09
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/level_10:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_10
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/waterlogged/level_10:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_10
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/level_11:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_11
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/waterlogged/level_11:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_11
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/level_12:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_12
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/waterlogged/level_12:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_12
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/level_13:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_13
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/waterlogged/level_13:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_13
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/level_14:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_14
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/waterlogged/level_14:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_14
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/level_15:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_15
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/waterlogged/level_15:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_15
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/level_16:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_16
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank_visual/waterlogged/level_16:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/glass_jug_tinted
+        tints:
+        - type: minecraft:custom_model_data
+          index: 0
+          default: 16777215
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_16
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_tank:
+    material: minecraft:paper
+    data:
+      item_name: <!i><white>玻璃流体储罐
+      lore:
+      - <!i><gray>容量：16 桶 / 16000 mB
+      - <!i><gray>桶或瓶右键转移；空手打开容器
+      - <!i><gray>输入输出支持漏斗；拆除保留流体；染料右键染色
+      max_stack_size: 1
+    model:
+      type: minecraft:model
+      path: farmersdelight:block/glass_jug_tinted
+      tints:
+      - type: minecraft:custom_model_data
+        index: 0
+        default: 16777215
+    settings:
+      fluidcore:container:
+        capacity: 16000
+    behavior:
+    - type: fluidcore:container
+      item-model: farmersdelight:fluid_tank_visual
+    - type: block_item
+      block:
+        settings:
+          hardness: 2.0
+          resistance: 6.0
+          is_suffocating: false
+          is_redstone_conductor: false
+          sounds:
+            break: minecraft:block.glass.break
+            place: minecraft:block.glass.place
+        behavior:
+          type: fluidcore:tank
+          capacity: 16000
+          transparent: true
+          dyeable: true
+          item-model: farmersdelight:fluid_tank_visual
+          menu:
+            layout: jug
+            theme: plain
+        loot:
+          pools:
+          - rolls: 1
+            entries:
+            - type: item
+              item: farmersdelight:fluid_tank
+              functions:
+              - type: set_count
+                count: 1
+              - type: fluidcore:preserve_tank
+        states:
+          properties:
+            facing:
+              type: horizontal_direction
+              default: north
+            waterlogged:
+              type: boolean
+              default: false
+          appearances:
+            north:
+              transparent: true
+              entity_renderer:
+                type: item_display
+                item: farmersdelight:fluid_tank_visual/empty
+                yaw: 0
+                tint_source:
+                  type: fluidcore:tank
+              state: chorus_plant[down=true,east=false,north=false,south=false,up=false,west=false]
+            north_waterlogged:
+              transparent: true
+              entity_renderer:
+                type: item_display
+                item: farmersdelight:fluid_tank_visual/empty
+                yaw: 0
+                tint_source:
+                  type: fluidcore:tank
+              auto_state: waterlogged_non_tintable_leaves
+              model:
+                path: farmersdelight:block/fluid_tank_invisible
+                y: 0
+            east:
+              transparent: true
+              entity_renderer:
+                type: item_display
+                item: farmersdelight:fluid_tank_visual/empty
+                yaw: 90
+                tint_source:
+                  type: fluidcore:tank
+              state: chorus_plant[down=true,east=false,north=false,south=false,up=false,west=false]
+            east_waterlogged:
+              transparent: true
+              entity_renderer:
+                type: item_display
+                item: farmersdelight:fluid_tank_visual/empty
+                yaw: 90
+                tint_source:
+                  type: fluidcore:tank
+              auto_state: waterlogged_non_tintable_leaves
+              model:
+                path: farmersdelight:block/fluid_tank_invisible
+                y: 90
+            south:
+              transparent: true
+              entity_renderer:
+                type: item_display
+                item: farmersdelight:fluid_tank_visual/empty
+                yaw: 180
+                tint_source:
+                  type: fluidcore:tank
+              state: chorus_plant[down=true,east=false,north=false,south=false,up=false,west=false]
+            south_waterlogged:
+              transparent: true
+              entity_renderer:
+                type: item_display
+                item: farmersdelight:fluid_tank_visual/empty
+                yaw: 180
+                tint_source:
+                  type: fluidcore:tank
+              auto_state: waterlogged_non_tintable_leaves
+              model:
+                path: farmersdelight:block/fluid_tank_invisible
+                y: 180
+            west:
+              transparent: true
+              entity_renderer:
+                type: item_display
+                item: farmersdelight:fluid_tank_visual/empty
+                yaw: 270
+                tint_source:
+                  type: fluidcore:tank
+              state: chorus_plant[down=true,east=false,north=false,south=false,up=false,west=false]
+            west_waterlogged:
+              transparent: true
+              entity_renderer:
+                type: item_display
+                item: farmersdelight:fluid_tank_visual/empty
+                yaw: 270
+                tint_source:
+                  type: fluidcore:tank
+              auto_state: waterlogged_non_tintable_leaves
+              model:
+                path: farmersdelight:block/fluid_tank_invisible
+                y: 270
+          variants:
+            facing=north,waterlogged=false:
+              appearance: north
+            facing=north,waterlogged=true:
+              appearance: north_waterlogged
+            facing=east,waterlogged=false:
+              appearance: east
+            facing=east,waterlogged=true:
+              appearance: east_waterlogged
+            facing=south,waterlogged=false:
+              appearance: south
+            facing=south,waterlogged=true:
+              appearance: south_waterlogged
+            facing=west,waterlogged=false:
+              appearance: west
+            facing=west,waterlogged=true:
+              appearance: west_waterlogged
+  farmersdelight:fluid_jug_visual/empty:
+    material: minecraft:paper
+    model:
+      type: minecraft:model
+      path: farmersdelight:block/jug
+  farmersdelight:fluid_jug_visual/waterlogged/empty:
+    material: minecraft:paper
+    model:
+      type: minecraft:model
+      path: farmersdelight:block/jug
+  farmersdelight:fluid_jug_visual/level_01:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_01
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/waterlogged/level_01:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_01
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/level_02:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_02
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/waterlogged/level_02:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_02
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/level_03:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_03
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/waterlogged/level_03:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_03
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/level_04:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_04
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/waterlogged/level_04:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_04
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/level_05:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_05
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/waterlogged/level_05:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_05
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/level_06:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_06
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/waterlogged/level_06:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_06
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/level_07:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_07
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/waterlogged/level_07:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_07
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/level_08:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_08
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/waterlogged/level_08:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_08
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/level_09:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_09
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/waterlogged/level_09:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_09
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/level_10:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_10
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/waterlogged/level_10:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_10
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/level_11:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_11
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/waterlogged/level_11:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_11
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/level_12:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_12
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/waterlogged/level_12:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_12
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/level_13:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_13
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/waterlogged/level_13:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_13
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/level_14:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_14
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/waterlogged/level_14:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_14
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/level_15:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_15
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/waterlogged/level_15:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_15
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/level_16:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_16
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug_visual/waterlogged/level_16:
+    material: minecraft:paper
+    model:
+      type: minecraft:composite
+      models:
+      - type: minecraft:model
+        path: farmersdelight:block/jug
+      - type: minecraft:model
+        path: farmersdelight:block/jug_fluid/glass_jug_fluid_model_16
+        tints:
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+        - type: minecraft:custom_model_data
+          index: 1
+          default: 16777215
+  farmersdelight:fluid_jug:
+    material: minecraft:paper
+    data:
+      item_name: <!i><white>流体储罐
+      lore:
+      - <!i><gray>容量：16 桶 / 16000 mB
+      - <!i><gray>桶或瓶右键转移；空手打开容器
+      - <!i><gray>输入输出支持漏斗；拆除保留流体
+      max_stack_size: 1
+    model:
+      type: minecraft:model
+      path: farmersdelight:block/jug
+    settings:
+      fluidcore:container:
+        capacity: 16000
+    behavior:
+    - type: fluidcore:container
+      item-model: farmersdelight:fluid_jug_visual
+    - type: block_item
+      block:
+        settings:
+          hardness: 2.0
+          resistance: 6.0
+          is_suffocating: false
+          is_redstone_conductor: false
+          sounds:
+            break: minecraft:block.copper.break
+            place: minecraft:block.copper.place
+        behavior:
+          type: fluidcore:tank
+          capacity: 16000
+          transparent: false
+          dyeable: false
+          item-model: farmersdelight:fluid_jug_visual
+          menu:
+            layout: jug
+            theme: plain
+        loot:
+          pools:
+          - rolls: 1
+            entries:
+            - type: item
+              item: farmersdelight:fluid_jug
+              functions:
+              - type: set_count
+                count: 1
+              - type: fluidcore:preserve_tank
+        states:
+          properties:
+            facing:
+              type: horizontal_direction
+              default: north
+            waterlogged:
+              type: boolean
+              default: false
+          appearances:
+            north:
+              transparent: false
+              entity_renderer:
+                type: item_display
+                item: farmersdelight:fluid_jug_visual/empty
+                yaw: 0
+                tint_source:
+                  type: fluidcore:tank
+              state: chorus_plant[down=true,east=false,north=false,south=false,up=false,west=false]
+            north_waterlogged:
+              transparent: false
+              entity_renderer:
+                type: item_display
+                item: farmersdelight:fluid_jug_visual/empty
+                yaw: 0
+                tint_source:
+                  type: fluidcore:tank
+              auto_state: waterlogged_non_tintable_leaves
+              model:
+                path: farmersdelight:block/fluid_tank_invisible
+                y: 0
+            east:
+              transparent: false
+              entity_renderer:
+                type: item_display
+                item: farmersdelight:fluid_jug_visual/empty
+                yaw: 90
+                tint_source:
+                  type: fluidcore:tank
+              state: chorus_plant[down=true,east=false,north=false,south=false,up=false,west=false]
+            east_waterlogged:
+              transparent: false
+              entity_renderer:
+                type: item_display
+                item: farmersdelight:fluid_jug_visual/empty
+                yaw: 90
+                tint_source:
+                  type: fluidcore:tank
+              auto_state: waterlogged_non_tintable_leaves
+              model:
+                path: farmersdelight:block/fluid_tank_invisible
+                y: 90
+            south:
+              transparent: false
+              entity_renderer:
+                type: item_display
+                item: farmersdelight:fluid_jug_visual/empty
+                yaw: 180
+                tint_source:
+                  type: fluidcore:tank
+              state: chorus_plant[down=true,east=false,north=false,south=false,up=false,west=false]
+            south_waterlogged:
+              transparent: false
+              entity_renderer:
+                type: item_display
+                item: farmersdelight:fluid_jug_visual/empty
+                yaw: 180
+                tint_source:
+                  type: fluidcore:tank
+              auto_state: waterlogged_non_tintable_leaves
+              model:
+                path: farmersdelight:block/fluid_tank_invisible
+                y: 180
+            west:
+              transparent: false
+              entity_renderer:
+                type: item_display
+                item: farmersdelight:fluid_jug_visual/empty
+                yaw: 270
+                tint_source:
+                  type: fluidcore:tank
+              state: chorus_plant[down=true,east=false,north=false,south=false,up=false,west=false]
+            west_waterlogged:
+              transparent: false
+              entity_renderer:
+                type: item_display
+                item: farmersdelight:fluid_jug_visual/empty
+                yaw: 270
+                tint_source:
+                  type: fluidcore:tank
+              auto_state: waterlogged_non_tintable_leaves
+              model:
+                path: farmersdelight:block/fluid_tank_invisible
+                y: 270
+          variants:
+            facing=north,waterlogged=false:
+              appearance: north
+            facing=north,waterlogged=true:
+              appearance: north_waterlogged
+            facing=east,waterlogged=false:
+              appearance: east
+            facing=east,waterlogged=true:
+              appearance: east_waterlogged
+            facing=south,waterlogged=false:
+              appearance: south
+            facing=south,waterlogged=true:
+              appearance: south_waterlogged
+            facing=west,waterlogged=false:
+              appearance: west
+            facing=west,waterlogged=true:
+              appearance: west_waterlogged

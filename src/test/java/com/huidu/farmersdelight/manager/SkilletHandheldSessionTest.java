@@ -15,10 +15,35 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class SkilletHandheldSessionTest {
+    @Test
+    void heatChecksAreBoundedAndAColdOrUnderwaterFinalTickCannotCommitFood() {
+        Stack pan = new Stack("pan", 1, 17), food = new Stack("food", 12, 0);
+        var session = new SkilletHandheldCooking.HandheldSession(EquipmentSlot.HAND, 2, 40, pan, food, null, 29, null);
+        AtomicReference<Boolean> underwater = new AtomicReference<>(false);
+        Player player = (Player) Proxy.newProxyInstance(getClass().getClassLoader(), new Class<?>[]{Player.class},
+                (proxy, method, args) -> {
+                    if (method.getName().equals("isUnderWater")) return underwater.get();
+                    throw new UnsupportedOperationException(method.getName());
+                });
+        AtomicInteger checks = new AtomicInteger();
+        for (int progress = 0; progress < 28; progress++) {
+            session.progress = progress;
+            assertTrue(session.heatValid(player, ignored -> { checks.incrementAndGet(); return true; }));
+        }
+        assertEquals(2, checks.get(), "Regular heat lookup is once per 20 active ticks");
+        session.progress = 28;
+        assertFalse(session.heatValid(player, ignored -> { checks.incrementAndGet(); return false; }), "A short recipe still rechecks its final commit tick");
+        assertEquals(3, checks.get());
+        assertFalse(session.consumed);
+        assertEquals(12, food.getAmount());
+        underwater.set(true);
+        assertFalse(session.heatValid(player, ignored -> { throw new AssertionError("Underwater cancellation must not query blocks"); }));
+    }
     @Test
     void staticDisplaySkipsRefreshButSettingAndModelChangesStillSync() {
         var session = session(EquipmentSlot.HAND, 2, 40, new Stack("pan", 1, 17), new Stack("food", 12, 0));

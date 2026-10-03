@@ -16,6 +16,7 @@ final class BoundedPacketMailbox<T> {
     private final Consumer<List<T>> consumer;
     private boolean scheduled;
     private boolean closed;
+    private volatile int peak;
 
     BoundedPacketMailbox(int capacity, int batchSize, Executor executor, Consumer<List<T>> consumer) {
         if (capacity < 1 || batchSize < 1) throw new IllegalArgumentException("Invalid mailbox limits");
@@ -30,6 +31,7 @@ final class BoundedPacketMailbox<T> {
         synchronized (this) {
             if (closed || pending.size() >= capacity) return false;
             pending.addLast(value);
+            peak = Math.max(peak, pending.size());
             start = !scheduled;
             scheduled = true;
         }
@@ -40,6 +42,8 @@ final class BoundedPacketMailbox<T> {
         closed = true;
         pending.clear();
     }
+
+    int peak() { return peak; }
 
     private boolean schedule() {
         try {

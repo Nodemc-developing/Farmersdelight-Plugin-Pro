@@ -539,35 +539,45 @@ public class CookingPotBlockEntity {
             if (!canCookInternal()) return false;
             recipe = currentRecipe.get();
             if (recipe == null) return false;
-        } else {
-            // The cached recipe may become invalid between canCook and finishCooking if inputs change (e.g. cross-region GUI sync,
-            // hopper interaction); re-validate under the lock before producing, to avoid conjuring a result from zero/insufficient ingredients (item duping).
-            if (plugin == null || !plugin.getCookingPotRecipes()
-                    .canCraft(recipe, getIngredientSlotsInternal())) {
-                currentRecipe.set(null);
-                return false;
-            }
         }
 
+        // A cached recipe may have become invalid after a hopper or another region's GUI changed the
+        // inputs. Validate and assign its debit together, under both locks, before inserting any output.
+        CookingPotCraftingHandler.Consumption consumption = craftingHandler.prepareConsumption(recipe);
+        if (consumption == null) {
+            currentRecipe.set(null);
+            canCookVersion = -1L;
+            canCookRecipeGeneration = -1L;
+            canCookResult = false;
+            return false;
+        }
         ItemStack resultItem = recipe.getResult();
         if (resultItem == null) return false;
 
         ItemStack outputItem = resultItem.clone();
-        CookingPotCraftingHandler.Consumption consumption = craftingHandler.prepareConsumption(recipe);
-        if (consumption == null) return false;
 
-        boolean stored = storeCookedResult(outputItem, recipe);
-        if (!stored) {
-            cookingProgress.set(getCookingDuration());
-            syncWorldlyContainer();
-            return false;
+        Throwable mutationFailure = null;
+        try {
+            if (!storeCookedResult(outputItem, recipe)) {
+                cookingProgress.set(getCookingDuration());
+                return false;
+            }
+            craftingHandler.consumeIngredientsInternal(consumption, world, blockLoc);
+            cookingProgress.set(0);
+            currentRecipe.set(null);
+        } catch (RuntimeException | Error failure) {
+            mutationFailure = failure;
+            throw failure;
+        } finally {
+            // Publish the complete inventory commit once. Partially applied mutations also need a dirty
+            // notification if a remainder or serving operation throws before the cook can finish.
+            try {
+                syncWorldlyContainer();
+            } catch (RuntimeException | Error syncFailure) {
+                if (mutationFailure == null) throw syncFailure;
+                if (syncFailure != mutationFailure) mutationFailure.addSuppressed(syncFailure);
+            }
         }
-
-        craftingHandler.consumeIngredientsInternal(consumption, world, blockLoc);
-        cookingProgress.set(0);
-        currentRecipe.set(null);
-
-        syncWorldlyContainer();
         fireCookFinished(world, blockLoc, recipe);
         return true;
     }
@@ -905,48 +915,52 @@ public class CookingPotBlockEntity {
     }
 
     public void tryMovePendingToOutput() {
-        tryMovePendingToOutput(false);
+        boolean changed;
+        synchronized (inventoryLock) {
+            changed = movePendingToOutputLocked();
+        }
+        if (changed) syncWorldlyContainer();
     }
 
-    private void tryMovePendingToOutput(boolean forceSync) {
+    // The caller holds inventoryLock. A finished cook serves its pending batch here without publishing
+    // an intermediate output snapshot; its final notification includes the ingredient and container debit.
+    private boolean movePendingToOutputLocked() {
         boolean changed = false;
-        synchronized (inventoryLock) {
+        if (!hasAnyItem(layout.pendingOutputSlots())) {
+            ItemStack previousContainer = mealContainerStack.getAndSet(null);
+            if (previousContainer != null && !previousContainer.getType().isAir()) {
+                changed = true;
+            }
+        } else {
+            for (int pendingSlot : layout.pendingOutputSlots()) {
+                ItemStack pending = inventory[pendingSlot];
+                if (pending == null || pending.getType().isAir()) {
+                    continue;
+                }
+                int movableAmount = getMovablePendingAmount(pending);
+                if (movableAmount <= 0) {
+                    continue;
+                }
+
+                SplitItem moving = splitItemFromSlot(pendingSlot, movableAmount);
+                addItemToSlots(layout.outputSlots(), moving.item());
+
+                ItemStack requiredContainer = mealContainerStack.get();
+                if (requiredContainer != null && !requiredContainer.getType().isAir()) {
+                    consumeContainerAmount(requiredContainer, movableAmount);
+                }
+
+                if (pending.getAmount() <= 0) {
+                    setSlot(pendingSlot, null);
+                }
+                changed = true;
+            }
             if (!hasAnyItem(layout.pendingOutputSlots())) {
                 ItemStack previousContainer = mealContainerStack.getAndSet(null);
-                if (previousContainer != null && !previousContainer.getType().isAir()) {
-                    changed = true;
-                }
-            } else {
-                for (int pendingSlot : layout.pendingOutputSlots()) {
-                    ItemStack pending = inventory[pendingSlot];
-                    if (pending == null || pending.getType().isAir()) {
-                        continue;
-                    }
-                    int movableAmount = getMovablePendingAmount(pending);
-                    if (movableAmount <= 0) {
-                        continue;
-                    }
-
-                    SplitItem moving = splitItemFromSlot(pendingSlot, movableAmount);
-                    addItemToSlots(layout.outputSlots(), moving.item());
-
-                    ItemStack requiredContainer = mealContainerStack.get();
-                    if (requiredContainer != null && !requiredContainer.getType().isAir()) {
-                        consumeContainerAmount(requiredContainer, movableAmount);
-                    }
-
-                    if (pending.getAmount() <= 0) {
-                        setSlot(pendingSlot, null);
-                    }
-                    changed = true;
-                }
-                if (!hasAnyItem(layout.pendingOutputSlots())) {
-                    ItemStack previousContainer = mealContainerStack.getAndSet(null);
-                    changed |= previousContainer != null && !previousContainer.getType().isAir();
-                }
+                changed |= previousContainer != null && !previousContainer.getType().isAir();
             }
         }
-        if (forceSync || changed) syncWorldlyContainer();
+        return changed;
     }
 
     private boolean storeCookedResult(ItemStack result, CookingPotRecipe recipe) {
@@ -960,7 +974,7 @@ public class CookingPotBlockEntity {
             addItemToSlots(layout.pendingOutputSlots(), result);
             usedRecipeTracker.merge(recipe.getId(), 1, Integer::sum);
             // All serving uses the same capacity check and per-portion container debit.
-            tryMovePendingToOutput(true);
+            movePendingToOutputLocked();
             return true;
         }
     }

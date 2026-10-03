@@ -1,5 +1,7 @@
 package com.huidu.farmersdelight.gui.editor;
 
+import com.huidu.farmersdelight.gui.GuiTextStyle;
+
 import com.huidu.farmersdelight.FarmersDelightPlugin;
 import com.huidu.farmersdelight.gui.AbstractInventoryGui;
 import com.huidu.farmersdelight.gui.GuiConfig;
@@ -178,8 +180,8 @@ public final class CookingPotEditorGui extends AbstractInventoryGui implements E
                     var meta = displayed.getItemMeta();
                     if (meta != null) {
                         List<Component> lore = meta.lore() == null ? new ArrayList<>() : new ArrayList<>(meta.lore());
-                        lore.add(I18n.getComponent("gui.fuzzy.weight", player, Map.of("weight", String.valueOf(weights[idx]))));
-                        lore.add(I18n.getComponent("gui.fuzzy.ingredient_hint", player));
+                        lore.add(GuiTextStyle.styled(I18n.getComponent("gui.fuzzy.weight", player, Map.of("weight", String.valueOf(weights[idx]))), GuiTextStyle.Role.VALUE));
+                        lore.add(GuiTextStyle.lore(I18n.getComponent("gui.fuzzy.ingredient_hint", player)));
                         meta.lore(lore);
                         displayed.setItemMeta(meta);
                     }
@@ -773,7 +775,7 @@ public final class CookingPotEditorGui extends AbstractInventoryGui implements E
     private static ItemStack named(ItemStack stack, String name) {
         ItemMeta meta = stack.getItemMeta();
         if (meta != null) {
-            meta.displayName(Text.name(name));
+            meta.displayName(GuiTextStyle.name(name));
             stack.setItemMeta(meta);
         }
         return stack;

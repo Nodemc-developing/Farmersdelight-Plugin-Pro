@@ -1,6 +1,7 @@
 package com.huidu.farmersdelight.gui.editor;
 
 import com.huidu.farmersdelight.FarmersDelightPlugin;
+import com.huidu.farmersdelight.gui.GuiTextStyle;
 import com.huidu.farmersdelight.api.FarmersDelightApi;
 import com.huidu.farmersdelight.api.recipe.RecipeType;
 import com.huidu.farmersdelight.i18n.I18n;
@@ -55,7 +56,7 @@ public final class RecipeEditorMenuGui implements EditorGui {
         this.group = group;
         this.addon = addon;
         this.back = back;
-        inventory = plugin.getServer().createInventory(this, 54, text("title_" + screen.name().toLowerCase(Locale.ROOT)));
+        inventory = plugin.getServer().createInventory(this, 54, GuiTextStyle.title(text("title_" + screen.name().toLowerCase(Locale.ROOT))));
     }
 
     public static void openHome(FarmersDelightPlugin plugin, Player player) {
@@ -274,7 +275,7 @@ public final class RecipeEditorMenuGui implements EditorGui {
     private Component text(String suffix, Object... args) {
         Map<String, String> placeholders = new java.util.HashMap<>();
         for (int i = 0; i + 1 < args.length; i += 2) placeholders.put(String.valueOf(args[i]), String.valueOf(args[i + 1]));
-        return I18n.getComponent("gui.editor.menu." + suffix, player, placeholders);
+        return GuiTextStyle.label(I18n.getComponent("gui.editor.menu." + suffix, player, placeholders), suffix);
     }
 
     private ItemStack button(Material material, String suffix) { return icon(new ItemStack(material), text(suffix)); }
@@ -282,7 +283,7 @@ public final class RecipeEditorMenuGui implements EditorGui {
         ItemStack item = source == null ? new ItemStack(Material.BOOK) : source.clone();
         item.setAmount(1);
         var meta = item.getItemMeta();
-        if (meta != null) { meta.displayName(name); meta.lore(List.of(lore)); item.setItemMeta(meta); }
+        if (meta != null) { meta.displayName(GuiTextStyle.name(name)); meta.lore(GuiTextStyle.loreLines(List.of(lore))); item.setItemMeta(meta); }
         return item;
     }
 

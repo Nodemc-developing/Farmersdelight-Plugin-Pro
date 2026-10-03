@@ -16,7 +16,7 @@ description: CraftEngine port of Farmer's Delight by vectorwing (MIT).
 authors:
   - HuiDu_OwO
   - ydxc2009
-website: https://github.com/Ydxc20091/Farmersdelight-Plugin-Pro
+website: https://github.com/Nodemc-developing/Farmersdelight-Plugin-Pro
 
 # The /farmersdelight command is registered through Paper's lifecycle API in onEnable:
 # paper-plugin.yml has no commands: section.

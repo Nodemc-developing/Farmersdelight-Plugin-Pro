@@ -9,6 +9,8 @@ out/
 # Vendored compile-only dependency (custom Folia build of UltimateAdvancementAPI, not on any
 # public Maven repo). Tracked so a fresh checkout / CI can compile.
 !/libs/*.jar
+# Original corresponding-source artifact for the bundled GPL dependency.
+!/libs/source/sparrow-yaml-1.0.22/sparrow-yaml-1.0.22-sources.jar
 
 .idea/
 *.iml
@@ -16,6 +18,8 @@ out/
 
 local.properties
 .local/
+dist/
+logs/
 
 # Python bytecode from the tools/ checkers, which CI runs and developers run locally.
 __pycache__/

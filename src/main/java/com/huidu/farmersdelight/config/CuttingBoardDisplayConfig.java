@@ -34,6 +34,14 @@ public final class CuttingBoardDisplayConfig {
     // Reload writes, event handlers read on Folia region threads — volatile publishes the new values.
     private volatile DisplayOverride defaultOverride;
     private volatile float itemSpread;
+    private volatile DisplayOverride blockOverride;
+    private volatile float blockSpread;
+    private volatile float stackYOffset;
+    private volatile float blockStackYOffset;
+    private volatile boolean absoluteItemPosition;
+    private volatile boolean absoluteBlockPosition;
+    private volatile List<String> forceBlock = List.of();
+    private volatile List<String> forceItem = List.of();
 
     public CuttingBoardDisplayConfig() {
         this(DisplayOverride.empty(), DEFAULT_ITEM_SPREAD);
@@ -56,6 +64,28 @@ public final class CuttingBoardDisplayConfig {
                 "display-item-spread",
                 section.getDouble("item-spread", fallbackItemSpread)
         ));
+        ConfigurationSection station = section.getName().equals("display") ? section.getParent() : section;
+        ConfigurationSection itemDisplay = section.getName().equals("display")
+                ? section : section.getConfigurationSection("display");
+        if (itemDisplay != null) {
+            defaultOverride = defaultOverride.withConfiguredDefaults(publicDisplay(itemDisplay, DisplayStyle.AUTO));
+            itemSpread = spread(itemDisplay, itemSpread);
+            stackYOffset = nonnegative(itemDisplay, "stack-y-offset", "stack_y_offset", 0.03F);
+            absoluteItemPosition = hasPosition(itemDisplay);
+        }
+        ConfigurationSection blockDisplay = ConfigLookup.firstSection(station, "display-block", "display_block");
+        blockOverride = defaultOverride.copy();
+        blockSpread = itemSpread;
+        blockStackYOffset = stackYOffset;
+        absoluteBlockPosition = absoluteItemPosition;
+        if (blockDisplay != null) {
+            blockOverride = blockOverride.withConfiguredDefaults(publicDisplay(blockDisplay, DisplayStyle.BLOCK));
+            blockSpread = spread(blockDisplay, itemSpread);
+            blockStackYOffset = nonnegative(blockDisplay, "stack-y-offset", "stack_y_offset", stackYOffset);
+            absoluteBlockPosition = hasPosition(blockDisplay);
+        }
+        forceBlock = List.copyOf(ConfigLookup.stringList(station, "block-display-overrides", "block_display_overrides"));
+        forceItem = List.copyOf(ConfigLookup.stringList(station, "item-display-overrides", "item_display_overrides"));
     }
 
     /**
@@ -75,6 +105,11 @@ public final class CuttingBoardDisplayConfig {
         tagOverrides.clear();
         defaultOverride = fallbackDefaults.copy();
         itemSpread = fallbackItemSpread;
+        blockOverride = defaultOverride.copy();
+        blockSpread = itemSpread;
+        stackYOffset = blockStackYOffset = 0.03F;
+        absoluteItemPosition = absoluteBlockPosition = false;
+        forceBlock = forceItem = List.of();
     }
 
     private void loadOverrides(ConfigurationSection displaySection, boolean tagSection, String sourceFile) {
@@ -117,7 +152,10 @@ public final class CuttingBoardDisplayConfig {
             return defaultOverride.copy();
         }
 
-        DisplayOverride resolved = defaultOverride;
+        boolean block = blockStyle(storedItem);
+        DisplayOverride resolved = block ? blockOverride : defaultOverride;
+        resolved = new DisplayOverride(resolved.displayItemId(), block ? DisplayStyle.BLOCK : DisplayStyle.ITEM,
+                resolved.offset(), resolved.translation(), resolved.rotationDegrees(), resolved.scale());
         synchronized (tagOverrides) { // iterate under the monitor; see field javadoc
             for (Map.Entry<String, DisplayOverride> entry : tagOverrides.entrySet()) {
                 try {
@@ -172,6 +210,65 @@ public final class CuttingBoardDisplayConfig {
 
     public float getItemSpread() {
         return itemSpread;
+    }
+
+    public float getItemSpread(ItemStack item) { return blockStyle(item) ? blockSpread : itemSpread; }
+
+    public float getStackYOffset(ItemStack item) { return blockStyle(item) ? blockStackYOffset : stackYOffset; }
+
+    public boolean isAbsolutePosition(ItemStack item) {
+        return blockStyle(item) ? absoluteBlockPosition : absoluteItemPosition;
+    }
+
+    private boolean blockStyle(ItemStack item) {
+        if (item == null || item.getType().isAir()) return false;
+        String id = getItemId(item);
+        if (matches(item, id, forceItem)) return false;
+        if (matches(item, id, forceBlock)) return true;
+        if (defaultOverride.style() == DisplayStyle.BLOCK) return true;
+        if (defaultOverride.style() == DisplayStyle.ITEM) return false;
+        return ItemUtils.shouldUseBlockStyleDisplay(item);
+    }
+
+    private boolean matches(ItemStack item, String id, List<String> rules) {
+        for (String rule : rules) {
+            if (rule.startsWith("#")) {
+                if (ItemUtils.matchesCustomOrVanillaTag(item, rule.substring(1))) return true;
+            } else if (normalize(rule).equals(normalize(id))) return true;
+        }
+        return false;
+    }
+
+    private static boolean hasPosition(ConfigurationSection section) {
+        for (String axis : List.of("x", "y", "z")) {
+            if (section.isSet("translate-" + axis) || section.isSet("translate_" + axis)) return true;
+        }
+        return false;
+    }
+
+    private static float spread(ConfigurationSection section, float fallback) {
+        return 2.0F * nonnegative(section, "stack-xz-offset", "stack_xz_offset", fallback * 0.5F);
+    }
+
+    private static float nonnegative(ConfigurationSection section, String normalized, String canonical, float fallback) {
+        double value = ConfigLookup.doubleValue(section, fallback, normalized, canonical);
+        return Double.isFinite(value) ? (float) Math.max(0, Math.min(16, value)) : fallback;
+    }
+
+    private static DisplayOverride publicDisplay(ConfigurationSection section, DisplayStyle style) {
+        Vector3f position = hasPosition(section) ? new Vector3f(
+                (float) ConfigLookup.doubleValue(section, 0, "translate-x", "translate_x"),
+                (float) ConfigLookup.doubleValue(section, 0, "translate-y", "translate_y"),
+                (float) ConfigLookup.doubleValue(section, 0, "translate-z", "translate_z")) : null;
+        boolean rotation = section.isSet("rotation-pitch") || section.isSet("rotation_pitch")
+                || section.isSet("rotation-y") || section.isSet("rotation_y")
+                || section.isSet("rotation-roll") || section.isSet("rotation_roll");
+        Vector3f degrees = rotation ? new Vector3f(
+                (float) ConfigLookup.doubleValue(section, 0, "rotation-pitch", "rotation_pitch"),
+                (float) ConfigLookup.doubleValue(section, 0, "rotation-y", "rotation_y"),
+                (float) ConfigLookup.doubleValue(section, 0, "rotation-roll", "rotation_roll")) : null;
+        return new DisplayOverride(null, style, position, null, degrees,
+                DisplayOverride.readVector(section, "scale"));
     }
 
     private String normalize(String itemId) {
@@ -263,7 +360,7 @@ public final class CuttingBoardDisplayConfig {
 
         private static DisplayOverride fromConfig(ConfigurationSection section) {
             String displayItemId = section.getString("display-item");
-            if (!ItemUtils.isValidItemId(displayItemId)) {
+            if (displayItemId != null && !ItemUtils.isValidItemId(displayItemId)) {
                 if (section.contains("display-item")) {
                     I18n.logWarning("plugin.config_value_invalid", "file", "config.yml",
                             "path", section.getCurrentPath() + ".display-item", "error", "invalid item id");
@@ -283,7 +380,7 @@ public final class CuttingBoardDisplayConfig {
 
         private static DisplayOverride fromDefaultConfig(ConfigurationSection section) {
             String displayItemId = section.getString("default-display-item");
-            if (!ItemUtils.isValidItemId(displayItemId)) {
+            if (displayItemId != null && !ItemUtils.isValidItemId(displayItemId)) {
                 if (section.contains("default-display-item")) {
                     I18n.logWarning("plugin.config_value_invalid", "file", "config.yml",
                             "path", section.getCurrentPath() + ".default-display-item", "error", "invalid item id");

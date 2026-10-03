@@ -1,0 +1,39 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "net.momirealms",
+    "module": "sparrow-yaml",
+    "version": "1.0.22",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.11"
+    }
+  },
+  "variants": [
+    {
+      "name": "shadowRuntimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "shadowed",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "sparrow-yaml-1.0.22.jar",
+          "url": "sparrow-yaml-1.0.22.jar",
+          "size": 646212,
+          "sha512": "2d0660bccb4023f70b5d1027a6e9914588ca07a31ed6ca1be18d246402ecd5d9f1b63e7d9cc47d9c3dcea3ca6fd9e3454a68a46485324515846591a575b15f70",
+          "sha256": "8373d0821e7e49ca76e9dc7d24a4c93eeb8d0bc801cf386ece2a568431770c1c",
+          "sha1": "01af9bbf40cc06cbd943790d9048d107b4ae33a9",
+          "md5": "baf8070c77e8eaf3a2b443f61a0a26ba"
+        }
+      ]
+    }
+  ]
+}

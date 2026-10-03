@@ -48,12 +48,23 @@ public final class RecipePackFiles {
 
     /** Must run before CraftEngine's initial pack parse. A completed migration never restores deleted entries. */
     public static void installAndMigrate(FarmersDelightPlugin plugin) throws Exception {
+        Map<String, Boolean> bundledNew = new LinkedHashMap<>();
+        for (String name : LEGACY_FILES) bundledNew.put(name, !Files.exists(file(plugin, name))
+                && !Files.exists(plugin.getDataFolder().toPath().resolve(name)));
         installAndMigrate(plugin.getDataFolder().toPath(), configurationFolder(plugin), name -> {
             try (InputStream input = plugin.getResource(name)) {
                 if (input == null) throw new IOException("Bundled recipe file missing: " + name);
                 return PlainYamlDocuments.parse(new String(input.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8), true);
             }
         });
+        for (var entry : bundledNew.entrySet()) if (entry.getValue() && Files.isRegularFile(file(plugin, entry.getKey())))
+            com.huidu.farmersdelight.pack.compat.ExternalContentCoordinator.recordInstalledDefault(plugin, file(plugin, entry.getKey()));
+        for (String name : LEGACY_FILES) try (InputStream input = plugin.getResource(name)) {
+            if (input == null) throw new IOException("Bundled recipe file missing: " + name);
+            YamlConfiguration bundled = PlainYamlDocuments.parse(new String(input.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8), true);
+            com.huidu.farmersdelight.pack.compat.ExternalContentCoordinator.registerDefaultDocument(
+                    plugin, file(plugin, name), canonical(bundled, name).saveToString());
+        }
     }
 
     @FunctionalInterface interface BundledReader { YamlConfiguration read(String name) throws Exception; }
@@ -154,6 +165,7 @@ public final class RecipePackFiles {
     }
 
     static List<PackSections.Section> generatedSections() { return generatedSections; }
+    static Map<Path, String> namespaces() { return packNamespaces; }
 
     static boolean containsFactory(YamlConfiguration document) {
         return document.getKeys(false).stream().anyMatch(key -> Set.of("config_factory", "config-factory", "config_factories", "config-factories").contains(key.split("#", 2)[0]));

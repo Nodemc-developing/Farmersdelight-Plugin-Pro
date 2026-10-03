@@ -1,26 +1,20 @@
 package com.huidu.farmersdelight.fluid;
 
-import net.momirealms.craftengine.core.item.behavior.ItemBehaviors;
-import net.momirealms.craftengine.core.item.setting.ItemSettingsModifiers;
-import net.momirealms.craftengine.core.registry.BuiltInRegistries;
-import net.momirealms.craftengine.core.util.Key;
+import org.bukkit.Bukkit;
 
-/** Registers compatibility identifiers through CraftEngine's public factories. */
+/** Keeps optional FluidCore types out of the ordinary cooking plugin's loading path. */
 public final class PapersFluidAliases {
-    private PapersFluidAliases() { }
-
+    private static boolean ownsJug;
+    private PapersFluidAliases() {}
+    static boolean ownsJug() { return ownsJug; }
     public static void register() {
-        // Jug blocks need an explicit fluid-preserving loot entry before adopting fluidcore:tank.
-        // A behavior factory cannot change the block's already-constructed loot table.
-        var container = BuiltInRegistries.ITEM_BEHAVIOR_TYPE.getValue(Key.of("fluidcore:container"));
-        Key jugItem = Key.of("papersdelight:jug_item");
-        if (container != null && BuiltInRegistries.ITEM_BEHAVIOR_TYPE.getValue(jugItem) == null) {
-            ItemBehaviors.register(jugItem, container.factory());
+        if (Bukkit.getPluginManager().getPlugin("FluidCore") == null) {
+            Bukkit.getLogger().info("[Farmersdelight-Plugin-Pro] FluidCore is absent; fluid content is unavailable. Cooking features remain enabled.");
+            return;
         }
-        var setting = BuiltInRegistries.ITEM_SETTINGS_TYPE.getValue(Key.of("fluidcore:container"));
-        Key legacySetting = Key.of("libuid:fluid_container");
-        if (setting != null && BuiltInRegistries.ITEM_SETTINGS_TYPE.getValue(legacySetting) == null) {
-            ItemSettingsModifiers.register(legacySetting, setting.factory());
+        try { ownsJug = TypedFluidContentAliases.register(); }
+        catch (LinkageError | RuntimeException incompatible) {
+            Bukkit.getLogger().warning("[Farmersdelight-Plugin-Pro] FluidCore content API could not be linked: " + incompatible.getMessage());
         }
     }
 }

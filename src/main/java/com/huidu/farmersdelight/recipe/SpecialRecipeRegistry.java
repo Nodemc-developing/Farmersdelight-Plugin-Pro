@@ -16,36 +16,65 @@ public class SpecialRecipeRegistry {
 
     private final Map<String, SpecialRecipeInfo> recipes = new LinkedHashMap<>();
     private volatile LinkIndex linkIndex;
+    private volatile State snapshot = new State(Map.of());
+    private static final class State {
+        final Map<String, SpecialRecipeInfo> recipes;
+        final List<SpecialRecipeInfo> ordered;
+        volatile LinkIndex index;
+        State(Map<String, SpecialRecipeInfo> recipes) {
+            this.recipes = Collections.unmodifiableMap(new LinkedHashMap<>(recipes));
+            this.ordered = List.copyOf(this.recipes.values());
+        }
+    }
+    private State currentState() { return RuntimeSnapshotPublication.get(this, snapshot); }
+    private void publish() {
+        State next = new State(recipes);
+        RuntimeSnapshotPublication.publish(this, snapshot, next);
+        snapshot = next;
+        linkIndex = null;
+    }
 
     public synchronized void register(SpecialRecipeInfo info) {
         if (info != null && info.id() != null) {
             recipes.put(info.id(), info);
-            linkIndex = null;
+            publish();
         }
     }
 
     public synchronized void unregister(String id) {
         if (id != null) {
             recipes.remove(id);
-            linkIndex = null;
+            publish();
         }
     }
 
     public synchronized void clear() {
         recipes.clear();
-        linkIndex = null;
+        publish();
     }
 
-    public synchronized SpecialRecipeInfo get(String id) {
-        return id == null ? null : recipes.get(id);
+    public SpecialRecipeInfo get(String id) {
+        return id == null ? null : currentState().recipes.get(id);
     }
 
-    public synchronized List<SpecialRecipeInfo> getAll() {
-        return Collections.unmodifiableList(new ArrayList<>(recipes.values()));
+    public List<SpecialRecipeInfo> getAll() {
+        return currentState().ordered;
     }
 
-    public synchronized boolean isEmpty() {
-        return recipes.isEmpty();
+    public boolean isEmpty() {
+        return currentState().recipes.isEmpty();
+    }
+
+    @org.jetbrains.annotations.ApiStatus.Internal
+    public synchronized Runnable captureReloadRollback() {
+        Map<String, SpecialRecipeInfo> previous = currentState().recipes;
+        return () -> {
+            synchronized (this) {
+                recipes.clear();
+                recipes.putAll(previous);
+                publish();
+            }
+        };
     }
 
     public String findProducingRecipe(ItemStack item) {
@@ -58,6 +87,7 @@ public class SpecialRecipeRegistry {
 
     public synchronized void invalidateIndex() {
         linkIndex = null;
+        currentState().index = null;
     }
 
     private String find(Map<String, String> index, ItemStack item) {
@@ -66,25 +96,26 @@ public class SpecialRecipeRegistry {
     }
 
     private LinkIndex linkIndex() {
-        LinkIndex current = linkIndex;
+        State state = currentState();
+        LinkIndex current = state.index;
         if (current != null) {
             return current;
         }
-        synchronized (this) {
-            if (linkIndex == null) {
+        synchronized (state) {
+            if (state.index == null) {
                 Map<String, String> producing = new LinkedHashMap<>();
-                for (SpecialRecipeInfo info : recipes.values()) {
+                for (SpecialRecipeInfo info : state.ordered) {
                     indexItem(producing, info.iconItemId(), info.id());
                     indexEntries(producing, info.outputSlots(), info.id());
                 }
                 Map<String, String> linked = new LinkedHashMap<>(producing);
-                for (SpecialRecipeInfo info : recipes.values()) {
+                for (SpecialRecipeInfo info : state.ordered) {
                     indexEntries(linked, info.inputSlots(), info.id());
                     indexEntries(linked, info.catalystSlots(), info.id());
                 }
-                linkIndex = new LinkIndex(Map.copyOf(producing), Map.copyOf(linked));
+                state.index = new LinkIndex(Map.copyOf(producing), Map.copyOf(linked));
             }
-            return linkIndex;
+            return state.index;
         }
     }
 

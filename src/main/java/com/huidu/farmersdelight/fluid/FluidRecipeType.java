@@ -63,7 +63,7 @@ public final class FluidRecipeType implements RecipeType {
             return List.of(FluidRecipeEditor.ingredientIcon(spec.ingredient()), fluidIcon());
         }
         @Override public ItemStack result() {
-            return spec.result().isEmpty() ? null : RecipeItemCodec.deserializeItem(spec.result());
+            return spec.result().isEmpty() ? null : FluidResultCodec.deserialize(spec.result());
         }
         @Override public ItemStack icon() {
             ItemStack result = result();
@@ -72,7 +72,7 @@ public final class FluidRecipeType implements RecipeType {
         @Override public List<Component> infoLines(Player viewer) {
             List<Component> lines = new ArrayList<>();
             lines.add(I18n.getComponent("fluid.editor.fluid", viewer).append(Component.text(": "
-                    + (spec.fluidTag() ? "#" : "") + spec.fluidId())));
+                    + FluidExpression.display(spec.fluidExpression()))));
             lines.add(I18n.getComponent("fluid.editor.amount", viewer).append(Component.text(": " + spec.amount() + " mB")));
             lines.add(I18n.getComponent("fluid.editor.ingredient", viewer)
                     .append(Component.text(": " + RecipeSerializer.serializeIngredient(spec.ingredient()))));
@@ -91,7 +91,7 @@ public final class FluidRecipeType implements RecipeType {
         }
         private ItemStack fluidIcon() {
             ItemStack icon = new ItemStack(Material.WATER_BUCKET);
-            RecipeBookGui.rename(icon, Component.text((spec.fluidTag() ? "#" : "") + spec.fluidId()));
+            RecipeBookGui.rename(icon, Component.text(FluidExpression.display(spec.fluidExpression())));
             RecipeBookGui.applyLore(icon, List.of(Component.text(spec.amount() + " mB")));
             return icon;
         }

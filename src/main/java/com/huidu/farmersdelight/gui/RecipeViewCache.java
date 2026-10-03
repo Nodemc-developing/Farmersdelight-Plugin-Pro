@@ -15,7 +15,8 @@ import java.util.function.Supplier;
 final class RecipeViewCache {
 
     private static volatile RecipeViewGuiConfig config;
-    private static final Map<String, ItemStack> recipeListDisplayCache = new ConcurrentHashMap<>();
+    private static final int MAX_DISPLAY_ITEMS = 8192;
+    private static volatile Map<String, ItemStack> recipeListDisplayCache = new ConcurrentHashMap<>();
     private static final Set<String> warnedMissingCustomCookingPotDetailConfigs = ConcurrentHashMap.newKeySet();
     private static final Set<String> warnedCookingPotDetailCapacityConfigs = ConcurrentHashMap.newKeySet();
 
@@ -38,7 +39,16 @@ final class RecipeViewCache {
 
     /** Built list display items, keyed by recipe type, group, preview count, recipe id and locale. */
     static Map<String, ItemStack> displayCache() {
-        return recipeListDisplayCache;
+        Map<String, ItemStack> current = recipeListDisplayCache;
+        if (current.size() < MAX_DISPLAY_ITEMS) return current;
+        synchronized (RecipeViewCache.class) {
+            if (recipeListDisplayCache == current) recipeListDisplayCache = new ConcurrentHashMap<>();
+            return recipeListDisplayCache;
+        }
+    }
+
+    static String scopedDisplayKey(String key) {
+        return com.huidu.farmersdelight.recipe.RuntimeSnapshotPublication.generation() + "|" + key;
     }
 
     /** True the first time this custom id is reported missing its own detail config. */
@@ -60,6 +70,6 @@ final class RecipeViewCache {
 
     /** Drops the built display items, which embed resolved names and lore from the language files. */
     static void clearDisplay() {
-        recipeListDisplayCache.clear();
+        recipeListDisplayCache = new ConcurrentHashMap<>();
     }
 }

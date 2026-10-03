@@ -1,0 +1,6 @@
+{
+  "block.farmersdelight.fluid_tank": "流体罐",
+  "item.farmersdelight.fluid_tank.capacity": "容量：16 桶（16000 mB）",
+  "item.farmersdelight.fluid_tank.use": "右键注入、取出或浸泡加工；空手右键查看容量",
+  "item.farmersdelight.fluid_tank.preserve": "打掉后保留罐内流体"
+}

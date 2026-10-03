@@ -26,15 +26,29 @@ MIT 与 AGPL-3.0 兼容，第三方内容的 MIT 声明随 jar 分发，完整�
 
 ## 运行时依赖
 
+流体罐内容包的 9 项罐体模型与贴图直接来自 Farmer's Delight 固定提交
+`0b424c370dc48197a9231771d55f0dcc3a36844e`，保留 vectorwing 归属及 MIT 文本。
+16 个液位模型定义由本项目工具自行生成。
+见 [素材说明](src/main/resources/craftengine/farmersdelight_fluids/ASSET-NOTICE.txt)
+和 [随附授权](src/main/resources/craftengine/farmersdelight_fluids/LICENSE)。
+逐项来源、版本、许可与 SHA-256 见
+[素材清单](src/main/resources/craftengine/farmersdelight_fluids/ASSET-ORIGINS.json)。
+不将上游 9 项素材主张为本项目原创。
+
 以下依赖不打进 Farmersdelight-Plugin-Pro 的 jar，只在运行时调用：
 
 - CraftEngine（GPL-3.0），内容平台与配方数据来源
-- UltimateAdvancementAPI（LGPL-3.0-or-later），成就系统；`libs/` 中的 `2.8.1-pro.1` 基于
+- FluidCore（实现模块 GPL-3.0，API 模块 Apache-2.0），可选流体机制，API 不打入本插件 JAR。
+- UltimateAdvancementAPI（LGPL-3.0-or-later），成就系统；`libs/` 中的 `2.8.1-pro.2` 基于
   [Nodemc-developing/UltimateAdvancementAPI](https://github.com/Nodemc-developing/UltimateAdvancementAPI)，
   由 fren_gor、EscanorTargaryen 等原作者开发。对应修改源码、构建脚本和许可证随本仓库提供，见
   [libs/README.md](libs/README.md)。
 
-## 关于盗版分发
+## 对应版本与源码
 
-如果有人拿到本插件的构建产物或源码后去掉版权声明、自行"开源"、或者篡改后重新打包分发，
-那属于违反 AGPL-3.0 的行为，与作者无关。作者只对本仓库（以及作者本人发布的构建产物）负责。
+修改版维护者：ydxc2009。当前项目源码地址为
+[Nodemc-developing/Farmersdelight-Plugin-Pro](https://github.com/Nodemc-developing/Farmersdelight-Plugin-Pro)。
+本地审阅构建尚未发布时，以交付包中的对应版本源码归档为准；JAR 内保留 AGPL 全文和版本说明。
+
+SQLite JDBC 3.53.4.0 随主 JAR 提供，其 Apache-2.0、原驱动及原生依赖声明保留于
+`META-INF/maven/org.xerial/sqlite-jdbc/`。其他打包依赖见 [THIRD_PARTY.md](THIRD_PARTY.md)。

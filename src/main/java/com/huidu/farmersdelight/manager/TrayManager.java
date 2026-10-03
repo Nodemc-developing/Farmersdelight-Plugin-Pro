@@ -120,11 +120,15 @@ public class TrayManager {
 
         Block blockBelow = world.getBlockAt(potPos.x(), potPos.y() - 1, potPos.z());
         if (heatConfig.isHeatSource(blockBelow)) {
+            Boolean configuredTray = heatConfig.trayRequirement(blockBelow);
+            if (configuredTray != null) return configuredTray;
             return isValidTraySupport(blockBelow, requireNonFullSupport);
         }
         if (heatConfig.isConductor(blockBelow)) {
             Block blockTwoBelow = world.getBlockAt(potPos.x(), potPos.y() - 2, potPos.z());
-            return heatConfig.isHeatSource(blockTwoBelow) && isValidTraySupport(blockBelow, requireNonFullSupport);
+            if (!heatConfig.isHeatSource(blockTwoBelow)) return false;
+            Boolean configuredTray = heatConfig.trayRequirement(blockBelow);
+            return configuredTray == null ? isValidTraySupport(blockBelow, requireNonFullSupport) : configuredTray;
         }
         return false;
     }

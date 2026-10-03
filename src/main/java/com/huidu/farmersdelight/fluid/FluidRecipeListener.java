@@ -31,9 +31,16 @@ import java.util.concurrent.ConcurrentHashMap;
 /** Delayed soaking rechecks the world, player, recipe and input before opening a fresh transaction. */
 public final class FluidRecipeListener implements Listener, AutoCloseable {
     private record Pending(FluidRecipeSpec recipe, int slot, Location location, ItemStack input, long generation) { }
+    private record Handled(int tick, UUID world, int x, int y, int z) {
+        private boolean matches(Player player, Location location) {
+            return tick == player.getTicksLived() && world.equals(location.getWorld().getUID())
+                    && x == location.getBlockX() && y == location.getBlockY() && z == location.getBlockZ();
+        }
+    }
     private final FarmersDelightPlugin plugin;
     private final FluidRecipeManager manager;
     private final Map<UUID, Pending> pending = new ConcurrentHashMap<>();
+    private final Map<UUID, Handled> handled = new ConcurrentHashMap<>();
 
     public FluidRecipeListener(FarmersDelightPlugin plugin, FluidRecipeManager manager) {
         this.plugin = plugin;
@@ -74,13 +81,20 @@ public final class FluidRecipeListener implements Listener, AutoCloseable {
     }
 
     private void handleInteraction(Player player, Location location, boolean offHand, Runnable claim) {
+        // Native tanks own their hand transfers and process soaking only from their input slot.
+        if (manager.bridge().nativeTankAt(location)) return;
+        Handled previous = handled.get(player.getUniqueId());
+        if (previous != null && previous.matches(player, location)) {
+            claim.run();
+            return;
+        }
         int slot = offHand ? 40 : player.getInventory().getHeldItemSlot();
         ItemStack input = player.getInventory().getItem(slot);
         List<FluidRecipeSpec> candidates = manager.candidates(input);
         if (candidates.isEmpty() || !manager.bridge().storageAt(location)) return;
         Pending active = pending.get(player.getUniqueId());
         if (active != null) {
-            claim.run();
+            claimInteraction(player, location, claim);
             return;
         }
         FluidCoreBridge.Outcome failure = null;
@@ -90,7 +104,7 @@ public final class FluidRecipeListener implements Listener, AutoCloseable {
                 if (probe != FluidCoreBridge.Outcome.NO_FLUID && probe != FluidCoreBridge.Outcome.NO_MATCH) failure = probe;
                 continue;
             }
-            claim.run();
+            claimInteraction(player, location, claim);
             if (recipe.timeTicks() > 0) {
                 Pending operation = new Pending(recipe, slot, location.clone(), input.clone(), manager.generation());
                 if (pending.putIfAbsent(player.getUniqueId(), operation) != null) return;
@@ -108,9 +122,16 @@ public final class FluidRecipeListener implements Listener, AutoCloseable {
             return;
         }
         if (failure != null) {
-            claim.run();
+            claimInteraction(player, location, claim);
             report(player, failure);
         }
+    }
+
+    private void claimInteraction(Player player, Location location, Runnable claim) {
+        // Cancelling CE's block event bypasses its success-tick guard. Keep both hands in one operation.
+        handled.put(player.getUniqueId(), new Handled(player.getTicksLived(), location.getWorld().getUID(),
+                location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+        claim.run();
     }
 
     private static void claim(PlayerInteractEvent event) {
@@ -133,6 +154,7 @@ public final class FluidRecipeListener implements Listener, AutoCloseable {
         if (!pending.remove(player.getUniqueId(), operation)) return;
         ItemStack input = player.getInventory().getItem(operation.slot());
         if (manager.generation() != operation.generation() || !canUse(player, operation.location())
+                || manager.bridge().nativeTankAt(operation.location())
                 || !operation.input().equals(input)
                 || (operation.slot() != 40 && player.getInventory().getHeldItemSlot() != operation.slot())) {
             if (player.isOnline()) player.sendMessage(I18n.getComponent("fluid.cancelled", player));
@@ -145,8 +167,14 @@ public final class FluidRecipeListener implements Listener, AutoCloseable {
         player.sendMessage(I18n.getComponent("fluid.outcome." + outcome.name().toLowerCase(java.util.Locale.ROOT), player));
     }
 
-    @EventHandler public void onQuit(PlayerQuitEvent event) { pending.remove(event.getPlayer().getUniqueId()); }
-    @EventHandler public void onDeath(PlayerDeathEvent event) { pending.remove(event.getEntity().getUniqueId()); }
+    @EventHandler public void onQuit(PlayerQuitEvent event) {
+        pending.remove(event.getPlayer().getUniqueId());
+        handled.remove(event.getPlayer().getUniqueId());
+    }
+    @EventHandler public void onDeath(PlayerDeathEvent event) {
+        pending.remove(event.getEntity().getUniqueId());
+        handled.remove(event.getEntity().getUniqueId());
+    }
     public void cancelPending() {
         for (var entry : pending.entrySet()) {
             if (!pending.remove(entry.getKey(), entry.getValue())) continue;
@@ -156,5 +184,5 @@ public final class FluidRecipeListener implements Listener, AutoCloseable {
             });
         }
     }
-    @Override public void close() { pending.clear(); }
+    @Override public void close() { pending.clear(); handled.clear(); }
 }

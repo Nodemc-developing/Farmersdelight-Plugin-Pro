@@ -17,6 +17,8 @@ public final class FoodGroupStore {
     private static final String SOURCE = "farmersdelight:food-groups";
     private static volatile Map<String, RecipeSource> sources = Map.of();
     private FoodGroupStore() { }
+    private static Map<String, RecipeSource> currentSources() { return RuntimeSnapshotPublication.get(FoodGroupStore.class, sources); }
+    private static void setSources(Map<String, RecipeSource> next) { RuntimeSnapshotPublication.publish(FoodGroupStore.class, sources, next); sources = next; }
 
     public record Loaded(List<FoodGroupSnapshot.Group> local, FoodGroupSnapshot combined) { }
 
@@ -45,7 +47,7 @@ public final class FoodGroupStore {
         Map<String, FoodGroupSnapshot.Group> combined = new LinkedHashMap<>();
         for (var group : local) combined.put(group.id(), group);
         for (var group : KaleidoscopeCompat.refresh(plugin)) combined.putIfAbsent(group.id(), group);
-        sources = Map.copyOf(nextSources);
+        setSources(Map.copyOf(nextSources));
         return new Loaded(List.copyOf(local), FoodGroupSnapshot.of(List.copyOf(combined.values())));
     }
 
@@ -68,6 +70,22 @@ public final class FoodGroupStore {
         return List.copyOf(groups);
     }
 
-    public static RecipeSource sourceOf(String id) { return sources.get(id); }
-    public static void clear() { sources = Map.of(); AdvancedPackGroups.clear(); AdvancedRecipeTags.clearFoodGroups(); CommonTagResolver.unregisterSource(SOURCE); }
+    public static RecipeSource sourceOf(String id) { return currentSources().get(id); }
+
+    @org.jetbrains.annotations.ApiStatus.Internal
+    public static Runnable captureReloadRollback() {
+        Map<String, RecipeSource> previous = currentSources();
+        Runnable advancedPacks = AdvancedPackGroups.captureReloadRollback();
+        Runnable foodGroups = AdvancedRecipeTags.captureFoodGroupsRollback();
+        Runnable common = CommonTagResolver.captureSourceRollback(SOURCE);
+        Runnable imported = CommonTagResolver.captureSourceRollback("farmersdelight:compat/kaleidoscope");
+        return () -> {
+            setSources(previous);
+            advancedPacks.run();
+            foodGroups.run();
+            common.run();
+            imported.run();
+        };
+    }
+    public static void clear() { setSources(Map.of()); AdvancedPackGroups.clear(); AdvancedRecipeTags.clearFoodGroups(); CommonTagResolver.unregisterSource(SOURCE); }
 }

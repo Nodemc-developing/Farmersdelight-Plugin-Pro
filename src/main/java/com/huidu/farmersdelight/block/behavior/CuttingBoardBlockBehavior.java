@@ -159,14 +159,14 @@ public class CuttingBoardBlockBehavior extends FarmersDelightBlockBehavior imple
 
     private static void indexAdd(UUID worldId, BlockPosKey posKey) {
         chunkIndex.computeIfAbsent(worldId, k -> new ConcurrentHashMap<>())
-                .computeIfAbsent(ManagerSupport.chunkKey(posKey.x(), posKey.z()), k -> ConcurrentHashMap.newKeySet())
+                .computeIfAbsent(ManagerSupport.chunkKey(posKey.x() >> 4, posKey.z() >> 4), k -> ConcurrentHashMap.newKeySet())
                 .add(posKey);
     }
 
     private static void indexRemove(UUID worldId, BlockPosKey posKey) {
         Map<Long, Set<BlockPosKey>> worldChunks = chunkIndex.get(worldId);
         if (worldChunks == null) return;
-        long ck = ManagerSupport.chunkKey(posKey.x(), posKey.z());
+        long ck = ManagerSupport.chunkKey(posKey.x() >> 4, posKey.z() >> 4);
         Set<BlockPosKey> set = worldChunks.get(ck);
         if (set == null) return;
         set.remove(posKey);
@@ -700,9 +700,9 @@ public class CuttingBoardBlockBehavior extends FarmersDelightBlockBehavior imple
 
             // Sound config is cached on the plugin (reload-refreshed volatile); reading it here instead of
             // re-parsing YAML on every retrieval right-click, matching the other real-time config getters.
-            float volume = plugin.getCuttingBoardFailVolume();
-            float pitch = plugin.getCuttingBoardFailPitch();
-            bukkitPlayer.playSound(bukkitPlayer.getLocation(), Sound.BLOCK_WOOD_HIT, volume, pitch);
+            var removeSound = plugin.getCuttingBoardSounds().remove();
+            SoundUtils.play(world, posKey.toLocation(world), removeSound.soundKey(),
+                    Sound.BLOCK_WOOD_HIT, removeSound.volume(), removeSound.pitch());
             bukkitPlayer.swingMainHand();
             return InteractionResult.SUCCESS_AND_CANCEL;
         }
@@ -807,9 +807,10 @@ public class CuttingBoardBlockBehavior extends FarmersDelightBlockBehavior imple
             }
         }
         Sound placeSound = carveTool ? Sound.ITEM_TRIDENT_HIT : Sound.BLOCK_WOOD_PLACE;
-        float pitch = carveTool ? 1.2f : 1.0f;
-        String soundKey = carveTool ? knifeSound : null;
-        SoundUtils.play(player.getWorld(), player.getLocation(), soundKey, placeSound, 1.0f, pitch);
+        var configuredSound = carveTool ? plugin.getCuttingBoardSounds().carve() : plugin.getCuttingBoardSounds().place();
+        String soundKey = configuredSound.soundKey() == null && carveTool ? knifeSound : configuredSound.soundKey();
+        SoundUtils.play(player.getWorld(), posKey.toLocation(world), soundKey, placeSound,
+                configuredSound.volume(), configuredSound.pitch());
         if (offhand) {
             player.swingOffHand();
         } else {
@@ -869,7 +870,9 @@ public class CuttingBoardBlockBehavior extends FarmersDelightBlockBehavior imple
                 player.getInventory().setItemInMainHand(mainHand);
             }
         }
-        SoundUtils.play(player.getWorld(), player.getLocation(), null, Sound.BLOCK_WOOD_PLACE, 1.0f, 1.0f);
+        var placeSound = plugin.getCuttingBoardSounds().place();
+        SoundUtils.play(player.getWorld(), posKey.toLocation(world), placeSound.soundKey(), Sound.BLOCK_WOOD_PLACE,
+                placeSound.volume(), placeSound.pitch());
         player.swingMainHand();
         return true;
     }

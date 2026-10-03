@@ -20,18 +20,17 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public final class RecipeIngredientIcons {
 
     // Item build cache. Values are cloned in and out so callers can freely mutate the returned meta.
-    private static final Map<Key, ItemStack> itemCache = new ConcurrentHashMap<>();
+    private static final GenerationScopedCache<Key, ItemStack> itemCache = new GenerationScopedCache<>();
     // Resolved tag ingredient option list (build cost O(items x excludedTags x items) plus CE item creation)
     // is fixed per tag ingredient; cache the result and clear on reload. Callers get clones.
-    private static final Map<RecipeIngredient.Tag, List<ItemStack>> tagOptionsCache = new ConcurrentHashMap<>();
-    private static final Map<RecipeIngredient.AdvancedTag, List<ItemStack>> advancedOptionsCache = new ConcurrentHashMap<>();
+    private static final GenerationScopedCache<RecipeIngredient.Tag, List<ItemStack>> tagOptionsCache = new GenerationScopedCache<>();
+    private static final GenerationScopedCache<RecipeIngredient.AdvancedTag, List<ItemStack>> advancedOptionsCache = new GenerationScopedCache<>();
     // Choice ingredient display options are likewise fixed. Choice is a record (value equality), safe as a key.
-    private static final Map<RecipeIngredient.Choice, List<ItemStack>> choiceOptionsCache = new ConcurrentHashMap<>();
+    private static final GenerationScopedCache<RecipeIngredient.Choice, List<ItemStack>> choiceOptionsCache = new GenerationScopedCache<>();
     private static final Collator DISPLAY_NAME_COLLATOR = Collator.getInstance(Locale.SIMPLIFIED_CHINESE);
 
     private RecipeIngredientIcons() {

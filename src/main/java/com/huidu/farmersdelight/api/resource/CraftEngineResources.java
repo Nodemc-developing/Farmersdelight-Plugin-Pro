@@ -28,7 +28,7 @@ public final class CraftEngineResources {
     private CraftEngineResources() {
     }
 
-    /** Installs missing files and applies the one-off text migrations. */
+    /** Installs missing files without rewriting existing operator files. */
     public static int release(JavaPlugin plugin, String namespace) {
         return release(plugin, namespace, true);
     }
@@ -76,7 +76,7 @@ public final class CraftEngineResources {
         }
 
         if (Files.exists(targetRoot) && !completeExisting) {
-            return migrateLegacyPositionArguments(targetRoot);
+            return 0;
         }
 
         String prefix = "craftengine/" + namespace + "/";
@@ -84,7 +84,7 @@ public final class CraftEngineResources {
         try (ZipFile zip = new ZipFile(jar.toFile())) {
             copied = copyEntries(zip, prefix, targetRoot, !Files.exists(targetRoot));
         }
-        return copied + migrateLegacyPositionArguments(targetRoot);
+        return copied;
     }
 
     private static int copyEntries(ZipFile zip, String prefix, Path targetRoot, boolean installAll)

@@ -1,0 +1,6 @@
+{
+  "block.farmersdelight.fluid_tank": "Fluid Tank",
+  "item.farmersdelight.fluid_tank.capacity": "Capacity: 16 buckets (16000 mB)",
+  "item.farmersdelight.fluid_tank.use": "Right-click to transfer or process; empty hand to inspect",
+  "item.farmersdelight.fluid_tank.preserve": "Retains stored fluid when broken"
+}

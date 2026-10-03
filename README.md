@@ -2,57 +2,90 @@
 
 **English** | [中文](README.zh-cn.md)
 
-Farmersdelight-Plugin-Pro is a Paper/Folia plugin port of **Farmer's Delight**, powered by CraftEngine. It adds crops, rich soil, cooking stations, knives, food, recipe discovery, advancements and a public API for addons.
+A CraftEngine-powered Farmer's Delight plugin for Paper and Folia: grow crops, prepare ingredients, cook meals and manage recipes in game.
 
-This project is a maintained **optimization fork** of [Farmersdelight-Plugin](https://github.com/IOVEYOUMC0/Farmersdelight-Plugin). Building on the original gameplay, it focuses on performance improvements, asynchronous scheduling, Folia and new-version compatibility, recipe editing and integrations with other plugins.
+This project is a maintained optimization fork of [Farmersdelight-Plugin](https://github.com/IOVEYOUMC0/Farmersdelight-Plugin). Original author: HuiDu_OwO (IOVEYOUMC0). Fork maintenance and optimization: ydxc2009.
 
-Original author: HuiDu_OwO (IOVEYOUMC0). Fork maintenance and optimization: ydxc2009.
-
-**Forever free and fully open source.** This project's published builds, all features and future updates will always be available free of charge. Third-party dependencies follow their own licensing and distribution policies.
-
-Version 1.0.4 opens a menu from `/fd recipe edit`: choose a station and recipe group, search or page through recipes, and return to the same list when editing is finished. It also includes optional Kaleidoscope recipe-book filling, fuzzy cooking-pot recipes and a food-group editor. See the [integration and recipe guide (Chinese)](KALEIDOSCOPE-COMPAT.zh-CN.md).
-
-Version 1.0.5 uses bStats 3.2.1 with plugin ID **34448**, registered as **FarmersDelightPro**. Standard server/plugin statistics use bStats' asynchronous transport and Folia support. Server owners can opt out globally by setting `enabled: false` in `plugins/bStats/config.yml` and restarting the server. Metrics tasks stop when the plugin is disabled.
-
-Version 1.1.0 adopts PapersDelight-style configuration and recipes loaded from CraftEngine content packs. Existing files are backed up and migrated; editing writes back to the original recipe node. Cooking, cutting, information cards, nested advanced ingredient groups and FluidCore filling, emptying and soaking recipes are supported. The fluid categories share the recipe editor and use atomic storage/inventory transactions on their owner thread. See the [format and migration guide (Chinese)](PAPERSDELIGHT-COMPAT.zh-CN.md) for supported fields, dependency requirements and content-pack limitations.
+**Forever free and permanently open source.** All features, published builds and future updates are free. Third-party dependencies retain their own licenses and distribution policies.
 
 ## Features
 
-- CraftEngine items, blocks, models, resource packs and loot integration.
-- Cooking pot, cutting board, stove and skillet gameplay.
-- Configurable crops, farmland, ropes, mushroom colonies and storage blocks.
-- Nourishment, Comfort, food effects and recipe-book integration.
-- Folia-safe scheduling and a stable `com.huidu.farmersdelight.api` addon API.
-- Optional addons for Brewin' And Chewin', End's Delight, Expanded Delight, Crabber's Delight, Barbeque's Delight and Villagers' Delight.
+| Feature | What it provides | Cost |
+| --- | --- | --- |
+| Cooking pot | Cooking progress, heat sources, containers and custom pot groups | Free |
+| Cutting board | Tool requirements, multiple outputs, output chances and sounds | Free |
+| Stove and skillet | Placed and handheld cooking, effects and configurable particles | Free |
+| Crops and farmland | Crops, wild plants, rich soil and configurable growth | Free |
+| Blocks and items | CraftEngine models, resource packs, loot, ropes, mushroom colonies and storage | Free |
+| Food effects | Nourishment, Comfort and configurable food effects | Free |
+| Recipe editor | `/fd recipe edit`, station selection, search, paging and return to the previous menu | Free |
+| Fuzzy recipes | Equivalent ingredients, food groups, ideal ratios, seasonings and priorities | Free |
+| Advanced ingredient groups | Nested groups, tag references and alternative ingredients | Free |
+| Content-pack recipes | Loading from enabled CraftEngine packs; editing writes back to the source node | Free |
+| Fluid recipes | Filling, emptying, soaking and ID/tag/alternative/component conditions with FluidCore | Free |
+| Fluid tank | Normal/glass tanks, capacity hints, menu, hopper processing, dyeing and content-preserving carried items/drops | Free |
+| Handheld cooking | Skillet jump/landing flips and meat/vegetable skewers | Free |
+| Villagers | Custom crop harvesting/replanting, seed/food pickup, sharing, native breeding rules and configurable trades | Free |
+| Persistent statistics | Asynchronous SQLite, player/item details and cached PlaceholderAPI queries | Free |
+| Generic crops | Single/double/rope crops, farmland, rich soil, compost and wild rice | Free |
+| Generic block behaviors | Basket settings, rope reels/bells, paired/double blocks, comparators and temperature damage | Free |
+| Configured functions | Full-hunger eating, effect removal/upgrades, advancements and safe teleportation | Free |
+| Presentation settings | Display offsets/overrides, sounds, chances, heat trays, density throttling and container intervals | Free |
+| Recipe discovery | Recipe books, information cards and links between recipes | Free |
+| Kaleidoscope integration | Optional recipe-book filling into cooking pots | Free |
+| Advancements | Optional UltimateAdvancementAPI integration and changed-node synchronization | Free |
+| Scheduling and performance | Folia owner-thread access, asynchronous file work, cached configuration and sleeping pot tickers | Free |
+| Addon API | `com.huidu.farmersdelight.api` and optional gameplay addons | Free |
 
-## Requirements
+## Installation
 
-- Paper or Folia 1.21.4 or newer
-- Java 21 for the plugin; the Minecraft 26.3 test server uses Java 25
-- CraftEngine 26.8.2 or newer (compiled against 26.9.1; 26.9.2 and 26.10-SNAPSHOT also verified on Paper 26.3)
+- This release targets **Paper 26.3** and **Folia 26.2**; consult the matching build's local acceptance results.
+- Java 21 for the plugin; the Minecraft 26.3 server requires **Java 25**.
+- **CraftEngine 26.10-SNAPSHOT build 26.10-20260929.192451-4** is pinned. Startup verifies the original JAR digest; other builds need adaptation and validation.
 
-Install CraftEngine first, then place the Farmersdelight-Plugin-Pro jar in `plugins/`. Use `/fd reload` for plugin configuration and `/ce reload` after changing CraftEngine resources.
+Install CraftEngine first, then put the Farmersdelight-Plugin-Pro JAR in `plugins/` and start the server. Use `/fd reload` after changing plugin configuration, and `/ce reload` after changing CraftEngine resources.
 
-Advancements require UltimateAdvancementAPI as a separate server plugin. `libs/` includes the optimized `2.8.1-pro.2` build and corresponding sources, verified on Paper 26.3 and Folia 26.2. This artifact includes only the 26.2/26.3 adapters; older servers need an API distribution matching their version. Other features remain available without the API. See [dependency details](libs/README.md). Resource-pack reloads force a definition resend; ordinary updates synchronize only changed nodes.
+Fluid features require **FluidCore** as a separate plugin; its API is not bundled. Other features remain available without it. New configuration, recipes and packs are supported; old fluid-library world/item data is not migrated. Recognized legacy payloads are protected rather than overwritten as empty tanks. See the [configuration and recipe guide](CONFIGURATION-RECIPES.zh-CN.md).
+
+External content takes precedence; bundled content fills missing definitions. Duplicate category/full-ID definitions between external packs are reported. Models/textures are selected by path and language JSON by key. Generated resources use a managed overlay without rewriting external asset directories.
+
+Standard browsing categories use one root with nine groups: tools, ingredients, crops, processed food, food, feasts, decorations, wild plants and pet food. Available items are combined without duplicates; normal and glass tanks have separate entries. Set `craftengine-resources.unified-categories: false` to retain the original category trees. This changes the loading copy, not source-pack files.
+
+Advancements require **UltimateAdvancementAPI** as a separate plugin. `libs/` includes the optimized **2.8.1-pro.2** JAR, its corresponding source archive and build instructions. This build contains the 26.2/26.3 adapters, verified on Paper 26.3 and Folia 26.2; older servers need an API distribution matching their version. See [dependency details](libs/README.md). Resource-pack reloads resend definitions; ordinary updates synchronize changed nodes.
+
+bStats 3.2.1 uses plugin ID **34448** (registered as **FarmersDelightPro**). To opt out, set `enabled: false` in `plugins/bStats/config.yml` and restart the server. Metrics use asynchronous transport, support Folia and stop when the plugin is disabled.
 
 ## Documentation
 
-The complete player, server, addon and API documentation is maintained in the [FarmersdelightPluginWiKi](https://github.com/IOVEYOUMC0/FarmersdelightPluginWiKi) repository. It can be connected to GitBook through its GitHub integration.
+- [Configuration, recipes and migration](CONFIGURATION-RECIPES.zh-CN.md)
+- [Fluid tank setup and use (Chinese)](FLUID-TANK.zh-CN.md)
+- [Kaleidoscope integration and fuzzy recipes](KALEIDOSCOPE-COMPAT.zh-CN.md)
+- [Dependency artifacts and sources](libs/README.md)
+- [1.2.0 changes and verification scope (Chinese)](RELEASE-NOTES-1.2.0.zh-CN.md)
+- [Player, server and addon wiki](https://github.com/IOVEYOUMC0/FarmersdelightPluginWiKi)
 
 ## Building
+
+Build with **JDK 25**; FD itself emits Java 21 bytecode. The current FluidCore 26.3 platform modules and test servers run on Java 25.
 
 ```text
 ./gradlew build
 ```
 
-The build resolves CraftEngine 26.9.1 from its official Maven repository; pass `-PceVersion=<version>` to compile against another release. CraftEngine 26.10 snapshots automatically enable native sleeping cooking-pot tickers at runtime; earlier releases use the existing scheduler. Unpublished snapshots can be compiled with `-PceJar=<plugin-jar>` and `-PceLibraries=<CraftEngine/libs-directory>` (the remapped runtime libraries). Addons compile against the generated API-only Farmersdelight-Plugin-Pro jar and must be checked out beside this repository.
+Pass `-PceJar=<pinned-snapshot-jar>`, `-PceLibraries=<CraftEngine/libs-directory>` and `-PfluidCoreJar=<FluidCore-jar>` for local dependencies. The CE Maven dependency is restricted to 26.10 snapshots; runtime must still match the pinned build.
+
+Cooking pots and fluid tanks use the pinned snapshot's native sleeping/waking tickers. Addons compile against the generated API-only JAR and must be checked out beside this repository. Performance reports identify measured environments and comparable scenarios; untested cases are not advertised as improvements.
+
+## Credits
+
+Thanks to **vectorwing** and the [Farmer's Delight](https://github.com/vectorwing/FarmersDelight) contributors for the original mod and its MIT-licensed assets, including the golden apple and golden carrot crate models and textures. Original plugin development: **HuiDu_OwO (IOVEYOUMC0)**. This fork is maintained by **ydxc2009**.
+
+Bundled third-party assets retain their source and license notices. External packs are supplied by server owners; their additional assets require their own distribution permission.
 
 ## License
 
 GNU Affero General Public License v3.0 only. See [LICENSE](LICENSE).
 
-The plugin is fully open source: the recipe editor, recipe-to-recipe jumps and handheld skillet cooking are all in this repository. You may use, modify and redistribute it, including for a fee, as long as AGPL-3.0 is honoured: keep the copyright and licence notices, ship the complete corresponding source of the version you distribute, license your modified version under AGPL-3.0, and if you run a modified version as a network service, offer its source to the users of that service.
+The complete plugin source, including the recipe editor, recipe links and handheld skillet, is available in this repository. You may use, modify and redistribute it, including for a fee, subject to AGPL-3.0: preserve copyright and license notices, provide the complete corresponding source, license modified versions under AGPL-3.0, and offer source to users who interact with a modified version over a network.
 
-Third-party content (the ported Farmer's Delight assets and the bundled libraries) keeps its own notices; see [NOTICE.md](NOTICE.md) and [THIRD_PARTY.md](THIRD_PARTY.md).
-
-This repository maintains the source and releases of this optimization fork. The upstream project and other forks are maintained by their respective authors.
+Third-party content and libraries retain their own notices and licenses. See [NOTICE.md](NOTICE.md), [THIRD_PARTY.md](THIRD_PARTY.md) and the notices shipped in the JAR. Upstream projects and other forks are maintained by their respective authors.

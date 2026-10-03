@@ -8,6 +8,13 @@ public final class GuiCacheInvalidator {
     private GuiCacheInvalidator() {
     }
 
+    /** Invalidates recipe previews without initializing a menu or creating Bukkit items. */
+    @org.jetbrains.annotations.ApiStatus.Internal
+    public static void clearRecipeDisplayCaches() {
+        RecipeViewCache.clearDisplay();
+        ToolPreviewRenderer.clearToolPreviewCache();
+    }
+
     public static void clearConfigCaches() {
         RecipeViewGui.clearConfigCache();
         RecipeBookGui.clearConfigCache();

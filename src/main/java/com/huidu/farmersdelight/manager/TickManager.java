@@ -38,6 +38,9 @@ public class TickManager {
     private static final int MARK_DRAIN_BUDGET = 1024;
     private final Map<ChunkKey, Object> scheduledChunks = new ConcurrentHashMap<>();
     private final Map<ActiveBlock, CookingPotBlockEntityController> nativePots = new ConcurrentHashMap<>();
+    private final GroupedEntryIndex<ActiveBlock, ChunkKey, ActiveBlock, CookingPotBlockEntityController> nativeIndex = new GroupedEntryIndex<>();
+    private final Map<ChunkKey, Map<ActiveBlock, CookingPotBlockEntityController>> pendingNativeWakes = new ConcurrentHashMap<>();
+    private static final int WAKE_CHUNK_BUDGET = 32;
     private final AtomicInteger nativeAwakePots = new AtomicInteger();
     private long observedRecipeGeneration = Long.MIN_VALUE;
     private final LongAdder submittedChunkTasks = new LongAdder();
@@ -55,6 +58,7 @@ public class TickManager {
     // Reload-written on the reload/command thread, read by the global tick thread — volatile for a
     // happens-before edge (Folia keeps reload on a different thread than the tick).
     private volatile int cookingPotTickBudget = 512;
+    private volatile int nativeWorkInterval = 4;
     private volatile int cookingPotProgressDisplayUpdateIntervalTicks = 8;
     private volatile int cookingPotProgressDisplayDisableAboveActivePots = 512;
     private volatile int activeBlockWarningThreshold = 1000;
@@ -81,6 +85,7 @@ public class TickManager {
     }
 
     public void reloadConfig() {
+        nativeWorkInterval = Math.max(1, Math.min(20, plugin.getConfigInt(4, "container.tick-interval-ticks", "container.tick_interval_ticks")));
         effectManager.reloadConfig();
         cookingPotTickBudget = Math.max(1, plugin.getConfigInt(DEFAULT_COOKING_POT_TICK_BUDGET,
                 "cooking-pot.tick-budget",
@@ -119,6 +124,8 @@ public class TickManager {
         
         activeWork.clear();
         nativePots.clear();
+        nativeIndex.clear();
+        pendingNativeWakes.clear();
         nativeAwakePots.set(0);
         activeCookingPotCount = 0;
         lastProcessedTicks.clear();
@@ -312,6 +319,9 @@ public class TickManager {
         if (world == null) return;
         ActiveBlock key = new ActiveBlock(world.getUID(), world, pos, BlockType.COOKING_POT);
         CookingPotBlockEntityController previous = nativePots.put(key, controller);
+        nativeIndex.put(key, chunkOf(key), Set.of(key,
+                new ActiveBlock(key.worldId(), world, new BlockPosKey(pos.x(), pos.y() - 1, pos.z()), BlockType.COOKING_POT),
+                new ActiveBlock(key.worldId(), world, new BlockPosKey(pos.x(), pos.y() - 2, pos.z()), BlockType.COOKING_POT)), controller);
         if (previous != controller) {
             if (previous != null && !previous.isTickSleeping()) nativeAwakePots.decrementAndGet();
             if (!controller.isTickSleeping()) nativeAwakePots.incrementAndGet();
@@ -324,6 +334,7 @@ public class TickManager {
         if (world == null) return;
         ActiveBlock key = new ActiveBlock(world.getUID(), world, pos, BlockType.COOKING_POT);
         if (nativePots.remove(key, controller)) {
+            nativeIndex.remove(key, controller);
             if (!controller.isTickSleeping()) nativeAwakePots.decrementAndGet();
             heatSourceLastCheckTicks.remove(key);
             progressDisplayLastUpdateTicks.remove(key);
@@ -351,29 +362,62 @@ public class TickManager {
 
     /** A heat source can reach a pot directly, or through one conducting block. */
     public void wakePotsAbove(World world, BlockPosKey changed) {
-        if (nativePots.isEmpty()) return;
-        wakeNativePot(world, changed);
-        wakeNativePot(world, new BlockPosKey(changed.x(), changed.y() + 1, changed.z()));
-        wakeNativePot(world, new BlockPosKey(changed.x(), changed.y() + 2, changed.z()));
+        if (world == null || changed == null || nativePots.isEmpty()) return;
+        nativeIndex.affected(new ActiveBlock(world.getUID(), world, changed, BlockType.COOKING_POT))
+                .forEach(this::queueNativeWake);
     }
 
     public void wakeAllNativePots() {
-        nativePots.forEach((key, controller) -> {
-            heatSourceLastCheckTicks.remove(key);
-            controller.requestTickWake();
+        for (ChunkKey chunk : nativeIndex.groups()) nativeIndex.group(chunk).forEach(this::queueNativeWake);
+    }
+
+    private void queueNativeWake(ActiveBlock key, CookingPotBlockEntityController controller) {
+        pendingNativeWakes.compute(chunkOf(key), (chunk, entries) -> {
+            if (entries == null) entries = new ConcurrentHashMap<>();
+            entries.put(key, controller);
+            return entries;
         });
+    }
+
+    private void dispatchNativeWakes() {
+        int dispatched = 0;
+        for (ChunkKey chunk : pendingNativeWakes.keySet()) {
+            if (dispatched++ >= WAKE_CHUNK_BUDGET) break;
+            Map<ActiveBlock, CookingPotBlockEntityController> entries = pendingNativeWakes.remove(chunk);
+            if (entries == null || entries.isEmpty()) continue;
+            World world = entries.keySet().iterator().next().world();
+            plugin.scheduler().runAt(world, chunk.x(), chunk.z(), () -> {
+                if (!running) return;
+                entries.forEach((key, controller) -> {
+                    if (nativePots.get(key) != controller) return;
+                    heatSourceLastCheckTicks.remove(key);
+                    controller.wakeFromOwnerThread();
+                });
+            });
+        }
     }
 
     /** Called only by CraftEngine's synchronous ticker on the owning block thread. */
     public boolean tickNativePot(World world, BlockPosKey pos, CookingPotBlockEntityController controller) {
+        return tickNativePot(world, pos, controller, nativeWorkInterval);
+    }
+
+    public int nativeWorkIntervalTicks() { return nativeWorkInterval; }
+
+    public int nativePotsInChunk(UUID world, int chunkX, int chunkZ) {
+        return nativeIndex.groupSize(new ChunkKey(world, chunkX, chunkZ));
+    }
+
+    public boolean tickNativePot(World world, BlockPosKey pos, CookingPotBlockEntityController controller, int elapsedTicks) {
         if (!running) return true;
-        if (!isNativePotRegistered(world, pos, controller)) return false;
+        if (world == null) return false;
         ActiveBlock key = new ActiveBlock(world.getUID(), world, pos, BlockType.COOKING_POT);
+        if (nativePots.get(key) != controller) return false;
         PerformanceMonitor.Session profile = performanceMonitor.recording();
         PerformanceMonitor.Timing timing = profile == null ? null : profile.timings.get(PerformanceMonitor.Feature.COOKING_POT);
         long started = timing == null ? 0L : System.nanoTime();
         try {
-            return tickCookingPot(key, world, pos, TICK_INTERVAL, Bukkit.getCurrentTick());
+            return tickCookingPot(key, world, pos, Math.max(1, Math.min(20, elapsedTicks)), Bukkit.getCurrentTick());
         } catch (Exception failure) {
             performanceMonitor.warnFeatureFailure("native-cooking-pot", "Error ticking cooking pot at " + pos, world, failure);
             return true;
@@ -422,9 +466,8 @@ public class TickManager {
         ChunkKey chunk = new ChunkKey(world.getUID(), chunkX, chunkZ);
         activeWork.retireGroup(chunk);
         scheduledChunks.remove(chunk);
-        nativePots.forEach((key, controller) -> {
-            if (chunkOf(key).equals(chunk)) unregisterNativePot(world, key.posKey(), controller);
-        });
+        pendingNativeWakes.remove(chunk);
+        nativeIndex.group(chunk).forEach((key, controller) -> unregisterNativePot(world, key.posKey(), controller));
     }
 
     /**
@@ -438,11 +481,13 @@ public class TickManager {
             return;
         }
         effectManager.cleanupWorld(worldId);
+        if (plugin.particles() != null) plugin.particles().cleanupDensityWorld(worldId);
         activeWork.retireWorld(worldId);
         scheduledChunks.keySet().removeIf(chunk -> chunk.worldId().equals(worldId));
-        nativePots.forEach((key, controller) -> {
-            if (key.worldId().equals(worldId)) unregisterNativePot(key.world(), key.posKey(), controller);
-        });
+        for (ChunkKey chunk : nativeIndex.groups()) if (chunk.worldId().equals(worldId)) {
+            pendingNativeWakes.remove(chunk);
+            nativeIndex.group(chunk).forEach((key, controller) -> unregisterNativePot(key.world(), key.posKey(), controller));
+        }
     }
 
     /** Drops the effect budget/viewer context of one unloading chunk; the map is otherwise never cleared. */
@@ -450,11 +495,13 @@ public class TickManager {
         if (world == null) {
             return;
         }
+        if (plugin.particles() != null) plugin.particles().cleanupDensityChunk(world.getUID(), blockX >> 4, blockZ >> 4);
         effectManager.cleanupChunk(world.getUID(), ManagerSupport.chunkKey(blockX >> 4, blockZ >> 4));
     }
 
     private void tick() {
         if (!running) return;
+        dispatchNativeWakes();
         if (plugin.getCookingPotRecipes() != null) {
             long generation = plugin.getCookingPotRecipes().recipeGeneration();
             if (generation != observedRecipeGeneration) {

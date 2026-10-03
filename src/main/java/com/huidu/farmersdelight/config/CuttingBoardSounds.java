@@ -16,14 +16,29 @@ public final class CuttingBoardSounds {
 
     private final ToolSoundTable table;
     private final ToolSoundTable.Entry fallback;
+    private final ToolSoundTable.Entry place;
+    private final ToolSoundTable.Entry remove;
+    private final ToolSoundTable.Entry carve;
+    private final double fortuneBonus;
 
-    private CuttingBoardSounds(ToolSoundTable table, ToolSoundTable.Entry fallback) {
+    private CuttingBoardSounds(ToolSoundTable table, ToolSoundTable.Entry fallback,
+                               ConfigurationSection section) {
         this.table = table;
         this.fallback = fallback;
+        this.place = StationSound.read(ConfigLookup.firstSection(section, "place-item", "place_item"),
+                null, 1.0F, 1.0F);
+        this.remove = StationSound.read(ConfigLookup.firstSection(section, "remove-item", "remove_item"),
+                null, section == null ? 0.25F : (float) section.getDouble("retrieve-volume", 0.25),
+                section == null ? 0.5F : (float) section.getDouble("retrieve-pitch", 0.5));
+        this.carve = StationSound.read(ConfigLookup.firstSection(section, "carve-tool", "carve_tool"),
+                null, 1.0F, 1.2F);
+        ConfigurationSection board = section == null ? null : section.getParent();
+        double configured = ConfigLookup.doubleValue(board, 0.1, "fortune-bonus", "fortune_bonus");
+        this.fortuneBonus = Double.isFinite(configured) ? Math.max(0, Math.min(1, configured)) : 0.1;
     }
 
     public static CuttingBoardSounds defaults() {
-        return new CuttingBoardSounds(ToolSoundTable.empty(), defaultFallback());
+        return new CuttingBoardSounds(ToolSoundTable.empty(), defaultFallback(), null);
     }
 
     public static CuttingBoardSounds from(ConfigurationSection soundsSection) {
@@ -43,7 +58,7 @@ public final class CuttingBoardSounds {
             fallback = new ToolSoundTable.Entry(sound, volume,
                     Math.min(pitchMin, pitchMax), Math.max(pitchMin, pitchMax));
         }
-        return new CuttingBoardSounds(table, fallback);
+        return new CuttingBoardSounds(table, fallback, soundsSection);
     }
 
     private static ToolSoundTable.Entry defaultFallback() {
@@ -55,4 +70,9 @@ public final class CuttingBoardSounds {
         ToolSoundTable.Entry entry = table.resolve(tool);
         return entry != null ? entry : fallback;
     }
+
+    public ToolSoundTable.Entry place() { return place; }
+    public ToolSoundTable.Entry remove() { return remove; }
+    public ToolSoundTable.Entry carve() { return carve; }
+    public double fortuneBonus() { return fortuneBonus; }
 }

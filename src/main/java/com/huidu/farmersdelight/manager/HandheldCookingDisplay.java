@@ -104,7 +104,7 @@ final class HandheldCookingDisplay extends ChannelOutboundHandlerAdapter {
     }
 
     private boolean matches(Object item) {
-        return ItemStackProxy.INSTANCE.getCount(item) == 1
+        return ItemStackProxy.INSTANCE.getCount(item) == ItemStackProxy.INSTANCE.getCount(original)
                 && ItemStackProxy.INSTANCE.isSameItemSameComponents(original, item);
     }
 

@@ -36,16 +36,30 @@ public final class BasketVacuumController extends BlockEntityController {
     private final int transferCooldownTicks;
     // Controls whether the basket pushes contents into the container it faces. Collection always runs.
     private final boolean eject;
+    private final boolean redstoneLock;
+    private final String facingProperty;
+    private final String enabledProperty;
     // Access stays on the owning region tick thread. A negative initial cooldown allows immediate collection.
     private int transferCooldown = -1;
     private boolean poweredByRedstone;
-    private int redstonePollTicks;
+    private int redstonePollTicks = REDSTONE_POLL_INTERVAL - 1;
+    private net.momirealms.craftengine.core.block.BlockDefinition propertyOwner;
+    private net.momirealms.craftengine.core.block.property.Property<Boolean> enabled;
+    private net.momirealms.craftengine.core.block.property.Property<?> direction;
 
     public BasketVacuumController(FarmersDelightPlugin plugin, BlockEntity blockEntity, int transferCooldownTicks, boolean eject) {
+        this(plugin, blockEntity, transferCooldownTicks, eject, true, "facing", "enabled");
+    }
+
+    public BasketVacuumController(FarmersDelightPlugin plugin, BlockEntity blockEntity, int transferCooldownTicks, boolean eject,
+                                  boolean redstoneLock, String facingProperty, String enabledProperty) {
         super(blockEntity);
         this.plugin = plugin;
         this.transferCooldownTicks = transferCooldownTicks;
         this.eject = eject;
+        this.redstoneLock = redstoneLock;
+        this.facingProperty = facingProperty;
+        this.enabledProperty = enabledProperty;
     }
 
     @Override
@@ -58,11 +72,17 @@ public final class BasketVacuumController extends BlockEntityController {
     }
 
     private void vacuum(BlockPos pos, ImmutableBlockState state) {
-        this.transferCooldown--;
-        if (this.transferCooldown > 0) {
-            return;
+        if (propertyOwner != state.owner().value()) {
+            propertyOwner = state.owner().value();
+            enabled = net.momirealms.craftengine.core.block.behavior.BlockBehaviorFactory.getOptionalProperty(propertyOwner, enabledProperty, Boolean.class);
+            direction = propertyOwner.getProperty(facingProperty);
         }
-        this.transferCooldown = 0;
+        if (enabled != null && !Boolean.TRUE.equals(state.get(enabled))) return;
+        this.transferCooldown--;
+        // Count native callbacks even during a transfer cooldown.
+        boolean pollRedstone = redstoneLock
+                && (this.poweredByRedstone || ++this.redstonePollTicks >= REDSTONE_POLL_INTERVAL);
+        if (this.transferCooldown > 0 && !pollRedstone) return;
 
         World world = CustomBlockUtils.getBukkitWorld(this.blockEntity);
         if (world == null) {
@@ -72,21 +92,27 @@ public final class BasketVacuumController extends BlockEntityController {
         // Pause collection while the basket receives a redstone signal.
         // Check periodically when unpowered and every tick while powered,
         // so collection resumes promptly without continuous idle neighbor scans.
-        if (this.poweredByRedstone || ++this.redstonePollTicks >= REDSTONE_POLL_INTERVAL) {
+        if (pollRedstone) {
             this.redstonePollTicks = 0;
             this.poweredByRedstone = world.getBlockAt(pos.x(), pos.y(), pos.z()).isBlockIndirectlyPowered();
         }
-        if (this.poweredByRedstone) {
-            this.transferCooldown = NO_OP_COOLDOWN;
+        if (redstoneLock && this.poweredByRedstone) {
+            this.transferCooldown = 0;
             return;
         }
+        if (this.transferCooldown > 0) return;
+        this.transferCooldown = 0;
 
         Inventory inventory = storageInventory();
         if (inventory == null) {
             return;
         }
 
-        BlockFace facing = CustomBlockUtils.getFullFacing(state);
+        BlockFace facing;
+        try {
+            facing = direction == null ? CustomBlockUtils.getFullFacing(state)
+                    : BlockFace.valueOf(String.valueOf(state.getNullable(direction)).toUpperCase(java.util.Locale.ROOT));
+        } catch (IllegalArgumentException invalidFacing) { return; }
         if (facing == null) {
             return;
         }
@@ -134,6 +160,7 @@ public final class BasketVacuumController extends BlockEntityController {
     }
 
     private static Inventory facedContainerInventory(World world, int x, int y, int z) {
+        if (y < world.getMinHeight() || y >= world.getMaxHeight() || !world.isChunkLoaded(x >> 4, z >> 4)) return null;
         BlockState facedState = world.getBlockAt(x, y, z).getState(false);
         if (facedState instanceof Container container) {
             return container.getInventory();

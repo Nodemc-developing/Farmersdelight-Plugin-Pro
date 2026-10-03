@@ -230,7 +230,7 @@ public class HeatSourceConfig {
     }
 
     /** One configured heat-source rule: how to match a block, and what matching it means. */
-    private record HeatEntry(EntryMatcher matcher, boolean heatSource, boolean conductor) {
+    private record HeatEntry(EntryMatcher matcher, boolean heatSource, boolean conductor, boolean tray) {
     }
 
     private interface EntryMatcher {
@@ -277,17 +277,29 @@ public class HeatSourceConfig {
         if (open < 0 || !data.endsWith("]")) {
             return false;
         }
-        Map<String, String> actual = new HashMap<>();
-        for (String pair : data.substring(open + 1, data.length() - 1).split(",")) {
-            int eq = pair.indexOf('=');
-            if (eq > 0) {
-                actual.put(pair.substring(0, eq).trim(), pair.substring(eq + 1).trim());
-            }
-        }
         for (Map.Entry<String, String> entry : required.entrySet()) {
-            if (!entry.getValue().equalsIgnoreCase(actual.get(entry.getKey()))) {
-                return false;
+            boolean matched = false;
+            for (int start = open + 1; start < data.length() - 1;) {
+                int end = data.indexOf(',', start);
+                if (end < 0) end = data.length() - 1;
+                int equals = data.indexOf('=', start);
+                if (equals >= start && equals < end) {
+                    int keyStart = start, keyEnd = equals, valueStart = equals + 1, valueEnd = end;
+                    while (keyStart < keyEnd && Character.isWhitespace(data.charAt(keyStart))) keyStart++;
+                    while (keyEnd > keyStart && Character.isWhitespace(data.charAt(keyEnd - 1))) keyEnd--;
+                    while (valueStart < valueEnd && Character.isWhitespace(data.charAt(valueStart))) valueStart++;
+                    while (valueEnd > valueStart && Character.isWhitespace(data.charAt(valueEnd - 1))) valueEnd--;
+                    if (keyEnd - keyStart == entry.getKey().length()
+                            && data.regionMatches(keyStart, entry.getKey(), 0, entry.getKey().length())
+                            && valueEnd - valueStart == entry.getValue().length()
+                            && data.regionMatches(true, valueStart, entry.getValue(), 0, entry.getValue().length())) {
+                        matched = true;
+                        break;
+                    }
+                }
+                start = end + 1;
             }
+            if (!matched) return false;
         }
         return true;
     }
@@ -309,6 +321,7 @@ public class HeatSourceConfig {
         Map<String, String> states = entryStates(raw);
         boolean heatSource = entryBoolean(raw, "heat-source", true);
         boolean conductor = entryBoolean(raw, "conductor", false);
+        boolean tray = entryBoolean(raw, "tray", false);
 
         EntryMatcher matcher = null;
         if (vanillaBlock != null) {
@@ -335,7 +348,7 @@ public class HeatSourceConfig {
                     "error", "entry matches nothing: " + raw);
             return null;
         }
-        return new HeatEntry(matcher, heatSource, conductor);
+        return new HeatEntry(matcher, heatSource, conductor, tray);
     }
 
     // The CE matcher is already driven by the "id[key:value]" syntax, so a states map is folded into it
@@ -437,6 +450,12 @@ public class HeatSourceConfig {
 
     public boolean isHeatSource(Block block) {
         return isHeatSource(block, null);
+    }
+
+    /** Explicit tray rules take precedence; legacy rules retain their shape-based support handling. */
+    public Boolean trayRequirement(Block block) {
+        HeatEntry entry = firstMatchingEntry(block, null);
+        return entry == null ? null : entry.tray();
     }
 
     public boolean isHeatSource(Block block, ImmutableBlockState preFetchedState) {

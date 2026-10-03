@@ -8,6 +8,8 @@ import com.huidu.farmersdelight.api.block.StoveSnapshot;
 import com.huidu.farmersdelight.i18n.I18n;
 import com.huidu.farmersdelight.util.ManagerSupport;
 import com.huidu.farmersdelight.util.SoundUtils;
+import com.huidu.farmersdelight.api.sound.ToolSoundTable;
+import com.huidu.farmersdelight.config.StationSound;
 import com.huidu.farmersdelight.util.BlockPosKey;
 import com.huidu.farmersdelight.util.CampfireRecipeCache;
 import com.huidu.farmersdelight.util.Constants;
@@ -105,6 +107,8 @@ public class StoveManager {
     // for a happens-before edge, matching the other reload-mutated tick-read fields.
     private volatile double effectViewerDistance = 32.0D;
     private volatile int effectIntervalTicks = 4;
+    private volatile int tickIntervalTicks = STOVE_TICK_INTERVAL;
+    private volatile ToolSoundTable.Entry placeFoodSound = new ToolSoundTable.Entry(null, 0.5F, 1.0F, 1.0F);
     // Per-chunk per-tick effect context: the packet budget (hard cap so a dense pocket of stoves —
     // 60/chunk × 4 slot rolls — can't steamroll the packet queue in one Bukkit tick) plus the tick's
     // chunk-tracked player list, fetched once and shared by every stove in the chunk. World-keyed so
@@ -135,6 +139,11 @@ public class StoveManager {
     }
 
     public void reloadConfig() {
+        int previousInterval = tickIntervalTicks;
+        tickIntervalTicks = Math.max(1, Math.min(200, plugin.getConfigInt(STOVE_TICK_INTERVAL,
+                "container.tick-interval-ticks", "container.tick_interval_ticks")));
+        placeFoodSound = StationSound.read(plugin.getFirstConfigSection("stove.sounds.place-food", "stove.sounds.place_food"),
+                null, 0.5F, 1.0F);
         this.tickBudget = Math.max(1, plugin.getConfigInt(DEFAULT_TICK_BUDGET,
                 "stove.tick-budget",
                 "performance.stove-tick-budget"));
@@ -149,6 +158,15 @@ public class StoveManager {
         loadEffectsConfig();
         visualManager.reloadSlotOffsets();
         visualManager.refreshAll(stoves.values());
+        if (previousInterval != tickIntervalTicks) {
+            synchronized (tickTaskLock) {
+                if (tickTask != null) {
+                    tickTask.cancel();
+                    tickTask = null;
+                    ensureTaskRunning();
+                }
+            }
+        }
     }
 
     private void loadEffectsConfig() {
@@ -165,6 +183,10 @@ public class StoveManager {
         smokeOffsetY = Math.max(0.0D, smokeSection == null ? 0.0D : ConfigSectionReader.optionalDouble(smokeSection, "offset-y", 0.0D));
         smokeOffsetZ = Math.max(0.0D, smokeSection == null ? 0.0D : ConfigSectionReader.optionalDouble(smokeSection, "offset-z", 0.0D));
         smokeSpeed = Math.max(0.0D, smokeSection == null ? 0.02D : ConfigSectionReader.optionalDouble(smokeSection, "speed", 0.02D));
+        smokeChance = ManagerSupport.clampChance(plugin.getConfigDouble(smokeChance,
+                "stove.particles.item-smoke-chance", "stove.particles.item_smoke_chance"));
+        smokeCount = Math.max(1, Math.min(128, plugin.getConfigInt(smokeCount,
+                "stove.particles.item-smoke-count", "stove.particles.item_smoke_count")));
 
         ConfigurationSection crackleSection = effectsSection != null ? effectsSection.getConfigurationSection("crackle") : null;
         crackleEnabled = crackleSection == null || ConfigSectionReader.optionalBoolean(crackleSection, "enabled", true);
@@ -193,7 +215,7 @@ public class StoveManager {
                 return;
             }
             debug("tick task: starting stove tick task");
-            tickTask = plugin.scheduler().runRepeating(this::tick, 1L, STOVE_TICK_INTERVAL);
+            tickTask = plugin.scheduler().runRepeating(this::tick, 1L, tickIntervalTicks);
         }
     }
 
@@ -309,7 +331,9 @@ public class StoveManager {
                     + ", location=" + formatLocation(location));
         }
 
-        location.getWorld().playSound(location, Sound.BLOCK_LANTERN_PLACE, 0.5f, 1.0f);
+        ToolSoundTable.Entry sound = placeFoodSound;
+        SoundUtils.play(location.getWorld(), location, sound.soundKey(), Sound.BLOCK_LANTERN_PLACE,
+                sound.volume(), sound.pitch());
         return true;
     }
 
@@ -784,7 +808,7 @@ public class StoveManager {
 
         long currentBukkitTick = Bukkit.getCurrentTick();
         // Credited once per visit and applied to every slot below: durations and cooling are in game ticks.
-        int elapsedTicks = stove.elapsedSinceLastCredit(currentBukkitTick, STOVE_TICK_INTERVAL,
+        int elapsedTicks = stove.elapsedSinceLastCredit(currentBukkitTick, tickIntervalTicks,
                 MAX_ELAPSED_CREDIT_TICKS);
         if (stove.blockedAboveCheckedTick == Long.MIN_VALUE
                 || currentBukkitTick - stove.blockedAboveCheckedTick > BLOCKED_RECHECK_TICKS) {
@@ -832,6 +856,8 @@ public class StoveManager {
         // permanently silence 3/4 of chunks. The chunk was checked loaded at the top of this method and
         // cannot unload within the same region tick, so getChunkAt cannot trigger a sync load here.
         boolean effectsDue = stove.effectCadence.tryAcquire(currentBukkitTick, effectIntervalTicks);
+        boolean particleDensity = effectsDue && plugin.particles().allowDensity("stove", location, false);
+        boolean soundDensity = effectsDue && plugin.particles().allowDensity("stove", location, true);
         ChunkFxContext fx = null;
         if (effectsDue) {
             long chunkKey = ManagerSupport.chunkKey(stoveChunkX, stoveChunkZ);
@@ -861,7 +887,7 @@ public class StoveManager {
         }
         AtomicInteger chunkBudget = nearbyViewers.isEmpty() ? null : fx.budget;
         boolean canSpawnEffects = chunkBudget != null && chunkBudget.get() < chunkEffectBudgetLimit;
-        if (isLit && canSpawnEffects && fireParticlesEnabled && random.nextDouble() < fireParticleChance
+        if (isLit && canSpawnEffects && particleDensity && fireParticlesEnabled && random.nextDouble() < fireParticleChance
                 && EffectPacketBudget.tryReserve(chunkBudget, chunkEffectBudgetLimit, 2)) {
             spawnAmbientFireParticles(nearbyViewers, location, front, random);
         }
@@ -892,11 +918,11 @@ public class StoveManager {
                 }
 
                 boolean canSpawnSlotEffects = canSpawnEffects && chunkBudget.get() < chunkEffectBudgetLimit;
-                if (canSpawnSlotEffects && smokeEnabled && random.nextDouble() < smokeChance
+                if (canSpawnSlotEffects && particleDensity && smokeEnabled && random.nextDouble() < smokeChance
                         && EffectPacketBudget.tryReserve(chunkBudget, chunkEffectBudgetLimit, 1)) {
                     spawnCookingParticles(nearbyViewers, location, i, facing);
                 }
-                if (canSpawnSlotEffects && crackleEnabled && random.nextDouble() < crackleChance
+                if (canSpawnSlotEffects && soundDensity && crackleEnabled && random.nextDouble() < crackleChance
                         && EffectPacketBudget.tryReserve(chunkBudget, chunkEffectBudgetLimit, 1)) {
                     if (!crackleResolved) {
                         crackleSound = getCrackleSound(state);

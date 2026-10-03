@@ -651,15 +651,24 @@ compat:
       wrong_region: "<yellow>请靠近厨锅后重新投料。"
 
 fluid:
+  browser:
+    title: "流体配方"
+    read_only: "<gray>查看配方不会消耗物品；编辑请使用 /fd recipe edit。"
+    count: "<gray>共 {count} 条配方"
+    previous: "上一页"
+    next: "下一页"
+    page: "第 {page} / {pages} 页"
+    back: "返回"
+    result: "产物"
   type:
     fluid_filling: "<aqua>流体灌装配方"
-    fluid_emptying: "<aqua>流体抽取配方"
+    fluid_emptying: "<aqua>流体排空配方"
     soaking: "<aqua>浸泡配方"
   editor:
     ingredient: "原料"
     fluid: "流体或流体标签"
     amount: "流体数量（mB）"
-    time: "浸泡时间"
+    time: "处理耗时"
     tick_unit: "刻"
     consume_fluid: "消耗流体"
     priority: "优先级"

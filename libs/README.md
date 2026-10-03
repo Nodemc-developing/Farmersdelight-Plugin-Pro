@@ -32,3 +32,20 @@ UltimateAdvancementAPI retains **LGPL-3.0-or-later** licensing. The original lic
 | --- | --- |
 | `UltimateAdvancementAPI-Plugin-2.8.1-pro.2.jar` | `e2a247b4c5e77f7489bad3e9bce93e9b8e0a91eebd7edbb36e803e0257af5c6a` |
 | `UltimateAdvancementAPI-2.8.1-pro.2-sources.zip` | `bc3c714eecc710fa3fc6eeff22f15e8351695f46661b7bdce4aeaab46ea7e851` |
+
+## Bundled GPL dependency source
+
+The plugin bundles Sparrow YAML 1.0.22. Its actual corresponding source, full fixed upstream repository archive, original GPL text, POM/module metadata and the embedded SnakeYAML fork's source are supplied in [source/sparrow-yaml-1.0.22](source/sparrow-yaml-1.0.22/README.md). That directory includes offline file verification and explicitly disclosed build-only preparation instructions. The delivered source has been checked; an exact binary rebuild has not been performed.
+
+## FluidCore dependency
+
+`FluidCore-0.1.0-SNAPSHOT.jar` is the compile-only dependency used by this version of Farmersdelight-Plugin-Pro. It is not shaded into either Farmersdelight JAR. Install it separately in the server's `plugins/` directory to enable fluid recipes and tanks. It targets Java 25 and the pinned CraftEngine 26.10 snapshot described in the main README.
+
+FluidCore is maintained by **ydxc20091**. Its implementation modules are **GPL-3.0-only**, while its API module is **Apache-2.0**. The complete corresponding source, build scripts, Gradle wrapper, dependency source and original notices are included in `FluidCore-0.1.0-SNAPSHOT-sources.zip`. The two license texts are also provided as `FluidCore-GPL-3.0.txt` and `FluidCore-API-Apache-2.0.txt`.
+
+Extract the source archive, supply the matching CraftEngine JAR using `FLUIDCORE_CE_JAR` or `-PceJar`, and run `./gradlew distribution`. See the archive's README for installation and API guidance. The default Farmersdelight build uses the JAR in this directory; `-PfluidCoreJar=<path>` selects a different local build.
+
+| Artifact | SHA-256 |
+| --- | --- |
+| `FluidCore-0.1.0-SNAPSHOT.jar` | `263752b800d2bde758433e2a380ce2bd082f72fee8ec87bd461e7f62090cd3f5` |
+| `FluidCore-0.1.0-SNAPSHOT-sources.zip` | `c7d6ffca3f455804c0edd1686a12704106a1475884587fdf6a8d40b8ad833b4e` |

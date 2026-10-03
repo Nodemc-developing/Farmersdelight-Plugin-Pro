@@ -109,6 +109,8 @@ public class WildRiceBlockBehavior extends FarmersDelightBlockBehavior {
     private final Object halfUpperValue;
     private final boolean requiresWater;
     private final SoilRules soilRules;
+    private final boolean blacklist, stackable;
+    private final int maximumHeight;
 
     private WildRiceBlockBehavior(
             BlockDefinition block,
@@ -116,7 +118,7 @@ public class WildRiceBlockBehavior extends FarmersDelightBlockBehavior {
             Object halfLowerValue,
             Object halfUpperValue,
             boolean requiresWater,
-            SoilRules soilRules
+            SoilRules soilRules, boolean blacklist, boolean stackable, int maximumHeight
     ) {
         super(block);
         this.halfProperty = halfProperty;
@@ -124,6 +126,9 @@ public class WildRiceBlockBehavior extends FarmersDelightBlockBehavior {
         this.halfUpperValue = halfUpperValue;
         this.requiresWater = requiresWater;
         this.soilRules = soilRules;
+        this.blacklist = blacklist;
+        this.stackable = stackable;
+        this.maximumHeight = maximumHeight;
     }
 
     public static final BlockBehaviorFactory<WildRiceBlockBehavior> FACTORY = new BlockBehaviorFactory<WildRiceBlockBehavior>() {
@@ -142,13 +147,17 @@ public class WildRiceBlockBehavior extends FarmersDelightBlockBehavior {
             Object upperHalfValue = inferHalfValue(halfProperty, "upper");
             boolean requiresWater = BehaviorArgParser.getBooleanStrict(arguments, "requires-water", true);
             SoilRules soilRules = SoilRuleSupport.parseSoilRules(arguments);
+            int height = BehaviorArgParser.getInt(arguments, "max-height", 2);
+            if (height < 1 || height > 256) throw new IllegalArgumentException("max-height must be in [1, 256]");
             WildRiceBlockBehavior behavior = new WildRiceBlockBehavior(
                     block,
                     halfProperty,
                     lowerHalfValue,
                     upperHalfValue,
                     requiresWater,
-                    soilRules
+                    soilRules, BehaviorArgParser.getBoolean(arguments, "blacklist", false),
+                    BehaviorArgParser.getBoolean(arguments, "stackable", false),
+                    height
             );
             BEHAVIORS.put(block.id(), behavior);
             return behavior;
@@ -204,8 +213,17 @@ public class WildRiceBlockBehavior extends FarmersDelightBlockBehavior {
     }
 
     public boolean isValidSoil(Block block) {
+        if (stackable && matchesWildRice(block)) {
+            int length = 1;
+            Block below = block;
+            while (length < maximumHeight && matchesWildRice(below.getRelative(BlockFace.DOWN))) {
+                below = below.getRelative(BlockFace.DOWN);
+                ++length;
+            }
+            return length < maximumHeight;
+        }
         SoilRules rules = soilRules != null && soilRules.isConfigured() ? soilRules : FALLBACK_SOIL_RULES;
-        return SoilRuleSupport.matches(block, rules);
+        return SoilRuleSupport.matches(block, rules) != blacklist;
     }
 
     public boolean isUpperHalf(ImmutableBlockState state) {

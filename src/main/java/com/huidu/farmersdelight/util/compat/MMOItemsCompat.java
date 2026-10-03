@@ -14,8 +14,8 @@ import java.lang.reflect.Method;
 
 // Soft dependency on MMOItems. Recipe ids use the "mmoitems:<TYPE>:<ID>" format: tryCreate builds
 // the item through MMOItems' API via reflection, getItemId reads the identity MMOItems stores in the
-// item's minecraft:custom_data component. All MMOItems classes are reached reflectively so FD
-// compiles and runs without MMOItems installed; every call is a no-op when the plugin is absent.
+// item's minecraft:custom_data component. Existing stored identities are readable without MMOItems;
+// constructing a new MMOItems item requires its installed API, reached reflectively.
 public final class MMOItemsCompat {
 
     private static final String PLUGIN_NAME = "MMOItems";
@@ -41,14 +41,21 @@ public final class MMOItemsCompat {
     }
 
     // Returns the "mmoitems:<TYPE>:<ID>" identity of an item, or null when the item carries none.
-    // CraftEngine custom items are skipped: their data lives in the item definition, not custom_data.
+    // CraftEngine identities take precedence over other item namespaces.
     public static String getItemId(ItemStack item) {
         if (item == null || item.getType().isAir() || CraftEngineItems.getCustomItemId(item) != null) {
             return null;
         }
+        return getNonCraftEngineItemId(item);
+    }
+
+    /** Caller must have ruled out a CE identity on this stack in the same owner operation. */
+    @org.jetbrains.annotations.ApiStatus.Internal
+    public static String getNonCraftEngineItemId(ItemStack item) {
+        if (item == null || item.getType().isAir()) return null;
         try {
             BukkitItem wrapped = BukkitItemManager.instance().wrap(item);
-            Tag tag = wrapped.getSparrowTag(DataComponentKeys.CUSTOM_DATA);
+            Tag tag = wrapped.getComponentAsSparrowTag(DataComponentKeys.CUSTOM_DATA);
             if (tag instanceof CompoundTag compound) {
                 String type = compound.getString(KEY_ITEM_TYPE, "");
                 String id = compound.getString(KEY_ITEM_ID, "");

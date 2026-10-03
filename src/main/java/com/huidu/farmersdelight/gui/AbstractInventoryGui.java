@@ -10,19 +10,17 @@ import org.bukkit.inventory.InventoryHolder;
 import javax.annotation.Nonnull;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public abstract class AbstractInventoryGui implements InventoryHolder {
 
-    // Closing another player's inventory is an entity write: on Folia it must happen on that player's
-    // own region. Batch close loops (reload, block break) run on whatever thread triggered them, so
-    // every such loop routes through here instead of calling closeInventory directly.
-    protected static void closeViewerInventory(Player player) {
-        if (player == null) {
-            return;
-        }
-        FarmersDelightPlugin plugin = FarmersDelightPlugin.getInstance();
+    /** Closes this retired window on its viewer's owner without disturbing a newer window. */
+    protected final void closeViewerInventory() {
+        Player viewer = player;
+        if (viewer == null) return;
         try {
-            player.getScheduler().run(plugin, t -> player.closeInventory(), null);
+            plugin.scheduler().runForEntity(viewer,
+                    viewerCloseAction(() -> viewer.getOpenInventory().getTopInventory(), viewer::closeInventory));
         } catch (RuntimeException stopped) {
             if (plugin.isEnabled()) {
                 plugin.getLogger().log(java.util.logging.Level.WARNING, "Could not schedule inventory closure", stopped);
@@ -35,13 +33,16 @@ public abstract class AbstractInventoryGui implements InventoryHolder {
     protected Player player;
     protected Inventory inventory;
     protected volatile boolean closed = false;
+    private volatile long openGeneration;
     protected final Consumer<Void> tickCallback;
 
     protected AbstractInventoryGui(FarmersDelightPlugin plugin, Player player) {
         this.plugin = plugin;
         this.player = player;
         this.playerId = player != null ? player.getUniqueId() : null;
-        this.tickCallback = v -> onTick();
+        this.tickCallback = v -> {
+            try (var ignored = com.huidu.farmersdelight.recipe.RuntimeSnapshotPublication.readScope()) { onTick(); }
+        };
     }
 
     @Override
@@ -58,6 +59,7 @@ public abstract class AbstractInventoryGui implements InventoryHolder {
     }
 
     protected final void doOpen(Runnable afterRefresh) {
+        ++openGeneration;
         closed = false;
 
         AbstractInventoryGui existingGui = findExistingGui(playerId);
@@ -69,7 +71,7 @@ public abstract class AbstractInventoryGui implements InventoryHolder {
         putActiveGui(playerId, this);
 
         if (afterRefresh != null) {
-            afterRefresh.run();
+            try (var ignored = com.huidu.farmersdelight.recipe.RuntimeSnapshotPublication.readScope()) { afterRefresh.run(); }
         }
         player.openInventory(inventory);
 
@@ -89,6 +91,16 @@ public abstract class AbstractInventoryGui implements InventoryHolder {
     protected abstract void ensureListenerRegistered();
 
     // ---- Shared lifecycle ----
+
+    final Runnable viewerCloseAction(Supplier<Inventory> currentTop, Runnable closeInventory) {
+        Inventory expected = inventory;
+        long generation = openGeneration;
+        return () -> {
+            if (closed && generation == openGeneration && expected != null && currentTop.get() == expected) {
+                closeInventory.run();
+            }
+        };
+    }
 
     public void close() {
         if (closed) return;

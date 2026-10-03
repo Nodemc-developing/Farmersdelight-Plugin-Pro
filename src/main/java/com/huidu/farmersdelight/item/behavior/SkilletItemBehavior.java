@@ -34,14 +34,17 @@ public final class SkilletItemBehavior extends ItemBehavior {
     private final String permission;
     private final NamespacedKey cookingModel;
     private final NamespacedKey ingredientOverlayModel;
+    private final boolean defaultCookingModel;
     private final Map<String, NamespacedKey> ingredientModels;
 
     private SkilletItemBehavior(String permission, NamespacedKey cookingModel,
-                                NamespacedKey ingredientOverlayModel, Map<String, NamespacedKey> ingredientModels) {
+                                NamespacedKey ingredientOverlayModel, Map<String, NamespacedKey> ingredientModels,
+                                boolean defaultCookingModel) {
         this.permission = permission;
         this.cookingModel = cookingModel;
         this.ingredientOverlayModel = ingredientOverlayModel;
         this.ingredientModels = Map.copyOf(ingredientModels);
+        this.defaultCookingModel = defaultCookingModel;
     }
 
     public NamespacedKey cookingModel() {
@@ -51,6 +54,9 @@ public final class SkilletItemBehavior extends ItemBehavior {
     public NamespacedKey ingredientOverlayModel() {
         return ingredientOverlayModel;
     }
+
+    /** Missing model options use this item's authored cooking model, with its base item as fallback. */
+    public boolean usesDefaultCookingModel() { return defaultCookingModel; }
 
     @Override
     public InteractionResult use(World world,
@@ -102,6 +108,9 @@ public final class SkilletItemBehavior extends ItemBehavior {
                     value -> NamespacedKey.fromString(value.getAsIdentifier().asString()));
             NamespacedKey overlayModel = section == null ? null : section.getValue("ingredient-overlay-model",
                     value -> NamespacedKey.fromString(value.getAsIdentifier().asString()));
+            boolean defaultCookingModel = cookingModel == null;
+            if (defaultCookingModel) cookingModel = new NamespacedKey(key.namespace(), key.value() + "_cooking");
+            if (overlayModel == null) overlayModel = new NamespacedKey("farmersdelight", "item/skillet_food");
             Map<String, NamespacedKey> models = new HashMap<>();
             ConfigSection modelSection = section == null ? null : section.getSection("ingredient-models");
             if (modelSection != null) {
@@ -115,7 +124,7 @@ public final class SkilletItemBehavior extends ItemBehavior {
                             modelSection.getNonNullIdentifier(ingredient).asString()));
                 }
             }
-            return new SkilletItemBehavior(permission, cookingModel, overlayModel, models);
+            return new SkilletItemBehavior(permission, cookingModel, overlayModel, models, defaultCookingModel);
         }
     }
 }

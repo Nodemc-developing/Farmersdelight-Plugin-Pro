@@ -16,6 +16,10 @@ import org.bukkit.Bukkit;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
+import java.util.function.LongSupplier;
 import java.util.logging.Level;
 
 /** Coordinates work that must wait for CraftEngine's deferred custom-item load. */
@@ -152,6 +156,7 @@ final class CraftEngineReadinessCoordinator {
         }
 
         long generation = reloadGeneration.incrementAndGet();
+        plugin.invalidateRecipePreparationForCraftEngineReload();
         if (pendingReloadTask != null && !pendingReloadTask.isCancelled()) {
             pendingReloadTask.cancel();
         }
@@ -195,25 +200,29 @@ final class CraftEngineReadinessCoordinator {
             I18n.reload();
             I18n.logDetail("startup", "plugin.craftengine_reload");
             plugin.refreshAfterCraftEngineReload();
-            if (!contentWarmupCompleted.get()) {
-                loadRecipesWhenReady("plugin.refreshing_recipes_after_ce");
-                refreshAdvancementsWhenReady(false);
-            }
-            // Outside the first-warm-up guard on purpose: refreshAfterCraftEngineReload just emptied the
-            // item, sound and GUI caches this fills. Leaving it to the guard meant that after the first
-            // warm-up every later reload dropped the caches and never rebuilt them, so the work was paid
-            // again lazily, one item at a time, during play instead of once here.
-            warmUpWhenReady("reload");
-            indexLoadedChunkContentWhenReady();
-            ToolRegistry.refresh();
-            // Report the content counts once the readiness pass has loaded everything. Runtime API
-            // registrations used to trigger this a tick later through their republish; recipes that arrive
-            // as CraftEngine pack content have no republish, so the pass itself has to report.
-            reportContentSummaryWhenReady();
+            afterRecipeCommit(plugin.requestRecipeManagerReload(), generation, reloadGeneration::get,
+                    () -> active && plugin.isEnabled(), plugin.scheduler()::run, () -> {
+                        if (!contentWarmupCompleted.get()) refreshAdvancementsWhenReady(false);
+                        warmUpWhenReady("reload");
+                        indexLoadedChunkContentWhenReady();
+                        ToolRegistry.refresh();
+                        reportContentSummaryWhenReady();
+                    }, failure -> plugin.getLogger().log(Level.WARNING,
+                            "CraftEngine recipe reload failed; previous recipe catalog remains active", failure));
         } catch (Exception e) {
             Bukkit.getLogger().log(Level.SEVERE,
                     "Error during CraftEngine reload processing in " + plugin.getClass().getSimpleName(), e);
         }
+    }
+
+    /** Runs the current reload's observers on their scheduler only after recipe publication succeeds. */
+    static void afterRecipeCommit(CompletableFuture<Void> publication, long generation, LongSupplier currentGeneration,
+                                  BooleanSupplier enabled, Consumer<Runnable> owner, Runnable committed,
+                                  Consumer<Throwable> failed) {
+        publication.whenComplete((ignored, failure) -> owner.accept(() -> {
+            if (!enabled.getAsBoolean() || generation != currentGeneration.getAsLong()) return;
+            if (failure == null) committed.run(); else failed.accept(failure);
+        }));
     }
     /**
      * Re-checks readiness on a widening delay, then runs the pending readiness work once it is true.
@@ -280,12 +289,7 @@ final class CraftEngineReadinessCoordinator {
      * event path and its readiness retry cannot drift apart.
      */
     private void runDeferredReadinessWork() {
-        loadRecipesWhenReady("plugin.refreshing_recipes_after_ce");
-        refreshAdvancementsWhenReady(false);
-        warmUpWhenReady("enable");
-        indexLoadedChunkContentWhenReady();
-        ToolRegistry.refresh();
-        reportContentSummaryWhenReady();
+        processReload(reloadGeneration.get());
     }
 
     private void warmUp(String reason) {

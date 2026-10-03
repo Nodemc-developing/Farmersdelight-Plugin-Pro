@@ -1,5 +1,7 @@
 package com.huidu.farmersdelight.fluid;
 
+import com.huidu.farmersdelight.recipe.RuntimeSnapshotPublication;
+
 import com.huidu.farmersdelight.FarmersDelightPlugin;
 import com.huidu.farmersdelight.api.config.ConfigFileUpdater;
 import com.huidu.farmersdelight.config.PlainYamlDocuments;
@@ -31,6 +33,14 @@ public final class FluidRecipeFiles {
     private volatile State state = new State(Map.of(), Set.of());
 
     public FluidRecipeFiles(FarmersDelightPlugin plugin) { this.plugin = plugin; }
+
+    private State currentState() { return RuntimeSnapshotPublication.get(this, state); }
+    private void setState(State next) { RuntimeSnapshotPublication.publish(this, state, next); state = next; }
+
+    Runnable captureReloadRollback() {
+        State previous = currentState();
+        return () -> setState(previous);
+    }
 
     /** Parses captured pack documents; this method does not read files or mutate live inventories. */
     public List<Entry> load() {
@@ -66,12 +76,12 @@ public final class FluidRecipeFiles {
                 }
             }
         }
-        state = new State(java.util.Collections.unmodifiableMap(new LinkedHashMap<>(loaded)), Set.copyOf(occupied));
+        setState(new State(java.util.Collections.unmodifiableMap(new LinkedHashMap<>(loaded)), Set.copyOf(occupied)));
         return List.copyOf(loaded.values());
     }
 
     public CompletableFuture<Boolean> saveAsync(FluidRecipeSpec recipe) {
-        State current = state;
+        State current = currentState();
         Entry previous = current.sources().get(recipe.id());
         if (previous == null && current.occupiedIds().contains(recipe.id())) {
             return CompletableFuture.completedFuture(false);
@@ -86,7 +96,7 @@ public final class FluidRecipeFiles {
     }
 
     public CompletableFuture<Boolean> deleteAsync(String id) {
-        State current = state;
+        State current = currentState();
         Entry previous = current.sources().get(id);
         return previous == null ? CompletableFuture.completedFuture(false) : persist(previous.source(), null);
     }
@@ -109,6 +119,37 @@ public final class FluidRecipeFiles {
             }
         })) result.complete(false);
         return result;
+    }
+
+    private static void retainUnplacedMetadata(Map<String, Object> previous, Map<String, Object> result) {
+        Map<String, Object> before = new LinkedHashMap<>(), after = new LinkedHashMap<>();
+        for (String key : List.of("empty_input", "filled_input", "ingredient", "filled_result", "empty_result", "result", "fluid")) {
+            metadata(previous.get(key), key, key.equals("fluid") ? "fluid" : "item", before);
+            metadata(result.get(key), key, key.equals("fluid") ? "fluid" : "item", after);
+        }
+        Map<String, Object> unplaced = new LinkedHashMap<>();
+        before.forEach((path, value) -> { if (!java.util.Objects.equals(value, after.get(path))) unplaced.put(path, value); });
+        if (unplaced.isEmpty()) return;
+        Object original = result.get("extensions");
+        Map<String, Object> extensions = new LinkedHashMap<>();
+        if (original instanceof Map<?, ?> map) map.forEach((key, value) -> extensions.put(String.valueOf(key), FluidExpression.immutable(value)));
+        else if (original != null) extensions.put("original_extensions", FluidExpression.immutable(original));
+        Map<String, Object> saved = new LinkedHashMap<>();
+        if (extensions.get("saved_fields") instanceof Map<?, ?> map) map.forEach((key, value) -> saved.put(String.valueOf(key), value));
+        unplaced.forEach(saved::putIfAbsent); extensions.put("saved_fields", saved); result.put("extensions", extensions);
+    }
+    private static void metadata(Object value, String path, String kind, Map<String, Object> found) {
+        if (value instanceof ConfigurationSection section) value = section.getValues(false);
+        if (value instanceof List<?> list) { for (int i = 0; i < list.size(); i++) metadata(list.get(i), path + "/" + i, kind, found); return; }
+        if (!(value instanceof Map<?, ?> map)) return;
+        List<String> managed = kind.equals("fluid") ? List.of("id", "tag", "fluid", "amount", "any-of", "components", "exact-components")
+                : kind.equals("components") ? List.of() : List.of("id", "item", "count", "nbt", "items", "choice", "components");
+        for (var entry : map.entrySet()) {
+            String key = String.valueOf(entry.getKey()); String child = path + "/" + key;
+            if ((kind.equals("components") && (key.startsWith("x-") || key.equals("extensions"))) || (!kind.equals("components") && !managed.contains(key))) found.put(child, FluidExpression.immutable(entry.getValue()));
+            else if (key.equals("components")) metadata(entry.getValue(), child, "components", found);
+            else if (key.equals("items") || key.equals("choice") || key.equals("any-of")) metadata(entry.getValue(), child, kind, found);
+        }
     }
 
     static void write(RecipeSource source, Map<String, Object> replacement) throws Exception {
@@ -136,7 +177,15 @@ public final class FluidRecipeFiles {
             if (item != null) result.put("id", item);
             body.put(output, result);
         }
-        body.put("fluid", (recipe.fluidTag() ? "#" : "") + recipe.fluidId());
+        Object expression = recipe.fluidExpression();
+        if (expression instanceof Map<?, ?> raw) {
+            Map<String, Object> changed = new LinkedHashMap<>();
+            raw.forEach((key, value) -> changed.put(String.valueOf(key), value));
+            // The canonical amount is edited once, never shadowed by an old nested amount.
+            changed.remove("amount");
+            expression = changed;
+        }
+        body.put("fluid", expression);
         body.put("amount", recipe.amount());
         if (recipe.timeTicks() > 0 || recipe.type().equals("soaking")) body.put("time", recipe.timeTicks());
         if (!recipe.consumeFluid()) body.put("consume_fluid", false);
@@ -159,11 +208,15 @@ public final class FluidRecipeFiles {
         for (String key : List.of("type", "empty_input", "filled_input", "ingredient", "filled_result", "empty_result", "result",
                 "fluid", "amount", "time", "consume_fluid", "priority")) result.remove(key);
         result.putAll(edited);
+        for (String key : List.of("empty_input", "filled_input", "ingredient", "filled_result", "empty_result", "result")) {
+            if (edited.containsKey(key)) result.put(key, preserveNested(previous.get(key), edited.get(key),
+                    key.equals("filled_result") || key.equals("empty_result") || key.equals("result")));
+        }
         Object newFluid = edited.get("fluid");
         if (oldFluid instanceof ConfigurationSection section) oldFluid = section.getValues(false);
         Map<String, Object> extensions = new LinkedHashMap<>();
         if (oldFluid instanceof Map<?, ?> raw) raw.forEach((key, value) -> extensions.put(String.valueOf(key), value));
-        for (String key : List.of("id", "tag", "fluid", "amount")) extensions.remove(key);
+        for (String key : List.of("id", "tag", "fluid", "any-of", "components", "exact-components", "amount")) extensions.remove(key);
         if (!extensions.isEmpty() && newFluid instanceof String identity) {
             // Keep extension options without duplicating the canonical top-level amount.
             extensions.put(identity.startsWith("#") ? "tag" : "id", identity.startsWith("#") ? identity.substring(1) : identity);
@@ -172,6 +225,39 @@ public final class FluidRecipeFiles {
             incoming.forEach((key, value) -> extensions.put(String.valueOf(key), value));
             result.put("fluid", extensions);
         }
+        retainUnplacedMetadata(previous, result);
         return result;
+    }
+
+    private static Object preserveNested(Object previous, Object edited, boolean output) {
+        if (previous instanceof ConfigurationSection section) previous = section.getValues(false);
+        if (edited instanceof ConfigurationSection section) edited = section.getValues(false);
+        if (previous instanceof Map<?, ?> old && !(edited instanceof Map<?, ?>) && edited instanceof String id) {
+            edited = Map.of(output ? "id" : "item", id);
+        }
+        if (previous instanceof Map<?, ?> old && edited instanceof Map<?, ?> update) {
+            Map<String, Object> merged = new LinkedHashMap<>();
+            old.forEach((key, value) -> merged.put(String.valueOf(key), FluidExpression.immutable(value)));
+            for (String key : List.of("item", "id", "nbt", "count", "items", "choice", "components")) merged.remove(key);
+            for (var entry : update.entrySet()) {
+                String key = String.valueOf(entry.getKey());
+                if (key.equals("components")) {
+                    Map<String, Object> components = new LinkedHashMap<>();
+                    if (old.get(key) instanceof Map<?, ?> values) values.forEach((component, value) -> {
+                        String name = String.valueOf(component);
+                        if (name.startsWith("x-") || name.equals("extensions")) components.put(name, FluidExpression.immutable(value));
+                    });
+                    if (entry.getValue() instanceof Map<?, ?> values) values.forEach((component, value) -> components.put(String.valueOf(component), FluidExpression.immutable(value)));
+                    merged.put(key, components);
+                } else merged.put(key, preserveNested(old.get(key), entry.getValue(), output));
+            }
+            return merged;
+        }
+        if (previous instanceof List<?> old && edited instanceof List<?> update) {
+            List<Object> merged = new java.util.ArrayList<>(update.size());
+            for (int index = 0; index < update.size(); index++) merged.add(preserveNested(index < old.size() ? old.get(index) : null, update.get(index), output));
+            return merged;
+        }
+        return FluidExpression.immutable(edited);
     }
 }

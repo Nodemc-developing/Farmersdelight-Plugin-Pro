@@ -50,6 +50,7 @@ class FluidRecipeTransactionTest {
             throw new AssertionError("Saved tank classification must only inspect persistent data");
         }
         @Override public org.bukkit.inventory.meta.ItemMeta getItemMeta() { return meta; }
+        @Override public io.papermc.paper.persistence.PersistentDataContainerView getPersistentDataContainer() { return meta.getPersistentDataContainer(); }
     }
 
     @Test void simulationRollsFluidBackWithoutEverWritingInventory() {

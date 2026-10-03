@@ -22,17 +22,17 @@ public final class PapersDelightConfigFormat {
             actionbar-refresh-ticks actionbar-separator active-block-threshold advancements allow-conductors
             allow-hopper allow-solid-supports-below-max-light always-valid-supports anvil auraskills auto-completion
             auto-disable-missing auto-disable-on-conflict backstabbing bell-ring-max-distance bubble budgets buff
-            categories chance channels chunk-effect-packet-budget color combat comfort compatibility conductor
+            cache-player-limit categories chance channels chunk-effect-packet-budget color combat comfort compatibility conductor
             conductor-tags conductors container-inference container-returns cook-time-multiplier cooking cooking-pot
             cooking-pot-density-threshold cooking-pot-total-threshold cooldown-seconds cooling-decrement count crackle
             craftengine-free-state-threshold craftengine-resources custom-block custom-block-tag custom-blocks
             cutting-board damage-type datapacks debug default-cook-time default-display-offset default-enchantability default-tools
             definition disable-above-active-pots discovery dispenser-behavior display display-item-spread durable
             effect-tick-interval-ticks effects enabled enchantments entries excluded-remainders experience-reward
-            extra-enchantments fallback fire fire-aspect-bonus food-groups force-disable force-enable groups handheld
+            extra-enchantments fallback fire fire-aspect-bonus food-groups force-disable force-enable groups handheld handheld-jump-flip
             heal-amount heal-interval-ticks heat heat-source heat-sources hopper-interactions id install-datapack
-            interaction-mode interval item-spread item-tags items jumps kaleidoscope knife-items knife-tags knives
-            language layout-mode lit locked-display locked-icon look-dot-threshold max-cook-time max-level max-light
+            interaction-mode interval item-spread item-tags items jump-flip jumps kaleidoscope knife-items knife-tags knives
+            language layout-mode lit locked-display locked-icon look-dot-threshold max-bell-distance max-cook-time max-level max-light
             merge-missing-bundled min-cook-time mode multiplier multiplier-base multiplier-per-level mushroom-colonies
             notify nourishment offset-x offset-y offset-z overlay override-offers pack-contents-on-break performance
             persistence pet-tempt-tick-budget pitch pitch-max pitch-min placement players-only progress-display
@@ -47,7 +47,13 @@ public final class PapersDelightConfigFormat {
             default-display-position default-display-translation default-display-rotation default-display-scale
             default-display-style default-display-item default-position default-offset default-translation
             default-rotation default-scale default-style display-overrides display-tag-overrides display-item
-            position offset translation rotation style entities foods duration
+            position offset translation rotation style entities foods duration always-eat stats flush-interval-seconds
+            particle-throttle stove-threshold stove-max-rate cooking-pot-threshold cooking-pot-max-rate skewer
+            ambient-sound-threshold ambient-sound-max-rate container tick-interval-ticks connection-particle-packet-budget
+            display-block block-display-overrides item-display-overrides stack-y-offset stack-xz-offset
+            translate-x translate-y translate-z rotation-pitch rotation-y rotation-roll fortune-bonus place-item
+            remove-item carve-tool add-food add-food-cold place-food item-smoke-chance item-smoke-count
+            fire-aspect-particle xz-spread velocity-y-base velocity-y-extra velocity-xz origin-x origin-y origin-z
             """).trim().split("\\s+"));
 
     private static final Map<String, String> PATHS = new LinkedHashMap<>();
@@ -64,6 +70,10 @@ public final class PapersDelightConfigFormat {
             PATHS.put("buff.display.styles." + effect + ".overlay", effect + "_effect.bossbar.style");
         }
         PATHS.put("performance.shutdown_wait_millis", "stats.shutdown_wait_millis");
+        PATHS.put("stats.enabled", "stats.enable");
+        PATHS.put("stats.flush_interval_seconds", "stats.flush_interval");
+        PATHS.put("rope.max_bell_distance", "rope.bell_ring_max_distance");
+        PATHS.put("skillet.handheld_jump_flip", "skillet.handheld.jump_flip");
         PATHS.put("cutting_board.allow_hopper", "cutting_board.hopper_interaction");
         PATHS.put("cutting_board.dispenser_behavior", "cutting_board.dispenser_cutting");
         PATHS.put("cutting_board.sounds.retrieve_volume", "cutting_board.sounds.remove_item.volume");
@@ -205,21 +215,8 @@ public final class PapersDelightConfigFormat {
     /** Fields with no corresponding implementation are retained and reported, rather than silently promised. */
     public static List<String> unsupportedOptions(ConfigurationSection source) {
         List<String> result = new ArrayList<>();
-        for (String path : List.of("garlic_effect", "nourishment_effect.always_eat", "stats.enabled",
-                "stats.io_wait_millis", "particle_throttle", "cutting_board.display_block",
-                "cutting_board.block_display_overrides", "cutting_board.item_display_overrides",
-                "cutting_board.display.stack_y_offset", "skillet.display.stack_y_offset",
-                "skillet.fire_aspect_particle", "cutting_board.fortune_bonus", "cutting_board.sounds.place_item",
-                "cutting_board.sounds.remove_item.sound", "cutting_board.sounds.carve_tool",
-                "skillet.sounds", "stove.sounds.place_food", "stove.particles.item_smoke_chance",
-                "stove.particles.item_smoke_count")) {
+        for (String path : List.of("garlic_effect", "stats.io_wait_millis")) {
             if (source.contains(path, true)) result.add(path);
-        }
-        for (Map<?, ?> entry : source.getMapList("heat_sources")) {
-            if (Boolean.TRUE.equals(entry.get("tray"))) {
-                result.add("heat_sources[].tray");
-                break;
-            }
         }
         return List.copyOf(result);
     }

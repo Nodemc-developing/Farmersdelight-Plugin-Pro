@@ -40,6 +40,8 @@ public final class AdvancedPackGroups {
 
     public static void clear() { AdvancedRecipeTags.unregisterSource(SOURCE); }
 
+    static Runnable captureReloadRollback() { return AdvancedRecipeTags.captureSourceRollback(SOURCE); }
+
     static Map<String, List<String>> resolve(Map<String, List<String>> definitions, Consumer<String> diagnostic) {
         Map<String, List<String>> resolved = new LinkedHashMap<>();
         Set<String> invalid = new LinkedHashSet<>();

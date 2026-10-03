@@ -223,7 +223,7 @@ class PapersDelightConfigFormatTest {
         PapersDelightConfigFormat.normalize(source);
         assertTrue(source.getBoolean("garlic_effect.enable"));
         assertEquals(300, source.getInt("stats.io_wait_millis"));
-        assertEquals(List.of("garlic_effect", "stats.enabled", "stats.io_wait_millis", "particle_throttle", "heat_sources[].tray"),
+        assertEquals(List.of("garlic_effect", "stats.io_wait_millis"),
                 PapersDelightConfigFormat.unsupportedOptions(source));
     }
 
@@ -309,6 +309,70 @@ class PapersDelightConfigFormatTest {
         assertEquals(20, StationSettings.previewCallbacks(runtime.getInt("recipe_book.tag_cycle_interval_ticks")));
         assertEquals(4, runtime.getInt("skillet.particles.interval_ticks"));
         assertEquals(4, runtime.getInt("stove.particles.interval_ticks"));
+        assertEquals(2048, runtime.getInt("stats.cache-player-limit"));
+        assertEquals(24, runtime.getInt("rope.max-bell-distance"));
+        assertTrue(runtime.getBoolean("skillet.handheld.jump-flip.enabled"));
+        assertEquals(0.6, runtime.getDouble("skillet.fire-aspect-particle.xz-spread"));
+        assertEquals(0.3, runtime.getDouble("skillet.fire-aspect-particle.velocity-y-base"));
+        assertEquals(0.8, runtime.getDouble("skillet.fire-aspect-particle.velocity-y-extra"));
+        assertEquals(0.3, runtime.getDouble("skillet.fire-aspect-particle.velocity-xz"));
+        assertEquals(0.5, runtime.getDouble("skillet.fire-aspect-particle.origin-x"));
+        assertEquals(0.3, runtime.getDouble("skillet.fire-aspect-particle.origin-y"));
+        assertEquals(0.5, runtime.getDouble("skillet.fire-aspect-particle.origin-z"));
+        assertEquals(0.05, runtime.getDouble("stove.particles.item-smoke-chance"));
+        assertEquals(1, runtime.getInt("stove.particles.item-smoke-count"));
+        for (String path : List.of("skillet.sounds.add-food", "skillet.sounds.add-food-cold",
+                "skillet.sounds.sizzle", "stove.sounds.place-food")) {
+            assertNotNull(runtime.getConfigurationSection(path));
+            assertTrue(runtime.getConfigurationSection(path).getKeys(false).isEmpty(),
+                    "default sound overrides must preserve each call site's own fallbacks");
+        }
+    }
+
+    @Test
+    void bellDistanceAndJumpFlipAliasesPreserveCanonicalPriorityAndLegacyValues() throws Exception {
+        YamlConfiguration legacy = yaml("""
+                rope: {max-bell-distance: 17}
+                stats: {cache-player-limit: 91}
+                skillet:
+                  handheld-jump-flip: {enabled: false}
+                """);
+        PapersDelightConfigFormat.normalize(legacy);
+        assertEquals(17, legacy.getInt("rope.bell_ring_max_distance"));
+        assertEquals(91, legacy.getInt("stats.cache_player_limit"));
+        assertFalse(legacy.getBoolean("skillet.handheld.jump_flip.enabled", true));
+        YamlConfiguration defaults = YamlConfiguration.loadConfiguration(Path.of("src/main/resources/config.yml").toFile());
+        ConfigFileUpdater.copyMissingKeys(defaults, legacy, List.of());
+        YamlConfiguration runtime = PapersDelightConfigFormat.runtimeViewOf(legacy);
+        assertEquals(17, runtime.getInt("rope.max-bell-distance"));
+        assertEquals(91, runtime.getInt("stats.cache-player-limit"));
+        assertFalse(runtime.getBoolean("skillet.handheld.jump-flip.enabled", true));
+        assertFalse(runtime.getBoolean("skillet.handheld-jump-flip.enabled", true));
+        for (String text : List.of(
+                "rope: {max-bell-distance: 17, bell_ring_max_distance: 23}",
+                "rope: {bell_ring_max_distance: 23, max-bell-distance: 17}")) {
+            assertEquals(23, PapersDelightConfigFormat.runtimeViewOf(yaml(text))
+                    .getInt("rope.max-bell-distance"));
+        }
+    }
+
+    @Test
+    void emptySoundOverridesKeepModeSpecificAndEffectDrivenFallbacks() {
+        YamlConfiguration source = YamlConfiguration.loadConfiguration(Path.of("src/main/resources/config.yml").toFile());
+        source.set("skillet.effects.sizzle.volume", 0.73);
+        source.set("skillet.effects.sizzle.pitch", 1.2);
+        YamlConfiguration runtime = PapersDelightConfigFormat.runtimeViewOf(source);
+        var addFood = runtime.getConfigurationSection("skillet.sounds.add-food");
+        assertEquals(StationSound.read(null, "test:handheld", 0.7F, 1.0F),
+                StationSound.read(addFood, "test:handheld", 0.7F, 1.0F));
+        assertEquals(StationSound.read(null, "test:placed", 0.8F, 1.0F),
+                StationSound.read(addFood, "test:placed", 0.8F, 1.0F));
+        float volume = (float) runtime.getDouble("skillet.effects.sizzle.volume");
+        float pitch = (float) runtime.getDouble("skillet.effects.sizzle.pitch");
+        assertEquals(0.73F, volume);
+        assertEquals(1.2F, pitch);
+        assertEquals(StationSound.read(null, null, volume, pitch),
+                StationSound.read(runtime.getConfigurationSection("skillet.sounds.sizzle"), null, volume, pitch));
     }
 
     @Test

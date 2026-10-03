@@ -20,6 +20,7 @@ import com.huidu.farmersdelight.util.compat.ProtectionCompat;
 final class LoadPhaseRegistrar {
 
     private final FarmersDelightPlugin plugin;
+    private AutoCloseable fluidFormatRegistration;
 
     LoadPhaseRegistrar(FarmersDelightPlugin plugin) {
         this.plugin = plugin;
@@ -37,13 +38,15 @@ final class LoadPhaseRegistrar {
         CommonTagResolver.reload(plugin);
         new ResourceInstaller(plugin, plugin.pluginJarFile()).installCraftEngineResourcesOnce();
 
-        BehaviorRegistrar.registerBlockBehaviors();
+        BehaviorRegistrar.registerBlockBehaviors(plugin);
         BehaviorRegistrar.registerItemBehaviors();
-        BehaviorRegistrar.registerFunctions();
+        BehaviorRegistrar.registerFunctions(plugin);
         BehaviorRegistrar.registerConditions();
         BehaviorRegistrar.registerLootFunctions();
-        com.huidu.farmersdelight.registry.PapersBehaviorAliases.register();
+        com.huidu.farmersdelight.registry.PapersBehaviorAliases.register(plugin);
         com.huidu.farmersdelight.fluid.PapersFluidAliases.register();
+        fluidFormatRegistration = com.huidu.farmersdelight.pack.compat.ExternalContentCoordinator.registerTransformer(
+                com.huidu.farmersdelight.fluid.FluidContentFormat::transform);
         // Register the farmersdelight:sword settings modifier before CraftEngine parses item YAML files.
         ToolRegistry.register();
         // Register the farmersdelight:pet_food settings modifier before CraftEngine parses item YAML files.
@@ -57,5 +60,13 @@ final class LoadPhaseRegistrar {
         ProtectionCompat.registerFlags();
         ProtectionCompat.registerCustomFlag("farmersdelight-fluids");
         return sections;
+    }
+
+    void close() {
+        AutoCloseable registration = fluidFormatRegistration;
+        fluidFormatRegistration = null;
+        if (registration == null) return;
+        try { registration.close(); }
+        catch (Exception failure) { plugin.getLogger().log(java.util.logging.Level.WARNING, "Content format registration cleanup failed", failure); }
     }
 }

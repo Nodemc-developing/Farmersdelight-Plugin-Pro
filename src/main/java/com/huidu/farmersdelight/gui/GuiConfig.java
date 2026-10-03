@@ -198,7 +198,7 @@ public class GuiConfig {
 
         Map<String, GuiItem> items = new HashMap<>();
         items.put("background", new GuiItem(Material.GRAY_STAINED_GLASS_PANE, null, " ", List.of()));
-        items.put("recipe", new GuiItem(Material.KNOWLEDGE_BOOK, null, "View Recipes", List.of("Click to view all cooking pot recipes")));
+        items.put("recipe", new GuiItem(Material.KNOWLEDGE_BOOK, null, "<green>View Recipes", List.of("Click to view all cooking pot recipes")));
 
         return new GuiConfig(
                 "<white><offset><icon>",
@@ -388,6 +388,7 @@ public class GuiConfig {
         private final String nameKey;
         private final List<String> loreKeys;
         private final List<String> commands;
+        private GuiTextStyle.Role nameRole;
         private volatile ItemStack cachedNoPlaceholders;
         private volatile ItemStack cachedCustomBase;
         private volatile Boolean cachedCustomBaseIsReal;
@@ -421,6 +422,7 @@ public class GuiConfig {
             this.name = name;
             this.lore = lore;
             this.nameKey = nameKey;
+            this.nameRole = GuiTextStyle.role(nameKey);
             if (loreKeys != null) {
                 this.loreKeys = loreKeys;
             } else {
@@ -473,8 +475,10 @@ public class GuiConfig {
                     "hide_tooltip", "hideTooltip");
             List<String> commands = readCommands(section);
 
-            return new GuiItem(material, customItemId, customModelData, itemModel, hideTooltip,
+            GuiItem result = new GuiItem(material, customItemId, customModelData, itemModel, hideTooltip,
                     name, lore, nameKey, loreKeys, commands);
+            result.nameRole = GuiTextStyle.role(nameKey != null ? nameKey : section.getName());
+            return result;
         }
 
         public static GuiItem fromMap(Map<?, ?> map) {
@@ -570,8 +574,10 @@ public class GuiConfig {
                     && resolvedHideTooltip == this.hideTooltip) {
                 return this;
             }
-            return new GuiItem(material, customItemId, resolvedCustomModelData, resolvedItemModel, resolvedHideTooltip,
+            GuiItem result = new GuiItem(material, customItemId, resolvedCustomModelData, resolvedItemModel, resolvedHideTooltip,
                     name, lore, nameKey, loreKeys, commands);
+            result.nameRole = nameRole;
+            return result;
         }
 
         private static boolean hasText(String value) {
@@ -637,22 +643,23 @@ public class GuiConfig {
             // overrides the custom item's.
             if (name != null || nameKey != null) {
                 String processedName = applyPlaceholders(resolveText(name, nameKey), placeholders);
-                meta.displayName(Text.name(processedName));
+                meta.displayName(GuiTextStyle.styled(Text.deserialize(processedName), nameRole));
             }
 
             if ((lore != null && !lore.isEmpty()) || !loreKeys.isEmpty()) {
                 List<Component> processedLore = new ArrayList<>();
                 if (lore != null) {
                     for (String line : lore) {
-                        processedLore.add(Text.lore(applyPlaceholders(line, placeholders)));
+                        processedLore.add(GuiTextStyle.lore(applyPlaceholders(line, placeholders)));
                     }
                 }
                 for (String key : loreKeys) {
-                    processedLore.add(Text.lore(applyPlaceholders(resolveText(null, key), placeholders)));
+                    processedLore.add(GuiTextStyle.lore(applyPlaceholders(resolveText(null, key), placeholders)));
                 }
                 meta.lore(processedLore);
             }
 
+            GuiTextStyle.normalizeDisplayMeta(meta);
             item.setItemMeta(meta);
             if (placeholders.isEmpty()) {
                 cachedNoPlaceholders = item.clone();

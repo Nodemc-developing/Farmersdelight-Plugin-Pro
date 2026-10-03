@@ -53,6 +53,16 @@ public final class SoilRuleSupport {
                     continue;
                 }
 
+                // A custom namespace is not a Bukkit material, including when properties follow its ID.
+                if (text.contains(":") && !text.startsWith("minecraft:")) {
+                    if (text.contains("[")) {
+                        CustomSoilState.parse(text);
+                        customStateStrings.add(text);
+                    } else {
+                        customBlockIds.add(Key.of(text).toString());
+                    }
+                    continue;
+                }
                 try {
                     BlockData blockData = Bukkit.createBlockData(text);
                     if (text.contains("[")) {
@@ -64,6 +74,11 @@ public final class SoilRuleSupport {
                 } catch (IllegalArgumentException ignored) {
                 }
 
+                if (text.contains("[")) {
+                    CustomSoilState.parse(text);
+                    customStateStrings.add(text);
+                    continue;
+                }
                 String materialName = text.contains(":")
                         ? text.substring(text.indexOf(':') + 1)
                         : text;
@@ -74,11 +89,7 @@ public final class SoilRuleSupport {
                     continue;
                 }
 
-                if (text.contains("[")) {
-                    customStateStrings.add(text);
-                } else {
-                    customBlockIds.add(text);
-                }
+                customBlockIds.add(Key.of(text).toString());
             }
         }
 
@@ -119,9 +130,8 @@ public final class SoilRuleSupport {
         if (configuredRules.customBlockIds().contains(customId)) {
             return true;
         }
-        if (configuredRules.customStateStrings().contains(configuredState.toString())) {
-            return true;
-        }
+        for (CustomSoilState allowedState : configuredRules.customStates())
+            if (allowedState.matches(configuredState)) return true;
 
         Set<Key> tags = configuredState.settings().tags();
         for (Key tag : tags) {
@@ -175,8 +185,20 @@ public final class SoilRuleSupport {
             Set<Key> tags,
             Set<String> customBlockIds,
             List<BlockData> vanillaStates,
-            Set<String> customStateStrings
+            Set<String> customStateStrings,
+            List<CustomSoilState> customStates
     ) {
+        public SoilRules(Set<Material> materials, Set<Key> tags, Set<String> customBlockIds,
+                         List<BlockData> vanillaStates, Set<String> customStateStrings) {
+            this(materials, tags, customBlockIds, vanillaStates, customStateStrings,
+                    customStateStrings.stream().map(CustomSoilState::parse).toList());
+        }
+
+        public SoilRules {
+            materials = Set.copyOf(materials); tags = Set.copyOf(tags);
+            customBlockIds = Set.copyOf(customBlockIds); vanillaStates = List.copyOf(vanillaStates);
+            customStateStrings = Set.copyOf(customStateStrings); customStates = List.copyOf(customStates);
+        }
         public boolean isConfigured() {
             return !materials.isEmpty()
                     || !tags.isEmpty()

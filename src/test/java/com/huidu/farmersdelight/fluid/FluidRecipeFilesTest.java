@@ -22,6 +22,35 @@ class FluidRecipeFilesTest {
 
     @AfterEach void clearReloadDiagnostics() { RecipeFileLoader.resetReportedIssues(); }
 
+    @Test void failedPublicationRestoresSourcePathsAndOccupiedIds() throws Exception {
+        FluidRecipeFiles files = new FluidRecipeFiles(null);
+        files.loadSections(List.of(section("previous.yml", """
+                papersdelight_recipes:
+                  addon:previous:
+                    type: fluid_filling
+                    fluid: minecraft:water
+                    empty_input: minecraft:bowl
+                    filled_result: minecraft:carrot
+                """)));
+        var field = FluidRecipeFiles.class.getDeclaredField("state");
+        field.setAccessible(true);
+        Object previous = field.get(files);
+        Runnable restore = files.captureReloadRollback();
+        var candidate = section("candidate.yml", """
+                papersdelight_recipes:
+                  addon:occupied: {type: cooking}
+                """);
+
+        assertThrows(IllegalStateException.class,
+                () -> com.huidu.farmersdelight.recipe.RecipePublicationTransaction.run(() -> {
+                    files.loadSections(List.of(candidate));
+                    throw new IllegalStateException("later publication stage failed");
+                }, restore));
+
+        assertSame(previous, field.get(files));
+        assertFalse(files.deleteAsync("addon:occupied").join());
+    }
+
     @Test void canonicalFieldsRoundTripEveryFluidRecipeKindWithCountsAndAdvancedChoices() {
         for (String type : List.of("fluid_filling", "fluid_emptying", "soaking")) {
             var recipe = new FluidRecipeSpec("addon:recipe.v2", type, RecipeParsingSupport.parseIngredientValue("advtag:addon:empty|minecraft:bowl"),

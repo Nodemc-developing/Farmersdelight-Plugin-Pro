@@ -19,13 +19,13 @@ public enum PackSection {
     COOKING_POT("cooking_recipes", "cooking_pot_recipes"),
     /** Cutting-board recipes; read by CuttingBoardRecipeManager. */
     CUTTING_BOARD("cutting_recipes", "cutting_board_recipes"),
-    /** PapersDelight-compatible typed recipes. */
+    /** Typed recipe definitions selected by their type field. */
     PAPERS_RECIPES("papersdelight_recipes", "papersdelight_recipes"),
     /** Named recipe groups for additional cooking-pot behaviors. */
     CUSTOM_COOKING_POT("custom_cooking_pot_recipes", "custom_cooking_pot_recipes"),
     /** Explicit ingredient groups used by fuzzy and advanced matching. */
     FOOD_GROUPS("food_groups", "groups"),
-    /** PapersDelight advanced groups, including references to other advanced groups. */
+    /** Advanced ingredient groups, including nested group references. */
     ADVANCED_TAGS("advanced_tags", "advanced_tags"),
     /** Special-recipe menu cards; read by SpecialRecipeLoader. */
     SPECIAL_RECIPE("special_recipes", "special_recipes"),

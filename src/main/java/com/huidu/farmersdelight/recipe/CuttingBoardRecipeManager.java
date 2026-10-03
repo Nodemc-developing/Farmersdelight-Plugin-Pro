@@ -7,7 +7,6 @@ import com.huidu.farmersdelight.api.config.ConfigSectionReader;
 import com.huidu.farmersdelight.i18n.I18n;
 import com.huidu.farmersdelight.pack.PackSection;
 import com.huidu.farmersdelight.pack.PackSections;
-import com.huidu.farmersdelight.gui.RecipeViewGui;
 import com.huidu.farmersdelight.util.CommonTagResolver;
 import com.huidu.farmersdelight.util.Constants;
 import com.huidu.farmersdelight.util.ItemUtils;
@@ -39,6 +38,28 @@ public class CuttingBoardRecipeManager {
     private volatile YamlConfiguration lastFileDocument;
     private volatile RecipeParseCache<CuttingBoardRecipe> parsedRecipes;
 
+    private Snapshot currentSnapshot() { return RuntimeSnapshotPublication.get(this, snapshot); }
+
+    private void setSnapshot(Snapshot next) {
+        RuntimeSnapshotPublication.publish(this, snapshot, next);
+        snapshot = next;
+    }
+
+    @org.jetbrains.annotations.ApiStatus.Internal
+    public synchronized Runnable captureReloadRollback() {
+        Snapshot previous = currentSnapshot();
+        YamlConfiguration document = lastFileDocument;
+        RecipeParseCache<CuttingBoardRecipe> parsing = parsedRecipes;
+        return () -> {
+            synchronized (this) {
+                lastFileDocument = document;
+                parsedRecipes = parsing;
+                setSnapshot(previous);
+                afterPublication();
+            }
+        };
+    }
+
     record Snapshot(Map<String, CuttingBoardRecipe> recipes, int packRecipeCount,
                     List<CuttingBoardRecipe> sortedRecipes, Map<String, Set<String>> byInputItemId,
                     Set<String> tagInputRecipeIds, Map<String, List<CuttingBoardRecipe>> resultToRecipes,
@@ -49,7 +70,7 @@ public class CuttingBoardRecipeManager {
     }
 
     public record ParseMetrics(int parsed, int reused) { }
-    public RecipeSource sourceOf(String id) { return snapshot.sources().get(id); }
+    public RecipeSource sourceOf(String id) { return currentSnapshot().sources().get(id); }
     public ParseMetrics parseMetrics() {
         RecipeParseCache<CuttingBoardRecipe> current = parsedRecipes;
         return current == null ? new ParseMetrics(0, 0) : new ParseMetrics(current.parsed(), current.reused());
@@ -58,7 +79,7 @@ public class CuttingBoardRecipeManager {
     // Recipes registered at runtime by addons via the public API; kept separate so they survive a
     // /fd reload (which rebuilds the file-backed map) and merged into the published map in loadRecipes().
     private final Map<String, CuttingBoardRecipe> externalRecipes = new ConcurrentHashMap<>();
-    // External (un)register republishing is coalesced to the next tick (one loadRecipes() per batch).
+    // External (un)register requests one complete catalog publication per next-tick batch.
     private final java.util.concurrent.atomic.AtomicBoolean externalRepublishScheduled = new java.util.concurrent.atomic.AtomicBoolean();
     // Caches CraftEngine's vanillaItemIdsByTag result per tag so matchesTaggedItem doesn't re-stream
     // the full vanilla tag membership on every cutting click (mirrors CookingPotRecipeManager).
@@ -165,19 +186,21 @@ public class CuttingBoardRecipeManager {
                 RecipeCollections.freezeLists(buildResultIndex(newSorted)), List.copyOf(uniqueTools), Map.copyOf(sources));
         lastFileDocument = mainConfig;
         parsedRecipes = parsing;
-        snapshot = next;
-        vanillaItemIdsByTagCache.clear();
-        // Invalidate the recipe-list GUI display cache: this republish path (incl. addon register/
-        // unregister) bypasses RecipeViewGui.clearConfigCache.
-        RecipeViewGui.clearRecipeDisplayCache();
-        // Same reason as the cooking pot's publish path: the decoded snapshots are keyed by strings the
-        // replaced recipes owned.
-        RecipeItemCodec.clearDecodeCache();
+        setSnapshot(next);
+        afterPublication();
+    }
+
+    private void afterPublication() {
+        RuntimeSnapshotPublication.afterCommit(vanillaItemIdsByTagCache, vanillaItemIdsByTagCache::clear);
+        RuntimeSnapshotPublication.afterCommit(com.huidu.farmersdelight.gui.GuiCacheInvalidator.class,
+                com.huidu.farmersdelight.gui.GuiCacheInvalidator::clearRecipeDisplayCaches);
+        RuntimeSnapshotPublication.afterCommit(RecipeItemCodec.class, RecipeItemCodec::clearDecodeCache);
     }
 
     private CuttingBoardRecipe parseRecipe(String id, ConfigurationSection section) {
         section = RecipeSchemaAdapter.normalizeBoard(section,
                 plugin.getConfigStringList("cutting_board.default_tools", "cutting-board.default-tools"));
+        RecipeParsingSupport.requireKnownSemantics(section, Set.of());
         Object rawInput = section.get("input");
         if (rawInput == null) {
             throw new IllegalArgumentException("Recipe must have an input");
@@ -255,12 +278,13 @@ public class CuttingBoardRecipeManager {
             Object nbtValue = resultMap.get("nbt");
             if (nbtValue != null) {
                 ItemStack fromNbt = RecipeItemCodec.itemFromBase64(nbtValue.toString());
-                if (fromNbt != null) {
-                    result = fromNbt;
-                    result.setAmount(count);
-                }
+                if (fromNbt == null) throw new IllegalArgumentException("Invalid item NBT at results[" + resultIndex + "].nbt");
+                result = fromNbt;
+                result.setAmount(count);
             }
             Object componentsValue = resultMap.get("components");
+            if (componentsValue != null && !(componentsValue instanceof Map<?, ?>))
+                throw new IllegalArgumentException("Components must be a map at results[" + resultIndex + "].components");
             if (componentsValue instanceof Map<?, ?> components) {
                 result = RecipeItemCodec.applyComponents(result, RecipeItemCodec.coerceStringMap(components));
                 result.setAmount(count);
@@ -335,6 +359,10 @@ public class CuttingBoardRecipeManager {
         }
 
         if (ingredient instanceof RecipeIngredient.Tag tagIngredient) {
+            // Common/addon mappings are independent of CE's native index, but are equally valid input groups.
+            ItemStack commonDisplay = commonDisplayItem(tagIngredient, this::createItem,
+                    (item, excluded) -> ItemUtils.matchesCustomOrVanillaTag(item, excluded.toString()));
+            if (commonDisplay != null) return commonDisplay;
             for (var candidate : plugin.getCraftEngine().itemManager().itemIdsByTag(tagIngredient.key())) {
                 if (tagIngredient.excludedItems().contains(candidate.key())) {
                     continue;
@@ -366,6 +394,19 @@ public class CuttingBoardRecipeManager {
             }
         }
 
+        return null;
+    }
+
+    static ItemStack commonDisplayItem(RecipeIngredient.Tag tag,
+                                      java.util.function.Function<String, ItemStack> builder,
+                                      java.util.function.BiPredicate<ItemStack, Key> excludedTagMatcher) {
+        for (String member : CommonTagResolver.getMembers(tag.key())) {
+            if (tag.excludedItems().stream().anyMatch(excluded -> excluded.toString().equalsIgnoreCase(member))) continue;
+            ItemStack item = builder.apply(member);
+            if (item == null || ResolvedRecipeInput.isAir(item.getType()) || tag.excludedTags().stream()
+                    .anyMatch(excluded -> excludedTagMatcher.test(item, excluded))) continue;
+            return item;
+        }
         return null;
     }
 
@@ -407,7 +448,11 @@ public class CuttingBoardRecipeManager {
     }
 
     public CuttingBoardRecipe matchRecipe(ItemStack input, ItemStack tool) {
-        Snapshot view = snapshot;
+        try (var scope = RuntimeSnapshotPublication.readScope()) { return matchRecipeInScope(input, tool); }
+    }
+
+    private CuttingBoardRecipe matchRecipeInScope(ItemStack input, ItemStack tool) {
+        Snapshot view = currentSnapshot();
         String toolId = ItemUtils.getCustomItemId(tool);
         // ToolContext depends only on the tool itself, not on any recipe; build it once outside the loop to avoid
         // repeating CraftEngine tag/ID lookups and set allocations per recipe (cutting is a per-click hot path).
@@ -427,7 +472,11 @@ public class CuttingBoardRecipeManager {
     }
 
     public boolean hasAnyRecipeFor(ItemStack input) {
-        Snapshot view = snapshot;
+        try (var scope = RuntimeSnapshotPublication.readScope()) { return hasAnyRecipeForInScope(input); }
+    }
+
+    private boolean hasAnyRecipeForInScope(ItemStack input) {
+        Snapshot view = currentSnapshot();
         if (input == null || input.getType().isAir()) return false;
         Set<String> candidates = candidateRecipeIds(input, view);
         for (CuttingBoardRecipe recipe : view.sortedRecipes()) {
@@ -440,7 +489,7 @@ public class CuttingBoardRecipeManager {
     }
 
     public boolean isRecipeTool(ItemStack tool) {
-        Snapshot view = snapshot;
+        Snapshot view = currentSnapshot();
         if (tool == null || tool.getType().isAir()) {
             return false;
         }
@@ -521,7 +570,7 @@ public class CuttingBoardRecipeManager {
 
     /** Recipes that produce this item, from the reverse result index (O(1), no full scan). */
     public List<CuttingBoardRecipe> getRecipesProducing(ItemStack item) {
-        Snapshot view = snapshot;
+        Snapshot view = currentSnapshot();
         if (item == null || item.getType().isAir()) {
             return List.of();
         }
@@ -685,17 +734,17 @@ public class CuttingBoardRecipeManager {
     }
 
     public Map<String, CuttingBoardRecipe> getRecipes() {
-        Snapshot view = snapshot;
+        Snapshot view = currentSnapshot();
         return Collections.unmodifiableMap(view.recipes());
     }
 
     public List<CuttingBoardRecipe> getSortedRecipes() {
-        Snapshot view = snapshot;
+        Snapshot view = currentSnapshot();
         return view.sortedRecipes();
     }
 
     public int getRecipeCount() {
-        Snapshot view = snapshot;
+        Snapshot view = currentSnapshot();
         return view.recipes().size();
     }
 
@@ -705,7 +754,7 @@ public class CuttingBoardRecipeManager {
 
     /** Recipes that reached this manager through a CraftEngine pack section, not the plugin's own file. */
     public int getPackRecipeCount() {
-        Snapshot view = snapshot;
+        Snapshot view = currentSnapshot();
         return view.packRecipeCount();
     }
 
@@ -719,7 +768,7 @@ public class CuttingBoardRecipeManager {
     }
 
     public CuttingBoardRecipe getRecipe(String id) {
-        Snapshot view = snapshot;
+        Snapshot view = currentSnapshot();
         return view.recipes().get(id);
     }
 
@@ -789,11 +838,10 @@ public class CuttingBoardRecipeManager {
         try {
             plugin.scheduler().runLater(() -> {
                 externalRepublishScheduled.set(false);
-                loadRecipes(lastFileDocument, true);
-                // Same as the cooking pot republish: the summary was already printed by the CraftEngine
-                // readiness pass, so the cutting board count would stay a batch behind the addon recipes
-                // without this. Deduped on the counts digest, so an unchanged batch prints nothing.
-                plugin.requestContentSummary();
+                plugin.reloadEditedRecipeFilesAsync().whenComplete((ignored, failure) -> {
+                    if (failure != null && plugin.isEnabled()) plugin.getLogger().log(java.util.logging.Level.WARNING,
+                            "External recipe catalog publication failed; previous recipes remain active", failure);
+                });
             }, 1L);
         } catch (RuntimeException stoppedScheduler) {
             externalRepublishScheduled.set(false);

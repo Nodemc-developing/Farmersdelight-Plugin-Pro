@@ -17,6 +17,23 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CommonTagResolverTest {
 
+    @Test void currentDefaultsFillOldDocumentsWithoutOverwritingDeclaredUserGroups() {
+        YamlConfiguration bundled = YamlConfiguration.loadConfiguration(new InputStreamReader(
+                getClass().getResourceAsStream("/common-tags.yml"), StandardCharsets.UTF_8));
+        YamlConfiguration old = new YamlConfiguration();
+        old.createSection("tags").set("c:foods/raw_meat", List.of("custom:meat"));
+        String before = old.saveToString();
+        var merged = CommonTagResolver.mergedDefinitions(bundled.getConfigurationSection("tags"), old.getConfigurationSection("tags"),
+                (path, error) -> { throw new AssertionError(path + ":" + error); });
+        assertEquals(Set.of("farmersdelight:wheat_dough"), merged.get("c:foods/dough"));
+        assertEquals(Set.of("custom:meat"), merged.get("c:foods/raw_meat"));
+        assertEquals(before, old.saveToString(), "The original configuration must remain unchanged");
+        old.getConfigurationSection("tags").set("C:Foods/Dough", List.of());
+        var emptyOverride = CommonTagResolver.mergedDefinitions(bundled.getConfigurationSection("tags"), old.getConfigurationSection("tags"),
+                (path, error) -> { throw new AssertionError(path + ":" + error); });
+        assertEquals(Set.of(), emptyOverride.get("c:foods/dough"), "An authored empty group is an explicit override");
+    }
+
     @Test
     void mergesSourcesAndBuildsReverseIndex() {
         String source = "test-common-tags";

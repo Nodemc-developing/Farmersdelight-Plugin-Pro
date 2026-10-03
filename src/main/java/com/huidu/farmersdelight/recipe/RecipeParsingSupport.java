@@ -66,13 +66,33 @@ public final class RecipeParsingSupport {
         return parseIngredientValue(value, 0);
     }
 
+    static void requireKnownSemantics(org.bukkit.configuration.ConfigurationSection section, Set<String> supported) {
+        for (String field : section.getKeys(false)) {
+            String key = field.toLowerCase(Locale.ROOT).replace('_', '-');
+            if (supported.contains(key)) continue;
+            if (key.startsWith("match") || key.startsWith("consume") || key.startsWith("condition")
+                    || key.equals("components") || key.equals("exact-components") || key.equals("nbt")) {
+                throw new IllegalArgumentException("Unsupported recipe condition or consumption field: " + field);
+            }
+        }
+    }
+
     private static RecipeIngredient parseIngredientValue(Object value, int depth) {
         if (depth > 32) throw new IllegalArgumentException("Ingredient alternatives are nested too deeply");
         if (value instanceof org.bukkit.configuration.ConfigurationSection section) {
             value = section.getValues(false);
         }
         if (value instanceof Map<?, ?> raw) {
+            for (Object field : raw.keySet()) {
+                String key = String.valueOf(field);
+                if (!java.util.Set.of("item", "nbt", "items", "choice", "extensions", "metadata").contains(key)
+                        && !key.startsWith("x-")) throw new IllegalArgumentException("Unsupported ingredient field: " + key);
+            }
             Object choice = raw.containsKey("items") ? raw.get("items") : raw.get("choice");
+            if (raw.containsKey("items") && raw.containsKey("choice")
+                    || choice != null && (raw.containsKey("item") || raw.containsKey("nbt"))) {
+                throw new IllegalArgumentException("Ingredient must use one item or one alternative list");
+            }
             if (choice instanceof List<?> options) {
                 Map<String, RecipeIngredient> parsed = new java.util.LinkedHashMap<>();
                 for (Object option : options) {

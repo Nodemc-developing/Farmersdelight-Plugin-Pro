@@ -172,7 +172,7 @@ public final class RecipeBookGuiConfig {
         legend.put('X', "background");
         Map<String, GuiConfig.GuiItem> items = new HashMap<>();
         items.put("background", new GuiConfig.GuiItem(Material.GRAY_STAINED_GLASS_PANE, null, " ", List.of()));
-        items.put("back", new GuiConfig.GuiItem(Material.BARRIER, null, "Close", List.of()));
+        items.put("back", new GuiConfig.GuiItem(Material.BARRIER, null, "<red>Close", List.of()));
         List<String> layout = List.of(
                 "XXXXXXXXX",
                 "XCCCCCCCX",
@@ -191,9 +191,9 @@ public final class RecipeBookGuiConfig {
         legend.put('B', "back");
         legend.put('X', "background");
         Map<String, GuiConfig.GuiItem> items = new HashMap<>();
-        items.put("prev_page", new GuiConfig.GuiItem(Material.ARROW, null, "Previous", List.of()));
-        items.put("next_page", new GuiConfig.GuiItem(Material.ARROW, null, "Next", List.of()));
-        items.put("back", new GuiConfig.GuiItem(Material.BARRIER, null, "Back", List.of()));
+        items.put("prev_page", new GuiConfig.GuiItem(Material.ARROW, null, "<green>Previous", List.of()));
+        items.put("next_page", new GuiConfig.GuiItem(Material.ARROW, null, "<green>Next", List.of()));
+        items.put("back", new GuiConfig.GuiItem(Material.BARRIER, null, "<white>Back", List.of()));
         List<String> layout = List.of(
                 "RRRRRRRRR",
                 "RRRRRRRRR",
@@ -212,8 +212,8 @@ public final class RecipeBookGuiConfig {
         legend.put('B', "back");
         legend.put('X', "background");
         Map<String, GuiConfig.GuiItem> items = new HashMap<>();
-        items.put("fill", new GuiConfig.GuiItem(Material.HOPPER, null, "Fill ingredients", List.of()));
-        items.put("back", new GuiConfig.GuiItem(Material.ARROW, null, "Back", List.of()));
+        items.put("fill", new GuiConfig.GuiItem(Material.HOPPER, null, "<green>Fill ingredients", List.of()));
+        items.put("back", new GuiConfig.GuiItem(Material.ARROW, null, "<white>Back", List.of()));
         List<String> layout = List.of(
                 "XXXXXXXXX",
                 "XIIIIIIRX",

@@ -58,6 +58,7 @@ public class RecipeViewGui extends AbstractInventoryGui {
     static {
         ItemMeta meta = EMPTY_SLOT_BACKGROUND.getItemMeta();
         meta.displayName(Component.text(" "));
+        GuiTextStyle.normalizeDisplayMeta(meta);
         EMPTY_SLOT_BACKGROUND.setItemMeta(meta);
     }
 
@@ -201,14 +202,12 @@ public class RecipeViewGui extends AbstractInventoryGui {
         // Built display items cache resolved names/lore (from the language files), so clear them too; otherwise
         // stale item names would linger in the recipe GUI after /fd reload lang/gui.
         RecipeIngredientIcons.clearCaches();
-        RecipeViewCache.clearDisplay();
-        ToolPreviewRenderer.clearToolPreviewCache();
+        GuiCacheInvalidator.clearRecipeDisplayCaches();
         RecipeDetailRenderer.clearProcessBarFrameCache();
     }
 
     public static void clearRecipeDisplayCache() {
-        RecipeViewCache.clearDisplay();
-        ToolPreviewRenderer.clearToolPreviewCache();
+        GuiCacheInvalidator.clearRecipeDisplayCaches();
     }
 
     private RecipeViewGuiConfig createDefaultConfig() {
@@ -412,6 +411,7 @@ public class RecipeViewGui extends AbstractInventoryGui {
     }
 
     private void refresh(Player player, boolean resetDetailAnimations) {
+        try (var ignored = com.huidu.farmersdelight.recipe.RuntimeSnapshotPublication.readScope()) {
         switch (state) {
             case MAIN_MENU -> drawMainMenu(player);
             case COOKING_POT_LIST -> drawCookingPotList(player);
@@ -420,6 +420,7 @@ public class RecipeViewGui extends AbstractInventoryGui {
             case INGREDIENT_OPTIONS -> drawIngredientOptions(player);
             case SPECIAL_RECIPE_LIST -> drawSpecialRecipeList(player);
             case SPECIAL_RECIPE_DETAIL -> drawSpecialRecipeDetail(player);
+        }
         }
     }
 
@@ -477,9 +478,9 @@ public class RecipeViewGui extends AbstractInventoryGui {
         // Locale + (for cooking pots) the per-instance preview-count and active group fully determine
         // a non-locked display item's content, so cache the built item across opens/pages/players.
         String locale = player == null ? "default" : player.locale().toString().toLowerCase(Locale.ROOT);
-        String cacheKeyPrefix = isCookingPot
+        String cacheKeyPrefix = RecipeViewCache.scopedDisplayKey(isCookingPot
                 ? "pot|" + getActiveCookingPotRecipeGroup() + '|' + config.getRecipeListMaxPreviewIngredients() + '|'
-                : "board|" + config.getRecipeListMaxPreviewIngredients() + '|';
+                : "board|" + config.getRecipeListMaxPreviewIngredients() + '|');
 
         for (int i = 0; i < recipeSlots.size(); i++) {
             int recipeIndex = startIndex + i;
@@ -668,7 +669,8 @@ public class RecipeViewGui extends AbstractInventoryGui {
         meta.displayName(craftableOnly
                 ? tr("gui.recipe.filter_craftable_on", NamedTextColor.GREEN)
                 : tr("gui.recipe.filter_craftable_off", NamedTextColor.GRAY));
-        meta.lore(List.of(tr("gui.recipe.click_to_toggle", NamedTextColor.YELLOW)));
+        meta.lore(List.of(tr("gui.recipe.click_to_toggle", NamedTextColor.GREEN)));
+        GuiTextStyle.normalizeDisplayMeta(meta);
         item.setItemMeta(meta);
         inventory.setItem(slot, item);
     }
@@ -702,6 +704,7 @@ public class RecipeViewGui extends AbstractInventoryGui {
             ItemMeta meta = button.getItemMeta();
             if (meta != null) {
                 meta.lore(List.of(I18n.getComponent("gui.fuzzy.fill_hint", player)));
+                GuiTextStyle.normalizeDisplayMeta(meta);
                 button.setItemMeta(meta);
             }
         }
@@ -749,6 +752,7 @@ public class RecipeViewGui extends AbstractInventoryGui {
         lore.add(Component.empty());
         lore.add(tr("gui.recipe.ingredient", NamedTextColor.GRAY));
         meta.lore(lore);
+        GuiTextStyle.normalizeDisplayMeta(meta);
         item.setItemMeta(meta);
         return item;
     }
@@ -1217,9 +1221,10 @@ public class RecipeViewGui extends AbstractInventoryGui {
                     Component.text(cookTimeStr).color(NamedTextColor.AQUA)));
         }
         lore.add(Component.text(""));
-        lore.add(tr("gui.recipe.click_to_view", NamedTextColor.YELLOW));
+        lore.add(tr("gui.recipe.click_to_view", NamedTextColor.GREEN));
 
         meta.lore(lore);
+        GuiTextStyle.normalizeDisplayMeta(meta);
         result.setItemMeta(meta);
         return result;
     }
@@ -1258,9 +1263,10 @@ public class RecipeViewGui extends AbstractInventoryGui {
             lore.add(tr("gui.recipe.more_items", remaining));
         }
         lore.add(Component.text(""));
-        lore.add(tr("gui.recipe.click_to_view", NamedTextColor.YELLOW));
+        lore.add(tr("gui.recipe.click_to_view", NamedTextColor.GREEN));
 
         meta.lore(lore);
+        GuiTextStyle.normalizeDisplayMeta(meta);
         input.setItemMeta(meta);
         return input;
     }
@@ -1281,8 +1287,7 @@ public class RecipeViewGui extends AbstractInventoryGui {
     }
 
     Component itemNameComponent(ItemStack item, Player player) {
-        return ItemUtils.getDisplayComponent(item, player)
-                .decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE);
+        return GuiTextStyle.name(ItemUtils.getDisplayComponent(item, player));
     }
 
     String i18nOrDefault(Player player) {
@@ -1316,7 +1321,7 @@ public class RecipeViewGui extends AbstractInventoryGui {
         }
         // \u652F\u6301 MiniMessage \u6807\u7B7E\u4EE5\u53CA\u65E7\u7248 &/\u00A7 \u989C\u8272\u4EE3\u7801\uFF1B\u5F3A\u5236\u5173\u95ED\u659C\u4F53\uFF08\u7269\u54C1 lore/\u540D\u79F0\u9ED8\u8BA4\u4F1A\u4EE5\u659C\u4F53
         // \u6E32\u67D3\uFF09\uFF0C\u8FD9\u6837\u5F00\u5934\u7684\u989C\u8272\u7247\u6BB5\u4EE5\u53CA\u6BCF\u4E2A\u8FFD\u52A0\u7684\u5B50\u8282\u70B9\u90FD\u662F\u76F4\u7ACB\u7684\uFF0C\u9664\u975E\u6587\u672C\u660E\u786E\u8981\u6C42\u4F7F\u7528\u659C\u4F53\u3002
-        return Text.deserialize(text).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE);
+        return GuiTextStyle.upright(Text.deserialize(text));
     }
 
     private Component coloredComponent(String text) {
@@ -1325,13 +1330,19 @@ public class RecipeViewGui extends AbstractInventoryGui {
             resolved = text;
         }
         if (resolved.contains("<") && resolved.contains(">")) {
-            return MINI_MESSAGE.deserialize(resolved);
+            return GuiTextStyle.title(MINI_MESSAGE.deserialize(resolved));
         }
         String normalized = resolved.replaceAll("&(?=[0-9a-fk-orA-FK-OR])", "\u00A7");
-        return LEGACY.deserialize(normalized);
+        return GuiTextStyle.title(LEGACY.deserialize(normalized));
     }
 
     void onClick(InventoryClickEvent event) {
+        try (var ignored = com.huidu.farmersdelight.recipe.RuntimeSnapshotPublication.readScope()) {
+            onClickWithinSnapshot(event);
+        }
+    }
+
+    private void onClickWithinSnapshot(InventoryClickEvent event) {
         if (event.getView().getTopInventory().getHolder() != this) return;
         event.setCancelled(true);
 
@@ -1897,14 +1908,11 @@ public class RecipeViewGui extends AbstractInventoryGui {
     public static void closeAllOpenGuis() {
         for (Map.Entry<UUID, RecipeViewGui> entry : new ArrayList<>(activeGuis.entrySet())) {
             RecipeViewGui gui = entry.getValue();
-            Player player = Bukkit.getPlayer(entry.getKey());
             if (gui != null && !gui.closed) {
                 gui.close();
             }
-            activeGuis.remove(entry.getKey());
-            if (player != null && player.isOnline()) {
-                closeViewerInventory(player);
-            }
+            activeGuis.remove(entry.getKey(), gui);
+            if (gui != null) gui.closeViewerInventory();
         }
     }
 
@@ -1920,7 +1928,7 @@ public class RecipeViewGui extends AbstractInventoryGui {
 
     @Override
     protected void removeFromActiveGuis(UUID playerId) {
-        activeGuis.remove(playerId);
+        activeGuis.remove(playerId, this);
     }
 
     @Override

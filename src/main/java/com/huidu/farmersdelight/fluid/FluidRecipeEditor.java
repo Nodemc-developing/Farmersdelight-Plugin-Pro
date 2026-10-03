@@ -97,16 +97,16 @@ public final class FluidRecipeEditor implements AsyncRecipeEditor {
         EditableRecipe draft = new EditableRecipe(id, 1);
         RecipeIngredient ingredient = spec == null ? null : spec.ingredient();
         ItemStack input = ingredient == null ? null : ingredientIcon(ingredient);
-        ItemStack result = spec == null || spec.result().isEmpty() ? null : RecipeItemCodec.deserializeItem(spec.result());
+        ItemStack result = spec == null || spec.result().isEmpty() ? null : FluidResultCodec.deserialize(spec.result());
         draft.setItem(0, input);
         draft.setResult(result);
         draft.setResultCount(result == null ? 1 : result.getAmount());
         draft.setNumber("amount", spec == null ? 1000 : spec.amount());
-        draft.setNumber("time", spec == null ? (type.equals("soaking") ? 200 : 0) : spec.timeTicks());
+        draft.setNumber("time", spec == null ? 0 : spec.timeTicks());
         draft.setNumber("consume_fluid", spec == null || spec.consumeFluid() ? 1 : 0);
         draft.setNumber("priority", spec == null ? 0 : spec.priority());
         contexts.put(draft, new Context(spec, ingredient, input, result,
-                spec == null ? "minecraft:water" : (spec.fluidTag() ? "#" : "") + spec.fluidId()));
+                spec == null ? "minecraft:water" : FluidExpression.display(spec.fluidExpression())));
         return draft;
     }
 
@@ -123,9 +123,7 @@ public final class FluidRecipeEditor implements AsyncRecipeEditor {
         Context context = context(draft);
         String input = value == null ? "" : value.trim();
         if (key.equals("fluid")) {
-            String identity = input.startsWith("#") ? input.substring(1) : input;
-            if (!identity.matches("[a-z0-9_.-]+:[a-z0-9/._-]+")) throw new IllegalArgumentException("Invalid fluid id/tag");
-            Key.of(identity);
+            expression(input);
             context.fluid = input;
         } else if (key.equals("ingredient")) {
             RecipeIngredient parsed = RecipeParsingSupport.parseIngredientValue(input);
@@ -163,14 +161,23 @@ public final class FluidRecipeEditor implements AsyncRecipeEditor {
         long amount = longValue(draft.number("amount", 1000), context.original == null ? null : context.original.amount(), "amount");
         long time = longValue(draft.number("time", 0), context.original == null ? null : context.original.timeTicks(), "time");
         boolean consume = !type.equals("soaking") || draft.number("consume_fluid", 1) >= 1;
+        Object fluidExpression = expression(context.fluid);
+        String primary = FluidExpression.primary(fluidExpression);
         FluidRecipeSpec edited = new FluidRecipeSpec(draft.id(), type, ingredient, result,
-                context.fluid.startsWith("#") ? context.fluid.substring(1) : context.fluid,
-                context.fluid.startsWith("#"), amount, time, consume,
-                Math.toIntExact(longValue(draft.number("priority", 0), null, "priority")));
+                primary.startsWith("#") ? primary.substring(1) : primary,
+                primary.startsWith("#"), amount, time, consume,
+                Math.toIntExact(longValue(draft.number("priority", 0), null, "priority")), fluidExpression);
         return manager.saveAsync(edited);
     }
 
     @Override public CompletableFuture<Boolean> deleteAsync(String id) { return manager.deleteAsync(id); }
+
+    private static Object expression(String input) {
+        if (!input.startsWith("{") && !input.startsWith("[")) return FluidExpression.capture(input);
+        try {
+            return FluidExpression.capture(com.huidu.farmersdelight.config.PlainYamlDocuments.parse("fluid: " + input, true).get("fluid"));
+        } catch (org.bukkit.configuration.InvalidConfigurationException invalid) { throw new IllegalArgumentException("Invalid fluid expression YAML", invalid); }
+    }
 
     private Context context(EditableRecipe draft) {
         Context context = contexts.get(draft);

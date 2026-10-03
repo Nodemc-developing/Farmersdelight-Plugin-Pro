@@ -64,6 +64,7 @@ class CookingPotEffectManager {
         // world per tick. A context is dropped by the chunk/world unload cleanup like the other managers.
         volatile long budgetTick = Long.MIN_VALUE;
         final AtomicInteger budget = new AtomicInteger();
+        final FairEffectSources<BlockPosKey> sources = new FairEffectSources<>();
         volatile List<Player> seeing;
     }
 
@@ -123,6 +124,16 @@ class CookingPotEffectManager {
             return;
         }
 
+        int chunkX = posKey.x() >> 4;
+        int chunkZ = posKey.z() >> 4;
+        UUID worldId = world.getUID();
+        Long effectChunkKey = ManagerSupport.chunkKey(chunkX, chunkZ);
+        Map<Long, CookingPotFxContext> worldFx = chunkFx.get(worldId);
+        CookingPotFxContext fx = worldFx == null ? null : worldFx.get(effectChunkKey);
+        // Another pot already queried this chunk on this tick. Its empty audience also rules out
+        // feedback here without taking this pot's inventory monitor. A new tick must still recheck.
+        if (fx != null && fx.budgetTick == currentBukkitTick && fx.seeing != null && fx.seeing.isEmpty()) return;
+
         boolean hasActivity = entity.hasInput()
                 || entity.hasPendingOutput()
                 || entity.hasMealDisplayItem()
@@ -132,23 +143,26 @@ class CookingPotEffectManager {
             return;
         }
 
-        ThreadLocalRandom random = ThreadLocalRandom.current();
-        Location center = ManagerSupport.toLocation(world, posKey);
-        if (center == null) {
-            return;
+        // An inactive pot does not create a world or chunk effect context.
+        if (fx == null) {
+            if (worldFx == null) worldFx = chunkFx.computeIfAbsent(worldId, w -> new ConcurrentHashMap<>());
+            fx = worldFx.computeIfAbsent(effectChunkKey, k -> new CookingPotFxContext());
         }
-        center.add(0.5, 0.9, 0.5);
-
-        int chunkX = posKey.x() >> 4;
-        int chunkZ = posKey.z() >> 4;
-        long effectChunkKey = ManagerSupport.chunkKey(chunkX, chunkZ);
-        CookingPotFxContext fx = chunkFx.computeIfAbsent(world.getUID(), w -> new ConcurrentHashMap<>())
-                .computeIfAbsent(effectChunkKey, k -> new CookingPotFxContext());
         if (fx.budgetTick != currentBukkitTick) {
             fx.budgetTick = currentBukkitTick;
             fx.budget.set(0);
             fx.seeing = null;
         }
+        // An empty tracked-player snapshot applies to every pot in this chunk for this tick.
+        // The next tick discards it so newly tracking players are observed normally.
+        if (fx.seeing != null && fx.seeing.isEmpty()) return;
+        // A source can emit bubble, steam, secondary steam and sound in one pass.
+        if (!fx.sources.admit(posKey, currentBukkitTick, Math.max(1, (cookingPotChunkEffectBudgetLimit + 3) / 4))
+                || fx.budget.get() >= cookingPotChunkEffectBudgetLimit) return;
+        EffectSpec bubble = bubbleEffect, steam = steamEffect;
+        float soundChance = soundFloat(behavior, CookingPotBlockBehavior::getSoundChance, 0.10f);
+        if ((!bubble.enabled() || bubble.chance() <= 0)
+                && (!steam.enabled() || steam.chance() <= 0) && soundChance <= 0) return;
         List<Player> seeing = fx.seeing;
         if (seeing == null) {
             seeing = world.isChunkLoaded(chunkX, chunkZ)
@@ -156,6 +170,18 @@ class CookingPotEffectManager {
                     : List.of();
             fx.seeing = seeing;
         }
+        // Discover an empty audience once after admission, even when density makes emission rare.
+        if (seeing.isEmpty()) return;
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+        int density = plugin.getTickManager().nativePotsInChunk(worldId, chunkX, chunkZ);
+        double particleRate = plugin.particles().potDensityRate(density, false);
+        boolean emitBubble = bubble.enabled() && random.nextFloat() < bubble.chance() * particleRate;
+        boolean emitSteam = steam.enabled() && random.nextFloat() < steam.chance() * particleRate;
+        boolean emitSound = random.nextFloat() < soundChance * plugin.particles().potDensityRate(density, true);
+        if (!emitBubble && !emitSteam && !emitSound) return;
+        Location center = ManagerSupport.toLocation(world, posKey);
+        if (center == null) return;
+        center.add(0.5, 0.9, 0.5);
         List<Player> nearbyViewers = NEARBY_VIEWER_SCRATCH.get();
         nearbyViewers.clear();
         for (Player player : seeing) {
@@ -171,8 +197,7 @@ class CookingPotEffectManager {
             return;
         }
 
-        EffectSpec bubble = bubbleEffect;
-        if (bubble.enabled() && random.nextFloat() < bubble.chance() && chunkBudget.get() < cookingPotChunkEffectBudgetLimit) {
+        if (emitBubble && chunkBudget.get() < cookingPotChunkEffectBudgetLimit) {
             chunkBudget.incrementAndGet();
             double x = center.getX() + (random.nextDouble() * 0.6D - 0.3D);
             double y = center.getY() + bubble.yOffset();
@@ -188,8 +213,7 @@ class CookingPotEffectManager {
             );
         }
 
-        EffectSpec steam = steamEffect;
-        if (steam.enabled() && random.nextFloat() < steam.chance() && chunkBudget.get() < cookingPotChunkEffectBudgetLimit) {
+        if (emitSteam && chunkBudget.get() < cookingPotChunkEffectBudgetLimit) {
             chunkBudget.incrementAndGet();
             double x = center.getX() + (random.nextDouble() * 0.4D - 0.2D);
             double y = center.getY() + steam.yOffset();
@@ -205,7 +229,7 @@ class CookingPotEffectManager {
             );
 
             EffectSpec secondary = secondarySteamEffect;
-            if (secondary.enabled() && chunkBudget.get() < cookingPotChunkEffectBudgetLimit) {
+            if (secondary.enabled() && random.nextFloat() < secondary.chance() && chunkBudget.get() < cookingPotChunkEffectBudgetLimit) {
                 chunkBudget.incrementAndGet();
                 plugin.particles().spawn(
                         nearbyViewers, center, effectViewerDistanceSquared, secondary.particle(),
@@ -221,8 +245,7 @@ class CookingPotEffectManager {
             }
         }
 
-        float soundChance = soundFloat(behavior, CookingPotBlockBehavior::getSoundChance, 0.10f);
-        if (random.nextFloat() < soundChance && chunkBudget.get() < cookingPotChunkEffectBudgetLimit) {
+        if (emitSound && chunkBudget.get() < cookingPotChunkEffectBudgetLimit) {
             chunkBudget.incrementAndGet();
             boolean soupReady = entity.hasPendingOutput() || entity.hasMealDisplayItem();
             String configuredSound;
@@ -334,17 +357,13 @@ class CookingPotEffectManager {
     }
 
     private void playConfiguredSound(List<Player> viewers, Location location, ResolvedSound sound, float volume, float pitch) {
-        if (sound.bukkitSound() != null) {
-            for (Player viewer : viewers) {
-                viewer.playSound(location, sound.bukkitSound(), volume, pitch);
-            }
-            return;
-        }
-        if (sound.soundKey() != null && !sound.soundKey().isBlank()) {
-            for (Player viewer : viewers) {
+        for (Player viewer : viewers) plugin.scheduler().runForEntity(viewer, () -> {
+            if (!viewer.isOnline() || viewer.getWorld() != location.getWorld()) return;
+            if (viewer.getLocation().distanceSquared(location) > effectViewerDistanceSquared) return;
+            if (sound.bukkitSound() != null) viewer.playSound(location, sound.bukkitSound(), volume, pitch);
+            else if (sound.soundKey() != null && !sound.soundKey().isBlank())
                 viewer.playSound(location, sound.soundKey(), SoundCategory.BLOCKS, volume, pitch);
-            }
-        }
+        });
     }
 
     private record ResolvedSound(Sound bukkitSound, String soundKey) {

@@ -20,17 +20,14 @@ import java.util.function.UnaryOperator;
 /** Compatibility identifiers reuse this plugin's registered mechanics without replacing other registrations. */
 public final class PapersBehaviorAliases {
     private static final Set<String> UNSUPPORTED = Set.of(
-            "papersdelight:basket", "papersdelight:advanced_crop", "papersdelight:roped_crop",
-            "papersdelight:double_crop", "papersdelight:grant_advancement", "papersdelight:remove_random_effect",
-            "papersdelight:organic_compost", "papersdelight:rich_soil", "papersdelight:farmland",
-            "papersdelight:rope", "papersdelight:rope_block", "papersdelight:skewer_item",
-            "papersdelight:high_temperature", "papersdelight:pairable_block",
-            "papersdelight:horizontal_double_block_item", "papersdelight:horizontal_double_block",
-            "papersdelight:wild_rice", "dumplings_delight:garlic_effect");
+            "dumplings_delight:garlic_effect");
 
     public static Set<String> unsupportedIdentifiers() { return UNSUPPORTED; }
 
     public static void register() {
+        register(null);
+    }
+    public static void register(com.huidu.farmersdelight.FarmersDelightPlugin plugin) {
         registerBlock("papersdelight:cooking_pot", "farmersdelight:cooking_pot", section -> {
             ConfigSection normalized = copy(section);
             normalized.put("support-integer", true);
@@ -49,8 +46,36 @@ public final class PapersBehaviorAliases {
                 return new CompositeItemBehavior(List.of(cooking, new BlockItemBehavior(placedBlock)));
             });
         }
-        registerBuff("papersdelight:nourishment_effect", FoodBuffFunction.Kind.NOURISHMENT);
-        registerBuff("papersdelight:comfort_effect", FoodBuffFunction.Kind.COMFORT);
+        registerBuff(plugin, "papersdelight:nourishment_effect", FoodBuffFunction.Kind.NOURISHMENT);
+        registerBuff(plugin, "papersdelight:comfort_effect", FoodBuffFunction.Kind.COMFORT);
+        registerExtendedMechanics(plugin);
+    }
+
+    private static void registerExtendedMechanics(com.huidu.farmersdelight.FarmersDelightPlugin plugin) {
+        var blocks = com.huidu.farmersdelight.block.behavior.CompatibilityMechanicFactories.blockFactories(plugin);
+        var items = com.huidu.farmersdelight.block.behavior.CompatibilityMechanicFactories.itemFactories(
+                plugin == null ? () -> null : plugin::getSkewerCookingService);
+        for (String namespace : List.of("farmersdelight", "papersdelight")) {
+            blocks.forEach((suffix, factory) -> {
+                Key id = Key.of(namespace + ":" + suffix);
+                if (BuiltInRegistries.BLOCK_BEHAVIOR_TYPE.getValue(id) == null) BlockBehaviors.register(id, factory);
+            });
+            items.forEach((suffix, factory) -> {
+                Key id = Key.of(namespace + ":" + suffix);
+                if (BuiltInRegistries.ITEM_BEHAVIOR_TYPE.getValue(id) == null) ItemBehaviors.register(id, factory);
+            });
+            com.huidu.farmersdelight.effect.ContentEffectFunction.factories(plugin).forEach((suffix, factory) -> {
+                Key id = Key.of(namespace + ":" + suffix);
+                if (BuiltInRegistries.COMMON_FUNCTION_TYPE.getValue(id) == null) CommonFunctions.register(id, factory);
+            });
+            Key sneaking = Key.of(namespace + ":is_sneaking");
+            if (BuiltInRegistries.COMMON_CONDITION_TYPE.getValue(sneaking) == null) CommonConditions.register(sneaking,
+                    com.huidu.farmersdelight.condition.SneakingCondition.FACTORY);
+            Key advancement = Key.of(namespace + ":grant_advancement");
+            if (BuiltInRegistries.LOOT_FUNCTION_TYPE.getValue(advancement) == null)
+                net.momirealms.craftengine.core.loot.function.LootFunctions.register(advancement,
+                        com.huidu.farmersdelight.loot.GrantAdvancementFunction.factory(plugin));
+        }
     }
 
     private static void registerBlock(String alias, String source, UnaryOperator<ConfigSection> normalize) {
@@ -61,10 +86,10 @@ public final class PapersBehaviorAliases {
         }
     }
 
-    private static void registerBuff(String alias, FoodBuffFunction.Kind kind) {
+    private static void registerBuff(com.huidu.farmersdelight.FarmersDelightPlugin plugin, String alias, FoodBuffFunction.Kind kind) {
         Key key = Key.of(alias);
         if (BuiltInRegistries.COMMON_FUNCTION_TYPE.getValue(key) == null) {
-            CommonFunctions.register(key, FoodBuffFunction.ticksFactory(kind, CommonConditions::fromConfig));
+            CommonFunctions.register(key, FoodBuffFunction.ticksFactory(plugin, kind, CommonConditions::fromConfig));
         }
     }
 

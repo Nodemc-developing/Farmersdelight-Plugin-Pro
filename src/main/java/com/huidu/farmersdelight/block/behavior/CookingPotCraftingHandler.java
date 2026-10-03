@@ -1,7 +1,6 @@
 package com.huidu.farmersdelight.block.behavior;
 
 import com.huidu.farmersdelight.FarmersDelightPlugin;
-import com.huidu.farmersdelight.api.recipe.IngredientMatching;
 import com.huidu.farmersdelight.recipe.CookingPotRecipe;
 import com.huidu.farmersdelight.util.CustomBlockUtils;
 import com.huidu.farmersdelight.util.ItemUtils;
@@ -50,28 +49,9 @@ public class CookingPotCraftingHandler {
         FarmersDelightPlugin plugin = entity.plugin();
         var recipes = plugin == null ? null : plugin.getCookingPotRecipes();
         if (recipes == null) return null;
-        if (recipe.isFuzzy()) {
-            if (!recipes.canCraft(recipe, available)) return null;
-            int[] consume = new int[slots.length];
-            List<ItemStack> remainders = new ArrayList<>();
-            for (int idx = 0; idx < slots.length; idx++) {
-                ItemStack input = available.get(idx);
-                if (input == null || input.getType().isAir() || input.getAmount() <= 0) continue;
-                consume[idx] = 1;
-                ItemStack remainder = getCraftingRemainder(input, recipe);
-                if (remainder != null && !remainder.getType().isAir()) remainders.add(remainder);
-            }
-            return new Consumption(consume, remainders);
-        }
-        // Use each filled slot once when possible, then allow stacked units for overlapping ingredients.
-        int[] assignment = IngredientMatching.assignIngredients(
-                recipe.getIngredients(), available, recipes::matchesIngredient,
-                item -> item == null || item.getType().isAir() || item.getAmount() <= 0 ? 0 : 1);
-        if (assignment == null) {
-            assignment = IngredientMatching.assignIngredients(
-                    recipe.getIngredients(), available, recipes::matchesIngredient,
-                    item -> item == null || item.getType().isAir() ? 0 : item.getAmount());
-        }
+        // Validation and assignment share one resolved identity per filled slot. The plan also rejects
+        // unusable extra inputs and stale fuzzy counts before either ingredients or outputs are changed.
+        int[] assignment = recipes.prepareConsumption(recipe, available);
         if (assignment == null) return null;
 
         int[] consume = new int[slots.length];

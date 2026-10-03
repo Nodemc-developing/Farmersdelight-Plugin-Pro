@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "retrieved_at_utc": "2026-10-02T21:35:42.634115+00:00",
+  "sparrow_yaml": {
+    "maven_coordinate": "net.momirealms:sparrow-yaml:1.0.22",
+    "repository": "https://github.com/Xiao-MoMi/sparrow-yaml",
+    "commit": "e325884f1e92dc4a86b35cdbc90bf0183458a7a6",
+    "commit_date_utc": "2026-09-06T08:17:10Z",
+    "repository_tag_available": false,
+    "repository_archive": "sparrow-yaml-e325884f1e92dc4a86b35cdbc90bf0183458a7a6.zip",
+    "published_binary_url": "https://repo.momirealms.net/releases/net/momirealms/sparrow-yaml/1.0.22/sparrow-yaml-1.0.22.jar",
+    "published_binary_sha256": "8373d0821e7e49ca76e9dc7d24a4c93eeb8d0bc801cf386ece2a568431770c1c",
+    "published_binary_bytes": 646212,
+    "published_binary_matches_resolved_gradle_artifact": true,
+    "source_jar_main_java_files": 109,
+    "all_source_jar_java_matches_commit_except_CRLF": true,
+    "upstream_build_wrapper": "8.11",
+    "upstream_shadow_plugin": "9.4.1",
+    "license_file": "Sparrow-YAML-GPL-3.0.txt"
+  },
+  "snake_yaml_fork": {
+    "version": "3.1-SNAPSHOT-forked",
+    "repository": "https://github.com/Catnies/snakeyaml-engine",
+    "commit": "30e9499fcd6e1569b81518db13e12d900c5da2eb",
+    "repository_archive": "snakeyaml-engine-30e9499fcd6e1569b81518db13e12d900c5da2eb.zip",
+    "bundled_binary_in_sparrow_repository": "libs/snakeyaml-engine-3.1-SNAPSHOT-forked.jar",
+    "bundled_binary_sha256": "cdfe1aa1a3f872a322f379e396cf649a8d756f2d39599607d1fda408487ac06d",
+    "source_pom_matches_embedded_binary_pom_except_CRLF": true,
+    "source_main_java_files": 136,
+    "binary_class_source_file_coverage": 224,
+    "version_and_fork_identification": "Same named version, exact normalized POM, full JVM SourceFile coverage, fork author also committed the unchanged binary in Sparrow upstream; exact bytecode rebuild not executed",
+    "fork_binary_build_manifest_utc": "2026-03-18T16:09:30.410Z",
+    "sparrow_binary_introduction_commit": "5d0a6062dcbf79cd031c7619d7ce3a541a167010",
+    "license_file": "SnakeYAML-Engine-Apache-2.0.txt"
+  },
+  "build_status": {
+    "executed": false,
+    "byte_for_byte_rebuild_verified": false,
+    "offline_build_guaranteed": false,
+    "preparation_is_separate_from_original_upstream_archives": true,
+    "business_java_or_dependency_versions_changed": false,
+    "gradle_compatibility_source": "https://gradleup.com/shadow/",
+    "prepared_gradle_version": "9.1.0",
+    "prepared_gradle_distribution_sha256": "a17ddd85a26b6a7f5ddb71ff8b05fc5104c0202c6e64782429790c933686c806",
+    "preparation_executed_and_verified": true,
+    "prepared_java_files_byte_for_byte_unchanged": 401
+  },
+  "other_gpl_family_dependencies": [
+    {
+      "name": "UltimateAdvancementAPI 2.8.1-pro.2",
+      "license": "LGPL-3.0-or-later",
+      "fd_shaded": false,
+      "fd_compile_only_vendored_binary": true,
+      "corresponding_source_relative_to_repository": "libs/UltimateAdvancementAPI-2.8.1-pro.2-sources.zip",
+      "source_sha256": "bc3c714eecc710fa3fc6eeff22f15e8351695f46661b7bdce4aeaab46ea7e851",
+      "binary_sha256": "e2a247b4c5e77f7489bad3e9bce93e9b8e0a91eebd7edbb36e803e0257af5c6a",
+      "license_and_build_scripts_in_source_archive": true,
+      "build_instructions_relative_to_source_archive": "MODERN_BUILD.md"
+    },
+    {
+      "name": "FluidCore implementation modules",
+      "license": "GPL-3.0-only",
+      "fd_shaded": false,
+      "cf_shaded": true,
+      "corresponding_source": "Full current FluidCore repository source distribution: api, core, paper-ce, examples, benchmarks, root build scripts, wrapper, LICENSE and LICENSE-API; root is preparing final source ZIP"
+    },
+    {
+      "name": "JMH 1.37",
+      "license": "GPL-2.0 with Classpath Exception",
+      "fd_shaded": false,
+      "cf_shaded": false,
+      "scope": "Only benchmarks compile/runtime dependencies; benchmark source is delivered, JMH binary is not in released server/API JARs"
+    }
+  ],
+  "files": [
+    {
+      "name": "gradle-9.1.0-bin.zip.sha256",
+      "bytes": 64,
+      "sha256": "6a738b61562dd212ad0d07d2fa04113b75d33879e6ebce1c8e273160a4c093cc",
+      "official_source_url": "https://services.gradle.org/distributions/gradle-9.1.0-bin.zip.sha256"
+    },
+    {
+      "name": "prepare-build.py",
+      "bytes": 4042,
+      "sha256": "e39d8ee2fc857e2bb1ab5a779f285984fe40c025a2ac92f423de6e16eb4e91b5",
+      "origin": "Local delivery verifier / explicitly disclosed build-only preparation; not upstream business source"
+    },
+    {
+      "name": "snakeyaml-engine-30e9499fcd6e1569b81518db13e12d900c5da2eb.zip",
+      "bytes": 1484161,
+      "sha256": "695b9ad44e1188b53db4fee2ff8cb99821abac0e32ba75a2e5d6ddeb16e15b7c",
+      "official_source_url": "https://codeload.github.com/Catnies/snakeyaml-engine/zip/30e9499fcd6e1569b81518db13e12d900c5da2eb"
+    },
+    {
+      "name": "SnakeYAML-Engine-Apache-2.0.txt",
+      "bytes": 10173,
+      "sha256": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9",
+      "official_source_url": "https://github.com/Catnies/snakeyaml-engine/blob/30e9499fcd6e1569b81518db13e12d900c5da2eb/LICENSE.txt"
+    },
+    {
+      "name": "sparrow-yaml-1.0.22-sources.jar",
+      "bytes": 148509,
+      "sha256": "f8f1d7a5e898e3364a4346101a2f6c0bcfe27fbc0549ab6e65f3f8cba2c6f504",
+      "official_source_url": "https://repo.momirealms.net/releases/net/momirealms/sparrow-yaml/1.0.22/sparrow-yaml-1.0.22-sources.jar"
+    },
+    {
+      "name": "sparrow-yaml-1.0.22.module",
+      "bytes": 1107,
+      "sha256": "57ef10b9ce6acfe3b9a75cdb0ea9fe4a51ff1cc88c7c01b90401d873629c1227",
+      "official_source_url": "https://repo.momirealms.net/releases/net/momirealms/sparrow-yaml/1.0.22/sparrow-yaml-1.0.22.module"
+    },
+    {
+      "name": "sparrow-yaml-1.0.22.pom",
+      "bytes": 856,
+      "sha256": "8fb9b0648967ee87f0aa16d0e3d004c63a08f241ee7ced6934c0e9822f2f8afb",
+      "official_source_url": "https://repo.momirealms.net/releases/net/momirealms/sparrow-yaml/1.0.22/sparrow-yaml-1.0.22.pom"
+    },
+    {
+      "name": "sparrow-yaml-e325884f1e92dc4a86b35cdbc90bf0183458a7a6.zip",
+      "bytes": 587214,
+      "sha256": "0faeaad1f8cefa5fb6337277f617c411991f2b3ecb14ad54c96b23f74374bc1d",
+      "official_source_url": "https://codeload.github.com/Xiao-MoMi/sparrow-yaml/zip/e325884f1e92dc4a86b35cdbc90bf0183458a7a6"
+    },
+    {
+      "name": "Sparrow-YAML-GPL-3.0.txt",
+      "bytes": 35129,
+      "sha256": "605e9047a563c5c8396ffb18232aa4304ec56586aee537c45064c6fb425e44ad",
+      "official_source_url": "https://github.com/Xiao-MoMi/sparrow-yaml/blob/e325884f1e92dc4a86b35cdbc90bf0183458a7a6/LICENSE"
+    },
+    {
+      "name": "verify.py",
+      "bytes": 5488,
+      "sha256": "09d80ef8a5004b2275266e750da3c45d225808a0ce52a75dc5b4f1b636713a1d",
+      "origin": "Local delivery verifier / explicitly disclosed build-only preparation; not upstream business source"
+    },
+    {
+      "name": "README.md",
+      "bytes": 6599,
+      "sha256": "bc7665bb3412692c933648a2bf134eedf370bee1b082e5f75b5ba9e59fc0bb79",
+      "origin": "Local source-delivery and disclosed build instructions"
+    }
+  ]
+}

@@ -15,6 +15,7 @@ import net.momirealms.craftengine.core.plugin.config.ConfigSection;
 import net.momirealms.craftengine.core.block.property.Property;
 import net.momirealms.craftengine.core.entity.player.InteractionResult;
 import net.momirealms.craftengine.core.entity.player.InteractionHand;
+import net.momirealms.craftengine.core.util.Key;
 import net.momirealms.craftengine.core.world.BlockPos;
 import net.momirealms.craftengine.core.world.context.BlockPlaceContext;
 import net.momirealms.craftengine.core.world.context.UseOnContext;
@@ -124,6 +125,9 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
     private final ConfiguredBlockSet connectorBlocks;
     private final FarmersDelightPlugin plugin;
     private final ConfiguredBlockSet exceptionBlocks;
+    private final int bellSearchRange;
+    private final Key reelItem;
+    private final Property<Boolean> bellProperty;
 
     private RopeBlockBehavior(FarmersDelightPlugin plugin,
                               BlockDefinition block,
@@ -134,7 +138,7 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
                               PlacementMode placementMode,
                               ConnectionMode connectionMode,
                               ConfiguredBlockSet connectorBlocks,
-                              ConfiguredBlockSet exceptionBlocks) {
+                              ConfiguredBlockSet exceptionBlocks, int bellSearchRange, Key reelItem, Property<Boolean> bellProperty) {
         super(block);
         this.plugin = plugin;
         this.northProperty = northProperty;
@@ -145,6 +149,9 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
         this.connectionMode = connectionMode;
         this.connectorBlocks = connectorBlocks;
         this.exceptionBlocks = exceptionBlocks;
+        this.bellSearchRange = bellSearchRange;
+        this.reelItem = reelItem;
+        this.bellProperty = bellProperty;
     }
 
     // The four connection properties stay optional: a rope that declares none of them is a plain single-model
@@ -157,6 +164,9 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
         Map<String, Object> arguments = section != null ? section.values() : Map.of();
         Object connectorRaw = BehaviorArgParser.getRaw(arguments, "connector-blocks");
         Object exceptionRaw = BehaviorArgParser.getRaw(arguments, "connection-exceptions");
+        int bellRange = BehaviorArgParser.getInt(arguments, "bell-search-range",
+                plugin == null ? 24 : plugin.getConfigInt(24, "rope.max-bell-distance"));
+        if (bellRange < 1 || bellRange > 256) throw new IllegalArgumentException("bell-search-range must be in [1, 256]");
         return new RopeBlockBehavior(
                 plugin,
                 block,
@@ -167,7 +177,10 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
                 PlacementMode.parse(BehaviorArgParser.getString(arguments, "placement-mode", "vanilla")),
                 ConnectionMode.parse(BehaviorArgParser.getString(arguments, "connection-mode", "restricted")),
                 connectorRaw == null ? ConfiguredBlockSet.EMPTY : ConfiguredBlockSet.parse(connectorRaw),
-                exceptionRaw == null ? null : ConfiguredBlockSet.parse(exceptionRaw)
+                exceptionRaw == null ? null : ConfiguredBlockSet.parse(exceptionRaw),
+                bellRange,
+                Key.of(BehaviorArgParser.getString(arguments, "reel-item", block.id().toString())),
+                BlockBehaviorFactory.getOptionalProperty(block, BehaviorArgParser.getString(arguments, "tied-to-bell-property", "tied_to_bell"), Boolean.class)
         );
     };
 
@@ -195,7 +208,7 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
             result = result.with(westProperty, connectsOnPlacement(world, pos, BlockFace.WEST, horizontalPlacement));
         }
 
-        return result;
+        return updateBellConnection(result, world, pos);
     }
 
     @Override
@@ -241,8 +254,7 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
         // dispatch here and would leave the whole bell path unreachable.
         if (hand == null || hand.getType().isAir()) return InteractionResult.TRY_EMPTY_HAND;
 
-        String handItemId = ItemUtils.getCustomItemId(hand);
-        if (handItemId == null || !state.owner().value().id().toString().equals(handItemId)) {
+        if (!ItemUtils.matchesItemId(hand, reelItem.toString())) {
             return InteractionResult.PASS;
         }
 
@@ -327,7 +339,7 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
         // ring the first bell found. Any gap, or any block that is neither a rope nor a bell, stops the search.
         int x = pos.x();
         int z = pos.z();
-        int maxDistance = Math.max(1, plugin.getConfigInt(24, "rope.bell-ring-max-distance"));
+        int maxDistance = bellSearchRange;
         for (int i = 1, y = pos.y() + 1; i <= maxDistance && y < world.getMaxHeight(); i++, y++) {
             Block above = world.getBlockAt(x, y, z);
             if (above.getType() == Material.BELL) {
@@ -471,8 +483,21 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
             );
             result = result.with(property, connectsToNeighbor(neighbor, face.getOppositeFace()));
         }
-        return result;
+        return updateBellConnection(result, world, pos);
     }
+
+    private ImmutableBlockState updateBellConnection(ImmutableBlockState state, World world, BlockPos pos) {
+        if (bellProperty == null) return state;
+        boolean tied = false;
+        for (int distance = 1; distance <= bellSearchRange && pos.y() + distance < world.getMaxHeight(); ++distance) {
+            Block next = world.getBlockAt(pos.x(), pos.y() + distance, pos.z());
+            if (next.getType() == Material.BELL) { tied = true; break; }
+            if (!CustomBlockUtils.hasBehavior(next, RopeBlockBehavior.class)) break;
+        }
+        return state.with(bellProperty, tied);
+    }
+
+    @Override public boolean canUseOnBlockIfSecondaryUseActive(UseOnContext context, ImmutableBlockState state) { return true; }
 
     private boolean connectsToNeighbor(Block neighbor, BlockFace faceTowardsRope) {
         return connectionMode == ConnectionMode.SOLID_FACE

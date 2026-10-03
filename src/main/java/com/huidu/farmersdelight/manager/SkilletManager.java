@@ -3,6 +3,8 @@ package com.huidu.farmersdelight.manager;
 import com.huidu.farmersdelight.util.ManagerSupport;
 import com.huidu.farmersdelight.util.ItemUtils;
 import com.huidu.farmersdelight.util.SoundUtils;
+import com.huidu.farmersdelight.api.sound.ToolSoundTable;
+import com.huidu.farmersdelight.config.StationSound;
 import com.huidu.farmersdelight.util.BlockPosKey;
 import com.huidu.farmersdelight.util.CampfireRecipeCache;
 import com.huidu.farmersdelight.util.Constants;
@@ -76,6 +78,9 @@ public class SkilletManager {
 
     /** Hand-held cooking; assigned in the constructor after the display models it depends on exist. */
     private SkilletHandheldCooking handheldCooking;
+    public void markHandheldJump(Player player) {
+        if (handheldCooking != null) handheldCooking.markJump(player);
+    }
 
     public boolean handleHandheldInteract(Player player, EquipmentSlot skilletHand,
                                           NamespacedKey cookingModel, NamespacedKey overlayModel,
@@ -148,6 +153,9 @@ public class SkilletManager {
     private volatile int reloadVisualRefreshBudget = DEFAULT_RELOAD_VISUAL_REFRESH_BUDGET;
     private volatile double cookTimeMultiplier = DEFAULT_COOK_TIME_MULTIPLIER;
     private volatile double fireAspectBonus = DEFAULT_FIRE_ASPECT_BONUS;
+    private volatile int tickIntervalTicks = PLACED_TICK_INTERVAL;
+    private volatile ToolSoundTable.Entry addFoodHot = new ToolSoundTable.Entry(null, 0.8F, 1.0F, 1.0F);
+    private volatile ToolSoundTable.Entry addFoodCold = new ToolSoundTable.Entry(null, 0.7F, 1.0F, 1.0F);
 
     public SkilletManager(FarmersDelightPlugin plugin) {
         this.plugin = plugin;
@@ -171,6 +179,13 @@ public class SkilletManager {
 
 
     public void reloadConfig() {
+        int previousInterval = tickIntervalTicks;
+        tickIntervalTicks = Math.max(1, Math.min(200, plugin.getConfigInt(PLACED_TICK_INTERVAL,
+                "container.tick-interval-ticks", "container.tick_interval_ticks")));
+        addFoodHot = StationSound.read(plugin.getFirstConfigSection("skillet.sounds.add-food", "skillet.sounds.add_food"),
+                null, 0.8F, 1.0F);
+        addFoodCold = StationSound.read(plugin.getFirstConfigSection("skillet.sounds.add-food-cold", "skillet.sounds.add_food_cold"),
+                null, 0.7F, 1.0F);
         this.tickBudget = Math.max(1, plugin.getConfigInt(DEFAULT_TICK_BUDGET,
                 "skillet.tick-budget",
                 "performance.skillet-tick-budget"));
@@ -200,6 +215,15 @@ public class SkilletManager {
         }
         effectManager.reloadConfig();
         refreshVisualsAfterConfigReload();
+        if (previousInterval != tickIntervalTicks) {
+            synchronized (tickTaskLock) {
+                if (tickTask != null) {
+                    tickTask.cancel();
+                    tickTask = null;
+                    ensureTaskRunning();
+                }
+            }
+        }
     }
 
     private void ensureTaskRunning() {
@@ -211,7 +235,7 @@ public class SkilletManager {
                 return;
             }
             debug("tick task: starting skillet tick task");
-            tickTask = plugin.scheduler().runRepeating(this::tick, 1L, PLACED_TICK_INTERVAL);
+            tickTask = plugin.scheduler().runRepeating(this::tick, 1L, tickIntervalTicks);
         }
     }
 
@@ -406,7 +430,7 @@ public class SkilletManager {
                         + ", location=" + formatLocation(location));
             }
 
-            SoundUtils.play(block.getWorld(), location, getAddFoodSound(location), Sound.BLOCK_LANTERN_PLACE, 0.7f, 1.0f);
+            playAddFoodSound(location);
             return true;
         }
 
@@ -456,7 +480,7 @@ public class SkilletManager {
                     + ", location=" + formatLocation(location));
         }
 
-        SoundUtils.play(block.getWorld(), location, getAddFoodSound(location), Sound.BLOCK_LANTERN_PLACE, 0.7f, 1.0f);
+        playAddFoodSound(location);
         return true;
         }
     }
@@ -1174,7 +1198,7 @@ public class SkilletManager {
         // (heat detection often does a CraftEngine custom block-state lookup).
         if (skillet.currentRecipe == null) {
             skillet.advanceCookingProgress(skillet.elapsedSinceLastCredit(
-                    Bukkit.getCurrentTick(), PLACED_TICK_INTERVAL, MAX_ELAPSED_CREDIT_TICKS), false, coolingDecrement);
+                    Bukkit.getCurrentTick(), tickIntervalTicks, MAX_ELAPSED_CREDIT_TICKS), false, coolingDecrement);
             return;
         }
 
@@ -1201,7 +1225,7 @@ public class SkilletManager {
         }
 
         skillet.advanceCookingProgress(skillet.elapsedSinceLastCredit(
-                currentBukkitTick, PLACED_TICK_INTERVAL, MAX_ELAPSED_CREDIT_TICKS), hasHeat, coolingDecrement);
+                currentBukkitTick, tickIntervalTicks, MAX_ELAPSED_CREDIT_TICKS), hasHeat, coolingDecrement);
         if (!hasHeat) return;
 
         if (skillet.effectCadence.tryAcquire(currentBukkitTick, effectManager.effectIntervalTicks())) {
@@ -1320,6 +1344,14 @@ public class SkilletManager {
             return behavior.getAddFoodSound();
         }
         return Constants.SOUND_SKILLET_ADD_FOOD;
+    }
+
+    private void playAddFoodSound(Location location) {
+        boolean hot = computeHasHeatSource(location);
+        ToolSoundTable.Entry settings = hot ? addFoodHot : addFoodCold;
+        String sound = settings.soundKey() == null && hot ? getAddFoodSound(location) : settings.soundKey();
+        SoundUtils.play(location.getWorld(), location, sound, Sound.BLOCK_LANTERN_PLACE,
+                settings.volume(), settings.pitch());
     }
 
     private BlockFace getClockWise(BlockFace facing) {

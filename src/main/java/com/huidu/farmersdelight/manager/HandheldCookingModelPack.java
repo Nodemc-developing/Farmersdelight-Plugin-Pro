@@ -57,6 +57,36 @@ final class HandheldCookingModelPack {
         model.add("textures", textures);
         return model;
     }
+    static NamespacedKey flippedKey(NamespacedKey normal) {
+        return normal == null ? null : new NamespacedKey(normal.getNamespace(), normal.getKey() + "_flipped");
+    }
+    static JsonObject flippedOverlay(String parent, String texture, Map<String, JsonObject> models) {
+        JsonObject result = overlayModel(parent, texture);
+        Set<String> visited = new HashSet<>();
+        String current = parent;
+        while (current != null && visited.add(current) && visited.size() <= 32) {
+            JsonObject template = models.get(current);
+            if (template == null) break;
+            if (template.has("elements")) {
+                JsonArray elements = template.getAsJsonArray("elements").deepCopy();
+                for (JsonElement element : elements) {
+                    if (!element.isJsonObject() || !element.getAsJsonObject().has("faces")) continue;
+                    JsonObject faces = element.getAsJsonObject().getAsJsonObject("faces");
+                    JsonElement up = faces.get("up"), down = faces.get("down");
+                    if (up != null && down != null) { faces.add("up", down); faces.add("down", up); }
+                    for (var face : faces.entrySet()) if (face.getValue().isJsonObject()) {
+                        JsonObject value = face.getValue().getAsJsonObject();
+                        int rotation = value.has("rotation") ? value.get("rotation").getAsInt() : 0;
+                        value.addProperty("rotation", (rotation + 180) % 360);
+                    }
+                }
+                result.add("elements", elements);
+                break;
+            }
+            current = template.has("parent") ? template.get("parent").getAsString() : null;
+        }
+        return result;
+    }
 
     static JsonObject composite(JsonObject base, String overlay) {
         JsonObject definition = base.deepCopy();
@@ -72,6 +102,21 @@ final class HandheldCookingModelPack {
         definition.add("model", model);
         definition.addProperty("hand_animation_on_swap", false);
         return definition;
+    }
+
+    /** Uses an authored cooking pose when present, otherwise preserves the exact external base definition. */
+    static JsonObject defaultCookingDefinition(Key itemId, JsonObject authoredItem, Map<String, JsonObject> models) {
+        String cookingModel = itemId.namespace() + ":item/" + itemId.value() + "_cooking";
+        if (authoredItem == null || !authoredItem.has("model")) return null;
+        JsonObject result = authoredItem.deepCopy();
+        if (models.containsKey(cookingModel)) {
+            JsonObject model = new JsonObject();
+            model.addProperty("type", "minecraft:model");
+            model.addProperty("model", cookingModel);
+            result.add("model", model);
+        }
+        result.addProperty("hand_animation_on_swap", false);
+        return result;
     }
 
     static String flatTexture(JsonObject item, Map<String, JsonObject> models) {

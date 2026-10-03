@@ -43,14 +43,14 @@ class CraftEngineResourcesTest {
     }
 
     @Test
-    void migratesLegacyPositionArgumentsWithoutCompletingExistingResources() throws IOException {
+    void preservesExistingPositionArgumentsWithoutCompletingExistingResources() throws IOException {
         Path jar = createJar();
         Path target = directory.resolve("plugins/CraftEngine/resources/demo/config.yml");
         Files.createDirectories(target.getParent());
         Files.writeString(target, "x: <arg:block.block_x>\ny: <arg:block.block_y>\nz: <arg:block.block_z>\n");
 
-        assertEquals(1, CraftEngineResources.release(jar, directory.resolve("plugins"), "demo", false));
-        assertEquals("x: <arg:position.block_x>\ny: <arg:position.block_y>\nz: <arg:position.block_z>\n",
+        assertEquals(0, CraftEngineResources.release(jar, directory.resolve("plugins"), "demo", false));
+        assertEquals("x: <arg:block.block_x>\ny: <arg:block.block_y>\nz: <arg:block.block_z>\n",
                 Files.readString(target));
     }
 

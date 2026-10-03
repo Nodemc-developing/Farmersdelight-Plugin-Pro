@@ -651,6 +651,15 @@ compat:
       wrong_region: "<yellow>Move closer to the pot and try again."
 
 fluid:
+  browser:
+    title: "Fluid recipes"
+    read_only: "<gray>Browsing consumes no items; use /fd recipe edit to edit."
+    count: "<gray>{count} recipes"
+    previous: "Previous page"
+    next: "Next page"
+    page: "Page {page} / {pages}"
+    back: "Back"
+    result: "Result"
   type:
     fluid_filling: "<aqua>Fluid filling recipes"
     fluid_emptying: "<aqua>Fluid emptying recipes"

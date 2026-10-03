@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 
 /**
  * Villager / wandering-trader offers registered at runtime by addons through the api
@@ -21,20 +22,26 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class ExternalVillagerTrades {
 
     private static final Map<String, TradeOffer> BY_ID = new ConcurrentHashMap<>();
+    private record Pool(String profession, int level) { }
+    private static volatile Map<Pool, List<TradeOffer>> villagerPools = Map.of();
+    private static volatile List<TradeOffer> wanderingPool = List.of();
 
     private ExternalVillagerTrades() {
     }
 
-    public static boolean register(String id, TradeOffer offer) {
+    public static synchronized boolean register(String id, TradeOffer offer) {
         if (id == null || id.isBlank() || offer == null) {
             return false;
         }
         BY_ID.put(id, offer);
+        rebuild();
         return true;
     }
 
-    public static boolean unregister(String id) {
-        return id != null && BY_ID.remove(id) != null;
+    public static synchronized boolean unregister(String id) {
+        boolean removed = id != null && BY_ID.remove(id) != null;
+        if (removed) rebuild();
+        return removed;
     }
 
     public static boolean isRegistered(String id) {
@@ -51,36 +58,28 @@ public final class ExternalVillagerTrades {
 
     /** Registered villager offers for a profession + level (profession-gated entries only). */
     public static List<TradeOffer> villagerTradesFor(String professionPath, int level) {
-        if (professionPath == null || BY_ID.isEmpty()) {
+        if (professionPath == null) {
             return List.of();
         }
-        List<TradeOffer> matches = null;
-        for (TradeOffer offer : BY_ID.values()) {
-            if (offer.profession() != null && offer.level() == level
-                    && professionPath.equals(offer.profession())) {
-                if (matches == null) {
-                    matches = new ArrayList<>(2);
-                }
-                matches.add(offer);
-            }
-        }
-        return matches == null ? List.of() : matches;
+        return villagerPools.getOrDefault(new Pool(professionPath, level), List.of());
     }
 
     /** Registered wandering-trader offers (entries with a null profession). */
     public static List<TradeOffer> wanderingTrades() {
-        if (BY_ID.isEmpty()) {
-            return List.of();
-        }
-        List<TradeOffer> matches = null;
-        for (TradeOffer offer : BY_ID.values()) {
-            if (offer.profession() == null) {
-                if (matches == null) {
-                    matches = new ArrayList<>(2);
-                }
-                matches.add(offer);
-            }
-        }
-        return matches == null ? List.of() : matches;
+        return wanderingPool;
+    }
+
+    private static void rebuild() {
+        Map<Pool, List<TradeOffer>> mutable = new HashMap<>();
+        List<TradeOffer> wandering = new ArrayList<>();
+        BY_ID.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(entry -> {
+            TradeOffer offer = entry.getValue();
+            if (offer.profession() == null) wandering.add(offer);
+            else mutable.computeIfAbsent(new Pool(offer.profession(), offer.level()), ignored -> new ArrayList<>()).add(offer);
+        });
+        Map<Pool, List<TradeOffer>> frozen = new HashMap<>();
+        mutable.forEach((pool, offers) -> frozen.put(pool, List.copyOf(offers)));
+        villagerPools = Map.copyOf(frozen);
+        wanderingPool = List.copyOf(wandering);
     }
 }

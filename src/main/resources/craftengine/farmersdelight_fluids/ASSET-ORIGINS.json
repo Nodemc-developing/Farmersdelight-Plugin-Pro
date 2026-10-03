@@ -1,0 +1,150 @@
+{
+  "upstream": "https://github.com/vectorwing/FarmersDelight",
+  "commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2020 vectorwing",
+  "files": [
+    {
+      "path": "models/block/glass_jug.json",
+      "source": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/models/block/glass_jug.json",
+      "sha256": "2b9485646f6c5244d5d2635d26d877f8c4c782d55656a43588e20bd1e0e3ef48",
+      "license": "MIT"
+    },
+    {
+      "path": "models/block/jug.json",
+      "source": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/models/block/jug.json",
+      "sha256": "7b206a9b452b4514c0e1b50731c002a2c1d37d76a5a94e88b1705ad9b2e41f61",
+      "license": "MIT"
+    },
+    {
+      "path": "models/item/glass_jug.json",
+      "source": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/models/item/glass_jug.json",
+      "sha256": "a45b6b3bd20cf47a53f870045d0e93618b517576990cb448349926c138c85381",
+      "license": "MIT"
+    },
+    {
+      "path": "textures/block/jug_side.png",
+      "source": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/jug_side.png",
+      "sha256": "d567626c2f7e56de0d63baada580ceae83c6cfc35ce01c46fd0bebdd1b89d2d9",
+      "license": "MIT"
+    },
+    {
+      "path": "textures/block/jug_top.png",
+      "source": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/jug_top.png",
+      "sha256": "1993041e822a678c9d70a29c562a57097177ba8c140949e197d75557ec77c5db",
+      "license": "MIT"
+    },
+    {
+      "path": "textures/block/jug_bottom.png",
+      "source": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/jug_bottom.png",
+      "sha256": "399757d8761230575bcb43259d9d2cad9f6221ce7e745c4190cb8bcadd49aa07",
+      "license": "MIT"
+    },
+    {
+      "path": "textures/block/glass_jug_side.png",
+      "source": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/glass_jug_side.png",
+      "sha256": "b4dc176accbe0cabcb66b294c2f6cb4fd90ecf912beef606f0aa41a7c4a5065f",
+      "license": "MIT"
+    },
+    {
+      "path": "textures/block/glass_jug_top.png",
+      "source": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/glass_jug_top.png",
+      "sha256": "93b86e77789e8c953e2cd1a20f30f229bd282d5e01590754bc87a1a2890159a0",
+      "license": "MIT"
+    },
+    {
+      "path": "textures/block/glass_jug_bottom.png",
+      "source": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/glass_jug_bottom.png",
+      "sha256": "2dab8437738369a4e6f50a656fa8579f12b9ae8ad4243a2da4d560fc7cbdafd8",
+      "license": "MIT"
+    }
+  ],
+  "generated_liquid_models": {
+    "generator": "tools/generate-tank-liquid-models.py",
+    "license": "AGPL-3.0-only",
+    "files": [
+      {
+        "path": "models/block/jug_fluid/glass_jug_fluid_model_01.json",
+        "sha256": "7ef9160f8c4a4d6383008ee5f2b3857856de647e60d3f7d34ce9efd3035e037f"
+      },
+      {
+        "path": "models/block/jug_fluid/glass_jug_fluid_model_02.json",
+        "sha256": "438145a1dd602df2aabfdc8a15296f6179630c225278e88c255f5b86cd88c7ba"
+      },
+      {
+        "path": "models/block/jug_fluid/glass_jug_fluid_model_03.json",
+        "sha256": "4815b8c3142280e2224e3543410828cdf4ce4e5bb8888cf44f4f8bc5d54bf4bb"
+      },
+      {
+        "path": "models/block/jug_fluid/glass_jug_fluid_model_04.json",
+        "sha256": "d994b65cf589145e9b7a63246e3e6d43e371c81408b21e3ab74c2336ba175634"
+      },
+      {
+        "path": "models/block/jug_fluid/glass_jug_fluid_model_05.json",
+        "sha256": "c4690d30abe7d1c935bca293af96956f48ba9b2ba47f6c0bd97484baec02fa71"
+      },
+      {
+        "path": "models/block/jug_fluid/glass_jug_fluid_model_06.json",
+        "sha256": "d99fd20f5cdd4fa87bbf1a73030f5bd4825f7a549754d94c680fa8f47abf809c"
+      },
+      {
+        "path": "models/block/jug_fluid/glass_jug_fluid_model_07.json",
+        "sha256": "c50dbee24234fa2c58ad8d8febc0cdfcbe649d70f3396ff1ba20747813d40f0e"
+      },
+      {
+        "path": "models/block/jug_fluid/glass_jug_fluid_model_08.json",
+        "sha256": "7c633b2f21b07cfeb6294d67b84f68acd934eb0e1d80e3cf6a9dfa44329ff9f9"
+      },
+      {
+        "path": "models/block/jug_fluid/glass_jug_fluid_model_09.json",
+        "sha256": "7e90e3734a1272b6bb46ca4eaa5161ed9a1c3f632fbda556e10d034a124a0562"
+      },
+      {
+        "path": "models/block/jug_fluid/glass_jug_fluid_model_10.json",
+        "sha256": "55f2821f7caaf6325df55401e7f21e1dc7e5f9deac0542a26945a27bbb3a1749"
+      },
+      {
+        "path": "models/block/jug_fluid/glass_jug_fluid_model_11.json",
+        "sha256": "da5eebfdf57946e9778c597e7fa20c0b607d1ada2d19f680935f885ab742700b"
+      },
+      {
+        "path": "models/block/jug_fluid/glass_jug_fluid_model_12.json",
+        "sha256": "85d5da4d3ca17a4a2a8e9b70c1f5dce7f150a73e83ae1e66b09690ddd3af11c2"
+      },
+      {
+        "path": "models/block/jug_fluid/glass_jug_fluid_model_13.json",
+        "sha256": "42e5b65325f539bf4995a2135cada256e41444ea34759833b62674b2618838f6"
+      },
+      {
+        "path": "models/block/jug_fluid/glass_jug_fluid_model_14.json",
+        "sha256": "fc0802892d3c2f0ea70973461601b0a12bf50674f99e168b5c50e0d0e3b80baa"
+      },
+      {
+        "path": "models/block/jug_fluid/glass_jug_fluid_model_15.json",
+        "sha256": "3ea1a93888d5e390e57b3d91729acd4b431a5735c9c0c26122af80dcf3303ed7"
+      },
+      {
+        "path": "models/block/jug_fluid/glass_jug_fluid_model_16.json",
+        "sha256": "9a326cec6a141057b86463fb0f2284e9b5f7a62ec35319f45fabd605f98c5d92"
+      }
+    ]
+  },
+  "derived": [
+    {
+      "path": "models/block/glass_jug_tinted.json",
+      "sha256": "26a72e5e17510bb18e31792b516384a691e81825f5fbb3a385d0da5fc079d682",
+      "source": "models/block/glass_jug.json",
+      "upstream_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "license": "MIT",
+      "change": "Add glass tint index 0 to upstream faces; original geometry and textures remain attributed to vectorwing."
+    }
+  ],
+  "generated_auxiliary_models": [
+    {
+      "path": "models/block/fluid_tank_invisible.json",
+      "sha256": "b4a96a7b73828cfff9b0870404243e76521ccd32627cd26a84007138afb0739e",
+      "generator": "tools/generate-tank-liquid-models.py",
+      "description": "Empty waterlogged base; instance shell and liquid are rendered by dynamic item displays."
+    }
+  ]
+}

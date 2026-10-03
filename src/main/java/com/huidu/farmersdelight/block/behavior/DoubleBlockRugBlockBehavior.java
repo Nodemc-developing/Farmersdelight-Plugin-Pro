@@ -17,6 +17,8 @@ import net.momirealms.craftengine.core.util.Direction;
 import net.momirealms.craftengine.core.world.BlockPos;
 import net.momirealms.craftengine.core.world.context.BlockPlaceContext;
 import org.bukkit.Material;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -35,19 +37,26 @@ public class DoubleBlockRugBlockBehavior extends RugBlockBehavior {
     private final Property<Direction> facingProperty;
     private final Property<?> partProperty;
     private final Set<String> partnerIds;
+    private final boolean needsSupport;
+    private final com.huidu.farmersdelight.FarmersDelightPlugin plugin;
 
     private DoubleBlockRugBlockBehavior(
+            com.huidu.farmersdelight.FarmersDelightPlugin plugin,
             BlockDefinition block,
             Property<Direction> facingProperty,
             Property<?> partProperty,
-            Set<String> partnerIds) {
+            Set<String> partnerIds, boolean needsSupport) {
         super(block);
+        this.plugin = plugin;
         this.facingProperty = facingProperty;
         this.partProperty = partProperty;
         this.partnerIds = partnerIds;
+        this.needsSupport = needsSupport;
     }
 
-    public static final BlockBehaviorFactory<DoubleBlockRugBlockBehavior> FACTORY = new BlockBehaviorFactory<DoubleBlockRugBlockBehavior>() {
+    public static final BlockBehaviorFactory<DoubleBlockRugBlockBehavior> FACTORY = factory(null);
+    public static BlockBehaviorFactory<DoubleBlockRugBlockBehavior> factory(com.huidu.farmersdelight.FarmersDelightPlugin plugin) {
+        return new BlockBehaviorFactory<DoubleBlockRugBlockBehavior>() {
         @Override
         public DoubleBlockRugBlockBehavior create(BlockDefinition block, ConfigSection section) {
             Map<String, Object> arguments = section != null ? section.values() : Map.of();
@@ -66,9 +75,11 @@ public class DoubleBlockRugBlockBehavior extends RugBlockBehavior {
                 throw new KnownResourceException(
                         "resource.block.behavior.missing_property", path, "facing/part");
             }
-            return new DoubleBlockRugBlockBehavior(block, facingProperty, partProperty, partnerIds);
+            return new DoubleBlockRugBlockBehavior(plugin, block, facingProperty, partProperty, partnerIds,
+                    BehaviorArgParser.getBoolean(arguments, "needs-support", true));
         }
-    };
+        };
+    }
 
     // Writes the player's horizontal placement direction into the facing property so the head carries the
     // same facing as the foot spawned beside it. The foot cell is validated here so an occupied cell rejects
@@ -82,13 +93,18 @@ public class DoubleBlockRugBlockBehavior extends RugBlockBehavior {
         if (footCellBlocked(context, face)) {
             return null;
         }
+        if (needsSupport && context.getLevel().platformWorld() instanceof World world) {
+            BlockPos pos = context.getClickedPos();
+            Block self = world.getBlockAt(pos.x(), pos.y(), pos.z());
+            if (!self.getRelative(BlockFace.DOWN).isSolid() || !self.getRelative(face).getRelative(BlockFace.DOWN).isSolid()) return null;
+        }
         // The foot cell is written by CraftEngineBlocks.place in placeMultiState, which bypasses the
         // vanilla build check the head cell went through. Reject the whole placement here (atomically,
         // before either cell exists) when the second cell falls in protected land.
         if (!footCellAllowed(context, face)) {
             return null;
         }
-        return withFacing(state, face);
+        return withPart(withFacing(state, face), "head");
     }
 
     @Override
@@ -106,7 +122,8 @@ public class DoubleBlockRugBlockBehavior extends RugBlockBehavior {
         if (state == null || state.isEmpty()) {
             return;
         }
-        placeDoubleBlock(world, self, state);
+        if (!owned(self) || OwnedBlockPairTransaction.editing(self.getLocation())) return;
+        placeDoubleBlock(world, self, state, args);
     }
 
     @Override
@@ -120,6 +137,7 @@ public class DoubleBlockRugBlockBehavior extends RugBlockBehavior {
             return;
         }
         Block self = world.getBlockAt(pos.x(), pos.y(), pos.z());
+        if (OwnedBlockPairTransaction.editing(self.getLocation())) return;
         ImmutableBlockState state = CraftEngineBlocks.getCustomBlockState(self);
         if (state == null || state.isEmpty()) {
             return;
@@ -135,8 +153,9 @@ public class DoubleBlockRugBlockBehavior extends RugBlockBehavior {
             // partner's chunk loads again.
             return;
         }
+        if (!owned(partner)) return;
         ImmutableBlockState partnerState = CustomBlockUtils.getStateIfResident(partner);
-        if (partnerState == null || partnerState.isEmpty() || !isPartner(partnerState)) {
+        if (!isPairedPartner(state, partnerState)) {
             teardownSelf(self);
         }
     }
@@ -162,14 +181,16 @@ public class DoubleBlockRugBlockBehavior extends RugBlockBehavior {
             return;
         }
         Block removed = world.getBlockAt(pos.x(), pos.y(), pos.z());
-        ImmutableBlockState state = CraftEngineBlocks.getCustomBlockState(removed);
+        if (OwnedBlockPairTransaction.editing(removed.getLocation())) return;
+        ImmutableBlockState state = net.momirealms.craftengine.bukkit.util.BlockStateUtils.getOptionalCustomBlockState(args[0]).orElse(null);
         if (state == null || state.isEmpty()) {
             return;
         }
         Block partner = partnerOf(removed, state);
-        if (partner != null) {
+        if (partner != null && partner.getWorld().isChunkLoaded(partner.getX() >> 4, partner.getZ() >> 4)
+                && owned(partner)) {
             ImmutableBlockState partnerState = CraftEngineBlocks.getCustomBlockState(partner);
-            if (partnerState != null && !partnerState.isEmpty() && isPartner(partnerState)) {
+            if (!OwnedBlockPairTransaction.editing(partner.getLocation()) && isPairedPartner(state, partnerState)) {
                 partner.setType(Material.AIR, false);
             }
         }
@@ -178,14 +199,71 @@ public class DoubleBlockRugBlockBehavior extends RugBlockBehavior {
     // The head cell spawns the foot along its facing; the foot (already carrying facing from the shared
     // placement) is placed next to the head, so one item yields two cells. The foot cell was verified free
     // at placement time, so no tear-down is needed here.
-    private void placeDoubleBlock(World world, Block self, ImmutableBlockState state) {
+    private void placeDoubleBlock(World world, Block self, ImmutableBlockState state, Object[] args) {
         if (!isPart(state, "head")) {
             // Already a foot half: its head partner was placed by the other cell, do not recurse.
             return;
         }
         BlockFace facing = facingFromState(state);
         Block partner = self.getRelative(facing);
-        CraftEngineBlocks.place(partner.getLocation(), withPart(state, "foot"), false);
+        if (!owned(partner) || !partner.getType().isAir()) { compensateHead(self, state, args); return; }
+        var headBefore = OwnedBlockPairTransaction.cell(plugin, self).read();
+        var footBefore = OwnedBlockPairTransaction.cell(plugin, partner).read();
+        if (headBefore.custom() != state || footBefore.custom() != null || !footBefore.vanilla().getMaterial().isAir()) {
+            compensateHead(self, state, args); return;
+        }
+        var footAfter = OwnedBlockPairTransaction.custom(withPart(state, "foot"));
+        var outcome = OwnedBlockPairTransaction.update(plugin, partner, footBefore, footAfter, self, headBefore, headBefore);
+        if (!outcome.committed()) {
+            if (!outcome.rollbackComplete() && plugin != null && plugin.isEnabled()) plugin.scheduler().runLaterAt(self.getLocation(), () -> {
+                if (!OwnedBlockPairTransaction.compensate(plugin, partner, footAfter, footBefore, self, headBefore, headBefore))
+                    plugin.getLogger().warning("A double block restoration could not finish at " + self.getLocation());
+            }, 1);
+            compensateHead(self, state, args);
+        }
+    }
+
+    private void compensateHead(Block self, ImmutableBlockState expected, Object[] args) {
+        PlacementReceipt receipt = placementReceipt(args);
+        Runnable cleanup = () -> {
+            if (!owned(self) || CraftEngineBlocks.getCustomBlockState(self) != expected) return;
+            Block partner = partnerOf(self, expected);
+            if (partner != null && owned(partner) && isPairedPartner(expected, CraftEngineBlocks.getCustomBlockState(partner))) return;
+            if (CraftEngineBlocks.remove(self, false) && receipt != null && receipt.unit() != null)
+                self.getWorld().dropItemNaturally(self.getLocation().add(.5, .5, .5), receipt.unit());
+        };
+        if (plugin != null && plugin.isEnabled()) {
+            if (receipt != null && receipt.player() != null && receipt.unit() != null)
+                plugin.scheduler().runLaterForEntity(receipt.player(), () -> {
+                    if (receipt.consumed()) plugin.scheduler().runAt(self.getLocation(), cleanup);
+                    else plugin.getLogger().warning("Double block refund was withheld because native item consumption was not confirmed at " + self.getLocation());
+                }, 1);
+            else plugin.scheduler().runLaterAt(self.getLocation(), cleanup, 1);
+        } else if (receipt == null || receipt.unit() == null) cleanup.run();
+    }
+    private record PlacementReceipt(Player player, Object source, int amountBefore, org.bukkit.inventory.ItemStack unit) {
+        boolean consumed() {
+            org.bukkit.inventory.ItemStack current = source instanceof org.bukkit.inventory.ItemStack item ? item
+                    : net.momirealms.craftengine.bukkit.util.ItemStackUtils.getBukkitStack(source);
+            return nativeConsumptionConfirmed(amountBefore, current == null ? 0 : current.getAmount(),
+                    current == null || current.getAmount() == 0 || unit.isSimilar(current));
+        }
+    }
+    static boolean nativeConsumptionConfirmed(int before, int after, boolean sameComponents) {
+        return before > 0 && after == before - 1 && sameComponents;
+    }
+    private PlacementReceipt placementReceipt(Object[] args) {
+        if (args.length < 5 || args[3] == null || args[4] == null) return null;
+        try {
+            Player player = args[3] instanceof Player value ? value
+                    : args[3] instanceof net.momirealms.craftengine.core.entity.player.Player value ? ItemUtils.getBukkitPlayer(value)
+                    : net.momirealms.craftengine.bukkit.util.EntityUtils.adaptNMS(args[3]).platformEntity() instanceof Player value ? value : null;
+            if (player == null || !Bukkit.isOwnedByCurrentRegion(player) || player.getGameMode() == GameMode.CREATIVE) return null;
+            org.bukkit.inventory.ItemStack item = args[4] instanceof org.bukkit.inventory.ItemStack value ? value
+                    : net.momirealms.craftengine.bukkit.util.ItemStackUtils.getBukkitStack(args[4]);
+            if (item == null || item.getType().isAir() || item.getAmount() < 1) return null;
+            var unit = item.clone(); unit.setAmount(1); return new PlacementReceipt(player, args[4], item.getAmount(), unit);
+        } catch (IllegalArgumentException ignored) { return null; }
     }
 
     private boolean footCellAllowed(BlockPlaceContext context, BlockFace facing) {
@@ -198,6 +276,8 @@ public class DoubleBlockRugBlockBehavior extends RugBlockBehavior {
         }
         BlockPos clicked = context.getClickedPos();
         Block foot = world.getBlockAt(clicked.x(), clicked.y(), clicked.z()).getRelative(facing);
+        if (!world.isChunkLoaded(foot.getX() >> 4, foot.getZ() >> 4)
+                || !owned(foot)) return false;
         return ProtectionCompat.canBuild(bukkitPlayer, foot, (String) null);
     }
 
@@ -207,11 +287,14 @@ public class DoubleBlockRugBlockBehavior extends RugBlockBehavior {
         }
         BlockPos clicked = context.getClickedPos();
         Block foot = world.getBlockAt(clicked.x(), clicked.y(), clicked.z()).getRelative(facing);
+        if (!world.isChunkLoaded(foot.getX() >> 4, foot.getZ() >> 4)
+                || !owned(foot)) return true;
         return !foot.getType().isAir();
     }
 
     private BlockFace facingFromState(ImmutableBlockState state) {
-        Object value = state.get(facingProperty);
+        Property<?> property = state.owner().value().getProperty(facingProperty.name());
+        Object value = property == null ? null : state.getNullable(property);
         if (value == null) {
             return BlockFace.NORTH;
         }
@@ -220,6 +303,10 @@ public class DoubleBlockRugBlockBehavior extends RugBlockBehavior {
         } catch (IllegalArgumentException e) {
             return BlockFace.NORTH;
         }
+    }
+    private boolean owned(Block block) {
+        return block.getWorld().isChunkLoaded(block.getX() >> 4, block.getZ() >> 4)
+                && (plugin == null || plugin.scheduler().isOwnedByCurrentRegion(block.getLocation()));
     }
 
     // Prefers the player's horizontal facing (their yaw). That stays stable when placing on a floor or
@@ -239,6 +326,7 @@ public class DoubleBlockRugBlockBehavior extends RugBlockBehavior {
     }
 
     private Block partnerOf(Block self, ImmutableBlockState state) {
+        if (!isPart(state, "head") && !isPart(state, "foot")) return null;
         BlockFace facing = isPart(state, "head")
                 ? facingFromState(state)
                 : facingFromState(state).getOppositeFace();
@@ -246,9 +334,10 @@ public class DoubleBlockRugBlockBehavior extends RugBlockBehavior {
     }
 
     private boolean isPart(ImmutableBlockState state, String value) {
-        return state != null
-                && state.get(partProperty) != null
-                && value.equals(state.get(partProperty).toString());
+        if (state == null || state.isEmpty()) return false;
+        Property<?> property = state.owner().value().getProperty(partProperty.name());
+        Object part = property == null ? null : state.getNullable(property);
+        return part != null && value.equals(part.toString());
     }
 
     private ImmutableBlockState withPart(ImmutableBlockState state, String value) {
@@ -257,6 +346,16 @@ public class DoubleBlockRugBlockBehavior extends RugBlockBehavior {
 
     private boolean isPartner(ImmutableBlockState state) {
         return matchesAnyId(state, partnerIds);
+    }
+    private boolean isPairedPartner(ImmutableBlockState self, ImmutableBlockState partner) {
+        if (!isPartner(partner) || partner.owner().value().getProperty(facingProperty.name()) == null) return false;
+        String selfPart = isPart(self, "head") ? "head" : isPart(self, "foot") ? "foot" : null;
+        String partnerPart = isPart(partner, "head") ? "head" : isPart(partner, "foot") ? "foot" : null;
+        return matchingPairParts(facingFromState(self), selfPart, facingFromState(partner), partnerPart);
+    }
+    static boolean matchingPairParts(BlockFace selfFacing, String selfPart, BlockFace partnerFacing, String partnerPart) {
+        return selfFacing != null && selfFacing == partnerFacing && ("head".equals(selfPart) && "foot".equals(partnerPart)
+                || "foot".equals(selfPart) && "head".equals(partnerPart));
     }
 
     private void teardownSelf(Block self) {

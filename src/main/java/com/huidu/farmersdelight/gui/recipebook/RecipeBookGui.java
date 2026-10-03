@@ -2,6 +2,7 @@ package com.huidu.farmersdelight.gui.recipebook;
 
 import com.huidu.farmersdelight.gui.editor.RecipeEditorView;
 import com.huidu.farmersdelight.FarmersDelightPlugin;
+import com.huidu.farmersdelight.gui.GuiTextStyle;
 import com.huidu.farmersdelight.api.FarmersDelightApi;
 import com.huidu.farmersdelight.api.recipe.FillOutcome;
 import com.huidu.farmersdelight.api.recipe.JumpTarget;
@@ -282,7 +283,7 @@ public final class RecipeBookGui implements InventoryHolder {
         recipeId = null;
         progressSlots = List.of();
         RecipeBookGuiConfig.ViewConfig cfg = config().menu();
-        renderedTitle = Text.title(cfg.title());
+        renderedTitle = GuiTextStyle.title(cfg.title());
         inventory = Bukkit.createInventory(this, cfg.size(), renderedTitle);
         cfg.renderChrome(inventory);
         List<Integer> categorySlots = cfg.slotsByType("category");
@@ -344,7 +345,7 @@ public final class RecipeBookGui implements InventoryHolder {
         List<ViewableRecipe> recipes = visibleRecipes(target);
         int pages = Math.max(1, (recipes.size() + pageSize - 1) / pageSize);
         page = Math.max(0, Math.min(targetPage, pages - 1));
-        renderedTitle = withPageInfo(spec.title(), page + 1, pages);
+        renderedTitle = GuiTextStyle.title(withPageInfo(spec.title(), page + 1, pages));
         inventory = Bukkit.createInventory(this, spec.size(), renderedTitle);
         spec.renderChrome(inventory);
         int start = page * pageSize;
@@ -389,7 +390,7 @@ public final class RecipeBookGui implements InventoryHolder {
         ViewableRecipe recipe = target.recipe(id);
         // Per-recipe title override falls back to the static layout title.
         Component detailTitle = recipe != null ? recipe.detailTitle() : null;
-        renderedTitle = detailTitle != null ? detailTitle : spec.title();
+        renderedTitle = GuiTextStyle.title(detailTitle != null ? detailTitle : spec.title());
         inventory = Bukkit.createInventory(this, spec.size(), renderedTitle);
         spec.renderChrome(inventory);
         if (recipe != null) {
@@ -462,6 +463,7 @@ public final class RecipeBookGui implements InventoryHolder {
             meta.displayName(Component.text(" "));
             meta.lore(List.of());
             meta.setHideTooltip(true);
+            GuiTextStyle.normalizeDisplayMeta(meta);
             item.setItemMeta(meta);
         }
         if (resolved) {
@@ -600,6 +602,7 @@ public final class RecipeBookGui implements InventoryHolder {
                         .colorIfAbsent(NamedTextColor.RED)
                         .decoration(TextDecoration.ITALIC, false));
                 meta.lore(lore);
+                GuiTextStyle.normalizeDisplayMeta(meta);
                 fillItem.setItemMeta(meta);
             }
             inventory.setItem(fillSlot, fillItem);
@@ -733,6 +736,7 @@ public final class RecipeBookGui implements InventoryHolder {
         if (meta != null && name != null) {
             meta.displayName(name.colorIfAbsent(NamedTextColor.WHITE)
                     .decoration(TextDecoration.ITALIC, false));
+            GuiTextStyle.normalizeDisplayMeta(meta);
             item.setItemMeta(meta);
         }
     }
@@ -753,6 +757,7 @@ public final class RecipeBookGui implements InventoryHolder {
                             .decoration(TextDecoration.ITALIC, false))
                     .toList());
         }
+        GuiTextStyle.normalizeDisplayMeta(meta);
         item.setItemMeta(meta);
         return item;
     }
@@ -771,6 +776,7 @@ public final class RecipeBookGui implements InventoryHolder {
                         .decoration(TextDecoration.ITALIC, false));
             }
             meta.lore(merged);
+            GuiTextStyle.normalizeDisplayMeta(meta);
             item.setItemMeta(meta);
         }
     }

@@ -1,5 +1,7 @@
 package com.huidu.farmersdelight.gui.editor;
 
+import com.huidu.farmersdelight.gui.GuiTextStyle;
+
 import com.huidu.farmersdelight.FarmersDelightPlugin;
 import com.huidu.farmersdelight.gui.AbstractInventoryGui;
 import com.huidu.farmersdelight.gui.GuiConfig;
@@ -47,7 +49,7 @@ public final class ChoiceBuilderGui extends AbstractInventoryGui implements Edit
                 ItemStack display = new ItemStack(Material.NAME_TAG);
                 var meta = display.getItemMeta();
                 if (meta != null) {
-                    meta.displayName(Component.text(RecipeSerializer.serializeIngredient(ingredient)));
+                    meta.displayName(GuiTextStyle.name(Component.text(RecipeSerializer.serializeIngredient(ingredient))));
                     display.setItemMeta(meta);
                 }
                 return new IngredientEntry(ingredient, display);

@@ -59,7 +59,8 @@ public final class ResourceInstaller {
                 changedFiles = plugin.getConfig().getBoolean("craftengine-resources.auto-completion", true)
                         ? copyBundledResourceFiles(targetRoot)
                         : 0;
-                changedFiles += migrateKnownResourceFixes(targetRoot);
+                // Existing pack files belong to the operator. Loading compatibility is applied to a
+                // managed copy; updates must not rewrite models, language documents or configuration.
             } else {
                 changedFiles = copyBundledResourceDirectory(targetRoot);
             }
@@ -67,6 +68,12 @@ public final class ResourceInstaller {
                 I18n.logInfo("plugin.craftengine_resources_released",
                         "path", targetRoot,
                         "count", changedFiles);
+            }
+            if (org.bukkit.Bukkit.getPluginManager().getPlugin("FluidCore") != null
+                    && net.momirealms.craftengine.core.registry.BuiltInRegistries.BLOCK_BEHAVIOR_TYPE.getValue(
+                            net.momirealms.craftengine.core.util.Key.of("fluidcore:tank")) != null) {
+                com.huidu.farmersdelight.api.resource.CraftEngineResources.release(plugin, "farmersdelight_fluids",
+                        plugin.getConfig().getBoolean("craftengine-resources.auto-completion", true));
             }
         } catch (IOException e) {
             I18n.logWarning("plugin.craftengine_resources_release_failed", "error", e.getMessage());

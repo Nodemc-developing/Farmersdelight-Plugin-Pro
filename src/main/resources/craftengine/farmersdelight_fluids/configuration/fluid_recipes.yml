@@ -1,0 +1,203 @@
+advanced_tags:
+  c:crops/wheat:
+    values:
+      - minecraft:wheat
+
+papersdelight_recipes:
+  farmersdelight:fluid_filling/water_bucket:
+    type: fluid_filling
+    fluid: "#c:water"
+    amount: 1000
+    empty_input: minecraft:bucket
+    filled_result: minecraft:water_bucket
+  farmersdelight:fluid_emptying/water_bucket:
+    type: fluid_emptying
+    fluid: minecraft:water
+    amount: 1000
+    filled_input: minecraft:water_bucket
+    empty_result: minecraft:bucket
+  farmersdelight:fluid_filling/milk_bottle:
+    type: fluid_filling
+    fluid: "#c:milk"
+    amount: 250
+    empty_input: minecraft:glass_bottle
+    filled_result: farmersdelight:milk_bottle
+  farmersdelight:fluid_filling/honey_bottle:
+    type: fluid_filling
+    fluid: "#c:honey"
+    amount: 250
+    empty_input: minecraft:glass_bottle
+    filled_result: minecraft:honey_bottle
+  farmersdelight:fluid_emptying/milk_bottle:
+    type: fluid_emptying
+    fluid: minecraft:milk
+    amount: 250
+    filled_input: farmersdelight:milk_bottle
+    empty_result: minecraft:glass_bottle
+  farmersdelight:soaking/wet_sponge:
+    type: soaking
+    ingredient: minecraft:sponge
+    fluid: "#c:water"
+    amount: 1000
+    result: minecraft:wet_sponge
+    time: 20
+    consume_fluid: true
+  farmersdelight:soaking/wheat_dough:
+    type: soaking
+    ingredient: advtag:c:crops/wheat
+    fluid: "#c:water"
+    amount: 1
+    result: farmersdelight:wheat_dough
+    time: 20
+    consume_fluid: false
+  farmersdelight:soaking/mud:
+    type: soaking
+    ingredient: minecraft:dirt
+    fluid: "#c:water"
+    amount: 1
+    result: minecraft:mud
+    time: 20
+    consume_fluid: false
+  farmersdelight:soaking/white_concrete:
+    type: soaking
+    ingredient: minecraft:white_concrete_powder
+    fluid: "#c:water"
+    amount: 1
+    result: minecraft:white_concrete
+    time: 20
+    consume_fluid: false
+
+  farmersdelight:soaking/orange_concrete:
+    type: soaking
+    ingredient: minecraft:orange_concrete_powder
+    fluid: "#c:water"
+    amount: 1
+    result: minecraft:orange_concrete
+    time: 20
+    consume_fluid: false
+
+  farmersdelight:soaking/magenta_concrete:
+    type: soaking
+    ingredient: minecraft:magenta_concrete_powder
+    fluid: "#c:water"
+    amount: 1
+    result: minecraft:magenta_concrete
+    time: 20
+    consume_fluid: false
+
+  farmersdelight:soaking/light_blue_concrete:
+    type: soaking
+    ingredient: minecraft:light_blue_concrete_powder
+    fluid: "#c:water"
+    amount: 1
+    result: minecraft:light_blue_concrete
+    time: 20
+    consume_fluid: false
+
+  farmersdelight:soaking/yellow_concrete:
+    type: soaking
+    ingredient: minecraft:yellow_concrete_powder
+    fluid: "#c:water"
+    amount: 1
+    result: minecraft:yellow_concrete
+    time: 20
+    consume_fluid: false
+
+  farmersdelight:soaking/lime_concrete:
+    type: soaking
+    ingredient: minecraft:lime_concrete_powder
+    fluid: "#c:water"
+    amount: 1
+    result: minecraft:lime_concrete
+    time: 20
+    consume_fluid: false
+
+  farmersdelight:soaking/pink_concrete:
+    type: soaking
+    ingredient: minecraft:pink_concrete_powder
+    fluid: "#c:water"
+    amount: 1
+    result: minecraft:pink_concrete
+    time: 20
+    consume_fluid: false
+
+  farmersdelight:soaking/gray_concrete:
+    type: soaking
+    ingredient: minecraft:gray_concrete_powder
+    fluid: "#c:water"
+    amount: 1
+    result: minecraft:gray_concrete
+    time: 20
+    consume_fluid: false
+
+  farmersdelight:soaking/light_gray_concrete:
+    type: soaking
+    ingredient: minecraft:light_gray_concrete_powder
+    fluid: "#c:water"
+    amount: 1
+    result: minecraft:light_gray_concrete
+    time: 20
+    consume_fluid: false
+
+  farmersdelight:soaking/cyan_concrete:
+    type: soaking
+    ingredient: minecraft:cyan_concrete_powder
+    fluid: "#c:water"
+    amount: 1
+    result: minecraft:cyan_concrete
+    time: 20
+    consume_fluid: false
+
+  farmersdelight:soaking/purple_concrete:
+    type: soaking
+    ingredient: minecraft:purple_concrete_powder
+    fluid: "#c:water"
+    amount: 1
+    result: minecraft:purple_concrete
+    time: 20
+    consume_fluid: false
+
+  farmersdelight:soaking/blue_concrete:
+    type: soaking
+    ingredient: minecraft:blue_concrete_powder
+    fluid: "#c:water"
+    amount: 1
+    result: minecraft:blue_concrete
+    time: 20
+    consume_fluid: false
+
+  farmersdelight:soaking/brown_concrete:
+    type: soaking
+    ingredient: minecraft:brown_concrete_powder
+    fluid: "#c:water"
+    amount: 1
+    result: minecraft:brown_concrete
+    time: 20
+    consume_fluid: false
+
+  farmersdelight:soaking/green_concrete:
+    type: soaking
+    ingredient: minecraft:green_concrete_powder
+    fluid: "#c:water"
+    amount: 1
+    result: minecraft:green_concrete
+    time: 20
+    consume_fluid: false
+
+  farmersdelight:soaking/red_concrete:
+    type: soaking
+    ingredient: minecraft:red_concrete_powder
+    fluid: "#c:water"
+    amount: 1
+    result: minecraft:red_concrete
+    time: 20
+    consume_fluid: false
+
+  farmersdelight:soaking/black_concrete:
+    type: soaking
+    ingredient: minecraft:black_concrete_powder
+    fluid: "#c:water"
+    amount: 1
+    result: minecraft:black_concrete
+    time: 20
+    consume_fluid: false

@@ -1,6 +1,6 @@
 # Farmersdelight-Plugin-Pro / 农夫乐事配置
-# Public option names follow the PapersDelight snake_case structure. Legacy option names migrate on startup.
-# 配置采用 PapersDelight 的 snake_case 分组结构；旧版选项启动时自动备份并迁移。
+# Public options use snake_case groups. Legacy option names migrate on startup.
+# 配置采用 snake_case 分组；旧版选项启动时自动备份并迁移。
 # config-version/config_format identify this plugin's format; do not copy another plugin's version counter.
 # config-version/config_format 标识本插件格式，请勿手工套用其他插件的配置版本号。
 # No license key or paid-feature switches are required. / 本插件无需授权码，全部功能免费。
@@ -14,15 +14,19 @@
 # 物品 ID/标签原样保留，命名空间或路径中的 '-'、'_' 不会被改写。
 # GUI layouts remain in gui.yml; display-overrides.yml contains per-item/per-tag overrides.
 # 界面仍由 gui.yml 配置；逐物品/标签显示覆盖表位于 display-overrides.yml。
-# Recipes load from CraftEngine content packs; see PAPERSDELIGHT-COMPAT.zh-CN.md for migration.
-# 配方从 CraftEngine 内容包加载；迁移说明见 PAPERSDELIGHT-COMPAT.zh-CN.md。
+# Recipes load from CraftEngine content packs; see CONFIGURATION-RECIPES.zh-CN.md for migration.
+# 配方从 CraftEngine 内容包加载；迁移说明见 CONFIGURATION-RECIPES.zh-CN.md。
 
 config-version: 3
 config_format: Farmersdelight-Plugin-Pro
 # Console language: empty follows the system; player text follows the client language. / 控制台语言；空值跟随系统，玩家文本跟随客户端。
 lang: ''
-# Ordered rules, first match wins; material or ce_block/ce_block_tag, optional states, heat_source and conductor.
-# 按顺序首个匹配生效；可用原版材质或 CE 方块/标签，并设置状态、是否发热和是否导热。tray is currently unsupported.
+# Merge standard browsing categories in a private loading copy; source packs remain unchanged.
+# 将标准浏览分类合并为一个入口，仅处理加载副本，不改写原内容包文件。
+craftengine-resources:
+  unified-categories: true
+# Ordered rules, first match wins; material or ce_block/ce_block_tag, optional states, heat_source, conductor and tray.
+# 按顺序首个匹配生效；可用原版材质或 CE 方块/标签，并设置状态、是否发热、是否导热及托盘要求。
 heat_sources:
 - states:
     lit: 'false'
@@ -137,6 +141,8 @@ cutting_board:
 skillet:
   handheld:
     enabled: true
+    jump_flip:
+      enabled: true
     progress_display:
       enabled: true
   allow_hopper: true
@@ -149,6 +155,20 @@ skillet:
     cooling_decrement: 2
   heat:
     allow_conductors: true
+  # Empty overrides preserve each cooking mode's own sound and volume. Optional fields: sound, volume, pitch, pitch_min, pitch_max.
+  # 空覆盖沿用各烹饪模式原有声音和音量；可设置上述字段，统一音调或指定音调范围。
+  sounds:
+    add_food: {}
+    add_food_cold: {}
+    sizzle: {}
+  fire_aspect_particle:
+    xz_spread: 0.6
+    velocity_y_base: 0.3
+    velocity_y_extra: 0.8
+    velocity_xz: 0.3
+    origin_x: 0.5
+    origin_y: 0.3
+    origin_z: 0.5
   effects:
     smoke:
       enabled: true
@@ -175,6 +195,9 @@ skillet:
 # display.slot_offsets preserves arbitrary per-slot positions. / slot_offsets 保留逐槽位自由位置；也兼容 slot_1_x/slot_1_z/col_spacing/row_spacing 格式。
 stove:
   tick_budget: 512
+  # Empty overrides retain the original placement sound, volume and pitch. / 空覆盖沿用原有放置声音、音量和音调。
+  sounds:
+    place_food: {}
   cooking:
     default_cook_time: 600
     cooling_decrement: 2
@@ -209,6 +232,8 @@ stove:
   particles:
     interval_ticks: 4
     view_distance_blocks: 32.0
+    item_smoke_chance: 0.05
+    item_smoke_count: 1
 # Ingredient/tool/catalyst icon rotation in game ticks. Legacy default stays 80; values round up to a 4-tick GUI callback.
 # 原料/工具/催化剂图标轮换间隔（游戏 tick）。沿用原默认 80 tick；向上对齐 4 tick 的界面回调。
 recipe_book:
@@ -216,6 +241,7 @@ recipe_book:
 # Per-effect enable applies to consumption, commands, restored state and API calls. / 单独开关同时适用于食用、命令、状态恢复与 API。
 nourishment_effect:
   enable: true
+  always_eat: true
   bossbar:
     color: GREEN
     style: SOLID
@@ -294,10 +320,54 @@ enchantment:
       multiplier_base: 1.4
       multiplier_per_level: 0.2
   enable: true
-# shutdown_wait_millis is the shared persistence/shutdown deadline (minimum 200ms). SQLite mechanic counters are not provided.
-# shutdown_wait_millis 是全部落盘步骤共享的关服期限（最小 200ms），本项目未提供 SQLite 机制计数。
+# Custom crops and foods supplement vanilla villager behavior. / 自定义作物与食物补充原版村民行为。
+villager:
+  enable: true
+  harvest:
+    enable: true
+    block_budget: 64
+    # Seed item ID -> managed crop block ID; empty uses each crop definition. / 种子物品 ID -> 受管作物方块 ID；留空使用作物定义。
+    planting: {}
+  pickup:
+    enable: true
+    scan_interval_ticks: 20
+    radius: 2.5
+  breed:
+    enable: true
+    scan_interval_ticks: 40
+    share_food: true
+    # Item ID -> food points; zero disables that food. / 物品 ID -> 食物点；零禁用该食物。
+    food_points: {}
+  # Work shares the shorter pickup/breed interval, clamped to 5..200 ticks. / 工作共用拾取和繁殖中的较短间隔，限制为 5..200 tick。
+  idle_interval_ticks: 200
+  farmers_buy_crops:
+    enable: true
+    # Rows: item, amount, level, max_uses, villager_xp, price_multiplier, chance. / 每行可设置这些买入参数。
+    trades: []
+  wandering_trader_sells:
+    enable: true
+    # Item IDs or rows with item, emerald_cost, amount, max_uses, villager_xp, price_multiplier, chance.
+    # 物品 ID 列表，或包含上述出售参数的行；空列表不新增交易，world-data.yml 交易继续独立加载。
+    items: []
+# Successful operations are cached immediately and written by a SQLite worker. / 成功操作立即计入缓存，由后台批量落盘。
+# shutdown_wait_millis is shared by all shutdown persistence. / 关服期限由全部落盘步骤共享。
 stats:
+  enabled: true
+  flush_interval_seconds: 30
+  cache_player_limit: 2048
   shutdown_wait_millis: 5000
+container:
+  tick_interval_ticks: 4
+particle_throttle:
+  stove_threshold: 8
+  stove_max_rate: 0.1
+  cooking_pot_threshold: 4
+  cooking_pot_max_rate: 0.05
+  ambient_sound_threshold: 4
+  ambient_sound_max_rate: 0.001
+skewer:
+  handheld:
+    enabled: true
 # Registry packs install once in the primary world; Folia requires a restart for registry changes. / 注册数据包只安装至主世界，Folia 修改注册表后需重启。
 datapacks:
   tags_enabled: true
@@ -327,6 +397,7 @@ recipes:
     notify: true
 # Runtime maintenance/packet budgets. / 运行期维护与发包预算。
 performance:
+  connection_particle_packet_budget: 64
   warnings:
     enabled: true
     cooldown_seconds: 600
