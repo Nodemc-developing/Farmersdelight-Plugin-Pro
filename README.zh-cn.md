@@ -45,7 +45,7 @@
 
 先安装 CraftEngine，再将 Farmersdelight-Plugin-Pro JAR 放入 `plugins/` 并启动服务器。修改插件配置后使用 `/fd reload`，修改 CraftEngine 资源后使用 `/ce reload`。
 
-流体玩法需要单独安装 **FluidCore**，其 API 不打入本插件 JAR。未安装时，其余玩法仍可使用。兼容新加载的配置、配方和内容包；**不转换旧流体库的世界或物品数据**。已识别的旧载荷会受到保护，不作为空罐覆盖。详见[配置与配方指南](CONFIGURATION-RECIPES.zh-CN.md)。
+流体玩法需要单独安装 **FluidCore**，其 API 不打入本插件 JAR。未安装时，其余玩法仍可使用。配方从已启用的 CraftEngine 内容包加载；**不转换旧流体库的世界或物品数据**。已识别的旧载荷会受到保护，不作为空罐覆盖。详见[配置与配方指南](CONFIGURATION-RECIPES.zh-CN.md)。
 
 外部内容包优先，自带内容只补缺。外部包之间同类别、同完整 ID 的冲突会明确报错；模型和纹理按路径选择，语言按键合并。资源生成使用受管理覆盖层，不改写外部素材目录。
 
@@ -57,7 +57,7 @@ bStats 3.2.1 的统计 ID 为 **34448**，登记名为 **FarmersDelightPro**。�
 
 ## 文档
 
-- [配置、配方与迁移](CONFIGURATION-RECIPES.zh-CN.md)
+- [配置与配方](CONFIGURATION-RECIPES.zh-CN.md)
 - [流体罐获取与操作](FLUID-TANK.zh-CN.md)
 - [森罗物语联动与模糊配方](KALEIDOSCOPE-COMPAT.zh-CN.md)
 - [依赖构建与对应源码](libs/README.md)

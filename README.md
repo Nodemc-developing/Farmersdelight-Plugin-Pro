@@ -45,7 +45,7 @@ This project is a maintained optimization fork of [Farmersdelight-Plugin](https:
 
 Install CraftEngine first, then put the Farmersdelight-Plugin-Pro JAR in `plugins/` and start the server. Use `/fd reload` after changing plugin configuration, and `/ce reload` after changing CraftEngine resources.
 
-Fluid features require **FluidCore** as a separate plugin; its API is not bundled. Other features remain available without it. New configuration, recipes and packs are supported; old fluid-library world/item data is not migrated. Recognized legacy payloads are protected rather than overwritten as empty tanks. See the [configuration and recipe guide](CONFIGURATION-RECIPES.zh-CN.md).
+Fluid features require **FluidCore** as a separate plugin; its API is not bundled. Other features remain available without it. Recipes load from enabled CraftEngine content packs; old fluid-library world/item data is not migrated. Recognized legacy payloads are protected rather than overwritten as empty tanks. See the [configuration and recipe guide](CONFIGURATION-RECIPES.zh-CN.md).
 
 External content takes precedence; bundled content fills missing definitions. Duplicate category/full-ID definitions between external packs are reported. Models/textures are selected by path and language JSON by key. Generated resources use a managed overlay without rewriting external asset directories.
 
@@ -57,7 +57,7 @@ bStats 3.2.1 uses plugin ID **34448** (registered as **FarmersDelightPro**). To 
 
 ## Documentation
 
-- [Configuration, recipes and migration](CONFIGURATION-RECIPES.zh-CN.md)
+- [Configuration and recipes](CONFIGURATION-RECIPES.zh-CN.md)
 - [Fluid tank setup and use (Chinese)](FLUID-TANK.zh-CN.md)
 - [Kaleidoscope integration and fuzzy recipes](KALEIDOSCOPE-COMPAT.zh-CN.md)
 - [Dependency artifacts and sources](libs/README.md)

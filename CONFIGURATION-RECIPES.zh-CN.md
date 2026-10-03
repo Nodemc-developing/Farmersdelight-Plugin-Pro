@@ -1,8 +1,8 @@
 # 配置、配方与内容包
 
-本页介绍 Farmersdelight-Plugin-Pro 的配置、内容包配方、食材表达式和迁移规则。配方由已启用的 CraftEngine 内容包加载，游戏内编辑会写回来源节点。文件能够解析与玩法能够执行需要分别确认，未实现的类型会保留原文件并输出诊断。
+本页介绍 Farmersdelight-Plugin-Pro 的配置、内容包配方和食材表达式。配方由已启用的 CraftEngine 内容包加载，游戏内编辑会写回来源节点。文件能够解析与玩法能够执行需要分别确认，未实现的类型会保留原文件并输出诊断。
 
-以下示例使用原版物品。兼容入口的技术键名保持不变；本插件自己的扩展字段与适用范围在对应段落中说明。
+以下示例使用原版物品和本插件的配方区块。
 
 ## 内容包位置
 
@@ -18,39 +18,33 @@ plugins/CraftEngine/resources/farmersdelight/
       food_groups.yml
 ```
 
-其他已启用内容包也可在其 `configuration/` 目录下放置配方 YAML。文件名和子目录用于组织文件；真正决定配方含义的是顶层配置区块和配方的 `type`。
+其他已启用内容包也可在其 `configuration/` 目录下放置配方 YAML。文件名和子目录用于组织文件；顶层配置区块决定配方类别，各字段定义食材、成品及加工条件。
 
-兼容配方入口为 `papersdelight_recipes`，与 CraftEngine 自身的 `recipes` 区块分别加载。不要将这两种区块互相替换。
+厨锅使用 `cooking_recipes`，砧板使用 `cutting_recipes`；两者与 CraftEngine 自身的 `recipes` 区块分别加载。不要将这些区块互相替换。
 
 ## 配方格式
 
-每条配方以唯一 ID 为键。建议使用 `命名空间:路径`，例如 `example:cooking/carrot`。同一个文件可同时包含厨锅、砧板及其他内容包区块。
+每条配方以唯一 ID 为键。建议使用 `命名空间:路径`，例如 `example:cooking/carrot`。同一个文件可同时包含厨锅、砧板及其他内容包区块。也可以通过 `/fd recipe edit` 创建和编辑配方。
 
-| 类型 | 必填字段 | 可选字段 | 对应机制 |
-| --- | --- | --- | --- |
-| `cooking` | `ingredients`、`result` | `container`、`time`、`experience` | 厨锅烹饪 |
-| `cutting` | `ingredient`、`results` | `tools`、`sound` | 砧板切割 |
-| `info` | `item` | `description` | 物品获取说明，纯展示 |
-| `fluid_filling` | `fluid`、`amount`、`empty_input`、`filled_result` | `time`、`priority` | 从 FluidCore 储罐灌装物品 |
-| `fluid_emptying` | `fluid`、`amount`、`filled_input`、`empty_result` | `time`、`priority` | 把物品中的流体排入 FluidCore 储罐 |
-| `soaking` | `ingredient`、`fluid`、`amount`、`result` | `time`、`consume_fluid`、`priority` | 在 FluidCore 储罐流体中浸泡物品 |
+| 配方区块 | 对应机制 |
+| --- | --- |
+| `cooking_recipes` | 厨锅烹饪 |
+| `cutting_recipes` | 砧板切割 |
+| `custom_cooking_pot_recipes` | 自定义厨锅组 |
+| `advanced_tags` | 高级食材标签 |
 
 ### 厨锅
 
 ```yaml
-papersdelight_recipes:
+cooking_recipes:
   example:cooking/carrot:
-    type: cooking
     ingredients:
       - minecraft:carrot
-      - items:
-          - minecraft:potato
-          - minecraft:beetroot
-    result:
-      id: minecraft:baked_potato
-      count: 1
+      - "minecraft:potato|minecraft:beetroot"
+    result: minecraft:baked_potato
+    result-count: 1
     container: none
-    time: 120
+    cooking_time: 120
     experience: 0.1
 ```
 
@@ -59,62 +53,44 @@ papersdelight_recipes:
 | 字段 | 格式 | 默认值及单位 |
 | --- | --- | --- |
 | `ingredients` | 非空列表，每项为字符串或 `{items: [...]}` | 普通厨锅最多 6 个原料槽 |
-| `result` | 物品 ID 字符串，或 `{id: 物品ID, count: 数量}` | `count` 为 1 |
+| `result` | 物品 ID 字符串，或包含 `item` 与组件数据的物品对象 | 必填 |
+| `result-count` | 整数 | 字符串成品的数量，默认 1 |
 | `container` | 容器物品 ID | 省略时无显式容器要求 |
-| `time` | 整数 | 200 tick；20 tick = 1 秒 |
+| `cooking_time` | 整数 | 缺省值和上下限由厨锅配置决定；20 tick = 1 秒 |
 | `experience` | 小数 | 0.0 |
 
-`container: none` 为本项目已有扩展，用于显式关闭容器要求。容器自动推断、容器归还及自定义大厨锅仍遵循 Farmersdelight-Plugin-Pro 的对应配置。
+`container: none` 用于显式关闭容器要求。容器自动推断、容器归还及自定义大厨锅遵循 Farmersdelight-Plugin-Pro 的对应配置。
 
 ### 砧板
 
 ```yaml
-papersdelight_recipes:
+cutting_recipes:
   example:cutting/carrot:
-    type: cutting
-    ingredient:
-      items:
-        - minecraft:carrot
-        - minecraft:golden_carrot
+    input: "minecraft:carrot|minecraft:golden_carrot"
     tools:
       - "#minecraft:axes"
       - minecraft:shears
     results:
-      - id: minecraft:orange_dye
+      - item: minecraft:orange_dye
         count: 2
-      - id: minecraft:wheat_seeds
+      - item: minecraft:wheat_seeds
         chance: 0.25
-    sound:
-      id: minecraft:block.wood.break
-      volume: 0.8
-      pitch: 1.0
+    sound: minecraft:block.wood.break
+    sound-volume: 0.8
+    sound-pitch: 1.0
 ```
 
 | 字段 | 格式 | 默认值 |
 | --- | --- | --- |
-| `ingredient` | 字符串，或 `{items: [...]}` 多选一 | 必填；每次处理一个输入物品 |
-| `results` | 非空列表，每项为字符串或 `{id, count, chance}` | `count: 1`、`chance: 1.0` |
-| `tools` | 物品/标签字符串列表 | 省略或为空时使用 `cutting_board.default_tools` |
-| `sound` | 音效 ID 字符串，或 `{id, volume, pitch}` | 字符串形式的 `volume` 和 `pitch` 均为 1.0 |
+| `input` | 物品或标签表达式，可用 `|` 指定多选一 | 必填；每次处理一个输入物品 |
+| `results` | 非空列表，每项为 `{item, count, chance}` | `count: 1`、`chance: 1.0` |
+| `tools` | 非空的物品/标签字符串列表；单个工具也可使用 `tool` 字段 | 必填工具条件 |
+| `sound` | 音效 ID 字符串 | 省略时使用默认切割音效 |
+| `sound-volume`、`sound-pitch` | 小数 | 省略时使用砧板音效配置 |
 
-兼容输入的产出数量小于 1 时按 1 处理；概率小于 0 或大于 1 时按边界处理。解析时同时检查无效数值。
+产出数量小于 1 时按 1 处理；概率小于 0 或大于 1 时按边界处理。解析时同时检查无效数值。
 
-注意：配方对象中的音效键为 `sound.id`；主配置里的音效对象使用 `sound` 子字段，例如 `cutting_board.sounds.place_item.sound`。
-
-### 信息展示
-
-`info` 只提供获取说明，不消耗材料、不产出物品：
-
-```yaml
-papersdelight_recipes:
-  example:info/carrot:
-    type: info
-    item: minecraft:carrot
-    description:
-      - "<gray>可通过种植获取。"
-```
-
-`description` 是文本行列表，默认空列表；支持 MiniMessage 和 `<lang:...>` 翻译键。本插件将这类条目显示为配方菜单中的信息卡，不作为厨锅配方执行。
+注意：砧板配方的 `sound` 是音效 ID；主配置里的音效对象使用 `sound` 子字段，例如 `cutting_board.sounds.place_item.sound`。
 
 ## 物品、标签与候选项
 
@@ -128,7 +104,7 @@ papersdelight_recipes:
 
 以 `#` 开头的值应加引号，避免被 YAML 视为注释。候选项是“多选一”，不表示需要同时投入列表中的全部物品。重复候选项不会提高材料数量；需要两份相同食材时，应在 `ingredients` 中写两项。
 
-匹配表达式会去除两端空格并转为小写。`advtag:` 由独立高级标签解析器处理，与普通 `#` 标签不是同一种注册方式。仅保留表达式不能恢复未提供的标签成员；迁移时应同时提供相应食材分组或标签定义，并核对最终展开结果。
+匹配表达式会去除两端空格并转为小写。`advtag:` 由独立高级标签解析器处理，与普通 `#` 标签不是同一种注册方式。引用食材分组或标签时，应同时提供其定义，并核对最终展开结果。
 
 内容包高级标签使用单独的 `advanced_tags` 区块，`values` 中可以引用其他高级标签：
 
@@ -150,33 +126,17 @@ advanced_tags:
 
 加工使用可选的 FluidCore 插件，并且只访问其实际注册的储罐。FluidCore 方块实体需要 CraftEngine 26.10。流体数量为整数 **mB**：一桶为 1000 mB，一瓶为 250 mB；`time` 为 tick。
 
-```yaml
-papersdelight_recipes:
-  example:fluid_emptying/water_bucket:
-    type: fluid_emptying
-    fluid: minecraft:water
-    amount: 1000
-    filled_input: minecraft:water_bucket
-    empty_result: minecraft:bucket
+使用 `/fd recipe edit` 的流体配方分类创建和编辑这些配方。编辑器保存时记录来源文件、区块和完整 ID。
 
-  example:fluid_filling/water_bucket:
-    type: fluid_filling
-    fluid: "#c:water"
-    amount: 1000
-    empty_input: minecraft:bucket
-    filled_result: minecraft:water_bucket
+| 加工类型 | 输入与输出 | 用途 |
+| --- | --- | --- |
+| `fluid_filling` | `empty_input` → `filled_result` | 从储罐灌装物品 |
+| `fluid_emptying` | `filled_input` → `empty_result` | 将容器内流体排入储罐 |
+| `soaking` | `ingredient` → `result` | 浸泡物品；`consume_fluid` 控制是否消耗流体 |
 
-  example:soaking/sponge:
-    type: soaking
-    ingredient: minecraft:sponge
-    fluid: "#c:water"
-    amount: 1000
-    result: minecraft:wet_sponge
-    time: 20
-    consume_fluid: true
-```
+三个类型均使用 `fluid` 和 `amount` 指定流体条件及数量；`time` 和 `priority` 分别设置加工时间和优先级。
 
-`fluid` 为流体 ID 或带 `#` 的流体标签，不是物品标签。优先使用 FluidCore 中实际定义的 `c:water`、`c:milk`、`c:lava`、`c:honey`；这些标签没有声明时才兼容映射到库自带的对应标签。其他未注册流体或标签不执行配方。
+`fluid` 为流体 ID 或带 `#` 的流体标签，不是物品标签。可使用 FluidCore 中实际定义的 `c:water`、`c:milk`、`c:lava`、`c:honey`。未注册流体或标签不执行配方。
 
 FluidCore 默认注册蜂蜜及原版桶瓶处理。服务器可添加或覆写流体元数据；已有定义只需补标签，避免重复注册同名流体：
 
@@ -202,11 +162,9 @@ FluidCore 默认注册蜂蜜及原版桶瓶处理。服务器可添加或覆写�
 
 排空读取输入容器实际持有的流体及组件，再检查 ID 或标签条件。没有可验证的容器处理器时不能从标签猜测流体。带组件的流体不能通过固定成品声明丢弃组件，输入容器剩余内容也不能丢失。
 
-新加载的 `papersdelight:jug`、`papersdelight:jug_item` 和 `libuid:fluid_container` 配置会适配为 FluidCore 的类型接口。物品设置提供缺省容量，方块行为显式容量优先；拆除自身掉落必须固定为一件并携带流体。适配在 CE 模板展开后执行，不修改原配置文件。
-
 **不转换旧流体库的世界与物品存档**。识别到旧载荷时保留并拒绝覆盖，不把旧罐视为空罐；先备份并在原环境处理已有内容。无法安全确定自身掉落条目的新配置会明确报错。
 
-以下为独立编写的完整储罐定义，放在已启用的 CE 内容包 `configuration/` 中即可。它使用原版铁块模型，容量为 16000 mB，掉落表只有一个自身物品条目；先固定数量为 1，再保存储罐数据：
+以下为完整的 FluidCore 储罐定义，放在已启用的 CE 内容包 `configuration/` 中即可。它使用原版铁块模型，容量为 16000 mB，掉落表只有一个自身物品条目；先固定数量为 1，再保存储罐数据：
 
 ```yaml
 items:
@@ -248,71 +206,47 @@ items:
 
 本插件保留精准和模糊配方、理想配比、等效食材、调味品、配方优先级、自定义厨锅组、物品组件及容器处理等已有功能。扩展项与其他配方一起从内容包加载和编辑。
 
-已有的 `cooking_pot_recipes`、`cutting_board_recipes`、`custom_cooking_pot_recipes` 格式属于兼容输入。默认的新配方采用上述内容包结构；已有菜单操作和森罗菜谱自动投料仍由 Farmersdelight-Plugin-Pro 处理。
+本插件同时读取自身的 `cooking_pot_recipes`、`cutting_board_recipes` 和 `custom_cooking_pot_recipes` 区块。菜单操作和森罗菜谱自动投料由 Farmersdelight-Plugin-Pro 处理。
 
-## 配置兼容边界
+## 主配置
 
 主配置以 `lang`、`heat_sources`、`cooking_pot`、`cutting_board`、`skillet`、`stove`、`pet_food`、`recipe_book` 等下划线分组组织。原有配置迁移后保留本插件独有选项，显式设置应优先于新版本默认值。
 
 `heat_sources` 是规则列表，支持原版 `material`、自定义方块 `ce_block` 和自定义方块标签 `ce_block_tag`，并检查配置的 `states` 条件。`heat_source`、`conductor` 分别控制热源与导热判断；`tray: true` 要求对应托盘，托盘定义由同一热源规则核对。
 
-| 兼容输入的功能/字段 | 当前处理范围 |
-| --- | --- |
-| `license` | 不参与本插件运行，无对应配置要求 |
-| `config-version` | 兼容输入的配置版本号，不作为本插件版本号 |
-| `particle_throttle` | 按锅/炉灶密度降低粒子与环境音机会；同时执行区块和单连接预算 |
-| `nourishment_effect`、`comfort_effect` | 本插件已有相近效果；启停、显示和持续时间按本插件配置生效 |
-| `garlic_effect` | 本插件未实现的效果不得以读取配置冒充支持 |
-| `stats` | 成功提交后的累计统计、异步 SQLite 和只读缓存的 PAPI；持续效果存档沿用原系统 |
-| `villager.yml` | 村民交易、拾取、食物点和自定义作物收获补种 |
-| `insertable_tools.yml` | 对接已有工具插入展示器，不是配方定义 |
+其他 CraftEngine 内容包可能使用单独注册的方块行为、物品事件函数、进度配置及附属入口。使用前应确认日志中没有未知行为、未知函数或未解析标签。
 
-其他 CraftEngine 内容包可能使用单独注册的方块行为、物品事件函数、进度配置及附属入口。配方格式兼容不自动注册这些入口；使用前应确认日志中没有未知行为、未知函数或未解析标签。
+## 方块行为与配置函数
 
-## 已适配的主要行为入口
-
-这些入口使用本插件已有的加工机制，并在加载内容包之前注册。遇到其他插件已经注册同一个 ID 时，不覆盖其行为。
-
-| ID | 适配内容与范围 |
-| --- | --- |
-| `papersdelight:cooking_pot` | 使用本插件厨锅；支持 `support: int` 的 0=无支撑显示、1=托盘、2=提手，保留原字符串状态接口 |
-| `papersdelight:cutting_board` | 使用本插件砧板；读取 `has_comparator` 控制比较器输出 |
-| `papersdelight:skillet` | 使用本插件煎锅；支持布尔 `support` 状态 |
-| `papersdelight:skillet_item` | 使用本插件手持煎锅，并保留 `block` 指定的 CE 方块放置能力 |
-| `papersdelight:stove` | 使用 `lit` 布尔状态与其 `sound`；原内容包事件负责点火及熄火，高温由独立行为配置 |
-| `papersdelight:nourishment_effect`、`papersdelight:comfort_effect` | 对接本插件效果；`duration` 按 tick 读取，600 tick 对应 30 秒 |
-
-本插件效果计时精度为秒，非整秒的 tick 持续时间向上取整到下一秒。炉灶声效与粒子采用配置的间隔、概率和音效参数，在所属线程交付。
-
-以下入口已接入实际机制。相同后缀也在 `farmersdelight` 命名空间提供；配置参数会验证并适配到本插件的行为：
+本插件在加载内容包之前注册以下入口。配置参数会验证并应用到对应机制；遇到已注册的相同 ID 时，不覆盖其行为。
 
 ```text
-papersdelight:basket
-papersdelight:advanced_crop
-papersdelight:roped_crop
-papersdelight:double_crop
-papersdelight:grant_advancement
-papersdelight:remove_random_effect
-papersdelight:organic_compost
-papersdelight:rich_soil
-papersdelight:farmland
-papersdelight:rope
-papersdelight:rope_block
-papersdelight:skewer_item
-papersdelight:high_temperature
-papersdelight:pairable_block
-papersdelight:horizontal_double_block_item
-papersdelight:horizontal_double_block
-papersdelight:wild_rice
-papersdelight:remove_effect
-papersdelight:upgrade_effect
-papersdelight:chorus_teleport
-papersdelight:enderman_gristle_teleport
-papersdelight:is_sneaking
-papersdelight:integer_comparator
+farmersdelight:basket
+farmersdelight:advanced_crop
+farmersdelight:roped_crop
+farmersdelight:double_crop
+farmersdelight:grant_advancement
+farmersdelight:remove_random_effect
+farmersdelight:organic_compost
+farmersdelight:rich_soil
+farmersdelight:farmland
+farmersdelight:rope
+farmersdelight:rope_block
+farmersdelight:skewer_item
+farmersdelight:high_temperature
+farmersdelight:pairable_block
+farmersdelight:horizontal_double_block_item
+farmersdelight:horizontal_double_block
+farmersdelight:wild_rice
+farmersdelight:remove_effect
+farmersdelight:upgrade_effect
+farmersdelight:chorus_teleport
+farmersdelight:enderman_gristle_teleport
+farmersdelight:is_sneaking
+farmersdelight:integer_comparator
 ```
 
-`dumplings_delight:garlic_effect` 是尚未支持的附属效果，会明确报告。其他未知入口同样不能用空行为伪装成功。上述新配置适配不迁移其他方块实体、库存或旧流体 NBT。
+未知入口会明确报告。本页的新配置说明不包含其他方块实体、库存或旧流体 NBT 的转换。
 
 ## 作物与耕地随机更新
 
@@ -322,7 +256,7 @@ papersdelight:integer_comparator
 
 ## 累计统计与占位符
 
-`stats.enabled`（兼容输入 `stats.enable`）默认开启，`stats.flush_interval_seconds`（兼容 `stats.flush_interval`）默认 30 秒。SQLite 工作在专用后台线程，玩家上线预热缓存；读取占位符不会查数据库。停止接受新提交后，落盘与其他关服存档共用 `performance.shutdown_wait_millis` 的期限，默认 5000 ms；旧配置的 `stats.shutdown_wait_millis` 可作为回退。
+`stats.enabled` 默认开启，`stats.flush_interval_seconds` 默认 30 秒。SQLite 工作在专用后台线程，玩家上线预热缓存；读取占位符不会查数据库。停止接受新提交后，落盘与其他关服存档共用 `performance.shutdown_wait_millis` 的期限，默认 5000 ms。
 
 | 示例 | 查询 |
 | --- | --- |
@@ -346,14 +280,6 @@ papersdelight:integer_comparator
 定义按类别和完整 ID 选取：外部包优先、自带补缺；多个外部包重复定义报错。模型/纹理按资源路径选取，语言 JSON 按键合并，双方来源及获胜结果写入受管理资源层的报告。原始内容目录保持只读，配方编辑是明确的例外。
 
 编辑保存定位原文件、根节点和完整 ID，只更新受管理字段，保留其他嵌套扩展数据。未知匹配或消耗条件会禁用该条配方并报告文件、ID 和字段。重载准备、文件读取与文档解析放到后台；物品转换及世界变动按线程归属执行。
-
-## 其他配方类型与行为边界
-
-兼容输入还可能包含 `single`、`decomposition` 类型。`decomposition` 可以带 `ingredient`、`result` 和 `catalysts` 字段，但方块分解的世界条件需要对应游戏机制；当前未实现这些类型，不能仅靠读取字段执行加工。
-
-对于本插件尚未实现或尚未验证的类型，应保留源文件、输出带配方 ID 和来源的诊断，并继续加载可用配方。不会将其退化成厨锅或砧板加工。
-
-本轮 `info` 已按信息卡展示，`single` 尚未适配。兼容声明仅覆盖已经实现并通过验证的条目。
 
 ## 已完成验证（1.1.0）
 
