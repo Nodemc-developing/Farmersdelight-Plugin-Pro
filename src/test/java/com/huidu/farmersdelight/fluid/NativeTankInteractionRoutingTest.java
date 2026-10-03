@@ -6,13 +6,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.junit.jupiter.api.Test;
+import java.lang.ref.Reference;
 import java.lang.reflect.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import static org.junit.jupiter.api.Assertions.*;
 
 class NativeTankInteractionRoutingTest {
     @Test void aRealNativeTankDelegationDoesNotInspectOrClaimTheHeldSoakingInput() throws Exception {
-        withServer(true, () -> {
+        withServer(true, world -> {
             var bridge = bridge(new Access(true));
             var manager = allocate(FluidRecipeManager.class); field(FluidRecipeManager.class, "bridge").set(manager, bridge);
             var listener = new FluidRecipeListener(null, manager);
@@ -20,24 +21,26 @@ class NativeTankInteractionRoutingTest {
             AtomicBoolean claimed = new AtomicBoolean();
             Method handle = FluidRecipeListener.class.getDeclaredMethod("handleInteraction", Player.class, Location.class, boolean.class, Runnable.class);
             handle.setAccessible(true);
-            handle.invoke(listener, player, location(), false, (Runnable) () -> claimed.set(true));
+            Location location = location(world);
+            System.gc();
+            handle.invoke(listener, player, location, false, (Runnable) () -> claimed.set(true));
             assertFalse(claimed.get());
         });
     }
 
     @Test void externalProvidersKeepTheirHandPathAndOffOwnerQueriesDoNotReachTheAdapter() throws Exception {
         Access external = new Access(false);
-        withServer(true, () -> {
+        withServer(true, world -> {
             var bridge = bridge(external);
-            assertFalse(bridge.nativeTankAt(location()));
-            assertTrue(bridge.storageAt(location()));
+            assertFalse(bridge.nativeTankAt(location(world)));
+            assertTrue(bridge.storageAt(location(world)));
+            assertFalse(new ExternalAccess().isNativeTank(location(world)));
         });
         Access inaccessible = new Access(true);
-        withServer(false, () -> {
-            assertFalse(bridge(inaccessible).nativeTankAt(location()));
+        withServer(false, world -> {
+            assertFalse(bridge(inaccessible).nativeTankAt(location(world)));
             assertEquals(0, inaccessible.nativeQueries);
         });
-        assertFalse(new ExternalAccess().isNativeTank(location()));
     }
 
     private static final class Access extends ExternalAccess {
@@ -64,6 +67,7 @@ class NativeTankInteractionRoutingTest {
     private static Plugin enabledPlugin;
     private static void withServer(boolean owned, CheckedRunnable task) throws Exception {
         Field server = field(Bukkit.class, "server"); Object previous = server.get(null);
+        World world = proxy(World.class, (method, arguments) -> { throw new AssertionError("World was queried: " + method); });
         enabledPlugin = proxy(Plugin.class, (method, arguments) -> switch (method.getName()) {
             case "isEnabled" -> true;
             default -> throw new AssertionError("Unexpected plugin call " + method);
@@ -77,10 +81,13 @@ class NativeTankInteractionRoutingTest {
             case "isOwnedByCurrentRegion" -> owned;
             default -> throw new AssertionError("Unexpected server call " + method);
         }));
-        try { task.run(); } finally { server.set(null, previous); enabledPlugin = null; }
+        try { task.run(world); } finally {
+            Reference.reachabilityFence(world);
+            server.set(null, previous); enabledPlugin = null;
+        }
     }
-    private static Location location() {
-        return new Location(proxy(World.class, (method, arguments) -> { throw new AssertionError("World was queried: " + method); }), 1, 64, 1);
+    private static Location location(World world) {
+        return new Location(world, 1, 64, 1);
     }
     private static <T> T allocate(Class<T> type) throws Exception {
         Class<?> unsafe = Class.forName("sun.misc.Unsafe");
@@ -95,5 +102,5 @@ class NativeTankInteractionRoutingTest {
                 (instance, method, arguments) -> handler.invoke(method, arguments)));
     }
     @FunctionalInterface private interface Calls { Object invoke(Method method, Object[] arguments) throws Throwable; }
-    @FunctionalInterface private interface CheckedRunnable { void run() throws Exception; }
+    @FunctionalInterface private interface CheckedRunnable { void run(World world) throws Exception; }
 }
