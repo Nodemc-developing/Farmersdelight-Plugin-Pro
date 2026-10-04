@@ -1,5 +1,6 @@
 package com.huidu.farmersdelight.fluid;
 
+import com.huidu.farmersdelight.compat.OtherDelightIds;
 import com.huidu.farmersdelight.recipe.RuntimeSnapshotPublication;
 
 import com.huidu.farmersdelight.FarmersDelightPlugin;
@@ -44,14 +45,14 @@ public final class FluidRecipeFiles {
 
     /** Parses captured pack documents; this method does not read files or mutate live inventories. */
     public List<Entry> load() {
-        return loadSections(RecipePackFiles.sections(plugin, PackSection.PAPERS_RECIPES));
+        return loadSections(RecipePackFiles.sections(plugin, PackSection.OTHER_DELIGHT_RECIPES));
     }
 
     List<Entry> loadSections(List<PackSections.Section> sections) {
         Map<String, Entry> loaded = new LinkedHashMap<>();
         Set<String> occupied = new LinkedHashSet<>();
         for (var section : sections) {
-            ConfigurationSection root = section.yaml().getConfigurationSection("papersdelight_recipes");
+            ConfigurationSection root = section.yaml().getConfigurationSection(OtherDelightIds.RECIPE_SECTION);
             if (root == null) continue;
             for (String id : root.getKeys(false)) {
                 // Every node owns its ID, including other recipe kinds and currently invalid definitions.
@@ -86,7 +87,7 @@ public final class FluidRecipeFiles {
         if (previous == null && current.occupiedIds().contains(recipe.id())) {
             return CompletableFuture.completedFuture(false);
         }
-        RecipeSource source = previous == null ? new RecipeSource(defaultFile(), List.of("papersdelight_recipes#fd_pro", recipe.id()), true)
+        RecipeSource source = previous == null ? new RecipeSource(defaultFile(), List.of(OtherDelightIds.RECIPE_EDITOR_SECTION, recipe.id()), true)
                 : previous.source();
         // Ingredient and NBT serialization is captured on the caller's owning thread before worker I/O.
         Map<String, Object> captured;

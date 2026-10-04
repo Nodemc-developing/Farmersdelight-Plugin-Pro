@@ -9,7 +9,7 @@ What it checks:
     `ConfigSectionReader`;
   * resolved against the union of the bundled default files in src/main/resources and the main
     config's runtime compatibility view. Known option names and semantic aliases are read from
-    PapersDelightConfigFormat.java; an arbitrary hyphen/underscore replacement is not accepted.
+    OtherDelightConfigFormat.java; an arbitrary hyphen/underscore replacement is not accepted.
 
 A call site is satisfied when *at least one* of its path aliases exists — the aliases are deliberate
 fallbacks for migrated keys, so an old name that no longer ships is fine as long as a current one exists.
@@ -36,7 +36,7 @@ except ImportError:
 
 FD_PACKAGE = "com.huidu.farmersdelight"
 BUNDLED = ["config.yml", "gui.yml", "drops.yml", "world-data.yml", "display-overrides.yml"]
-FORMAT_SOURCE = Path("src/main/java/com/huidu/farmersdelight/config/PapersDelightConfigFormat.java")
+FORMAT_SOURCE = Path("src/main/java/com/huidu/farmersdelight/config/OtherDelightConfigFormat.java")
 
 # Helpers whose literal arguments are config paths.
 HELPERS = (
@@ -122,7 +122,7 @@ def load_runtime_schema(root: Path) -> tuple[set[str], list[tuple[str, str]]]:
     options = re.search(r'OPTION_NAMES\s*=\s*Set\.of\(\("""(.*?)"""\)', text, re.S)
     initializer = re.search(r'\bstatic\s*\{(.*?)^    \}', text, re.S | re.M)
     if options is None or initializer is None:
-        raise ValueError("cannot read PapersDelightConfigFormat option names/PATHS initializer")
+        raise ValueError("cannot read OtherDelightConfigFormat option names/PATHS initializer")
     aliases: list[tuple[str, str]] = []
 
     def expression(raw: str, variables: dict[str, str]) -> str:

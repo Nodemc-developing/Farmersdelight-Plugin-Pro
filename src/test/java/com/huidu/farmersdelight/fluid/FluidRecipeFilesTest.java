@@ -108,7 +108,7 @@ class FluidRecipeFilesTest {
         assertEquals("papersdelight_recipes: [broken\n", Files.readString(file));
     }
 
-    @Test void originalScalarFluidKeepsPapersDelightShapeAndDropsOldAmountAliases() {
+    @Test void originalScalarFluidKeepsOtherDelightShapeAndDropsOldAmountAliases() {
         var merged = FluidRecipeFiles.merge(Map.of("fluid", "minecraft:water", "amount", 1000),
                 Map.of("fluid", "#c:water", "amount", 250L));
         assertEquals("#c:water", merged.get("fluid"));
@@ -126,7 +126,7 @@ class FluidRecipeFilesTest {
         assertEquals("cooking", source.body(PlainYamlDocuments.readLiteral(file)).get("type"));
     }
 
-    @Test void anyPapersRecipeKindOwnsItsIdBeforeSchedulingANewFluidSave() throws Exception {
+    @Test void anyOtherDelightRecipeKindOwnsItsIdBeforeSchedulingANewFluidSave() throws Exception {
         FluidRecipeFiles files = new FluidRecipeFiles(null);
         var first = section("first.yml", """
                 papersdelight_recipes:
@@ -172,7 +172,7 @@ class FluidRecipeFilesTest {
     }
 
     private PackSections.Section section(String file, String yaml) throws Exception {
-        return new PackSections.Section(PackSection.PAPERS_RECIPES, file, "addon", PlainYamlDocuments.parse(yaml, true),
+        return new PackSections.Section(PackSection.OTHER_DELIGHT_RECIPES, file, "addon", PlainYamlDocuments.parse(yaml, true),
                 directory.resolve(file), "papersdelight_recipes");
     }
 }

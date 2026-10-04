@@ -1,5 +1,6 @@
 package com.huidu.farmersdelight.recipe;
 
+import com.huidu.farmersdelight.compat.OtherDelightIds;
 import com.huidu.farmersdelight.FarmersDelightPlugin;
 import com.huidu.farmersdelight.api.config.ConfigFileUpdater;
 import com.huidu.farmersdelight.config.PlainYamlDocuments;
@@ -107,7 +108,7 @@ public final class RecipePackFiles {
             if (!target.isSet(key)) PlainYamlDocuments.setValue(target, key, entry.getValue());
             else if (entry.getValue() instanceof ConfigurationSection source && target.get(key) instanceof ConfigurationSection destination) {
                 // Registry entries are indivisible: never splice part of a conflicting recipe into a pack's node.
-                if (key.equals("papersdelight_recipes") || key.equals("food_groups") || key.equals("custom_cooking_pot_recipes")) {
+                if (key.equals(OtherDelightIds.RECIPE_SECTION) || key.equals("food_groups") || key.equals("custom_cooking_pot_recipes")) {
                     for (var child : source.getValues(false).entrySet()) if (!destination.isSet(child.getKey())) PlainYamlDocuments.setValue(destination, child.getKey(), child.getValue());
                 }
             }
@@ -121,7 +122,7 @@ public final class RecipePackFiles {
         if (POT_FILE.equals(name) || BOARD_FILE.equals(name)) {
             String oldRoot = POT_FILE.equals(name) ? "cooking_pot_recipes" : "cutting_board_recipes";
             ConfigurationSection root = legacy.getConfigurationSection(oldRoot);
-            ConfigurationSection existing = legacy.getConfigurationSection("papersdelight_recipes");
+            ConfigurationSection existing = legacy.getConfigurationSection(OtherDelightIds.RECIPE_SECTION);
             Map<String, Object> recipes = existing == null ? new LinkedHashMap<>() : new LinkedHashMap<>(existing.getValues(false));
             if (root != null) root.getValues(false).forEach((id, raw) -> {
                 if (raw instanceof ConfigurationSection section) {
@@ -131,7 +132,7 @@ public final class RecipePackFiles {
                 }
             });
             out.set(oldRoot, null);
-            PlainYamlDocuments.setValue(out, "papersdelight_recipes", recipes);
+            PlainYamlDocuments.setValue(out, OtherDelightIds.RECIPE_SECTION, recipes);
         } else if (GROUP_FILE.equals(name)) {
             if (legacy.isSet("groups") && !legacy.isSet("food_groups")) PlainYamlDocuments.setValue(out, "food_groups", legacy.get("groups"));
             out.set("groups", null);
@@ -178,10 +179,10 @@ public final class RecipePackFiles {
             YamlConfiguration source = documents.get(section.file());
             if (source == null || !containsFactory(source)) continue;
             if (section.section() == kind) result.add(section);
-            else if (section.section() == PackSection.PAPERS_RECIPES && (kind == PackSection.COOKING_POT || kind == PackSection.CUTTING_BOARD)) {
+            else if (section.section() == PackSection.OTHER_DELIGHT_RECIPES && (kind == PackSection.COOKING_POT || kind == PackSection.CUTTING_BOARD)) {
                 YamlConfiguration raw = new YamlConfiguration();
                 raw.options().pathSeparator('\u0001');
-                PlainYamlDocuments.setValue(raw, section.sectionKey(), section.yaml().get(PackSection.PAPERS_RECIPES.rootKey()));
+                PlainYamlDocuments.setValue(raw, section.sectionKey(), section.yaml().get(PackSection.OTHER_DELIGHT_RECIPES.rootKey()));
                 for (var converted : sections(Map.of(section.file(), raw), null, kind)) result.add(new PackSections.Section(kind,
                         section.source(), section.namespace(), converted.yaml(), section.file(), section.sectionKey(), true));
             }
@@ -221,11 +222,11 @@ public final class RecipePackFiles {
             Map<String, Object> recipes = new LinkedHashMap<>();
             for (String key : document.getKeys(false)) {
                 String base = key.split("#", 2)[0];
-                if (base.equals(kind.rootKey()) || base.equals(kind.sectionId()) || base.equals("papersdelight_recipes")) {
+                if (base.equals(kind.rootKey()) || base.equals(kind.sectionId()) || base.equals(OtherDelightIds.RECIPE_SECTION)) {
                     ConfigurationSection root = document.getConfigurationSection(key);
                     if (root == null) continue;
                     root.getValues(false).forEach((id, value) -> {
-                        if (value instanceof ConfigurationSection body && (!base.equals("papersdelight_recipes") || typeMatches(kind, body))) recipes.putIfAbsent(id, value);
+                        if (value instanceof ConfigurationSection body && (!base.equals(OtherDelightIds.RECIPE_SECTION) || typeMatches(kind, body))) recipes.putIfAbsent(id, value);
                     });
                 }
             }
@@ -264,11 +265,11 @@ public final class RecipePackFiles {
         PackSection kind = POT_FILE.equals(name) ? PackSection.COOKING_POT : PackSection.CUTTING_BOARD;
         for (String key : document.getKeys(false)) {
             ConfigurationSection root = document.getConfigurationSection(key);
-            if (root != null && root.getKeys(false).contains(id) && (key.split("#",2)[0].equals("papersdelight_recipes") || key.split("#",2)[0].equals(kind.sectionId()) || key.equals(kind.rootKey()))) {
-                return new RecipeSource(path, List.of(key, id), key.split("#",2)[0].equals("papersdelight_recipes"), true);
+            if (root != null && root.getKeys(false).contains(id) && (key.split("#",2)[0].equals(OtherDelightIds.RECIPE_SECTION) || key.split("#",2)[0].equals(kind.sectionId()) || key.equals(kind.rootKey()))) {
+                return new RecipeSource(path, List.of(key, id), key.split("#",2)[0].equals(OtherDelightIds.RECIPE_SECTION), true);
             }
         }
-        return new RecipeSource(path, List.of("papersdelight_recipes", id), true);
+        return new RecipeSource(path, List.of(OtherDelightIds.RECIPE_SECTION, id), true);
     }
 
     /** Uses freshly prepared documents for /fd reload and CE's transformed sections for CE reloads. */
@@ -282,11 +283,11 @@ public final class RecipePackFiles {
             if (section.file() == null || !section.file().equals(defaultFile)) result.add(section);
         }
         if (kind != PackSection.COOKING_POT && kind != PackSection.CUTTING_BOARD) return List.copyOf(result);
-        for (PackSections.Section section : plugin.packSectionsOf(PackSection.PAPERS_RECIPES)) {
+        for (PackSections.Section section : plugin.packSectionsOf(PackSection.OTHER_DELIGHT_RECIPES)) {
             if (section.file() == null || section.file().equals(defaultFile)) continue;
             YamlConfiguration raw = new YamlConfiguration();
             raw.options().pathSeparator('\u0001');
-            PlainYamlDocuments.setValue(raw, section.sectionKey(), section.yaml().get(PackSection.PAPERS_RECIPES.rootKey()));
+            PlainYamlDocuments.setValue(raw, section.sectionKey(), section.yaml().get(PackSection.OTHER_DELIGHT_RECIPES.rootKey()));
             for (var converted : sections(Map.of(section.file(), raw), defaultFile, kind)) {
                 result.add(new PackSections.Section(kind, section.source(), section.namespace(), converted.yaml(),
                         section.file(), section.sectionKey(), section.generated()));
@@ -318,13 +319,13 @@ public final class RecipePackFiles {
             for (String key : document.getKeys(false)) {
                 String base = key.split("#", 2)[0];
                 boolean typedRecipes = kind == PackSection.COOKING_POT || kind == PackSection.CUTTING_BOARD;
-                if (!base.equals(kind.sectionId()) && !base.equals(kind.rootKey()) && !(typedRecipes && base.equals("papersdelight_recipes"))) continue;
+                if (!base.equals(kind.sectionId()) && !base.equals(kind.rootKey()) && !(typedRecipes && base.equals(OtherDelightIds.RECIPE_SECTION))) continue;
                 ConfigurationSection root = document.getConfigurationSection(key);
                 if (root == null) continue;
                 Map<String, Object> selected = new LinkedHashMap<>();
                 for (var recipe : root.getValues(false).entrySet()) {
-                    if (kind == PackSection.PAPERS_RECIPES || recipe.getValue() instanceof ConfigurationSection body
-                            && (!typedRecipes || !base.equals("papersdelight_recipes") || typeMatches(kind, body))) {
+                    if (kind == PackSection.OTHER_DELIGHT_RECIPES || recipe.getValue() instanceof ConfigurationSection body
+                            && (!typedRecipes || !base.equals(OtherDelightIds.RECIPE_SECTION) || typeMatches(kind, body))) {
                         selected.put(recipe.getKey(), recipe.getValue());
                     }
                 }

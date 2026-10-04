@@ -1,5 +1,6 @@
 package com.huidu.farmersdelight.registry;
 
+import com.huidu.farmersdelight.compat.OtherDelightIds;
 import com.huidu.farmersdelight.effect.FoodBuffFunction;
 import net.momirealms.craftengine.bukkit.item.behavior.BlockItemBehavior;
 import net.momirealms.craftengine.core.block.behavior.BlockBehaviors;
@@ -18,7 +19,7 @@ import java.util.Set;
 import java.util.function.UnaryOperator;
 
 /** Compatibility identifiers reuse this plugin's registered mechanics without replacing other registrations. */
-public final class PapersBehaviorAliases {
+public final class OtherDelightBehaviorAliases {
     private static final Set<String> UNSUPPORTED = Set.of(
             "dumplings_delight:garlic_effect");
 
@@ -28,16 +29,16 @@ public final class PapersBehaviorAliases {
         register(null);
     }
     public static void register(com.huidu.farmersdelight.FarmersDelightPlugin plugin) {
-        registerBlock("papersdelight:cooking_pot", "farmersdelight:cooking_pot", section -> {
+        registerBlock(OtherDelightIds.COOKING_POT, "farmersdelight:cooking_pot", section -> {
             ConfigSection normalized = copy(section);
             normalized.put("support-integer", true);
             return normalized;
         });
-        registerBlock("papersdelight:cutting_board", "farmersdelight:cutting_board", PapersBehaviorAliases::copy);
-        registerBlock("papersdelight:skillet", "farmersdelight:skillet", PapersBehaviorAliases::copy);
-        registerBlock("papersdelight:stove", "farmersdelight:stove", PapersBehaviorAliases::stoveSection);
+        registerBlock(OtherDelightIds.CUTTING_BOARD, "farmersdelight:cutting_board", OtherDelightBehaviorAliases::copy);
+        registerBlock(OtherDelightIds.SKILLET, "farmersdelight:skillet", OtherDelightBehaviorAliases::copy);
+        registerBlock(OtherDelightIds.STOVE, "farmersdelight:stove", OtherDelightBehaviorAliases::stoveSection);
 
-        Key skilletItem = Key.of("papersdelight:skillet_item");
+        Key skilletItem = Key.of(OtherDelightIds.SKILLET_ITEM);
         var handheld = BuiltInRegistries.ITEM_BEHAVIOR_TYPE.getValue(Key.of("farmersdelight:skillet_item"));
         if (handheld != null && BuiltInRegistries.ITEM_BEHAVIOR_TYPE.getValue(skilletItem) == null) {
             ItemBehaviors.register(skilletItem, (pack, path, id, section) -> {
@@ -46,8 +47,8 @@ public final class PapersBehaviorAliases {
                 return new CompositeItemBehavior(List.of(cooking, new BlockItemBehavior(placedBlock)));
             });
         }
-        registerBuff(plugin, "papersdelight:nourishment_effect", FoodBuffFunction.Kind.NOURISHMENT);
-        registerBuff(plugin, "papersdelight:comfort_effect", FoodBuffFunction.Kind.COMFORT);
+        registerBuff(plugin, OtherDelightIds.NOURISHMENT_EFFECT, FoodBuffFunction.Kind.NOURISHMENT);
+        registerBuff(plugin, OtherDelightIds.COMFORT_EFFECT, FoodBuffFunction.Kind.COMFORT);
         registerExtendedMechanics(plugin);
     }
 
@@ -55,7 +56,7 @@ public final class PapersBehaviorAliases {
         var blocks = com.huidu.farmersdelight.block.behavior.CompatibilityMechanicFactories.blockFactories(plugin);
         var items = com.huidu.farmersdelight.block.behavior.CompatibilityMechanicFactories.itemFactories(
                 plugin == null ? () -> null : plugin::getSkewerCookingService);
-        for (String namespace : List.of("farmersdelight", "papersdelight")) {
+        for (String namespace : List.of("farmersdelight", OtherDelightIds.NAMESPACE)) {
             blocks.forEach((suffix, factory) -> {
                 Key id = Key.of(namespace + ":" + suffix);
                 if (BuiltInRegistries.BLOCK_BEHAVIOR_TYPE.getValue(id) == null) BlockBehaviors.register(id, factory);
@@ -110,5 +111,5 @@ public final class PapersBehaviorAliases {
         return section == null ? ConfigSection.ofRoot(new LinkedHashMap<>()) : section.copy();
     }
 
-    private PapersBehaviorAliases() { }
+    private OtherDelightBehaviorAliases() { }
 }

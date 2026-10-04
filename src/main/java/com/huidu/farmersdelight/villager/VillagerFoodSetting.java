@@ -1,5 +1,6 @@
 package com.huidu.farmersdelight.villager;
 
+import com.huidu.farmersdelight.compat.OtherDelightIds;
 import net.momirealms.craftengine.core.item.setting.CustomItemSettingType;
 import net.momirealms.craftengine.core.item.setting.ItemSettings;
 import net.momirealms.craftengine.core.item.setting.ItemSettingsModifier;
@@ -15,7 +16,7 @@ public final class VillagerFoodSetting {
     private VillagerFoodSetting() { }
 
     public static void register() {
-        for (String namespace : java.util.List.of("farmersdelight", "papersdelight")) {
+        for (String namespace : java.util.List.of("farmersdelight", OtherDelightIds.NAMESPACE)) {
             Key id = Key.of(namespace + ":villager_food_point");
             if (BuiltInRegistries.ITEM_SETTINGS_TYPE.getValue(id) == null) ItemSettingsModifiers.register(id, VillagerFoodSetting::modifier);
         }

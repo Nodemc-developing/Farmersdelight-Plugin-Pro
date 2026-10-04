@@ -1,5 +1,6 @@
 package com.huidu.farmersdelight.fluid;
 
+import com.huidu.farmersdelight.compat.OtherDelightIds;
 import com.huidu.farmersdelight.recipe.AdvancedRecipeTags;
 import com.huidu.farmersdelight.recipe.RecipeIngredient;
 import com.huidu.farmersdelight.recipe.RecipeItemCodec;
@@ -143,7 +144,7 @@ public final class FluidCoreBridge {
         String normalized = key.toLowerCase(java.util.Locale.ROOT);
         if (normalized.equals("fluidcore") || normalized.startsWith("fluidcore:")) return false;
         return normalized.equals("libuid") || normalized.startsWith("libuid:")
-                || normalized.equals("papersdelight") || normalized.startsWith("papersdelight:")
+                || normalized.equals(OtherDelightIds.NAMESPACE) || normalized.startsWith(OtherDelightIds.NAMESPACE_PREFIX)
                 || normalized.startsWith("jug_")
                 || normalized.contains("fluid") || normalized.contains("liquid")
                 || normalized.contains("jug_data") || normalized.contains("tank_data");

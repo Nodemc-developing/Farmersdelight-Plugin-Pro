@@ -1,5 +1,6 @@
 package com.huidu.farmersdelight.fluid;
 
+import com.huidu.farmersdelight.compat.OtherDelightIds;
 import net.momirealms.craftengine.core.pack.CachedConfigSection;
 import net.momirealms.craftengine.core.plugin.config.ConfigSection;
 import net.momirealms.craftengine.core.util.Key;
@@ -21,7 +22,7 @@ public final class FluidContentFormat {
             Map.entry("fluid-item-prefix", "farmersdelight:jug_fluid_"));
     static Map<String, Object> menuDefaults() { return MENU_DEFAULTS; }
     public static CachedConfigSection transform(String parserType, CachedConfigSection source) {
-        if (!source.config().path().split("#", 2)[0].equals("items") || !PapersFluidAliases.ownsJug()) return source;
+        if (!source.config().path().split("#", 2)[0].equals("items") || !OtherDelightFluidAliases.ownsJug()) return source;
         Map<String, Object> definitions = new LinkedHashMap<>();
         Map<String, Object> visuals = new LinkedHashMap<>();
         source.config().values().forEach((id, value) -> {
@@ -66,7 +67,7 @@ public final class FluidContentFormat {
     }
     private static Map<String, Object> jugItem(Object value) {
         if (value instanceof List<?> list) { for (Object entry : list) { var item = jugItem(entry); if (item != null) return item; } return null; }
-        if (value instanceof Map<?, ?> map && "papersdelight:jug_item".equals(map.get("type"))) return mutable(value);
+        if (value instanceof Map<?, ?> map && OtherDelightIds.JUG_ITEM.equals(map.get("type"))) return mutable(value);
         return null;
     }
     private static boolean booleanValue(Object value, String field) {
@@ -96,7 +97,7 @@ public final class FluidContentFormat {
         if (!(value instanceof Map<?, ?> map) || !"block_item".equals(map.get("type"))) return false;
         Object block = map.get("block");
         return block instanceof Map<?, ?> definition && definition.get("behavior") instanceof Map<?, ?> behavior
-                && "papersdelight:jug".equals(behavior.get("type"));
+                && OtherDelightIds.JUG.equals(behavior.get("type"));
     }
     private static boolean hasUnresolvedTemplate(Object value) {
         if (value instanceof String text) return text.contains("${") || text.contains("$()");
@@ -111,11 +112,11 @@ public final class FluidContentFormat {
     private static Object behavior(String id, Object raw, long capacity, String prefix) {
         if (!(raw instanceof Map<?, ?>)) return raw;
         Map<String, Object> behavior = mutable(raw);
-        if ("papersdelight:jug_item".equals(behavior.get("type")) && prefix != null) { behavior.put("item-model", prefix); return behavior; }
+        if (OtherDelightIds.JUG_ITEM.equals(behavior.get("type")) && prefix != null) { behavior.put("item-model", prefix); return behavior; }
         if (!"block_item".equals(behavior.get("type"))) return behavior;
         Map<String, Object> block = map(behavior.get("block"));
         Map<String, Object> jug = map(block.get("behavior"));
-        if (!"papersdelight:jug".equals(jug.get("type"))) return behavior;
+        if (!OtherDelightIds.JUG.equals(jug.get("type"))) return behavior;
         jug.putIfAbsent("capacity", capacity);
         Object configuredMenu = jug.get("menu");
         if (jug.containsKey("menu") && !(configuredMenu instanceof Map<?, ?>))

@@ -150,7 +150,7 @@ class AddonPackSectionsTest {
         assertTrue(parser.sections("cooking_recipes").isEmpty());
     }
 
-    @Test void papersRootsKeepTypedBodiesAndLiteralDottedRecipeIds() {
+    @Test void otherDelightRootsKeepTypedBodiesAndLiteralDottedRecipeIds() {
         AddonPackSections parser = AddonPackSections.createForTesting(ROOTS);
         feed(parser, pack("addon", "addon"), "papersdelight_recipes#addon", Map.of("addon:meal.v2", Map.of("type", "cooking")));
         parser.loadAll();

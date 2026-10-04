@@ -93,7 +93,7 @@ class RecipeSchemaAdapterTest {
         assertEquals(1.1, roundTrip.getDouble("sound-pitch"));
     }
 
-    @Test void explicitPapersContainerIsPreserved() throws Exception {
+    @Test void explicitOtherDelightContainerIsPreserved() throws Exception {
         ConfigurationSection parsed = RecipeSchemaAdapter.normalizePot(yaml("type: cooking\ncontainer: minecraft:bowl\nresult: minecraft:mushroom_stew\n"));
         assertEquals("minecraft:bowl", parsed.get("container"));
         assertEquals(200, parsed.getInt("cook-time"));
@@ -109,7 +109,7 @@ class RecipeSchemaAdapterTest {
     }
 
     @Test void infoIsAnItemDescriptionWithLiteralMiniMessageText() throws Exception {
-        var info = SpecialRecipeLoader.parsePapersInfo("example:notes", yaml("""
+        var info = SpecialRecipeLoader.parseOtherDelightInfo("example:notes", yaml("""
                 type: info
                 item: minecraft:carrot
                 description: ['<green>Notes', '<lang:item.minecraft.carrot>']
@@ -118,6 +118,6 @@ class RecipeSchemaAdapterTest {
         assertEquals(List.of("<green>Notes", "<lang:item.minecraft.carrot>"), info.descriptionKeys());
         assertEquals("papers_info", info.displayType());
         assertTrue(info.inputSlots().isEmpty());
-        assertThrows(IllegalArgumentException.class, () -> SpecialRecipeLoader.parsePapersInfo("example:bad", yaml("description: [hi]\n")));
+        assertThrows(IllegalArgumentException.class, () -> SpecialRecipeLoader.parseOtherDelightInfo("example:bad", yaml("description: [hi]\n")));
     }
 }

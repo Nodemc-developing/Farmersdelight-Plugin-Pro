@@ -3,9 +3,9 @@ package com.huidu.farmersdelight.fluid;
 import org.bukkit.Bukkit;
 
 /** Keeps optional FluidCore types out of the ordinary cooking plugin's loading path. */
-public final class PapersFluidAliases {
+public final class OtherDelightFluidAliases {
     private static boolean ownsJug;
-    private PapersFluidAliases() {}
+    private OtherDelightFluidAliases() {}
     static boolean ownsJug() { return ownsJug; }
     public static void register() {
         if (Bukkit.getPluginManager().getPlugin("FluidCore") == null) {

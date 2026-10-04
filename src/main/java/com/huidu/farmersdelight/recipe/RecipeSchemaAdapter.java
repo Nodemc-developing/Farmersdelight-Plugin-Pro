@@ -12,23 +12,23 @@ import java.util.Map;
 public final class RecipeSchemaAdapter {
     private RecipeSchemaAdapter() { }
 
-    private static boolean papersType(Object type, String expected) {
+    private static boolean otherDelightType(Object type, String expected) {
         return type instanceof String value && (value.equals(expected) || value.endsWith(":" + expected));
     }
 
     public static ConfigurationSection normalizePot(ConfigurationSection source) {
         Map<String, Object> body = values(source);
-        boolean papers = papersType(body.get("type"), "cooking");
+        boolean otherDelight = otherDelightType(body.get("type"), "cooking");
         alias(body, "cook-time", "time", "cooking_time", "cooking-time");
         alias(body, "result-count", "result_count");
         alias(body, "match-mode", "match_mode");
         alias(body, "use-equivalent-foods", "use_equivalent_foods");
         alias(body, "use-seasonings", "use_seasonings");
         alias(body, "minimum-score", "minimum_score");
-        if (papers && !body.containsKey("container") && !Boolean.TRUE.equals(body.get("infer_container"))) {
+        if (otherDelight && !body.containsKey("container") && !Boolean.TRUE.equals(body.get("infer_container"))) {
             body.put("container", "none");
         }
-        if (papers && !body.containsKey("cook-time")) body.put("cook-time", 200);
+        if (otherDelight && !body.containsKey("cook-time")) body.put("cook-time", 200);
         if (body.containsKey("result")) body.put("result", item(body.get("result")));
         return section(body);
     }
@@ -39,9 +39,9 @@ public final class RecipeSchemaAdapter {
 
     public static ConfigurationSection normalizeBoard(ConfigurationSection source, List<String> defaultTools) {
         Map<String, Object> body = values(source);
-        boolean papers = papersType(body.get("type"), "cutting");
+        boolean otherDelight = otherDelightType(body.get("type"), "cutting");
         alias(body, "input", "ingredient");
-        if (papers && (!body.containsKey("tools") || body.get("tools") instanceof List<?> tools && tools.isEmpty())) {
+        if (otherDelight && (!body.containsKey("tools") || body.get("tools") instanceof List<?> tools && tools.isEmpty())) {
             body.put("tools", List.copyOf(defaultTools));
         }
         Object rawResults = body.get("results");
@@ -70,9 +70,9 @@ public final class RecipeSchemaAdapter {
         return section(body);
     }
 
-    public static Map<String, Object> formatPot(Map<String, Object> source, boolean papers) {
+    public static Map<String, Object> formatPot(Map<String, Object> source, boolean otherDelight) {
         Map<String, Object> body = map(source);
-        if (!papers) return body;
+        if (!otherDelight) return body;
         body.put("type", "cooking");
         rename(body, "cook-time", "time");
         rename(body, "cooking_time", "time");
@@ -81,11 +81,11 @@ public final class RecipeSchemaAdapter {
         rename(body, "use-equivalent-foods", "use_equivalent_foods");
         rename(body, "use-seasonings", "use_seasonings");
         rename(body, "minimum-score", "minimum_score");
-        // Legacy recipes without a container used result-based inference; Papers recipes do not.
+        // Legacy recipes without a container used result-based inference; OtherDelight recipes do not.
         if (!body.containsKey("container")) body.put("infer_container", true);
         Object count = body.remove("result-count");
         if (count == null) count = body.remove("result_count");
-        Object result = papersItem(body.get("result"));
+        Object result = otherDelightItem(body.get("result"));
         if (count != null) {
             Map<String, Object> output = result instanceof Map<?, ?> raw ? map(raw) : new LinkedHashMap<>();
             if (!(result instanceof Map<?, ?>)) output.put("id", result);
@@ -97,15 +97,15 @@ public final class RecipeSchemaAdapter {
         return typeFirst(body);
     }
 
-    public static Map<String, Object> formatBoard(Map<String, Object> source, boolean papers) {
+    public static Map<String, Object> formatBoard(Map<String, Object> source, boolean otherDelight) {
         Map<String, Object> body = map(source);
-        if (!papers) return body;
+        if (!otherDelight) return body;
         body.put("type", "cutting");
         rename(body, "input", "ingredient");
-        if (body.containsKey("ingredient")) body.put("ingredient", papersIngredient(body.get("ingredient")));
+        if (body.containsKey("ingredient")) body.put("ingredient", otherDelightIngredient(body.get("ingredient")));
         Object results = body.get("results");
         if (results instanceof List<?> list) {
-            body.put("results", list.stream().map(RecipeSchemaAdapter::papersItem).toList());
+            body.put("results", list.stream().map(RecipeSchemaAdapter::otherDelightItem).toList());
         }
         Object volume = body.remove("sound-volume");
         if (volume == null) volume = body.remove("sound_volume");
@@ -122,14 +122,14 @@ public final class RecipeSchemaAdapter {
     }
 
     private static void formatIngredients(Map<String, Object> body, String key) {
-        if (body.get(key) instanceof List<?> values) body.put(key, values.stream().map(RecipeSchemaAdapter::papersIngredient).toList());
+        if (body.get(key) instanceof List<?> values) body.put(key, values.stream().map(RecipeSchemaAdapter::otherDelightIngredient).toList());
     }
 
-    private static Object papersIngredient(Object value) {
+    private static Object otherDelightIngredient(Object value) {
         if (value instanceof Map<?, ?> raw) {
             Map<String, Object> result = map(raw);
             Object choice = result.remove("choice");
-            if (choice instanceof List<?> values) result.put("items", values.stream().map(RecipeSchemaAdapter::papersIngredient).toList());
+            if (choice instanceof List<?> values) result.put("items", values.stream().map(RecipeSchemaAdapter::otherDelightIngredient).toList());
             return result;
         }
         if (value instanceof String text && text.contains("|")) {
@@ -155,7 +155,7 @@ public final class RecipeSchemaAdapter {
         return result;
     }
 
-    private static Object papersItem(Object value) {
+    private static Object otherDelightItem(Object value) {
         if (!(value instanceof Map<?, ?> raw)) return value;
         Map<String, Object> result = map(raw);
         rename(result, "item", "id");

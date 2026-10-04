@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Map;
 
 /** Exact on-disk location of a recipe, independent of Bukkit's dotted path syntax. */
-public record RecipeSource(Path file, List<String> keys, boolean papersFormat, boolean existingNode) {
-    public RecipeSource(Path file, List<String> keys, boolean papersFormat) {
-        this(file, keys, papersFormat, false);
+public record RecipeSource(Path file, List<String> keys, boolean otherDelightFormat, boolean existingNode) {
+    public RecipeSource(Path file, List<String> keys, boolean otherDelightFormat) {
+        this(file, keys, otherDelightFormat, false);
     }
     public RecipeSource {
         file = file.toAbsolutePath().normalize();

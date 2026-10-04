@@ -1,5 +1,6 @@
 package com.huidu.farmersdelight.pack;
 
+import com.huidu.farmersdelight.compat.OtherDelightIds;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -20,7 +21,7 @@ public enum PackSection {
     /** Cutting-board recipes; read by CuttingBoardRecipeManager. */
     CUTTING_BOARD("cutting_recipes", "cutting_board_recipes"),
     /** Typed recipe definitions selected by their type field. */
-    PAPERS_RECIPES("papersdelight_recipes", "papersdelight_recipes"),
+    OTHER_DELIGHT_RECIPES(OtherDelightIds.RECIPE_SECTION, OtherDelightIds.RECIPE_SECTION),
     /** Named recipe groups for additional cooking-pot behaviors. */
     CUSTOM_COOKING_POT("custom_cooking_pot_recipes", "custom_cooking_pot_recipes"),
     /** Explicit ingredient groups used by fuzzy and advanced matching. */

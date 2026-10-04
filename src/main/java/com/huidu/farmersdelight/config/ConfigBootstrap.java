@@ -164,7 +164,7 @@ public final class ConfigBootstrap {
     /** Validates only keys present in the operator file against the bundled value type. */
     public void validateConfigTypes() {
         validateFile("config.yml", plugin.getSourceConfig(), readBundledYaml("config.yml"),
-                PapersDelightConfigFormat.canonicalRegistrySections(CONFIG_POLICY.registrySections()));
+                OtherDelightConfigFormat.canonicalRegistrySections(CONFIG_POLICY.registrySections()));
         validateExternalTypes(WORLD_DATA_FILE, WORLD_DATA_REGISTRY_SECTIONS);
         validateExternalTypes(DROPS_FILE, DROPS_REGISTRY_SECTIONS);
         validateExternalTypes(DISPLAY_OVERRIDES_FILE, DISPLAY_OVERRIDES_REGISTRY_SECTIONS);
@@ -274,13 +274,13 @@ public final class ConfigBootstrap {
     }
 
     public void migrateConfigKeys() {
-        if (!PapersDelightConfigFormat.mayMigrate(plugin.getSourceConfig())) {
+        if (!OtherDelightConfigFormat.mayMigrate(plugin.getSourceConfig())) {
             plugin.getLogger().warning("config.yml declares a newer config-version; leaving it untouched.");
             return;
         }
-        boolean foreign = PapersDelightConfigFormat.isForeignConfiguration(plugin.getSourceConfig());
+        boolean foreign = OtherDelightConfigFormat.isForeignConfiguration(plugin.getSourceConfig());
         int previousVersion = ConfigFileUpdater.deployedVersion(plugin.getSourceConfig());
-        if (foreign || previousVersion < PapersDelightConfigFormat.VERSION) {
+        if (foreign || previousVersion < OtherDelightConfigFormat.VERSION) {
             backupQuietly(plugin.getDataFolder().toPath().resolve("config.yml"));
         }
         boolean changed = migrateLegacyWorldData() | migrateLegacyEnchantmentGroups()
@@ -293,17 +293,17 @@ public final class ConfigBootstrap {
         }
         changed |= migrateLegacyDrops();
         changed |= removeRetiredConfigKeys();
-        changed |= PapersDelightConfigFormat.normalize(plugin.getSourceConfig());
-        if (foreign || previousVersion != PapersDelightConfigFormat.VERSION
-                || !PapersDelightConfigFormat.FORMAT.equals(plugin.getSourceConfig().getString(
-                        PapersDelightConfigFormat.FORMAT_KEY))) {
-            plugin.getSourceConfig().set(ConfigFileUpdater.CONFIG_VERSION_KEY, PapersDelightConfigFormat.VERSION);
-            plugin.getSourceConfig().set(PapersDelightConfigFormat.FORMAT_KEY, PapersDelightConfigFormat.FORMAT);
+        changed |= OtherDelightConfigFormat.normalize(plugin.getSourceConfig());
+        if (foreign || previousVersion != OtherDelightConfigFormat.VERSION
+                || !OtherDelightConfigFormat.FORMAT.equals(plugin.getSourceConfig().getString(
+                        OtherDelightConfigFormat.FORMAT_KEY))) {
+            plugin.getSourceConfig().set(ConfigFileUpdater.CONFIG_VERSION_KEY, OtherDelightConfigFormat.VERSION);
+            plugin.getSourceConfig().set(OtherDelightConfigFormat.FORMAT_KEY, OtherDelightConfigFormat.FORMAT);
             changed = true;
         }
         int addedKeys = mergeMissingConfigKeys();
         if (changed || addedKeys > 0) {
-            if (!foreign && previousVersion >= PapersDelightConfigFormat.VERSION) {
+            if (!foreign && previousVersion >= OtherDelightConfigFormat.VERSION) {
                 backupQuietly(plugin.getDataFolder().toPath().resolve("config.yml"));
             }
             ConfigFileUpdater.tidy(plugin.getSourceConfig());
@@ -318,7 +318,7 @@ public final class ConfigBootstrap {
             plugin.reloadConfig();
         }
         plugin.invalidateConfigView();
-        for (String option : PapersDelightConfigFormat.unsupportedOptions(plugin.getSourceConfig())) {
+        for (String option : OtherDelightConfigFormat.unsupportedOptions(plugin.getSourceConfig())) {
             I18n.logWarning("plugin.config_option_unsupported", "file", "config.yml", "path", option);
         }
         mergeMissingGuiKeys();
@@ -491,7 +491,7 @@ public final class ConfigBootstrap {
         }
         try {
             int added = ConfigFileUpdater.copyMissingKeys(bundled, plugin.getSourceConfig(),
-                    PapersDelightConfigFormat.canonicalRegistrySections(CONFIG_POLICY.registrySections()));
+                    OtherDelightConfigFormat.canonicalRegistrySections(CONFIG_POLICY.registrySections()));
             if (added > 0) {
                 backupQuietly(plugin.getDataFolder().toPath().resolve("config.yml"));
                 I18n.logInfo("plugin.config_keys_added", "file", "config.yml", "count", added);

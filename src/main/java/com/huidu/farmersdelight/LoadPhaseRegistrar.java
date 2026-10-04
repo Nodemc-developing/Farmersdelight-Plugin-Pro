@@ -43,8 +43,8 @@ final class LoadPhaseRegistrar {
         BehaviorRegistrar.registerFunctions(plugin);
         BehaviorRegistrar.registerConditions();
         BehaviorRegistrar.registerLootFunctions();
-        com.huidu.farmersdelight.registry.PapersBehaviorAliases.register(plugin);
-        com.huidu.farmersdelight.fluid.PapersFluidAliases.register();
+        com.huidu.farmersdelight.registry.OtherDelightBehaviorAliases.register(plugin);
+        com.huidu.farmersdelight.fluid.OtherDelightFluidAliases.register();
         fluidFormatRegistration = com.huidu.farmersdelight.pack.compat.ExternalContentCoordinator.registerTransformer(
                 com.huidu.farmersdelight.fluid.FluidContentFormat::transform);
         // Register the farmersdelight:sword settings modifier before CraftEngine parses item YAML files.

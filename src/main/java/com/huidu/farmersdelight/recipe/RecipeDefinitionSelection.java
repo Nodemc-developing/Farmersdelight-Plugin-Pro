@@ -1,5 +1,6 @@
 package com.huidu.farmersdelight.recipe;
 
+import com.huidu.farmersdelight.compat.OtherDelightIds;
 import com.huidu.farmersdelight.pack.PackSection;
 import com.huidu.farmersdelight.pack.compat.ExternalContentCoordinator;
 import org.bukkit.configuration.ConfigurationSection;
@@ -60,7 +61,7 @@ final class RecipeDefinitionSelection {
     }
 
     private static String category(String root, ConfigurationSection body) {
-        if (root.equals("papersdelight_recipes")) {
+        if (root.equals(OtherDelightIds.RECIPE_SECTION)) {
             String type = body.getString("type", "");
             int separator = type.indexOf(':');
             return separator < 0 ? type : type.substring(separator + 1);

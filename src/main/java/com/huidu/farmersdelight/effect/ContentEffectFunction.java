@@ -1,5 +1,6 @@
 package com.huidu.farmersdelight.effect;
 
+import com.huidu.farmersdelight.compat.OtherDelightIds;
 import com.huidu.farmersdelight.FarmersDelightPlugin;
 import com.huidu.farmersdelight.api.advancement.FarmersDelightAdvancements;
 import com.huidu.farmersdelight.api.buff.CustomBuff;
@@ -156,8 +157,8 @@ public final class ContentEffectFunction extends AbstractConditionalFunction<Con
 
     static String canonicalEffectId(String id) {
         return switch (id) {
-            case "nourishment", "nourishment_effect", "farmersdelight:nourishment", "farmersdelight:nourishment_effect", "papersdelight:nourishment", "papersdelight:nourishment_effect" -> "farmersdelight:nourishment";
-            case "comfort", "comfort_effect", "farmersdelight:comfort", "farmersdelight:comfort_effect", "papersdelight:comfort", "papersdelight:comfort_effect" -> "farmersdelight:comfort";
+            case "nourishment", "nourishment_effect", "farmersdelight:nourishment", "farmersdelight:nourishment_effect", OtherDelightIds.NOURISHMENT, OtherDelightIds.NOURISHMENT_EFFECT -> "farmersdelight:nourishment";
+            case "comfort", "comfort_effect", "farmersdelight:comfort", "farmersdelight:comfort_effect", OtherDelightIds.COMFORT, OtherDelightIds.COMFORT_EFFECT -> "farmersdelight:comfort";
             default -> id.indexOf(':') < 0 ? "minecraft:" + id : id;
         };
     }

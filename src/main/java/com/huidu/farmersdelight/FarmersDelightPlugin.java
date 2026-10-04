@@ -999,7 +999,7 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
             synchronized (this) {
                 source = getSourceConfig();
                 if (runtimeConfigView == null || runtimeConfigSource != source) {
-                    runtimeConfigView = com.huidu.farmersdelight.config.PapersDelightConfigFormat.runtimeView(source);
+                    runtimeConfigView = com.huidu.farmersdelight.config.OtherDelightConfigFormat.runtimeView(source);
                     runtimeConfigSource = source;
                 }
                 view = runtimeConfigView;

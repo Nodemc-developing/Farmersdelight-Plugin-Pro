@@ -1,5 +1,6 @@
 package com.huidu.farmersdelight.recipe;
 
+import com.huidu.farmersdelight.compat.OtherDelightIds;
 import com.huidu.farmersdelight.FarmersDelightPlugin;
 import com.huidu.farmersdelight.api.config.ConfigSectionReader;
 import com.huidu.farmersdelight.i18n.I18n;
@@ -216,7 +217,7 @@ public class CookingPotRecipeManager {
                         CookingPotRecipe recipe = parsing.parse(packSection.source(), recipeId, section, () -> parseRecipe(recipeId, section, 6));
                         newRecipes.put(recipeId, recipe);
                         if (packSection.file() != null) sources.put(recipeId, new RecipeSource(packSection.file(),
-                                List.of(packSection.sectionKey(), recipeId), packSection.sectionKey().split("#", 2)[0].equals("papersdelight_recipes"), true));
+                                List.of(packSection.sectionKey(), recipeId), packSection.sectionKey().split("#", 2)[0].equals(OtherDelightIds.RECIPE_SECTION), true));
                         packIds.add(recipeId);
                         indexDefaultRecipe(newIngredientToRecipes, recipeId, recipe);
                         indexContainer(newValidContainerKeys, recipe);

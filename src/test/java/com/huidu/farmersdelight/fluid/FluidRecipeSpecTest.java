@@ -10,7 +10,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FluidRecipeSpecTest {
-    @Test void papersFillingFieldsAndMilliBucketUnitAreKept() throws Exception {
+    @Test void otherDelightFillingFieldsAndMilliBucketUnitAreKept() throws Exception {
         YamlConfiguration yaml = new YamlConfiguration();
         yaml.loadFromString("""
                 recipe:
@@ -31,7 +31,7 @@ class FluidRecipeSpecTest {
         assertInstanceOf(RecipeIngredient.Item.class, recipe.ingredient());
     }
 
-    @Test void papersEmptyingUsesItsOwnInputAndOutputFieldNames() {
+    @Test void otherDelightEmptyingUsesItsOwnInputAndOutputFieldNames() {
         FluidRecipeSpec recipe = FluidRecipeSpec.parse("example:bucket", Map.of("type", "fluid_emptying",
                 "fluid", "minecraft:water", "amount", 1000, "filled_input", "minecraft:water_bucket",
                 "empty_result", "minecraft:bucket"));

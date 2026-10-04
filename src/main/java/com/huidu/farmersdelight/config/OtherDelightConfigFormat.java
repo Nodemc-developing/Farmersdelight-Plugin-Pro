@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 /** Public configuration format and the cached compatibility snapshot used by existing consumers. */
-public final class PapersDelightConfigFormat {
+public final class OtherDelightConfigFormat {
     public static final int VERSION = 3;
     public static final String FORMAT_KEY = "config_format";
     public static final String FORMAT = "Farmersdelight-Plugin-Pro";
@@ -85,7 +85,7 @@ public final class PapersDelightConfigFormat {
         }
     }
 
-    private PapersDelightConfigFormat() { }
+    private OtherDelightConfigFormat() { }
 
     /** Only an unmistakable foreign file has its unrelated generation counter ignored. */
     public static boolean isForeignConfiguration(ConfigurationSection source) {

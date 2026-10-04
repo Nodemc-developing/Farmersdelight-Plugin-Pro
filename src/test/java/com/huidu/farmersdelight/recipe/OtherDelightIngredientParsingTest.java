@@ -9,7 +9,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class PapersIngredientParsingTest {
+class OtherDelightIngredientParsingTest {
     @Test void nestedItemsAndLegacyChoiceAreOneAlternativeSetWithSnapshotsIntact() {
         var parsed = RecipeParsingSupport.parseIngredientValue(Map.of("items", List.of(
                 "minecraft:carrot", Map.of("items", List.of("advtag:example:vegetables", "minecraft:carrot")),
@@ -22,7 +22,7 @@ class PapersIngredientParsingTest {
         assertEquals(parsed, RecipeParsingSupport.parseIngredientValue(RecipeSerializer.serializeIngredientValue(parsed)));
     }
 
-    @Test void configurationSectionMapsAcceptPapersAlternatives() {
+    @Test void configurationSectionMapsAcceptOtherDelightAlternatives() {
         var yaml = new YamlConfiguration();
         yaml.set("ingredient.items", List.of("minecraft:carrot", "minecraft:potato"));
         var parsed = RecipeParsingSupport.parseIngredientValue(yaml.getConfigurationSection("ingredient"));

@@ -36,9 +36,9 @@ final class SpecialRecipeRenderer {
             icon = new ItemStack(Material.KNOWLEDGE_BOOK);
         }
         ItemMeta meta = icon.getItemMeta();
-        boolean papersInfo = SpecialRecipeInfo.DISPLAY_PAPERS_INFO.equals(info.displayType());
-        if (!papersInfo) meta.displayName(translatable(info.titleKey(), NamedTextColor.GOLD));
-        List<Component> lore = new ArrayList<>(papersInfo
+        boolean otherDelightInfo = SpecialRecipeInfo.DISPLAY_OTHER_DELIGHT_INFO.equals(info.displayType());
+        if (!otherDelightInfo) meta.displayName(translatable(info.titleKey(), NamedTextColor.GOLD));
+        List<Component> lore = new ArrayList<>(otherDelightInfo
                 ? info.descriptionKeys().stream().map(line -> net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(line)
                         .decoration(TextDecoration.ITALIC, false)).toList()
                 : translatableKeys(info.descriptionKeys(), NamedTextColor.GRAY));
@@ -54,7 +54,7 @@ final class SpecialRecipeRenderer {
 
     boolean isListOnlySpecial(SpecialRecipeInfo info) {
         return info != null && (SpecialRecipeInfo.DISPLAY_ITEM_DESCRIPTION.equalsIgnoreCase(info.displayType())
-                || SpecialRecipeInfo.DISPLAY_PAPERS_INFO.equalsIgnoreCase(info.displayType()));
+                || SpecialRecipeInfo.DISPLAY_OTHER_DELIGHT_INFO.equalsIgnoreCase(info.displayType()));
     }
 
     // Shared translatable-component builders: every condition/description label disables italics the same

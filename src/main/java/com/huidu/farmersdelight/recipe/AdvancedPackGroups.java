@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 
 /** Expands explicit cross-pack advanced groups once at reload, before recipe matching indexes are built. */
 public final class AdvancedPackGroups {
-    private static final String SOURCE = "papersdelight:advanced_tags";
+    private static final String SOURCE = "otherdelight:advanced_tags";
     private AdvancedPackGroups() { }
 
     public static void load(FarmersDelightPlugin plugin) {

@@ -1,5 +1,6 @@
 package com.huidu.farmersdelight.gui.editor;
 
+import com.huidu.farmersdelight.compat.OtherDelightIds;
 import com.huidu.farmersdelight.api.config.ConfigFileUpdater;
 import com.huidu.farmersdelight.config.YamlFileTransactions;
 import com.huidu.farmersdelight.recipe.RecipeFileLoader;
@@ -81,7 +82,7 @@ public final class RecipeEditorStore {
             }
         }
         RecipeSource target = group == null || group.isBlank()
-                ? new RecipeSource(RecipePackFiles.file(plugin, COOKING_POT_FILE), List.of("papersdelight_recipes", recipe.getId()), true)
+                ? new RecipeSource(RecipePackFiles.file(plugin, COOKING_POT_FILE), List.of(OtherDelightIds.RECIPE_SECTION, recipe.getId()), true)
                 : new RecipeSource(RecipePackFiles.file(plugin, COOKING_POT_FILE), List.of(CUSTOM_COOKING_POT_ROOT, group, recipe.getId()), true);
         return recipeEdit(target, body, true);
     }
@@ -141,7 +142,7 @@ public final class RecipeEditorStore {
                 setExternalOverride(yaml, "cutting_board", id, true);
             });
         }
-        return recipeEdit(new RecipeSource(RecipePackFiles.file(plugin, CUTTING_BOARD_FILE), List.of("papersdelight_recipes", id), true), body, false);
+        return recipeEdit(new RecipeSource(RecipePackFiles.file(plugin, CUTTING_BOARD_FILE), List.of(OtherDelightIds.RECIPE_SECTION, id), true), body, false);
     }
 
     public boolean deleteCuttingBoardRecipe(String recipeId) {
@@ -175,8 +176,8 @@ public final class RecipeEditorStore {
 
     private Edit recipeEdit(RecipeSource source, Map<String, Object> body, boolean pot) {
         Map<String, Object> formatted = body == null ? null : pot
-                ? RecipeSchemaAdapter.formatPot(body, source.papersFormat())
-                : RecipeSchemaAdapter.formatBoard(body, source.papersFormat());
+                ? RecipeSchemaAdapter.formatPot(body, source.otherDelightFormat())
+                : RecipeSchemaAdapter.formatBoard(body, source.otherDelightFormat());
         java.nio.file.Path defaultFile = formatted == null ? RecipePackFiles.file(plugin, pot ? COOKING_POT_FILE : CUTTING_BOARD_FILE) : null;
         return new Edit(source.file().toFile(), null, yaml -> {
             if (formatted == null) { deleteRecipeSource(yaml, source, pot, defaultFile); return; }

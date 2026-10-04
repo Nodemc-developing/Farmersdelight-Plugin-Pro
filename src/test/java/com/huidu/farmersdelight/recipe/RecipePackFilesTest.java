@@ -97,7 +97,7 @@ class RecipePackFilesTest {
         assertEquals(file, cooking.getFirst().file());
         var cutting = RecipePackFiles.sections(Map.of(file, yaml), null, PackSection.CUTTING_BOARD);
         assertEquals(List.of("addon:slice"), List.copyOf(cutting.getFirst().yaml().getConfigurationSection("cutting_board_recipes").getKeys(false)));
-        assertEquals(3, RecipePackFiles.sections(Map.of(file, yaml), null, PackSection.PAPERS_RECIPES)
+        assertEquals(3, RecipePackFiles.sections(Map.of(file, yaml), null, PackSection.OTHER_DELIGHT_RECIPES)
                 .getFirst().yaml().getConfigurationSection("papersdelight_recipes").getKeys(false).size());
     }
 
@@ -115,7 +115,7 @@ class RecipePackFilesTest {
         Path configuration = directory.resolve("configuration");
         Path subpack = configuration.resolve("enabled-subpack");
         var document = PlainYamlDocuments.parse("papersdelight_recipes#editor: {meal: {type: cooking}}\n", true);
-        var sections = RecipePackFiles.sections(Map.of(subpack.resolve("recipes.yml"), document), null, PackSection.PAPERS_RECIPES,
+        var sections = RecipePackFiles.sections(Map.of(subpack.resolve("recipes.yml"), document), null, PackSection.OTHER_DELIGHT_RECIPES,
                 Map.of(configuration, "outer_pack", subpack, "actual_pack"));
         assertEquals("actual_pack", sections.getFirst().namespace());
         assertEquals("papersdelight_recipes#editor", sections.getFirst().sectionKey());
@@ -130,7 +130,7 @@ class RecipePackFilesTest {
 
     @Test void preparedReloadRetainsCeExpandedFactoriesWithoutInventingEditableNodes() throws Exception {
         Path file = directory.resolve("configuration/generated.yml");
-        var generated = new com.huidu.farmersdelight.pack.PackSections.Section(PackSection.PAPERS_RECIPES,
+        var generated = new com.huidu.farmersdelight.pack.PackSections.Section(PackSection.OTHER_DELIGHT_RECIPES,
                 "addon/configuration/generated.yml", "addon", PlainYamlDocuments.parse(
                 "papersdelight_recipes: {addon:soup: {type: cooking, result: minecraft:carrot}}\n", true), file,
                 "papersdelight_recipes", true);
@@ -142,7 +142,7 @@ class RecipePackFilesTest {
         assertTrue(RecipePackFiles.preserveGenerated(List.of(), List.of(generated), Map.of(file, new YamlConfiguration()), PackSection.COOKING_POT).isEmpty());
     }
 
-    @Test void sharedPapersSnapshotsRetainBadScalarsForOwnershipWhileTypedLoadersFilterThem() throws Exception {
+    @Test void sharedOtherDelightSnapshotsRetainBadScalarsForOwnershipWhileTypedLoadersFilterThem() throws Exception {
         Path file = directory.resolve("mixed.yml");
         var document = PlainYamlDocuments.parse("""
                 papersdelight_recipes#addon:
@@ -150,7 +150,7 @@ class RecipePackFilesTest {
                   addon:broken: [invalid, list]
                   addon:cooked: {type: cooking, result: minecraft:carrot}
                 """, true);
-        var shared = RecipePackFiles.sections(Map.of(file, document), null, PackSection.PAPERS_RECIPES).getFirst();
+        var shared = RecipePackFiles.sections(Map.of(file, document), null, PackSection.OTHER_DELIGHT_RECIPES).getFirst();
         assertEquals("papersdelight_recipes#addon", shared.sectionKey());
         var root = shared.yaml().getConfigurationSection("papersdelight_recipes");
         assertEquals("invalid", root.getString("addon:reserved.v2"));

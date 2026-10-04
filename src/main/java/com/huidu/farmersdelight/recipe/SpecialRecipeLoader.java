@@ -1,5 +1,6 @@
 package com.huidu.farmersdelight.recipe;
 
+import com.huidu.farmersdelight.compat.OtherDelightIds;
 import com.huidu.farmersdelight.FarmersDelightPlugin;
 import com.huidu.farmersdelight.api.config.ConfigSectionReader;
 import com.huidu.farmersdelight.api.recipe.SpecialRecipeInfo;
@@ -28,7 +29,7 @@ public final class SpecialRecipeLoader {
 
     private static final String FILE_NAME = "recipes/special_recipes.yml";
     private static final String ROOT_KEY = "special_recipes";
-    private static final Set<String> SUPPORTED_PAPERS_TYPES = Set.of(
+    private static final Set<String> SUPPORTED_OTHER_DELIGHT_TYPES = Set.of(
             "cooking", "cutting", "fluid_filling", "fluid_emptying", "soaking");
 
     // Cards the CraftEngine pack layer registered, with the exact instance it registered, so a later pass can
@@ -128,8 +129,8 @@ public final class SpecialRecipeLoader {
         for (PackSections.Section section : RecipePackFiles.sections(plugin, PackSection.SPECIAL_RECIPE)) {
             parseInto(current, section.yaml(), section.source());
         }
-        for (PackSections.Section section : RecipePackFiles.sections(plugin, PackSection.PAPERS_RECIPES)) {
-            ConfigurationSection root = section.yaml().getConfigurationSection(PackSection.PAPERS_RECIPES.rootKey());
+        for (PackSections.Section section : RecipePackFiles.sections(plugin, PackSection.OTHER_DELIGHT_RECIPES)) {
+            ConfigurationSection root = section.yaml().getConfigurationSection(PackSection.OTHER_DELIGHT_RECIPES.rootKey());
             if (root == null) continue;
             for (String id : root.getKeys(false)) {
                 ConfigurationSection body = root.getConfigurationSection(id);
@@ -140,13 +141,13 @@ public final class SpecialRecipeLoader {
                 }
                 String type = body.getString("type", "");
                 if ("info".equals(type)) {
-                    try { current.putIfAbsent(id, parsePapersInfo(id, body)); }
+                    try { current.putIfAbsent(id, parseOtherDelightInfo(id, body)); }
                     catch (IllegalArgumentException invalid) {
                         I18n.logWarning("recipe.special_recipe_parse_failed", "id", id,
                                 "error", section.source() + ": " + invalid.getMessage());
                     }
-                } else if (!SUPPORTED_PAPERS_TYPES.contains(type)) {
-                    I18n.logWarning("recipe.papers_unsupported_type", "type", type, "id", id, "file", section.source());
+                } else if (!SUPPORTED_OTHER_DELIGHT_TYPES.contains(type)) {
+                    I18n.logWarning(OtherDelightIds.UNSUPPORTED_RECIPE_MESSAGE, "type", type, "id", id, "file", section.source());
                 }
             }
         }
@@ -195,7 +196,7 @@ public final class SpecialRecipeLoader {
         return RecipeFileLoader.loadRecipeFile(plugin, FILE_NAME);
     }
 
-    public static SpecialRecipeInfo parsePapersInfo(String id, ConfigurationSection section) {
+    public static SpecialRecipeInfo parseOtherDelightInfo(String id, ConfigurationSection section) {
         Object item = section.get("item");
         if (!(item instanceof String text) || text.isBlank()) throw new IllegalArgumentException("info.item must name an item");
         Object description = section.get("description");
@@ -208,7 +209,7 @@ public final class SpecialRecipeLoader {
             }
         }
         return new SpecialRecipeInfo(id, "", text, lines, List.of(), List.of(), false, false, false,
-                List.of(), SpecialRecipeInfo.DISPLAY_PAPERS_INFO);
+                List.of(), SpecialRecipeInfo.DISPLAY_OTHER_DELIGHT_INFO);
     }
 
     private static YamlConfiguration loadBundled(FarmersDelightPlugin plugin) {
