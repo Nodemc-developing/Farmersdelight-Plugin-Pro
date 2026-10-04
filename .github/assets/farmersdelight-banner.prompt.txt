@@ -1,0 +1,17 @@
+Built-in image_gen was used for the wooden title artwork. Official platform logos are embedded unchanged by the final SVG, rather than regenerated.
+
+Initial composition request:
+Use case: compositing and text-localization.
+Asset type: transparent horizontal GitHub README title banner.
+Input image 1 is the user's reference/edit target: a low-resolution warm wooden pixel-art sign with a left framed panel and a right title plaque. Input image 2 is the official PaperMC logomark, to insert unchanged. Input image 3 is the official Folia logo, to insert unchanged.
+Create the requested new banner in the same general pixel-art wooden sign composition as image 1, extending the right wooden plaque enough to fit the new longer title comfortably in ONE single line. Use fresh original wood pixel textures, a crisp dark-brown stepped wooden frame, tan inner label, subtle grain and clean pixel edges. Keep the banner very wide, approximately 5.5:1, with no large unused canvas margins.
+Replace the hoe illustration in the left panel with the two supplied official server logos, separated and legible: PaperMC mark centered in the upper part, and the COMPLETE rainbow Folia leaf plus FOLIA wordmark below it. They identify supported server platforms only. Keep the inserted logo artwork's original shape, colors, relative geometry, aspect ratio and alpha; no pixel-art redrawing, recoloring, stretching, overlapping, decorative additions, or branding painted onto the marks themselves. Preserve clear space between the two logos and the wood edge. Do not include the old pot or hoe; leave the left panel devoted to the two server platform marks.
+Replace the title with the exact text "Farmer's Delight Plugin Pro". Pay particular attention to the apostrophe and final words "Plugin Pro"; no hyphen, no possessive added to Plugin, no second line, no other slogan. Render the title as large readable dark-brown Minecraft-inspired pixel lettering centered vertically on the long right label. Do not reuse the old title; do not omit any words.
+Background: genuinely transparent outside the wooden banner, preserve full alpha. No opaque background, checkerboard pixels, watermark, extra text, or additional logos.
+
+Final wooden-base edit request:
+Use case: precise-object-edit.
+Edit target: the attached generated horizontal wooden pixel-art title banner.
+Change ONLY the small PaperMC and Folia logo graphics inside the square wooden panel at the left. Remove both of those graphics completely and restore clean warm wooden planks with matching wood grain underneath. That left square panel must now be entirely EMPTY clean wood, with no icons, text, marks or symbols.
+Preserve the entire wooden frame shape, pixel art, lighting, color palette, RIGHT title plaque, title lettering, spacing and all other content unchanged. Keep the right plaque's EXACT existing title text "Farmer's Delight Plugin Pro" readable and on ONE line. Do not remove or change the title. No pot, hoe, new icon or new text in the left panel.
+Preserve actual transparency outside the wooden sign. Keep the banner very wide, with as little transparent margin above and below as possible. No background or checkerboard.

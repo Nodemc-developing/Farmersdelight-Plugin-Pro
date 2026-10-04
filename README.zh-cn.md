@@ -1,91 +1,93 @@
-# Farmersdelight-Plugin-Pro
+<h1 align="center">
+  <img src=".github/assets/farmersdelight-banner.svg" width="640" alt="Farmer's Delight Plugin Pro"><br>
+  Farmersdelight-Plugin-Pro
+</h1>
 
-[English](README.md) | **中文**
+<p align="center">在 Paper 和 Folia 上种植、烹饪，分享农夫乐事的美味。</p>
 
-基于 CraftEngine 的 Farmer's Delight Paper/Folia 插件，提供种植、食材处理、烹饪和游戏内配方管理。
+<p align="center">
+  <img src="https://img.shields.io/badge/License-AGPL--3.0-blue" alt="AGPL-3.0 授权">
+  <img src="https://img.shields.io/badge/All_features-Free-3fb950" alt="全部功能免费">
+  <img src="https://img.shields.io/badge/Paper-26.3-5865F2" alt="Paper 26.3">
+  <img src="https://img.shields.io/badge/Folia-26.2-8b5cf6" alt="Folia 26.2">
+  <img src="https://img.shields.io/badge/Java-25-orange" alt="Java 25 服务端环境">
+</p>
 
-本项目是 [Farmersdelight-Plugin](https://github.com/IOVEYOUMC0/Farmersdelight-Plugin) 的持续维护优化分支。原项目作者：HuiDu_OwO（IOVEYOUMC0）；本分支维护与优化：ydxc2009。
+<p align="center">
+  <a href="https://github.com/Nodemc-developing/Farmersdelight-Plugin-Pro/releases/latest">下载</a> ·
+  <a href="#-文档">文档</a> ·
+  <a href="README.md">English</a>
+</p>
 
-**永久免费、永久开源。** 全部功能、发布构建和后续更新均免费提供。第三方依赖保留各自的授权和发布规则。
+## 🌱 关于
 
-## 功能
+本项目是**灰度 HuiDu_OwO（IOVEYOUMC0）**的 [Farmersdelight-Plugin](https://github.com/IOVEYOUMC0/Farmersdelight-Plugin) 的**独立维护硬分支**，由 **ydxc2009** 持续维护。
 
-| 功能 | 内容 | 费用 |
+**永久免费，永久开源。** 全部功能、发布构建与后续更新均免费。CraftEngine 提供物品、方块与资源包，本插件负责玩法、菜单和自动化。
+
+## ✨ 功能
+
+| 功能 | 包含内容 | 费用 |
 | --- | --- | --- |
-| 厨锅 | 烹饪进度、热源、容器处理与自定义厨锅组 | 免费 |
-| 砧板 | 工具要求、多项产出、产出概率与音效 | 免费 |
-| 炉灶与煎锅 | 放置及手持烹饪、效果与可配置粒子 | 免费 |
-| 作物与耕地 | 作物、野生植物、沃土与可配置生长 | 免费 |
-| 方块与物品 | CraftEngine 模型、资源包、掉落、绳索、蘑菇群落与储物方块 | 免费 |
-| 食物效果 | 营养、舒适与可配置食物效果 | 免费 |
-| 配方编辑器 | `/fd recipe edit`，厨具选择、搜索、翻页与逐级返回 | 免费 |
-| 模糊配方 | 等效食材、食材分组、理想配比、调味品与优先级 | 免费 |
-| 高级食材组 | 嵌套分组、标签引用与多选一原料 | 免费 |
-| 内容包配方 | 加载已启用的 CE 内容包，编辑保存回配方来源节点 | 免费 |
-| 流体配方 | FluidCore 灌装、排空、浸泡；物品、标签、多选与组件条件 | 免费 |
-| 流体罐 | 普通罐与玻璃罐、容量提示、菜单、漏斗加工、染色与保留内容的携带和掉落 | 免费 |
-| 手持烹饪 | 煎锅跳跃落地翻面、肉串与蔬菜串烹饪 | 免费 |
-| 村民 | 自定义作物收获补种、种子与食物拾取、食物共享、原版繁殖条件与可配置交易 | 免费 |
-| 累计统计 | 异步 SQLite、玩家与物品明细、只读缓存的 PlaceholderAPI 查询 | 免费 |
-| 通用作物 | 单层、双层及攀绳作物、耕地、沃土、堆肥与野稻 | 免费 |
-| 通用方块行为 | 篮子配置、绳索收放与敲钟、成对及双格方块、比较器与温度伤害 | 免费 |
-| 配置函数 | 满饥饿进食、清除与升级效果、成就函数、安全传送 | 免费 |
-| 表现配置 | 显示位置与覆盖、音效、粒子概率、热源托盘、密度节流与容器间隔 | 免费 |
-| 配方发现 | 配方书、信息卡与配方关联跳转 | 免费 |
-| 森罗物语联动 | 可选菜谱自动投料至厨锅 | 免费 |
-| 成就系统 | 可选 UltimateAdvancementAPI 接入与变化节点同步 | 免费 |
-| 调度与性能 | Folia 所属线程访问、异步文件处理、配置缓存与厨锅睡眠唤醒 | 免费 |
-| 附属 API | `com.huidu.farmersdelight.api` 与可选玩法附属 | 免费 |
+| 🍲 厨锅 | 热源、烹饪进度、容器处理、漏斗自动化与自定义厨锅组 | 免费 |
+| 🔪 砧板 | 工具要求、多项产出、产出概率、音效与自动化 | 免费 |
+| 🍳 炉灶与手持烹饪 | 放置烹饪、煎锅翻面、肉串与蔬菜串、可配置粒子 | 免费 |
+| 🌾 种植 | 单层、双层、攀绳作物，野生植物、沃土、堆肥与蘑菇群落 | 免费 |
+| 🧺 储物与方块 | 篮子、自动收集、红石锁定、绳索、成对方块、比较器与温度伤害 | 免费 |
+| 🍽️ 食物与效果 | 营养、舒适、满饥饿进食、效果清除与升级、可配置传送 | 免费 |
+| 🛠️ 配方编辑器 | 游戏内编辑、厨具选择、搜索、翻页与逐级返回 | 免费 |
+| 🥕 灵活配方 | 等效食材、嵌套分组、标签、组件、调味品、配比与优先级 | 免费 |
+| 📦 内容包 | CraftEngine 配方加载、外部内容优先、分类合并与来源文件保存 | 免费 |
+| 🫙 流体 | 普通罐与玻璃罐、染色、灌装、排空、浸泡、漏斗加工与内容保留 | 免费 |
+| 🏡 村民 | 自定义作物收获补种、食物共享、繁殖条件与可配置交易 | 免费 |
+| 📊 统计 | 玩家与物品累计统计、异步 SQLite、PlaceholderAPI 查询 | 免费 |
+| 📖 配方发现 | 配方书、关联配方与可选森罗物语自动投料 | 免费 |
+| 🏆 成就 | UltimateAdvancementAPI 接入、自动布局与增量同步 | 免费 |
 
-## 安装
+同时提供 Folia 调度、方块睡眠唤醒、异步文件与数据库处理，以及附属 API。
 
-- 本版测试目标为 **Paper 26.3** 和 **Folia 26.2**；验收结果以对应构建的本地报告为准。
-- 插件使用 Java 21；Minecraft 26.3 服务端需要 **Java 25**。
-- 固定使用 **CraftEngine 26.10-SNAPSHOT，构建 26.10-20260929.192451-4**。本版按该快照接口实现，启动时核对原始 JAR 哈希；其他构建需要重新适配、验证。
+## 🧩 环境与依赖
 
-先安装 CraftEngine，再将 Farmersdelight-Plugin-Pro JAR 放入 `plugins/` 并启动服务器。修改插件配置后使用 `/fd reload`，修改 CraftEngine 资源后使用 `/ce reload`。
+| 组件 | 版本 | 用途 |
+| --- | --- | --- |
+| Paper 或 Folia | **Paper 26.3 / Folia 26.2** | 已验证的服务端版本 |
+| Java | **25** | 服务端运行环境 |
+| [CraftEngine](https://github.com/Xiao-MoMi/craft-engine) | **固定 26.10 快照** | 必选；[具体构建](docs/DEVELOPMENT.zh-cn.md#支持环境) |
+| [FluidCore](https://github.com/Nodemc-developing/FluidCore/releases/tag/v0.1.0-SNAPSHOT.2) | 0.1.0-SNAPSHOT，Build 2 | 流体配方与储罐 |
+| [UltimateAdvancementAPI](https://github.com/Nodemc-developing/UltimateAdvancementAPI/releases/tag/v2.8.1-pro.2) | 2.8.1-pro.2 | 成就功能 |
+| [PlaceholderAPI](https://github.com/PlaceholderAPI/PlaceholderAPI) | 可选 | 统计占位符 |
 
-流体玩法需要单独安装 **FluidCore**，其 API 不打入本插件 JAR。未安装时，其余玩法仍可使用。配方从已启用的 CraftEngine 内容包加载；**不转换旧流体库的世界或物品数据**。已识别的旧载荷会受到保护，不作为空罐覆盖。详见[配置与配方指南](CONFIGURATION-RECIPES.zh-CN.md)。
+## 🚀 安装
 
-外部内容包优先，自带内容只补缺。外部包之间同类别、同完整 ID 的冲突会明确报错；模型和纹理按路径选择，语言按键合并。资源生成使用受管理覆盖层，不改写外部素材目录。
+1. 下载[服务端整合包或插件 JAR](https://github.com/Nodemc-developing/Farmersdelight-Plugin-Pro/releases/latest)。
+2. 安装固定 CraftEngine 构建，将本插件及需要的可选依赖放入 `plugins/`。
+3. 启动服务器并接受资源包。自带内容补缺，外部内容包优先。
 
-标准浏览分类合并为一个入口，包含工具、食材、农作物、加工食品、食物、盛宴、装饰、野生植物和宠物食物九类。已加载物品去重并集，普通罐与玻璃罐分别提供入口。设置 `craftengine-resources.unified-categories: false` 可保留原分类树；该处理仅修改加载副本，不改写原内容包文件。
+配方从已启用的 CraftEngine 内容包加载。**不会转换旧流体库的世界或物品数据**；升级已有服务器前，请阅读[配置与配方指南](CONFIGURATION-RECIPES.zh-CN.md)。
 
-成就功能需要单独安装 **UltimateAdvancementAPI**。`libs/` 附有 **2.8.1-pro.2** 优化版 JAR、对应源码归档和构建说明，包含 26.2/26.3 适配，已验证 Paper 26.3 和 Folia 26.2；较旧服务端应使用适配对应版本的 API。详见[依赖说明](libs/README.md)。资源包重载后重发成就定义，平时只同步变化的节点。
+## 🎮 命令
 
-bStats 3.2.1 的统计 ID 为 **34448**，登记名为 **FarmersDelightPro**。在 `plugins/bStats/config.yml` 设置 `enabled: false` 并重启，可全局关闭统计。统计使用异步发送，支持 Folia，并在插件停用时结束任务。
+| 命令 | 用途 |
+| --- | --- |
+| `/fd help` | 查看可用命令 |
+| `/fd recipe` | 浏览配方 |
+| `/fd recipe book` | 打开配方书 |
+| `/fd recipe edit` | 选择厨具并编辑配方 |
+| `/fd reload` | 重载插件配置与配方 |
+| `/fd stats` | 查看运行时统计 |
+| `/ce reload` | 重载 CraftEngine 内容与资源 |
 
-## 文档
+编辑、重载和运行时统计需要管理员权限。
 
-- [配置与配方](CONFIGURATION-RECIPES.zh-CN.md)
-- [流体罐获取与操作](FLUID-TANK.zh-CN.md)
+## 📚 文档
+
+- [配置与配方](CONFIGURATION-RECIPES.zh-CN.md) · [流体罐操作](FLUID-TANK.zh-CN.md)
 - [森罗物语联动与模糊配方](KALEIDOSCOPE-COMPAT.zh-CN.md)
-- [依赖构建与对应源码](libs/README.md)
-- [1.2.0 更新与验证范围](RELEASE-NOTES-1.2.0.zh-CN.md)
-- [玩家、服主与附属文档](https://github.com/IOVEYOUMC0/FarmersdelightPluginWiKi)
+- [依赖与对应源码](libs/README.md) · [构建与技术说明](docs/DEVELOPMENT.zh-cn.md)
+- [1.2.0 更新与验证范围](RELEASE-NOTES-1.2.0.zh-CN.md) · [原项目 Wiki](https://github.com/IOVEYOUMC0/FarmersdelightPluginWiKi)
 
-## 构建
+## 🙏 致谢与授权
 
-使用 **JDK 25** 构建；FD 本体输出 Java 21 字节码。当前 FluidCore 的 26.3 平台模块及测试服运行使用 Java 25。
+原插件作者：**灰度 HuiDu_OwO（IOVEYOUMC0）**；本分支维护：**ydxc2009**。感谢 **vectorwing** 与 [Farmer's Delight](https://github.com/vectorwing/FarmersDelight) 原模组贡献者提供原版玩法及 MIT 授权素材。
 
-```text
-./gradlew build
-```
-
-使用 `-PceJar=<固定快照JAR>`、`-PceLibraries=<CraftEngine/libs目录>` 和 `-PfluidCoreJar=<FluidCore构建JAR>` 指定本地依赖。`ceLibraries` 提供固定快照的重映射运行库；CE Maven 依赖仅限 26.10 快照，运行时仍须符合固定构建。
-
-厨锅及流体罐使用该快照的原生睡眠与唤醒 ticker。附属通过生成的 API-only JAR 编译，并要求与本仓库处于同级目录。性能报告记录实际环境和可比较范围，不将未测试场景描述为性能优势。
-
-## 致谢
-
-感谢 **vectorwing** 与 [Farmer's Delight](https://github.com/vectorwing/FarmersDelight) 原模组贡献者，提供原版玩法及 MIT 授权素材，包括装箱金苹果、装箱金胡萝卜的模型和纹理。原插件开发：**HuiDu_OwO（IOVEYOUMC0）**；本分支维护：**ydxc2009**。
-
-随附第三方素材保留真实来源和许可声明。外部内容包由服主提供，其中新增素材的公开分发需另行确认授权。
-
-## 授权
-
-GNU Affero General Public License v3.0 only，全文见 [LICENSE](LICENSE)。
-
-配方编辑器、配方关联跳转、手持煎锅等全部源码都在本仓库。允许使用、修改及再分发，也允许收费分发；须遵守 AGPL-3.0，保留版权与许可声明、提供完整对应源码、修改版同样以 AGPL-3.0 发布。如果修改版通过网络提供服务，还须向与该服务交互的用户提供源码。
-
-第三方内容和依赖库保留各自的来源及许可，见 [NOTICE.md](NOTICE.md)、[THIRD_PARTY.md](THIRD_PARTY.md) 与 JAR 内随附声明。上游项目及其他分支由各自作者维护。
+本项目使用 **AGPL-3.0-only**。使用、修改及再分发（包括商业分发）须遵守 [LICENSE](LICENSE)。第三方素材与依赖保留各自归属和许可，见 [NOTICE](NOTICE.md) · [THIRD_PARTY](THIRD_PARTY.md)。
