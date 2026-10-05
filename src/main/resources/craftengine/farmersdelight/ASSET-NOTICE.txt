@@ -1,0 +1,6 @@
+Farmersdelight-Plugin-Pro legacy decoration models
+
+The three models under models/block/legacy retain the complete geometry, texture references and existing credits from this repository's full_tatami_mat, half_tatami_mat and canvas_rug block models.
+No additional third-party models or textures are imported. ASSET-ORIGINS-LEGACY.json records the source repository, source revision, source file hashes and generated file hashes.
+Original resource attribution and MIT terms remain in the plugin NOTICE.txt, including Copyright (c) 2020 vectorwing for Farmer's Delight assets. Original plugin authorship remains HuiDu_OwO; this modification is maintained by ydxc2009.
+The generation script is this project's AGPL-3.0-only code. Model credits, upstream asset licences and this plugin's AGPL distribution terms remain unchanged.

@@ -1,6 +1,5 @@
 package com.huidu.farmersdelight.recipe;
 
-import com.huidu.farmersdelight.compat.OtherDelightIds;
 import com.huidu.farmersdelight.FarmersDelightPlugin;
 import com.huidu.farmersdelight.api.recipe.AddonRecipeFiles;
 import com.huidu.farmersdelight.api.recipe.IngredientMatchMemo;
@@ -129,7 +128,7 @@ public class CuttingBoardRecipeManager {
                         }
                         newRecipes.put(recipeId, parsing.parse(packSection.source(), recipeId, section, () -> parseRecipe(recipeId, section)));
                         if (packSection.file() != null) sources.put(recipeId, new RecipeSource(packSection.file(),
-                                List.of(packSection.sectionKey(), recipeId), packSection.sectionKey().split("#", 2)[0].equals(OtherDelightIds.RECIPE_SECTION), true));
+                                List.of(packSection.sectionKey(), recipeId), packSection.sectionKey().split("#", 2)[0].equals(NativeRecipeSchema.ROOT), true));
                         packIds.add(recipeId);
                     });
         }

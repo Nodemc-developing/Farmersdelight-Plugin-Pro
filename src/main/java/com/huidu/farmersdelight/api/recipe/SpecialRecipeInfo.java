@@ -12,12 +12,6 @@ public class SpecialRecipeInfo {
 
     public static final String DISPLAY_RECIPE = "recipe";
     public static final String DISPLAY_ITEM_DESCRIPTION = "item_description";
-    public static final String DISPLAY_OTHER_DELIGHT_INFO = "papers_info";
-
-    /** @deprecated Use {@link #DISPLAY_OTHER_DELIGHT_INFO}. */
-    @Deprecated(forRemoval = false)
-    public static final String DISPLAY_PAPERS_INFO = DISPLAY_OTHER_DELIGHT_INFO;
-
     private final String id;
     private final String titleKey;
     private final String iconItemId;

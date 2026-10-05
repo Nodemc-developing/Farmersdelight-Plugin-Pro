@@ -2,6 +2,7 @@ package com.huidu.farmersdelight.fluid;
 
 import com.huidu.farmersdelight.config.PlainYamlDocuments;
 import com.huidu.farmersdelight.recipe.RecipeIngredient;
+import com.huidu.farmersdelight.recipe.NativeRecipeSchema;
 import org.bukkit.configuration.ConfigurationSection;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +17,7 @@ class BundledFluidRecipeDefinitionsTest {
         assertNotNull(resource);
         try (resource) {
             var document = PlainYamlDocuments.parse(new String(resource.readAllBytes(), StandardCharsets.UTF_8), true);
-            var recipes = document.getConfigurationSection("papersdelight_recipes");
+            var recipes = document.getConfigurationSection(NativeRecipeSchema.ROOT);
             var groups = document.getConfigurationSection("advanced_tags");
             assertNotNull(recipes);
             assertNotNull(groups);

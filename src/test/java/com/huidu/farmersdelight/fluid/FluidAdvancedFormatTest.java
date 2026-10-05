@@ -1,6 +1,7 @@
 package com.huidu.farmersdelight.fluid;
 
 import org.junit.jupiter.api.Test;
+import com.huidu.farmersdelight.recipe.NativeRecipeSchema;
 import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -12,30 +13,30 @@ class FluidAdvancedFormatTest {
         assertEquals(7, ((Map<?, ?>) ((Map<?, ?>) recipe.fluidExpression()).get("components")).get("test:temperature"));
         assertEquals(0, recipe.timeTicks());
         assertThrows(IllegalArgumentException.class, () -> FluidRecipeSpec.parse("test:bad", body(Map.of("fluid", "minecraft:water", "unknown-predicate", true))));
-        Map<String, Object> invalid = body("minecraft:water"); invalid.put("ingredient", Map.of("item", "minecraft:sponge", "count", 2));
+        Map<String, Object> invalid = body("minecraft:water"); invalid.put("input", Map.of("item", Map.of("item", "minecraft:sponge", "count", 2)));
         assertThrows(IllegalArgumentException.class, () -> FluidRecipeSpec.parse("test:bad-count", invalid));
         assertThrows(IllegalArgumentException.class, () -> FluidRecipeSpec.parse("test:branch-amount", body(Map.of("any-of", List.of(Map.of("fluid", "minecraft:water", "amount", 2000), "minecraft:milk")))));
     }
 
     @Test void removingMatchingComponentsCannotResurrectThemAndRemovedChoiceMetadataSurvivesOutsideThePredicate() {
-        Map<String, Object> previous = new LinkedHashMap<>(Map.of(
-                "ingredient", Map.of("items", List.of(Map.of("item", "minecraft:sponge", "x-note", Map.of("owner", "a")), Map.of("item", "minecraft:paper", "x-note", "b"))),
+        Map<String, Object> previous = NativeRecipeSchema.formatFluid(new LinkedHashMap<>(Map.of(
+                "type", "soaking", "ingredient", Map.of("items", List.of(Map.of("item", "minecraft:sponge", "x-note", Map.of("owner", "a")), Map.of("item", "minecraft:paper", "x-note", "b"))),
                 "result", Map.of("id", "minecraft:wet_sponge", "components", Map.of("minecraft:custom_name", "old", "minecraft:unbreakable", true, "x-note", "c")),
-                "fluid", Map.of("any-of", List.of(Map.of("fluid", "minecraft:water", "x-note", "d")), "x-source", "e")));
-        Map<String, Object> edited = Map.of("ingredient", "minecraft:sponge", "result", Map.of("id", "minecraft:wet_sponge", "components", Map.of("minecraft:custom_name", "new")), "fluid", "minecraft:water");
+                "fluid", Map.of("any-of", List.of(Map.of("fluid", "minecraft:water", "x-note", "d")), "x-source", "e"))));
+        Map<String, Object> edited = NativeRecipeSchema.formatFluid(Map.of("type", "soaking", "ingredient", "minecraft:sponge", "result", Map.of("id", "minecraft:wet_sponge", "components", Map.of("minecraft:custom_name", "new")), "fluid", "minecraft:water"));
         Map<String, Object> merged = FluidRecipeFiles.merge(previous, edited);
-        var components = (Map<?, ?>) ((Map<?, ?>) merged.get("result")).get("components");
+        var components = (Map<?, ?>) ((Map<?, ?>) merged.get("output")).get("components");
         assertEquals("new", components.get("minecraft:custom_name")); assertFalse(components.containsKey("minecraft:unbreakable"));
         assertEquals("c", components.get("x-note"));
         var saved = (Map<?, ?>) ((Map<?, ?>) merged.get("extensions")).get("saved_fields");
-        assertEquals("b", saved.get("ingredient/items/1/x-note")); assertEquals("d", saved.get("fluid/any-of/0/x-note"));
-        assertEquals("e", ((Map<?, ?>) merged.get("fluid")).get("x-source"));
+        assertEquals("b", saved.get("input/item/items/1/x-note")); assertEquals("d", saved.get("fluid/match/any-of/0/x-note"));
+        assertEquals("e", ((Map<?, ?>) ((Map<?, ?>) merged.get("fluid")).get("match")).get("x-source"));
     }
 
     @Test void aNewJugDefinitionRetainsItsSchemaAndCreatesNativeLootCapacityAndVisualBindings() {
-        Map<String, Object> original = Map.of("model", "test:block/glass_jug", "settings", Map.of("libuid:fluid_container", Map.of("capacity", 24000)),
-                "behavior", List.of(Map.of("type", "papersdelight:jug_item", "transparent", true, "model", "test:block/liquid"),
-                        Map.of("type", "block_item", "block", Map.of("behavior", Map.of("type", "papersdelight:jug", "transparent", true),
+        Map<String, Object> original = Map.of("model", "test:block/glass_jug", "settings", Map.of("fluidcore:container", Map.of("capacity", 24000)),
+                "behavior", List.of(Map.of("type", "farmersdelight:jug_item", "transparent", true, "model", "test:block/liquid"),
+                        Map.of("type", "block_item", "block", Map.of("behavior", Map.of("type", "farmersdelight:jug", "transparent", true),
                                 "loot", Map.of("template", "default:loot_table/self"), "states", Map.of("appearances", Map.of("north", Map.of("entity_renderer", Map.of("type", "item_display", "item", "test:shell"))))))));
         var adapted = (Map<?, ?>) FluidContentFormat.item("test:jug", original);
         var behaviors = (List<?>) adapted.get("behavior");
@@ -67,7 +68,7 @@ class FluidAdvancedFormatTest {
     }
     @Test void userMenuFieldsAndUnknownMetadataOverrideDefaultsWithoutChangingTheOriginalDefinition() {
         Map<String, Object> menu = new LinkedHashMap<>(Map.of("theme", "plain", "bucket-item", "test:bucket", "x-note", List.of("keep")));
-        Map<String, Object> jug = new LinkedHashMap<>(Map.of("type", "papersdelight:jug", "menu", menu));
+        Map<String, Object> jug = new LinkedHashMap<>(Map.of("type", "farmersdelight:jug", "menu", menu));
         Map<String, Object> original = Map.of("behavior", Map.of("type", "block_item", "block", Map.of("behavior", jug, "loot", Map.of("template", "default:loot_table/self"))));
         var adapted = (Map<?, ?>) FluidContentFormat.item("test:jug", original);
         var outputBlock = (Map<?, ?>) ((Map<?, ?>) adapted.get("behavior")).get("block");
@@ -78,7 +79,7 @@ class FluidAdvancedFormatTest {
         menu.put("x-note", List.of("changed")); assertEquals(List.of("keep"), outputMenu.get("x-note"));
     }
     @Test void scalarMenuIsRejectedBeforeHostConstructionAndNativeDefinitionsKeepTheirOwnMenu() {
-        Map<String, Object> original = Map.of("behavior", Map.of("type", "block_item", "block", Map.of("behavior", Map.of("type", "papersdelight:jug", "menu", "invalid"), "loot", Map.of("template", "default:loot_table/self"))));
+        Map<String, Object> original = Map.of("behavior", Map.of("type", "block_item", "block", Map.of("behavior", Map.of("type", "farmersdelight:jug", "menu", "invalid"), "loot", Map.of("template", "default:loot_table/self"))));
         var error = assertThrows(IllegalArgumentException.class, () -> FluidContentFormat.item("test:jug", original));
         assertTrue(error.getMessage().contains("test:jug/behavior/block/behavior/menu"));
         Map<String, Object> nativeDefinition = Map.of("behavior", Map.of("type", "block_item", "block", Map.of("behavior", Map.of("type", "fluidcore:tank", "menu", Map.of("theme", "plain")))));
@@ -86,12 +87,15 @@ class FluidAdvancedFormatTest {
     }
     private static Map<String, Object> jugWithTint(Map<String, Object> tint) {
         return Map.of("model", "test:block/glass_jug", "behavior", List.of(
-                Map.of("type", "papersdelight:jug_item", "model", "test:block/liquid"),
-                Map.of("type", "block_item", "block", Map.of("behavior", Map.of("type", "papersdelight:jug"),
+                Map.of("type", "farmersdelight:jug_item", "model", "test:block/liquid"),
+                Map.of("type", "block_item", "block", Map.of("behavior", Map.of("type", "farmersdelight:jug"),
                         "loot", Map.of("template", "default:loot_table/self"), "states", Map.of("appearances", Map.of("north",
                                 Map.of("entity_renderer", Map.of("type", "item_display", "item", "test:shell", "tint_source", tint))))))));
     }
     private static Map<String, Object> body(Object expression) {
-        return new LinkedHashMap<>(Map.of("type", "soaking", "ingredient", "minecraft:sponge", "fluid", expression, "result", "minecraft:wet_sponge"));
+        // Test raw document input: the save formatter intentionally removes nested quantity aliases.
+        return new LinkedHashMap<>(Map.of("station", "fluid_tank", "operation", "soak",
+                "input", Map.of("item", "minecraft:sponge"), "output", Map.of("item", "minecraft:wet_sponge"),
+                "fluid", Map.of("match", expression, "amount-mb", 1000)));
     }
 }

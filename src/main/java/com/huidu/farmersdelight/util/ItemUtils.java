@@ -6,8 +6,7 @@ import com.huidu.farmersdelight.block.behavior.ConfiguredBlockSet;
 import com.huidu.farmersdelight.config.ContainerReturnConfig;
 import com.huidu.farmersdelight.i18n.I18n;
 import com.huidu.farmersdelight.util.compat.MMOItemsCompat;
-import io.papermc.paper.datacomponent.DataComponentTypes;
-import io.papermc.paper.datacomponent.item.UseRemainder;
+import com.huidu.farmersdelight.util.compat.CraftEngineItemComponents;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -1145,11 +1144,7 @@ public final class ItemUtils {
 
     private static ItemStack useRemainderComponent(ItemStack item) {
         try {
-            UseRemainder useRemainder = item.getData(DataComponentTypes.USE_REMAINDER);
-            if (useRemainder == null) {
-                return null;
-            }
-            ItemStack converted = useRemainder.transformInto();
+            ItemStack converted = CraftEngineItemComponents.useRemainder(item);
             return converted != null && !converted.getType().isAir() ? converted : null;
         } catch (RuntimeException | LinkageError ignored) {
             return null;

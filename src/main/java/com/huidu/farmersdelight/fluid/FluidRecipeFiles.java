@@ -1,6 +1,6 @@
 package com.huidu.farmersdelight.fluid;
 
-import com.huidu.farmersdelight.compat.OtherDelightIds;
+import com.huidu.farmersdelight.recipe.NativeRecipeSchema;
 import com.huidu.farmersdelight.recipe.RuntimeSnapshotPublication;
 
 import com.huidu.farmersdelight.FarmersDelightPlugin;
@@ -29,7 +29,6 @@ import java.util.concurrent.CompletableFuture;
 public final class FluidRecipeFiles {
     public record Entry(FluidRecipeSpec recipe, RecipeSource source) { }
     private record State(Map<String, Entry> sources, Set<String> occupiedIds) { }
-    private static final Set<String> TYPES = Set.of("fluid_filling", "fluid_emptying", "soaking");
     private final FarmersDelightPlugin plugin;
     private volatile State state = new State(Map.of(), Set.of());
 
@@ -45,14 +44,14 @@ public final class FluidRecipeFiles {
 
     /** Parses captured pack documents; this method does not read files or mutate live inventories. */
     public List<Entry> load() {
-        return loadSections(RecipePackFiles.sections(plugin, PackSection.OTHER_DELIGHT_RECIPES));
+        return loadSections(RecipePackFiles.sections(plugin, PackSection.NATIVE_RECIPES));
     }
 
     List<Entry> loadSections(List<PackSections.Section> sections) {
         Map<String, Entry> loaded = new LinkedHashMap<>();
         Set<String> occupied = new LinkedHashSet<>();
         for (var section : sections) {
-            ConfigurationSection root = section.yaml().getConfigurationSection(OtherDelightIds.RECIPE_SECTION);
+            ConfigurationSection root = section.yaml().getConfigurationSection(NativeRecipeSchema.ROOT);
             if (root == null) continue;
             for (String id : root.getKeys(false)) {
                 // Every node owns its ID, including other recipe kinds and currently invalid definitions.
@@ -62,7 +61,7 @@ public final class FluidRecipeFiles {
                     RecipeFileLoader.reportProblem(section.source(), id, "Expected a recipe section");
                     continue;
                 }
-                if (!TYPES.contains(body.getString("type", ""))) continue;
+                if (!"fluid_tank".equals(body.getString("station", ""))) continue;
                 try {
                     FluidRecipeSpec recipe = FluidRecipeSpec.parse(id, body);
                     if (loaded.containsKey(id)) {
@@ -87,7 +86,7 @@ public final class FluidRecipeFiles {
         if (previous == null && current.occupiedIds().contains(recipe.id())) {
             return CompletableFuture.completedFuture(false);
         }
-        RecipeSource source = previous == null ? new RecipeSource(defaultFile(), List.of(OtherDelightIds.RECIPE_EDITOR_SECTION, recipe.id()), true)
+        RecipeSource source = previous == null ? new RecipeSource(defaultFile(), List.of(NativeRecipeSchema.EDITOR_ROOT, recipe.id()), true)
                 : previous.source();
         // Ingredient and NBT serialization is captured on the caller's owning thread before worker I/O.
         Map<String, Object> captured;
@@ -122,21 +121,17 @@ public final class FluidRecipeFiles {
         return result;
     }
 
-    private static void retainUnplacedMetadata(Map<String, Object> previous, Map<String, Object> result) {
-        Map<String, Object> before = new LinkedHashMap<>(), after = new LinkedHashMap<>();
-        for (String key : List.of("empty_input", "filled_input", "ingredient", "filled_result", "empty_result", "result", "fluid")) {
-            metadata(previous.get(key), key, key.equals("fluid") ? "fluid" : "item", before);
-            metadata(result.get(key), key, key.equals("fluid") ? "fluid" : "item", after);
-        }
+    private static void preserveUnplacedMetadata(Map<String, Object> result, Map<String, Object> before, Map<String, Object> after) {
         Map<String, Object> unplaced = new LinkedHashMap<>();
         before.forEach((path, value) -> { if (!java.util.Objects.equals(value, after.get(path))) unplaced.put(path, value); });
         if (unplaced.isEmpty()) return;
         Object original = result.get("extensions");
+        if (original instanceof ConfigurationSection section) original = section.getValues(false);
         Map<String, Object> extensions = new LinkedHashMap<>();
         if (original instanceof Map<?, ?> map) map.forEach((key, value) -> extensions.put(String.valueOf(key), FluidExpression.immutable(value)));
         else if (original != null) extensions.put("original_extensions", FluidExpression.immutable(original));
         Map<String, Object> saved = new LinkedHashMap<>();
-        if (extensions.get("saved_fields") instanceof Map<?, ?> map) map.forEach((key, value) -> saved.put(String.valueOf(key), value));
+        mapping(extensions.get("saved_fields")).forEach(saved::put);
         unplaced.forEach(saved::putIfAbsent); extensions.put("saved_fields", saved); result.put("extensions", extensions);
     }
     private static void metadata(Object value, String path, String kind, Map<String, Object> found) {
@@ -157,10 +152,14 @@ public final class FluidRecipeFiles {
         YamlFileTransactions.execute(source.file(), () -> {
             YamlConfiguration document = Files.isRegularFile(source.file()) ? PlainYamlDocuments.readLiteral(source.file()) : new YamlConfiguration();
             document.options().pathSeparator('\u0001');
-            if (!source.existingNode() && !source.body(document).isEmpty()) {
+            Map<String, Object> previous = source.body(document);
+            if (!source.existingNode() && !previous.isEmpty()) {
                 throw new IllegalStateException("A recipe with this ID already exists at the destination");
             }
-            source.put(document, replacement == null ? null : merge(source.body(document), replacement));
+            if (source.existingNode() && !previous.isEmpty() && !"fluid_tank".equals(previous.get("station"))) {
+                throw new IllegalStateException("The recipe station changed before the fluid edit was saved");
+            }
+            source.put(document, replacement == null ? null : merge(previous, replacement));
             ConfigFileUpdater.writeStringAtomically(source.file(), document.saveToString(), true);
             return null;
         });
@@ -191,7 +190,7 @@ public final class FluidRecipeFiles {
         if (recipe.timeTicks() > 0 || recipe.type().equals("soaking")) body.put("time", recipe.timeTicks());
         if (!recipe.consumeFluid()) body.put("consume_fluid", false);
         if (recipe.priority() != 0) body.put("priority", recipe.priority());
-        return body;
+        return NativeRecipeSchema.formatFluid(body);
     }
 
     private static Object ingredient(Object value) {
@@ -204,30 +203,86 @@ public final class FluidRecipeFiles {
     }
 
     static Map<String, Object> merge(Map<String, Object> previous, Map<String, Object> edited) {
+        return mergeNative(previous, edited);
+    }
+
+    private static Map<String, Object> mergeNative(Map<String, Object> previous, Map<String, Object> edited) {
         Map<String, Object> result = new LinkedHashMap<>(previous);
-        Object oldFluid = result.get("fluid");
-        for (String key : List.of("type", "empty_input", "filled_input", "ingredient", "filled_result", "empty_result", "result",
-                "fluid", "amount", "time", "consume_fluid", "priority")) result.remove(key);
+        for (String key : List.of("station", "operation", "input", "output", "fluid", "process", "priority",
+                "type", "empty_input", "filled_input", "ingredient", "filled_result", "empty_result", "result",
+                "amount", "time", "consume_fluid")) result.remove(key);
         result.putAll(edited);
-        for (String key : List.of("empty_input", "filled_input", "ingredient", "filled_result", "empty_result", "result")) {
-            if (edited.containsKey(key)) result.put(key, preserveNested(previous.get(key), edited.get(key),
-                    key.equals("filled_result") || key.equals("empty_result") || key.equals("result")));
+        if (edited.containsKey("extensions")) result.put("extensions", preserveExtensionValue(previous.get("extensions"), edited.get("extensions")));
+        Map<String, Object> oldInput = mapping(previous.get("input")), newInput = mapping(edited.get("input"));
+        if (edited.containsKey("input")) {
+            Map<String, Object> input = preserveFields(oldInput, newInput, List.of("item"));
+            if (newInput.containsKey("item")) input.put("item", preserveNested(oldInput.get("item"), newInput.get("item"), false));
+            result.put("input", input);
         }
-        Object newFluid = edited.get("fluid");
-        if (oldFluid instanceof ConfigurationSection section) oldFluid = section.getValues(false);
-        Map<String, Object> extensions = new LinkedHashMap<>();
-        if (oldFluid instanceof Map<?, ?> raw) raw.forEach((key, value) -> extensions.put(String.valueOf(key), value));
-        for (String key : List.of("id", "tag", "fluid", "any-of", "components", "exact-components", "amount")) extensions.remove(key);
-        if (!extensions.isEmpty() && newFluid instanceof String identity) {
-            // Keep extension options without duplicating the canonical top-level amount.
-            extensions.put(identity.startsWith("#") ? "tag" : "id", identity.startsWith("#") ? identity.substring(1) : identity);
-            result.put("fluid", extensions);
-        } else if (newFluid instanceof Map<?, ?> incoming) {
-            incoming.forEach((key, value) -> extensions.put(String.valueOf(key), value));
-            result.put("fluid", extensions);
+        if (edited.containsKey("output")) result.put("output", preserveNested(previous.get("output"), edited.get("output"), true));
+        Map<String, Object> oldFluid = mapping(previous.get("fluid")), newFluid = mapping(edited.get("fluid"));
+        if (edited.containsKey("fluid")) {
+            Map<String, Object> fluid = preserveFields(oldFluid, newFluid, List.of("match", "amount-mb", "consume"));
+            if (newFluid.containsKey("match")) fluid.put("match", preserveFluidMetadata(oldFluid.get("match"), newFluid.get("match")));
+            result.put("fluid", fluid);
         }
-        retainUnplacedMetadata(previous, result);
+        Map<String, Object> process = preserveFields(mapping(previous.get("process")), mapping(edited.get("process")), List.of("ticks"));
+        if (edited.containsKey("process") || !process.isEmpty()) result.put("process", process);
+        retainNativeMetadata(previous, result);
         return result;
+    }
+
+    private static Map<String, Object> preserveFields(Map<String, Object> previous, Map<String, Object> edited, List<String> managed) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        previous.forEach((key, value) -> { if (!managed.contains(key)) result.put(key, FluidExpression.immutable(value)); });
+        edited.forEach((key, value) -> result.put(key, managed.contains(key) ? FluidExpression.immutable(value)
+                : preserveExtensionValue(previous.get(key), value)));
+        return result;
+    }
+
+    private static Map<String, Object> mapping(Object value) {
+        if (value instanceof ConfigurationSection section) value = section.getValues(false);
+        Map<String, Object> result = new LinkedHashMap<>();
+        if (value instanceof Map<?, ?> map) map.forEach((key, nested) -> result.put(String.valueOf(key), nested));
+        return result;
+    }
+
+    private static Object preserveExtensionValue(Object previous, Object edited) {
+        if (previous instanceof ConfigurationSection section) previous = section.getValues(false);
+        if (edited instanceof ConfigurationSection section) edited = section.getValues(false);
+        if (previous instanceof Map<?, ?> old && edited instanceof Map<?, ?> update) {
+            Map<String, Object> result = new LinkedHashMap<>();
+            old.forEach((key, value) -> result.put(String.valueOf(key), FluidExpression.immutable(value)));
+            update.forEach((key, value) -> result.put(String.valueOf(key), preserveExtensionValue(old.get(key), value)));
+            return result;
+        }
+        return FluidExpression.immutable(edited);
+    }
+
+    private static Object preserveFluidMetadata(Object previous, Object edited) {
+        Map<String, Object> extensions = mapping(previous);
+        for (String key : List.of("id", "tag", "fluid", "any-of", "components", "exact-components", "amount")) extensions.remove(key);
+        if (extensions.isEmpty()) return FluidExpression.immutable(edited);
+        if (edited instanceof String identity) {
+            extensions.put(identity.startsWith("#") ? "tag" : "id", identity.startsWith("#") ? identity.substring(1) : identity);
+            return extensions;
+        }
+        if (edited instanceof ConfigurationSection || edited instanceof Map<?, ?>) {
+            extensions.putAll(mapping(edited));
+            return extensions;
+        }
+        return FluidExpression.immutable(edited);
+    }
+
+    private static void retainNativeMetadata(Map<String, Object> previous, Map<String, Object> result) {
+        Map<String, Object> before = new LinkedHashMap<>(), after = new LinkedHashMap<>();
+        for (Map<String, Object> body : List.of(previous, result)) {
+            Map<String, Object> fields = body == previous ? before : after;
+            metadata(mapping(body.get("input")).get("item"), "input/item", "item", fields);
+            metadata(body.get("output"), "output", "item", fields);
+            metadata(mapping(body.get("fluid")).get("match"), "fluid/match", "fluid", fields);
+        }
+        preserveUnplacedMetadata(result, before, after);
     }
 
     private static Object preserveNested(Object previous, Object edited, boolean output) {
@@ -248,9 +303,15 @@ public final class FluidRecipeFiles {
                         String name = String.valueOf(component);
                         if (name.startsWith("x-") || name.equals("extensions")) components.put(name, FluidExpression.immutable(value));
                     });
-                    if (entry.getValue() instanceof Map<?, ?> values) values.forEach((component, value) -> components.put(String.valueOf(component), FluidExpression.immutable(value)));
+                    if (entry.getValue() instanceof Map<?, ?> values) values.forEach((component, value) -> {
+                        String name = String.valueOf(component);
+                        components.put(name, name.startsWith("x-") || name.equals("extensions")
+                                ? preserveExtensionValue(components.get(name), value) : FluidExpression.immutable(value));
+                    });
                     merged.put(key, components);
-                } else merged.put(key, preserveNested(old.get(key), entry.getValue(), output));
+                } else merged.put(key, key.startsWith("x-") || key.equals("extensions")
+                        ? preserveExtensionValue(old.get(key), entry.getValue())
+                        : preserveNested(old.get(key), entry.getValue(), output));
             }
             return merged;
         }

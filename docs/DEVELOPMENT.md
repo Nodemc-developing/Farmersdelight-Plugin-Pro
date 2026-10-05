@@ -4,10 +4,10 @@
 
 ## Supported environment
 
-- Verified targets: **Paper 26.3** and **Folia 26.2**. The release notes identify the tested builds and verification scope; Folia 26.3 has not been verified.
-- Server runtime and build toolchain: **Java 25**. Farmersdelight-Plugin-Pro itself emits Java 21 bytecode.
-- CraftEngine is pinned to **26.10-SNAPSHOT build `26.10-20260929.192451-4`**. Startup verifies the original JAR digest. Other builds require adaptation and validation; the Maven snapshot range does not imply runtime support for every snapshot.
-- Fluid mechanics require a separate **FluidCore 0.1.0-SNAPSHOT, Build 2** installation. Advancements require **UltimateAdvancementAPI 2.8.1-pro.2**, which contains the 26.2/26.3 adapters. Neither dependency is bundled into the plugin or its API JAR.
+- Target range: **Minecraft 1.21–26.3 on Paper/Folia**. Exact tested builds and old-client presentation differences are listed in [COMPATIBILITY.md](COMPATIBILITY.md). An implemented version branch does not prove every server build has been tested.
+- Server runtime: **Java 21 for 1.21.x; Java 25 for 26.x**. The build toolchain uses JDK 25; Farmersdelight-Plugin-Pro and FluidCore emit Java 21 bytecode. Shared FD gameplay compiles against the Paper 1.21 API.
+- CraftEngine **26.9.2** and **26.10-SNAPSHOT build `26.10-20260929.192451-4`** are supported. Startup verifies the original JAR digest against the documented builds. Other builds require adaptation and validation; a version label alone does not imply support for every repackaged JAR or snapshot.
+- Fluid mechanics require the compatible **FluidCore 0.1.0-SNAPSHOT** supplied in `libs/`. Advancements require **UltimateAdvancementAPI 2.8.1-pro.3**, which contains ten native adapter families. Neither dependency is bundled into the plugin or its API JAR. Old dependency builds do not acquire this coverage by upgrading FD alone.
 
 Dependency artifacts, corresponding sources, build instructions and licenses are listed in [libs/README.md](../libs/README.md).
 
@@ -28,10 +28,10 @@ Then build:
 To supply local dependencies:
 
 ```text
-./gradlew build -PceJar=<pinned-snapshot-jar> -PceLibraries=<CraftEngine/libs-directory> -PfluidCoreJar=<FluidCore-jar>
+./gradlew build -PceJar=<supported-CraftEngine-jar> -PceLibraries=<CraftEngine/libs-directory> -PfluidCoreJar=<FluidCore-jar>
 ```
 
-`ceLibraries` supplies the pinned snapshot's remapped runtime libraries. Without a local JAR, the CE Maven dependency is restricted to 26.10 snapshots; the server still needs the exact pinned build.
+`ceLibraries` supplies CraftEngine's remapped runtime libraries. Without a local JAR, compilation uses the latest published stable Maven APIs, 26.9.1; the official repository had not published 26.9.2 Maven modules at verification time. Use `-PceJar` to compile against the exact 26.9.2 server JAR. `-PceVersion=26.10-SNAPSHOT` selects the snapshot compile dependency. Compile dependency versions do not widen the runtime digest allowlist.
 
 The build produces the plugin JAR and an API-only JAR for addon compilation. The API package is `com.huidu.farmersdelight.api`; use the API JAR as `compileOnly`. The existing addon build arrangement expects addon checkouts beside this repository.
 
@@ -47,11 +47,11 @@ Old fluid-library world/item data is not migrated. Recognized legacy payloads ar
 
 ## Scheduling & updates
 
-World, player and inventory access stays on the owning server thread. File parsing and database work run asynchronously. Cooking pots and fluid tanks use the pinned CraftEngine snapshot's native sleeping/waking tickers.
+World, player and inventory access stays on the owning server thread. File parsing and database work run asynchronously. Cooking pots and fluid tanks use native sleep lists on CraftEngine 26.10. On 26.9.2, compatible tickers skip sleeping business work, and chunk wake notifications use a chunk index.
 
 Ordinary advancement updates synchronize changed nodes. Resource-pack reloads resend definitions. Details and adapter limits are in [the dependency guide](../libs/README.md).
 
-Performance reports identify measured environments and comparable scenarios. Untested cases are not advertised as performance improvements. The current correctness and client-verification scope is recorded in [the release notes](../RELEASE-NOTES-1.2.0.zh-CN.md).
+Performance reports identify measured environments and comparable scenarios. Untested cases are not advertised as performance improvements. The current correctness and client-verification scope is recorded in [the release notes](../RELEASE-NOTES-1.2.2.zh-CN.md).
 
 ## Metrics
 

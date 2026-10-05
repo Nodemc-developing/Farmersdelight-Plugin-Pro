@@ -8,9 +8,8 @@ Each pack ships ``configuration/meal_icons.yml`` with one ``images:`` entry per 
 This tool derives the entries from the recipes that actually exist, so deleting an item (or its recipe, or its
 texture) prunes the now-invalid icon instead of leaving a dead entry behind:
 
-* results are read from the plugin recipe files (root key ``cooking_pot_recipes``) and from the CraftEngine pack
-  under ``src/main/resources/craftengine/`` (root key ``cooking_recipes``, the CraftEngine section id),
-  including ``custom_cooking_pot_recipes``;
+* results are read from ``farmersdelight_recipes`` entries whose station is ``cooking_pot``, both in the
+  bundled recipe files and the CraftEngine packs under ``src/main/resources/craftengine/``;
 * a result whose texture is missing or is not 16x16 is reported and skipped;
 * entries whose item is no longer produced by that pack are removed, existing entries keep their order and new
   ones are appended;
@@ -74,11 +73,14 @@ def result_ids(recipe_file: Path) -> list[str]:
         return []
     data = yaml.safe_load(recipe_file.read_text(encoding="utf-8")) or {}
     ids: list[str] = []
-    for section in ("cooking_pot_recipes", "cooking_recipes", "custom_cooking_pot_recipes"):
-        for recipe in (data.get(section) or {}).values():
-            if not isinstance(recipe, dict):
+    for section, values in data.items():
+        base = section.split("#", 1)[0]
+        if base != "farmersdelight_recipes" or not isinstance(values, dict):
+            continue
+        for recipe in values.values():
+            if not isinstance(recipe, dict) or recipe.get("station") != "cooking_pot":
                 continue
-            results = recipe.get("result")
+            results = recipe.get("output")
             for entry in results if isinstance(results, list) else [results]:
                 if isinstance(entry, str):
                     ids.append(entry)

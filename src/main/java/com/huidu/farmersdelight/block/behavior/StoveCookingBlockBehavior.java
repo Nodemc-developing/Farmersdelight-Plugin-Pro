@@ -13,7 +13,7 @@ import com.huidu.farmersdelight.util.SoundUtils;
 import com.huidu.farmersdelight.util.compat.CraftEngineAdapter;
 import com.huidu.farmersdelight.util.compat.ProtectionCompat;
 import com.huidu.farmersdelight.util.PermissionChecker;
-import io.papermc.paper.datacomponent.DataComponentTypes;
+import com.huidu.farmersdelight.util.compat.CraftEngineItemComponents;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
 import net.momirealms.craftengine.bukkit.api.CraftEngineBlocks;
@@ -499,7 +499,7 @@ public class StoveCookingBlockBehavior extends FarmersDelightBlockBehavior imple
     @SuppressWarnings("UnstableApiUsage")
     public static boolean isEquippable(ItemStack item) {
         if (item == null) return false;
-        return isEquippable(item.getType(), item.hasData(DataComponentTypes.EQUIPPABLE));
+        return isEquippable(item.getType(), CraftEngineItemComponents.hasEquippable(item));
     }
 
     static boolean isEquippable(Material type, boolean hasEquippableComponent) {

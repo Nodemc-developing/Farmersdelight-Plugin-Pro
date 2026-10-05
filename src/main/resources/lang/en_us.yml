@@ -451,7 +451,6 @@ console:
     special_recipe_backfilled: "Backfilled {count} bundled special recipes missing from the on-disk config"
     special_recipe_missing_root: "Special recipe file {file} has no 'special_recipes' section; skipping it. Add the section or delete the file to restore the bundled defaults."
     special_recipe_parse_failed: "Failed to parse special recipe '{id}': {error}"
-    papers_unsupported_type: "Unsupported recipe type '{type}' in {file} ({id}); the source file is preserved."
     special_recipe_save_failed: "Failed to write special recipe file {file}: {error}"
     special_recipe_load_failed: "Failed to read special recipe file {file} as UTF-8 YAML: {error}"
   worlddata:

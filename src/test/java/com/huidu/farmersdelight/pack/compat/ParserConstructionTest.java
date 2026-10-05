@@ -73,6 +73,17 @@ class ParserConstructionTest {
         }
     }
 
+    @Test void loadingFieldsRejectChangedContainerTypesBeforeInstallingAParser() throws Exception {
+        assertTrue(List.class.isAssignableFrom(ExternalContentCoordinator.typedField(
+                SynchronousItems.class, "configStorage", List.class).getType()));
+        assertTrue(List.class.isAssignableFrom(ExternalContentCoordinator.typedField(
+                SynchronousItems.class, "pendingConfigSections", List.class).getType()));
+        var failure = assertThrows(IllegalStateException.class, () -> ExternalContentCoordinator.typedField(
+                SynchronousItems.class, "configStorage", java.util.Map.class));
+        assertTrue(failure.getMessage().contains("configStorage"));
+        assertTrue(failure.getMessage().contains("expected java.util.Map"));
+    }
+
     private static final class SynchronousItems extends IdSectionConfigParser {
         @Override public Key type() { return Key.of("local_test:sync_items"); }
         @Override public String[] sectionId() { return new String[]{"items"}; }

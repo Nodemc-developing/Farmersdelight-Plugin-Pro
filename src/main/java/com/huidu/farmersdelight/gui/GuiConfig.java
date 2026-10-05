@@ -628,6 +628,11 @@ public class GuiConfig {
             }
 
             ItemStack item = resolveBaseItem();
+            if (!CompatItemMeta.isSupported()
+                    && ("air".equals(itemModel) || "minecraft:air".equals(itemModel))) {
+                ItemStack invisible = ItemUtils.createItem(Key.of("farmersdelight:gui_invisible"));
+                if (invisible != null) item = invisible;
+            }
 
             ItemMeta meta = item.getItemMeta();
             if (meta == null) {

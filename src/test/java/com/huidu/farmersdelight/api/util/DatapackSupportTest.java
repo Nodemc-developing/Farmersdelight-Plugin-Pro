@@ -2,6 +2,8 @@ package com.huidu.farmersdelight.api.util;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,6 +17,24 @@ class DatapackSupportTest {
 
     @TempDir
     Path directory;
+
+    @ParameterizedTest
+    @CsvSource({"1.21,48", "1.21.1-R0.1-SNAPSHOT,48", "1.21.2,57", "1.21.3-R0.1-SNAPSHOT,57",
+            "1.21.4,61", "1.21.5,71", "1.21.6,80", "1.21.7,80", "1.21.8,80"})
+    void usesTheCorrectLegacyDataPackFormat(String version, int format) {
+        String metadata = DatapackSupport.renderPackMetadata("Verification", version);
+        assertTrue(metadata.contains("\"pack_format\": " + format));
+        assertFalse(metadata.contains("min_format"));
+    }
+
+    @ParameterizedTest
+    @CsvSource({"1.21.9", "1.21.10-R0.1-SNAPSHOT", "1.21.11", "26.1", "26.1.2", "26.2", "26.3"})
+    void newerVersionsUseARangeAndCannotMatchTheEarlyVersionPrefix(String version) {
+        String metadata = DatapackSupport.renderPackMetadata("Verification", version);
+        assertTrue(metadata.contains("\"min_format\": 88"));
+        assertTrue(metadata.contains("\"max_format\": 150"));
+        assertFalse(metadata.contains("\"pack_format\""));
+    }
 
     @Test
     void findsNewDimensionWorldRootBeforeItsFirstSave() throws IOException {

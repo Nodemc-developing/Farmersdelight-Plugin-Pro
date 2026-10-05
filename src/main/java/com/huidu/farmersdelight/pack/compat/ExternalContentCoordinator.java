@@ -2,6 +2,7 @@ package com.huidu.farmersdelight.pack.compat;
 
 import com.huidu.farmersdelight.FarmersDelightPlugin;
 import com.huidu.farmersdelight.util.CommonTagResolver;
+import com.huidu.farmersdelight.util.compat.CraftEngineBaseline;
 import net.momirealms.craftengine.bukkit.api.event.AsyncResourcePackCacheEvent;
 import net.momirealms.craftengine.bukkit.plugin.BukkitCraftEngine;
 import net.momirealms.craftengine.core.pack.CachedConfigSection;
@@ -48,11 +49,11 @@ import java.util.function.BiFunction;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * A loading-only adapter for the supported host snapshot. No reflective access runs in gameplay tasks.
+ * A loading-only adapter for the verified host builds. No reflective access runs in gameplay tasks.
  * The adapter preserves parser stages and never adds a competing task to the loading pyramid.
  */
 public final class ExternalContentCoordinator implements AutoCloseable, Listener {
-    public static final String SUPPORTED_SHA256 = "46ebe45f31f3e3f0965179a85cb1f308d8729f53281d6c64f4ef2af5c23d99f6";
+    public static final String SUPPORTED_SHA256 = CraftEngineBaseline.SHA256;
     private static volatile ExternalContentCoordinator active;
     private static final List<BiFunction<String, CachedConfigSection, CachedConfigSection>> TRANSFORMERS = new CopyOnWriteArrayList<>();
     private static final Map<Path, Map<String, Object>> EXTRA_DEFAULTS = new java.util.concurrent.ConcurrentHashMap<>();
@@ -130,7 +131,7 @@ public final class ExternalContentCoordinator implements AutoCloseable, Listener
             return coordinator;
         } catch (Exception failure) {
             if (coordinator != null) coordinator.close();
-            throw new IllegalStateException("External content priority requires the supported CraftEngine 26.10 snapshot; "
+            throw new IllegalStateException("External content priority requires a verified CraftEngine 26.9.2 or 26.10 build; "
                     + "compatibility loading was refused: " + failure.getMessage(), failure);
         }
     }
@@ -172,11 +173,7 @@ public final class ExternalContentCoordinator implements AutoCloseable, Listener
         this.plugin = plugin;
         BukkitCraftEngine engine = BukkitCraftEngine.instance();
         if (engine == null || engine.packManager() == null) throw new IllegalStateException("CraftEngine is not loaded");
-        Path host = Path.of(BukkitCraftEngine.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-        String hostHash = "";
-        if (Files.isRegularFile(host)) try (var input = Files.newInputStream(host)) { hostHash = BundledContentManifest.digest(input); }
-        if (!SUPPORTED_SHA256.equals(hostHash))
-            throw new IllegalStateException("CraftEngine snapshot checksum does not match the supported loading adapter");
+        CraftEngineBaseline.verifyHostArtifact(BukkitCraftEngine.class);
         this.manager = engine.packManager();
         var blockManager = engine.blockManager();
         itemManager = engine.itemManager();
@@ -204,15 +201,15 @@ public final class ExternalContentCoordinator implements AutoCloseable, Listener
         resourceLayer = new ManagedResourceLayer(cache.resolve("resource-layers"), ownership, report);
         emptyRoot = cache.resolve("empty-resources");
         Files.createDirectories(emptyRoot);
-        routes = (Map<String, ConfigParser>) field(manager.getClass(), "sectionParsers").get(manager);
+        routes = (Map<String, ConfigParser>) typedField(manager.getClass(), "sectionParsers", Map.class).get(manager);
         Object registry = BuiltInRegistries.CONFIG_PARSER;
-        registryValues = (Map<Object, Object>) field(registry.getClass(), "byValue").get(registry);
-        registryIds = (Map<Object, Integer>) field(registry.getClass(), "toId").get(registry);
+        registryValues = (Map<Object, Object>) typedField(registry.getClass(), "byValue", Map.class).get(registry);
+        registryIds = (Map<Object, Integer>) typedField(registry.getClass(), "toId", Map.class).get(registry);
         holderValue = field(Class.forName("net.momirealms.craftengine.core.registry.Holder$Reference"), "value");
-        folderInputs = field(PackCacheData.class, "externalFolders");
-        zipInputs = field(PackCacheData.class, "externalZips");
+        folderInputs = typedField(PackCacheData.class, "externalFolders", Set.class);
+        zipInputs = typedField(PackCacheData.class, "externalZips", Set.class);
         // Validate the final-field bridge against a disposable cache input before changing live parsers.
-        var constructor = PackCacheData.class.getDeclaredConstructors()[0];
+        var constructor = PackCacheData.class.getDeclaredConstructor(net.momirealms.craftengine.core.plugin.CraftEngine.class);
         constructor.setAccessible(true);
         Object probe = constructor.newInstance(engine);
         Set<Path> probeSet = new LinkedHashSet<>();
@@ -288,7 +285,7 @@ public final class ExternalContentCoordinator implements AutoCloseable, Listener
         if (!UnifiedCategories.recognized(definitions)) return selected;
         Map<String, Object> merged = UnifiedCategories.merge(definitions, id -> {
             Key key = Key.of(id);
-            return itemManager.isVanillaItem(key) || itemManager.getItemDefinitionOrNull(key) != null;
+            return itemManager.isVanillaItem(key) || itemManager.loadedItems().containsKey(key);
         });
         List<CachedConfigSection> configs = new ArrayList<>();
         Set<String> retained = new LinkedHashSet<>();
@@ -370,7 +367,7 @@ public final class ExternalContentCoordinator implements AutoCloseable, Listener
                 try {
                     Key id = Key.of(member);
                     if (itemManager.isVanillaItem(id)) vanilla.add(UniqueKey.create(id));
-                    else if (itemManager.getItemDefinitionOrNull(id) != null) custom.add(UniqueKey.create(id));
+                    else if (itemManager.loadedItems().containsKey(id)) custom.add(UniqueKey.create(id));
                     else {
                         invalidMember = true;
                         diagnostics.add(new CommonTagExportDiagnostic(source, path, tagName, member, "rejected_member", "Item is not registered on the host"));
@@ -528,6 +525,14 @@ public final class ExternalContentCoordinator implements AutoCloseable, Listener
         throw new NoSuchFieldException(type.getName() + "." + name);
     }
 
+    static Field typedField(Class<?> type, String name, Class<?> expectedType) throws NoSuchFieldException {
+        Field field = field(type, name);
+        if (!expectedType.isAssignableFrom(field.getType()))
+            throw new IllegalStateException("Unsupported loading field " + type.getName() + "." + name
+                    + ": expected " + expectedType.getName() + ", received " + field.getType().getName());
+        return field;
+    }
+
     private final class PrioritizingParser extends IdSectionConfigParser {
         private final ConfigParser delegate;
         private final Field storage;
@@ -552,12 +557,13 @@ public final class ExternalContentCoordinator implements AutoCloseable, Listener
         }
         PrioritizingParser(ConfigParser delegate) throws ReflectiveOperationException {
             this.delegate = delegate;
-            storage = field(delegate.getClass(), "configStorage");
+            storage = typedField(delegate.getClass(), "configStorage", List.class);
             Field found;
-            try { found = field(delegate.getClass(), "pendingConfigSections"); }
+            try { found = typedField(delegate.getClass(), "pendingConfigSections", List.class); }
             catch (NoSuchFieldException absent) { found = null; }
             pending = found;
             if (java.util.Arrays.asList(delegate.sectionId()).contains("items") && delegate instanceof IdSectionConfigParser) {
+                if (pending == null) throw new IllegalStateException("The item parser has no pending item loading stage: " + delegate.type());
                 Method parse = delegate.getClass().getDeclaredMethod("parseSection", Pack.class, Path.class, Key.class, ConfigSection.class);
                 parse.setAccessible(true);
                 itemParseSection = MethodHandles.lookup().unreflect(parse).bindTo(delegate);
@@ -717,7 +723,9 @@ public final class ExternalContentCoordinator implements AutoCloseable, Listener
             try {
                 @SuppressWarnings("unchecked") Map<String, Object> body = (Map<String, Object>) values;
                 originalAttempts.computeIfAbsent(id.toString(), ignored -> new java.util.concurrent.atomic.AtomicInteger()).incrementAndGet();
-                ConfigSection adaptedSection = ConfigSection.of(expanded.path(), ConfigPriorityFilter.copyMap(body));
+                ConfigSection adaptedSection = ConfigSection.of(expanded.path(), ItemVersionInputs.adapt(body,
+                        net.momirealms.craftengine.core.util.VersionHelper.isOrAbove1_21_2,
+                        net.momirealms.craftengine.core.util.VersionHelper.isOrAbove1_21_5));
                 itemParseSection.invoke(pack, path, id, adaptedSection);
                 successfulCalls.computeIfAbsent(id.toString(), ignored -> new java.util.concurrent.atomic.AtomicInteger()).incrementAndGet();
                 expandedItems.putIfAbsent(id, new PendingConfigSection(pack, path, id, adaptedSection));

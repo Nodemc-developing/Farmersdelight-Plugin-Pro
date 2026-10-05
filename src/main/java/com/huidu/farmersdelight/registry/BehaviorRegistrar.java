@@ -69,6 +69,8 @@ public final class BehaviorRegistrar {
         registerBehavior(Constants.BEHAVIOR_ORGANIC_COMPOST, OrganicCompostBlockBehavior.FACTORY);
         registerBehavior(Constants.BEHAVIOR_RICH_SOIL, RichSoilBlockBehavior.FACTORY);
         registerBehavior(Constants.BEHAVIOR_RICH_SOIL_FARMLAND, RichSoilFarmlandBlockBehavior.factory(plugin));
+        com.huidu.farmersdelight.block.behavior.CompatibilityMechanicFactories.blockFactories(plugin)
+                .forEach((suffix, factory) -> registerBehavior("farmersdelight:" + suffix, factory));
 
         // Census line, not news on a healthy boot: routed through the startup detail channel so it is
         // recorded at FINE normally and raised to INFO only for an operator debugging the load phase.
@@ -76,8 +78,15 @@ public final class BehaviorRegistrar {
     }
 
     public static void registerItemBehaviors() {
+        registerItemBehaviors(null);
+    }
+
+    public static void registerItemBehaviors(com.huidu.farmersdelight.FarmersDelightPlugin plugin) {
         registerItemBehavior();
         registerItemBehavior(Constants.ITEM_BEHAVIOR_SKILLET, SkilletItemBehavior.FACTORY);
+        com.huidu.farmersdelight.block.behavior.CompatibilityMechanicFactories.itemFactories(
+                plugin == null ? () -> null : plugin::getSkewerCookingService)
+                .forEach((suffix, factory) -> registerItemBehavior("farmersdelight:" + suffix, factory));
     }
 
     public static void registerFunctions() {
@@ -89,6 +98,8 @@ public final class BehaviorRegistrar {
                 FoodBuffFunction.factory(plugin, FoodBuffFunction.Kind.COMFORT, CommonConditions::fromConfig));
         registerFunction("farmersdelight:nourishment",
                 FoodBuffFunction.factory(plugin, FoodBuffFunction.Kind.NOURISHMENT, CommonConditions::fromConfig));
+        com.huidu.farmersdelight.effect.ContentEffectFunction.factories(plugin)
+                .forEach((suffix, factory) -> registerFunction("farmersdelight:" + suffix, factory));
     }
 
     // Conditions and loot functions the bundled drop packs use, so a rule that needs plugin knowledge (what
@@ -98,10 +109,16 @@ public final class BehaviorRegistrar {
         registerCondition(Constants.CONDITION_IS_ADULT, IsAdultCondition.FACTORY);
         registerCondition(Constants.CONDITION_IS_BURNING, IsBurningCondition.FACTORY);
         registerCondition(Constants.CONDITION_IS_KNIFE, IsKnifeCondition.FACTORY);
+        registerCondition("farmersdelight:is_sneaking", com.huidu.farmersdelight.condition.SneakingCondition.FACTORY);
     }
 
     public static void registerLootFunctions() {
+        registerLootFunctions(null);
+    }
+
+    public static void registerLootFunctions(com.huidu.farmersdelight.FarmersDelightPlugin plugin) {
         registerLootFunction(Constants.LOOT_FUNCTION_AWARD_ADVANCEMENT, AwardAdvancementFunction.FACTORY);
+        registerLootFunction("farmersdelight:grant_advancement", com.huidu.farmersdelight.loot.GrantAdvancementFunction.factory(plugin));
     }
 
     private static void registerBehavior(String key, BlockBehaviorFactory<?> factory) {

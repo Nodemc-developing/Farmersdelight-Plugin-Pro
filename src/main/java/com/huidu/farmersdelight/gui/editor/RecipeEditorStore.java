@@ -1,6 +1,5 @@
 package com.huidu.farmersdelight.gui.editor;
 
-import com.huidu.farmersdelight.compat.OtherDelightIds;
 import com.huidu.farmersdelight.api.config.ConfigFileUpdater;
 import com.huidu.farmersdelight.config.YamlFileTransactions;
 import com.huidu.farmersdelight.recipe.RecipeFileLoader;
@@ -12,6 +11,7 @@ import com.huidu.farmersdelight.recipe.CuttingBoardRecipe;
 import com.huidu.farmersdelight.recipe.RecipePackFiles;
 import com.huidu.farmersdelight.recipe.RecipeSource;
 import com.huidu.farmersdelight.recipe.RecipeSchemaAdapter;
+import com.huidu.farmersdelight.recipe.NativeRecipeSchema;
 import com.huidu.farmersdelight.FarmersDelightPlugin;
 import com.huidu.farmersdelight.api.recipe.AddonRecipeFiles;
 import com.huidu.farmersdelight.api.recipe.AddonRecipeFiles.RecipeOwner;
@@ -35,9 +35,6 @@ public final class RecipeEditorStore {
     private static final String COOKING_POT_FILE = "recipes/cooking_pot_recipes.yml";
     private static final String CUTTING_BOARD_FILE = "recipes/cutting_board_recipes.yml";
 
-    private static final String COOKING_POT_ROOT = "cooking_pot_recipes";
-    private static final String CUSTOM_COOKING_POT_ROOT = "custom_cooking_pot_recipes";
-    private static final String CUTTING_BOARD_ROOT = "cutting_board_recipes";
     private static final String EXTERNAL_OVERRIDES_ROOT = "external-overrides";
     /** Written when a recipe must keep no container although its result declares one (see the recipe loader). */
     static final String CONTAINER_OPT_OUT = "none";
@@ -63,6 +60,7 @@ public final class RecipeEditorStore {
     private Edit cookingPotEdit(CookingPotRecipe recipe, String group) {
         // CraftEngine/NMS item serialization belongs to the caller's owning thread.
         Map<String, Object> body = buildCookingPotBody(recipe);
+        if (group != null && !group.isBlank()) body.put("group", group);
         RecipeSource source = plugin.getCookingPotRecipes().sourceOf(recipe.getId(), group);
         if (source != null) return recipeEdit(source, body, true);
         if (group == null || group.isBlank()) {
@@ -75,15 +73,17 @@ public final class RecipeEditorStore {
                 });
             }
             if (plugin.getCookingPotRecipes().isExternalRecipe(recipe.getId())) {
-                return local(COOKING_POT_FILE, yaml -> {
-                    putRecipe(yaml, COOKING_POT_ROOT, recipe.getId(), body);
+                RecipeSource target = new RecipeSource(RecipePackFiles.file(plugin, COOKING_POT_FILE),
+                        List.of(NativeRecipeSchema.EDITOR_ROOT, recipe.getId()), true);
+                Map<String, Object> formatted = RecipeSchemaAdapter.formatPot(body, true);
+                return new Edit(target.file().toFile(), null, yaml -> {
+                    saveRecipeSource(yaml, target, formatted, true);
                     setExternalOverride(yaml, "cooking_pot", recipe.getId(), true);
-                });
+                }, true);
             }
         }
-        RecipeSource target = group == null || group.isBlank()
-                ? new RecipeSource(RecipePackFiles.file(plugin, COOKING_POT_FILE), List.of(OtherDelightIds.RECIPE_SECTION, recipe.getId()), true)
-                : new RecipeSource(RecipePackFiles.file(plugin, COOKING_POT_FILE), List.of(CUSTOM_COOKING_POT_ROOT, group, recipe.getId()), true);
+        RecipeSource target = new RecipeSource(RecipePackFiles.file(plugin, COOKING_POT_FILE),
+                List.of(NativeRecipeSchema.EDITOR_ROOT, recipe.getId()), true);
         return recipeEdit(target, body, true);
     }
 
@@ -104,15 +104,15 @@ public final class RecipeEditorStore {
                 return external(owner, yaml -> yaml.set(owner.yamlPath(), null));
             }
             if (plugin.getCookingPotRecipes().isExternalRecipe(id)) {
-                return local(COOKING_POT_FILE, yaml -> {
-                    putRecipe(yaml, COOKING_POT_ROOT, id, null);
+                return new Edit(RecipePackFiles.file(plugin, COOKING_POT_FILE).toFile(), null, yaml -> {
+                    deleteRecipeSource(yaml, new RecipeSource(RecipePackFiles.file(plugin, COOKING_POT_FILE),
+                            List.of(NativeRecipeSchema.EDITOR_ROOT, id), true), true, RecipePackFiles.file(plugin, COOKING_POT_FILE));
                     setExternalOverride(yaml, "cooking_pot", id, false);
-                });
+                }, true);
             }
         }
-        List<String> keys = group == null || group.isBlank() ? List.of(COOKING_POT_ROOT, id)
-                : List.of(CUSTOM_COOKING_POT_ROOT, group, id);
-        return recipeEdit(new RecipeSource(RecipePackFiles.file(plugin, COOKING_POT_FILE), keys, false, true), null, true);
+        return recipeEdit(new RecipeSource(RecipePackFiles.file(plugin, COOKING_POT_FILE),
+                List.of(NativeRecipeSchema.EDITOR_ROOT, id), true, true), null, true);
     }
 
     public boolean saveCuttingBoardRecipe(CuttingBoardRecipe recipe) {
@@ -137,12 +137,15 @@ public final class RecipeEditorStore {
             });
         }
         if (plugin.getCuttingBoardRecipes().isExternalRecipe(id)) {
-            return local(CUTTING_BOARD_FILE, yaml -> {
-                putRecipe(yaml, CUTTING_BOARD_ROOT, id, body);
+            RecipeSource target = new RecipeSource(RecipePackFiles.file(plugin, CUTTING_BOARD_FILE),
+                    List.of(NativeRecipeSchema.EDITOR_ROOT, id), true);
+            Map<String, Object> formatted = RecipeSchemaAdapter.formatBoard(body, true);
+            return new Edit(target.file().toFile(), null, yaml -> {
+                saveRecipeSource(yaml, target, formatted, false);
                 setExternalOverride(yaml, "cutting_board", id, true);
-            });
+            }, true);
         }
-        return recipeEdit(new RecipeSource(RecipePackFiles.file(plugin, CUTTING_BOARD_FILE), List.of(OtherDelightIds.RECIPE_SECTION, id), true), body, false);
+        return recipeEdit(new RecipeSource(RecipePackFiles.file(plugin, CUTTING_BOARD_FILE), List.of(NativeRecipeSchema.EDITOR_ROOT, id), true), body, false);
     }
 
     public boolean deleteCuttingBoardRecipe(String recipeId) {
@@ -161,31 +164,62 @@ public final class RecipeEditorStore {
             return external(owner, yaml -> yaml.set(owner.yamlPath(), null));
         }
         if (plugin.getCuttingBoardRecipes().isExternalRecipe(id)) {
-            return local(CUTTING_BOARD_FILE, yaml -> {
-                putRecipe(yaml, CUTTING_BOARD_ROOT, id, null);
+            return new Edit(RecipePackFiles.file(plugin, CUTTING_BOARD_FILE).toFile(), null, yaml -> {
+                deleteRecipeSource(yaml, new RecipeSource(RecipePackFiles.file(plugin, CUTTING_BOARD_FILE),
+                        List.of(NativeRecipeSchema.EDITOR_ROOT, id), true), false, RecipePackFiles.file(plugin, CUTTING_BOARD_FILE));
                 setExternalOverride(yaml, "cutting_board", id, false);
-            });
+            }, true);
         }
         return recipeEdit(new RecipeSource(RecipePackFiles.file(plugin, CUTTING_BOARD_FILE),
-                List.of(CUTTING_BOARD_ROOT, id), false, true), null, false);
-    }
-
-    private Edit local(String path, YamlMutation mutation) {
-        return new Edit(RecipePackFiles.file(plugin, path).toFile(), RecipePackFiles.managed(path) ? null : path, mutation, RecipePackFiles.managed(path));
+                List.of(NativeRecipeSchema.EDITOR_ROOT, id), true, true), null, false);
     }
 
     private Edit recipeEdit(RecipeSource source, Map<String, Object> body, boolean pot) {
         Map<String, Object> formatted = body == null ? null : pot
-                ? RecipeSchemaAdapter.formatPot(body, source.otherDelightFormat())
-                : RecipeSchemaAdapter.formatBoard(body, source.otherDelightFormat());
+                ? RecipeSchemaAdapter.formatPot(body, true)
+                : RecipeSchemaAdapter.formatBoard(body, true);
         java.nio.file.Path defaultFile = formatted == null ? RecipePackFiles.file(plugin, pot ? COOKING_POT_FILE : CUTTING_BOARD_FILE) : null;
         return new Edit(source.file().toFile(), null, yaml -> {
             if (formatted == null) { deleteRecipeSource(yaml, source, pot, defaultFile); return; }
-            source.put(yaml, mergeRecipeBody(source.body(yaml), formatted));
+            saveRecipeSource(yaml, source, formatted, pot);
         }, true);
     }
 
+    static void saveRecipeSource(YamlConfiguration yaml, RecipeSource source, Map<String, Object> formatted) {
+        saveRecipeSource(yaml, source, formatted, "cooking_pot".equals(formatted.get("station")));
+    }
+
+    static void saveRecipeSource(YamlConfiguration yaml, RecipeSource source, Map<String, Object> formatted, boolean pot) {
+        requireNativeSource(source);
+        if (!source.existingNode() && source.exists(yaml)) {
+            throw new IllegalStateException("A recipe with this ID already exists at the destination");
+        }
+        Map<String, Object> previous = source.body(yaml);
+        String expected = pot ? "cooking_pot" : "cutting_board";
+        if (!expected.equals(formatted.get("station"))) {
+            throw new IllegalStateException("The edited recipe belongs to a different station");
+        }
+        requireOriginalStation(yaml, source, expected);
+        Map<String, Object> replacement = NativeRecipeSchema.copy(formatted);
+        if (!replacement.containsKey("group") && previous.containsKey("group")) replacement.put("group", previous.get("group"));
+        source.put(yaml, mergeRecipeBody(previous, replacement));
+    }
+
+    private static void requireNativeSource(RecipeSource source) {
+        if (!source.nativeFormat() || !source.keys().getFirst().split("#", 2)[0].equals(NativeRecipeSchema.ROOT)) {
+            throw new IllegalStateException("Recipe edits require a native content-pack source");
+        }
+    }
+
+    private static void requireOriginalStation(YamlConfiguration yaml, RecipeSource source, String expected) {
+        if (source.exists(yaml) && !expected.equals(source.body(yaml).get("station"))) {
+            throw new IllegalStateException("The recipe station changed at the original source; the edit was refused");
+        }
+    }
+
     static void deleteRecipeSource(YamlConfiguration yaml, RecipeSource source, boolean pot, java.nio.file.Path defaultFile) {
+        requireNativeSource(source);
+        requireOriginalStation(yaml, source, pot ? "cooking_pot" : "cutting_board");
         source.put(yaml, null);
         if (!source.file().equals(defaultFile.toAbsolutePath().normalize())) return;
         String station = pot ? "cooking_pot" : "cutting_board";
@@ -197,15 +231,85 @@ public final class RecipeEditorStore {
     }
 
     static Map<String, Object> mergeRecipeBody(Map<String, Object> previous, Map<String, Object> edited) {
-        Map<String, Object> result = new LinkedHashMap<>(previous);
-        // Fields represented by the editor are replaced as a unit; other extension data retains its value.
-        for (String key : List.of("type", "ingredients", "ingredient", "input", "result", "results", "result-count", "container",
-                "cook-time", "time", "experience", "category", "priority", "tool", "tools", "sound", "match-mode", "perfect",
-                "use-equivalent-foods", "use-seasonings", "minimum-score", "sound-volume", "sound-pitch",
-                "match_mode", "use_equivalent_foods", "use_seasonings", "minimum_score", "sound_volume", "sound_pitch",
-                "result_count", "cooking_time", "cooking-time", "infer_container")) result.remove(key);
-        result.putAll(edited);
+        Map<String, Object> unplaced = new LinkedHashMap<>();
+        @SuppressWarnings("unchecked") Map<String, Object> result = (Map<String, Object>) mergeRecipeValue(
+                NativeRecipeSchema.copy(previous), NativeRecipeSchema.copy(edited), "recipe", unplaced);
+        if (!unplaced.isEmpty()) {
+            Map<String, Object> extensions = result.get("extensions") instanceof Map<?, ?> values
+                    ? NativeRecipeSchema.copy(values) : new LinkedHashMap<>();
+            if (result.get("extensions") != null && !(result.get("extensions") instanceof Map<?, ?>)) {
+                extensions.put("original_extensions", result.get("extensions"));
+            }
+            Map<String, Object> saved = extensions.get("saved_fields") instanceof Map<?, ?> values
+                    ? NativeRecipeSchema.copy(values) : new LinkedHashMap<>();
+            unplaced.forEach(saved::putIfAbsent);
+            extensions.put("saved_fields", saved);
+            result.put("extensions", extensions);
+        }
         return result;
+    }
+
+    private static Object mergeRecipeValue(Object previous, Object edited, String path, Map<String, Object> unplaced) {
+        // These maps contain gameplay keys, even when a key happens to begin with "x-".
+        if (path.endsWith("/components") || path.endsWith("/perfect")) return edited;
+        if (previous instanceof Map<?, ?> before && edited instanceof Map<?, ?> after) {
+            Map<String, Object> result = NativeRecipeSchema.copy(after);
+            for (var entry : before.entrySet()) {
+                String key = String.valueOf(entry.getKey());
+                if (extensionKey(key)) {
+                    if (result.containsKey(key)) result.put(key, mergeExtensionValue(entry.getValue(), result.get(key)));
+                    else result.put(key, entry.getValue());
+                } else if (result.containsKey(key)) {
+                    result.put(key, mergeRecipeValue(entry.getValue(), result.get(key), path + "/" + key, unplaced));
+                } else if (path.equals("recipe") && !managedRootField(key)) {
+                    result.put(key, entry.getValue());
+                } else {
+                    collectExtensions(entry.getValue(), path + "/" + key, unplaced);
+                }
+            }
+            return result;
+        }
+        if (previous instanceof List<?> before && edited instanceof List<?> after) {
+            List<Object> result = new ArrayList<>(after.size());
+            for (int index = 0; index < after.size(); index++) result.add(mergeRecipeValue(
+                    index < before.size() ? before.get(index) : null, after.get(index), path + "/" + index, unplaced));
+            for (int index = after.size(); index < before.size(); index++) collectExtensions(before.get(index), path + "/" + index, unplaced);
+            return result;
+        }
+        collectExtensions(previous, path, unplaced);
+        return edited;
+    }
+
+    private static Object mergeExtensionValue(Object previous, Object edited) {
+        if (previous instanceof Map<?, ?> before && edited instanceof Map<?, ?> after) {
+            Map<String, Object> result = NativeRecipeSchema.copy(before);
+            after.forEach((key, value) -> result.put(String.valueOf(key), mergeExtensionValue(before.get(key), value)));
+            return result;
+        }
+        return edited;
+    }
+
+    private static boolean extensionKey(String key) {
+        return key.startsWith("x-") || key.equals("extensions") || key.equals("metadata");
+    }
+
+    private static boolean managedRootField(String key) {
+        return java.util.Set.of("station", "input", "output", "process", "matching", "operation", "fluid",
+                "group", "category", "priority", "ingredients", "result", "results", "result-count", "container",
+                "cook-time", "experience", "tool", "tools", "sound", "match-mode", "perfect",
+                "use-equivalent-foods", "use-seasonings", "minimum-score", "sound-volume", "sound-pitch").contains(key);
+    }
+
+    private static void collectExtensions(Object value, String path, Map<String, Object> found) {
+        if (path.endsWith("/components") || path.endsWith("/perfect")) return;
+        if (value instanceof Map<?, ?> fields) fields.forEach((key, nested) -> {
+            String name = String.valueOf(key), child = path + "/" + name;
+            if (extensionKey(name)) found.put(child, nested);
+            else if (!name.equals("components") && !name.equals("perfect")) collectExtensions(nested, child, found);
+        });
+        else if (value instanceof List<?> values) for (int index = 0; index < values.size(); index++) {
+            collectExtensions(values.get(index), path + "/" + index, found);
+        }
     }
 
     private Edit external(RecipeOwner owner, YamlMutation mutation) {

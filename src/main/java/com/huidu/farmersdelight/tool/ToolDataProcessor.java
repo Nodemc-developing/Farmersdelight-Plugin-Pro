@@ -4,6 +4,7 @@ import net.momirealms.craftengine.core.item.Item;
 import net.momirealms.craftengine.core.item.ItemBuildContext;
 import net.momirealms.craftengine.core.item.component.DataComponentKeys;
 import net.momirealms.craftengine.core.item.processor.ItemProcessor;
+import net.momirealms.craftengine.core.util.VersionHelper;
 
 import java.util.Map;
 
@@ -28,14 +29,8 @@ public final class ToolDataProcessor implements ItemProcessor {
         item.maxStackSize(1);
         item.maxDamage(maxDurability);
         item.damage(0);
-        if (enchantability > 0) {
-            try {
-                // 1.21.5+: enchantable changed from int to {"value": int}
-                item.setJavaComponent(DataComponentKeys.ENCHANTABLE, Map.of("value", enchantability));
-            } catch (RuntimeException e) {
-                // 1.21.4 and earlier: enchantable is a plain int
-                item.setJavaComponent(DataComponentKeys.ENCHANTABLE, enchantability);
-            }
+        if (enchantability > 0 && VersionHelper.isOrAbove1_21_2) {
+            item.setJavaComponent(DataComponentKeys.ENCHANTABLE, Map.of("value", enchantability));
         }
         return item;
     }

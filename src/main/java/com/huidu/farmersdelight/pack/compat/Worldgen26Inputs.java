@@ -15,29 +15,28 @@ final class Worldgen26Inputs {
     static Result adapt(Map<String, Object> definitions, boolean modern, Predicate<String> customBlock) {
         List<Change> changes = new ArrayList<>();
         Map<String, Object> result = new LinkedHashMap<>();
-        definitions.forEach((id, value) -> result.put(id, modern ? visit(value, id, "", customBlock, changes)
-                : ConfigPriorityFilter.copy(value)));
+        definitions.forEach((id, value) -> result.put(id, visit(value, id, "", modern, customBlock, changes)));
         return new Result(result, List.copyOf(changes));
     }
 
-    private static Object visit(Object value, String id, String path, Predicate<String> customBlock,
+    private static Object visit(Object value, String id, String path, boolean modern, Predicate<String> customBlock,
                                 List<Change> changes) {
         if (value instanceof List<?> list) {
             List<Object> result = new ArrayList<>(list.size());
-            for (int i = 0; i < list.size(); ++i) result.add(visit(list.get(i), id, path + "[" + i + "]", customBlock, changes));
+            for (int i = 0; i < list.size(); ++i) result.add(visit(list.get(i), id, path + "[" + i + "]", modern, customBlock, changes));
             return result;
         }
         if (!(value instanceof Map<?, ?> map)) return value;
         Map<String, Object> result = new LinkedHashMap<>();
         map.forEach((key, child) -> result.put(String.valueOf(key), visit(child, id,
-                path.isEmpty() ? String.valueOf(key) : path + "." + key, customBlock, changes)));
+                path.isEmpty() ? String.valueOf(key) : path + "." + key, modern, customBlock, changes)));
         String type = result.get("type") instanceof String text ? text : "";
-        if (type.equals("minecraft:simple_block"))
+        if (modern && type.equals("minecraft:simple_block"))
             unwrap(result, Set.of("to_place", "schedule_tick"), Set.of("to_place"), id, path, changes);
-        else if (type.equals("minecraft:block_column"))
+        else if (modern && type.equals("minecraft:block_column"))
             unwrap(result, Set.of("layers", "direction", "allowed_placement", "prioritize_tip"),
                     Set.of("layers", "direction", "allowed_placement", "prioritize_tip"), id, path, changes);
-        else if (type.equals("minecraft:random_offset")) {
+        else if (modern && type.equals("minecraft:random_offset")) {
             if (result.keySet().equals(Set.of("type", "xz_spread", "y_spread"))) {
                 Object horizontal = result.remove("xz_spread");
                 Object vertical = result.remove("y_spread");
@@ -50,11 +49,11 @@ final class Worldgen26Inputs {
             if (customState(result.get("state"), customBlock)) {
                 result.put("type", "craftengine:simple_state_provider");
                 changes.add(new Change(id, path + ".type", "converted", "Registered custom block state provider"));
-            } else if (result.containsKey("state")) {
+            } else if (modern && result.containsKey("state")) {
                 result.put("type", "minecraft:simple");
                 changes.add(new Change(id, path + ".type", "converted", "Native simple provider registry ID changed in 26.3"));
             }
-        } else if (type.equals("minecraft:rule_based_state_provider") && result.get("rules") instanceof List<?>) {
+        } else if (modern && type.equals("minecraft:rule_based_state_provider") && result.get("rules") instanceof List<?>) {
             result.put("type", "minecraft:rule_based");
             changes.add(new Change(id, path + ".type", "converted", "Native rule-based provider registry ID changed in 26.3"));
         } else if (type.equals("minecraft:weighted_state_provider") && result.get("entries") instanceof List<?> entries) {
@@ -66,7 +65,7 @@ final class Worldgen26Inputs {
                 changes.add(new Change(id, path + ".type", "converted", "Registered custom weighted block states"));
             } else if (custom > 0) changes.add(new Change(id, path, "refused",
                     "Mixed vanilla/custom weighted states are unsupported; original shape preserved"));
-            else {
+            else if (modern) {
                 result.put("type", "minecraft:weighted");
                 changes.add(new Change(id, path + ".type", "converted", "Native weighted provider registry ID changed in 26.3"));
             }

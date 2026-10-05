@@ -1,0 +1,104 @@
+{
+  "version": "1.2.2",
+  "time": "2026-10-05T15:48:51.625788+00:00",
+  "overall": "PASS",
+  "combinations": 2,
+  "native_pass": 38,
+  "load_log_pass": 4,
+  "combined_pass": 42,
+  "cases": [
+    {
+      "environment": "paper-26.3",
+      "ce": "26.9.2",
+      "core_build": "26.3-140-977da0d",
+      "java": "25.0.3",
+      "native_pass": 19,
+      "load_log_pass": 2,
+      "status": "PASS",
+      "recipes": "28/107/24",
+      "config_version": 4,
+      "deployed_plugins": {
+        "Farmersdelight-Plugin-Pro.jar": {
+          "source": "Farmersdelight-Plugin-Pro-1.2.2.jar",
+          "sha256": "b9c892f3df897965a408399f20b772737ca7b5884d4c9af98b4389265d6155b1"
+        },
+        "FluidCore.jar": {
+          "source": "FluidCore-0.1.0-SNAPSHOT.jar",
+          "sha256": "ae4c584cf18c1c11d716fed395bb8cdcdf05a204d1fcb68b784128220933f04a"
+        },
+        "UltimateAdvancementAPI.jar": {
+          "source": "UltimateAdvancementAPI-Plugin-2.8.1-pro.3.jar",
+          "sha256": "23c42974685fbdbed4b6be6e29903df4be11bed89b1e46cb0136603bdec8a589"
+        },
+        "FdVersionVerification.jar": {
+          "source": "FdVersionVerification.jar",
+          "sha256": "90cc932052aade918c330a7976aaa3c54e745702ec74eb7f2ce444416d9fcaf3"
+        },
+        "CraftEngine.jar": {
+          "source": "craft-engine-paper-plugin-26.9.2.jar",
+          "sha256": "1f9e0935a11e7d6c7a979f2d521ec24efb715375c876a57ef3cc11e9fb9895aa"
+        }
+      },
+      "report_json": {
+        "file": "paper-26.3-ce-26.9.2-report.json",
+        "sha256": "7c14b773c559d1a126f0c4d56d3dc099cf991f0371d2db945037f0ee3d6bd7ec"
+      },
+      "result_json": {
+        "file": "paper-26.3-ce-26.9.2-result.json",
+        "sha256": "6f23ea34ec8c14424d422b147c4f3d551a3e75e1fc4f5fb03058d86bfd362bde"
+      }
+    },
+    {
+      "environment": "folia-26.2",
+      "ce": "26.10",
+      "core_build": "26.2-7-14b7fee",
+      "java": "25.0.3",
+      "native_pass": 19,
+      "load_log_pass": 2,
+      "status": "PASS",
+      "recipes": "28/107/24",
+      "config_version": 4,
+      "deployed_plugins": {
+        "Farmersdelight-Plugin-Pro.jar": {
+          "source": "Farmersdelight-Plugin-Pro-1.2.2.jar",
+          "sha256": "b9c892f3df897965a408399f20b772737ca7b5884d4c9af98b4389265d6155b1"
+        },
+        "FluidCore.jar": {
+          "source": "FluidCore-0.1.0-SNAPSHOT.jar",
+          "sha256": "ae4c584cf18c1c11d716fed395bb8cdcdf05a204d1fcb68b784128220933f04a"
+        },
+        "UltimateAdvancementAPI.jar": {
+          "source": "UltimateAdvancementAPI-Plugin-2.8.1-pro.3.jar",
+          "sha256": "23c42974685fbdbed4b6be6e29903df4be11bed89b1e46cb0136603bdec8a589"
+        },
+        "FdVersionVerification.jar": {
+          "source": "FdVersionVerification.jar",
+          "sha256": "90cc932052aade918c330a7976aaa3c54e745702ec74eb7f2ce444416d9fcaf3"
+        },
+        "CraftEngine.jar": {
+          "source": "craft-engine-paper-plugin-26.10-SNAPSHOT.jar",
+          "sha256": "46ebe45f31f3e3f0965179a85cb1f308d8729f53281d6c64f4ef2af5c23d99f6"
+        }
+      },
+      "report_json": {
+        "file": "folia-26.2-ce-26.10-report.json",
+        "sha256": "2cc3d1b16c7a925663cae05890eb93b5c9601242758d72fb5f4741070beb91ee"
+      },
+      "result_json": {
+        "file": "folia-26.2-ce-26.10-result.json",
+        "sha256": "a6569824cc7fa1c896e47f58c60475c70fe97455824e65371e9e79578adf8aa1"
+      }
+    }
+  ],
+  "limits": [
+    "Headless correctness only; no client rendering or live network connection",
+    "No manual player inventory/GUI interaction",
+    "No full placed-tank world save/restart or cross-region player/hopper scenario",
+    "No performance benchmark or full-version matrix in this round"
+  ],
+  "servers_created": 0,
+  "fd_unit_tests": 836,
+  "fd_fluid_tests_final_dependency": 65,
+  "fluid_platform_tests": 221,
+  "unchanged_core_tests_previously_passed": 73
+}

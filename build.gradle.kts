@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.huidu.farmersdelight"
-version = "1.2.0"
+version = "1.2.2"
 
 repositories {
     mavenCentral()
@@ -21,9 +21,11 @@ repositories {
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
 }
 
-// The supported host API is the pinned 26.10 snapshot; unpublished builds accept its plugin JAR.
-val ceVersion = providers.gradleProperty("ceVersion").getOrElse("26.10-SNAPSHOT")
-require(ceVersion.startsWith("26.10")) { "Farmersdelight-Plugin-Pro requires the CraftEngine 26.10 API." }
+// The latest published stable Maven API is the compilation baseline; use ceJar for 26.9.2.
+val ceVersion = providers.gradleProperty("ceVersion").getOrElse("26.9.1")
+require(ceVersion == "26.9.1" || ceVersion == "26.9.2" || ceVersion.startsWith("26.10")) {
+    "Compile with CraftEngine 26.9.1 Maven APIs, a local 26.9.2 JAR, or the verified 26.10 snapshot."
+}
 val ceJar = providers.gradleProperty("ceJar").orElse(providers.environmentVariable("FARMERSDELIGHT_CE_JAR"))
 val fluidCoreJar = providers.gradleProperty("fluidCoreJar").orElse(
     layout.projectDirectory.file("libs/FluidCore-0.1.0-SNAPSHOT.jar").asFile.absolutePath)
@@ -66,6 +68,7 @@ val prepareCeCompileApi by tasks.registering(ShadowJar::class) {
     relocate("org.snakeyaml.engine", "net.momirealms.craftengine.libraries.snakeyaml.engine")
     relocate("net.momirealms.sparrow.nbt", "net.momirealms.craftengine.libraries.nbt")
     relocate("com.github.benmanes.caffeine", "net.momirealms.craftengine.libraries.caffeine")
+    relocate("net.kyori.adventure", "net.momirealms.craftengine.libraries.adventure")
 }
 val ceCompileApiFiles = files(prepareCeCompileApi.flatMap { it.archiveFile }).builtBy(prepareCeCompileApi)
 
@@ -73,11 +76,14 @@ dependencies {
     add(ceCompileApiLibraries.name, "org.snakeyaml:snakeyaml-engine:3.1.1")
     add(ceCompileApiLibraries.name, "net.momirealms:sparrow-util:0.124")
     add(ceCompileApiLibraries.name, "com.github.ben-manes.caffeine:caffeine:3.3.0")
+    add(ceCompileApiLibraries.name, "net.kyori:adventure-api:5.2.0")
+    add(ceCompileApiLibraries.name, "net.kyori:adventure-key:5.2.0")
     if (!ceLibraries.isPresent) {
         compileOnly(ceCompileApiFiles)
         testImplementation(ceCompileApiFiles)
     }
-    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
+    // Compile shared gameplay against the oldest supported server API.
+    compileOnly("io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT")
     compileOnly("org.jetbrains:annotations:26.1.0")
     // Already provided by Paper; only the transport API is needed for per-player display packets.
     compileOnly("io.netty:netty-transport:4.1.135.Final")
@@ -111,10 +117,11 @@ dependencies {
     implementation("net.momirealms:sparrow-yaml:1.0.22")
     implementation("net.momirealms:sparrow-ui:beta.38") { isTransitive = false }
     // UltimateAdvancementAPI: separate server plugin; vendored only for offline compile against its API.
-    compileOnly(files("libs/UltimateAdvancementAPI-Plugin-2.8.1-pro.2.jar"))
+    compileOnly(files("libs/UltimateAdvancementAPI-Plugin-2.8.1-pro.3.jar"))
     // FluidCore remains a separate optional plugin and owns these runtime types.
     compileOnly(files(fluidCoreJar.get()))
     testImplementation(files(fluidCoreJar.get()))
+    // Unit fixtures exercise modern metadata; production compilation still uses the 1.21 API above.
     testImplementation("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     if (ceJar.isPresent) {
         testImplementation(ceSnapshotPluginFiles)

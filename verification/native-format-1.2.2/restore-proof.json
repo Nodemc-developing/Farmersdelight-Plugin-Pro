@@ -1,0 +1,31 @@
+{
+  "overall": "PASS",
+  "cases": [
+    {
+      "environment": "paper-26.3",
+      "original_jar_hashes_restored": true,
+      "fd_config_and_recipe_file_count": 13,
+      "all_original_file_hashes_restored": true,
+      "original_fd_cache_file_count": 2210,
+      "all_original_cache_hashes_restored": true,
+      "registry_original_plugin_fields_restored": true,
+      "runtime_profile_active": false,
+      "no_running_server_process_or_bound_port": true
+    },
+    {
+      "environment": "folia-26.2",
+      "original_jar_hashes_restored": true,
+      "fd_config_and_recipe_file_count": 13,
+      "all_original_file_hashes_restored": true,
+      "original_fd_cache_file_count": 2210,
+      "all_original_cache_hashes_restored": true,
+      "registry_original_plugin_fields_restored": true,
+      "runtime_profile_active": false,
+      "no_running_server_process_or_bound_port": true
+    }
+  ],
+  "unselected_registry_profiles_unchanged": true,
+  "other_registry_fields_unchanged": true,
+  "worlds_and_databases_not_copied_reset_or_replaced": true,
+  "daily_profiles_untouched": true
+}

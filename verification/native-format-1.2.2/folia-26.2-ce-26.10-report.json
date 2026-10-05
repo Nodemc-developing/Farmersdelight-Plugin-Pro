@@ -1,0 +1,88 @@
+{
+  "server": "26.2-7-14b7fee (MC: 26.2)",
+  "java": "25.0.3",
+  "time": "2026-10-05T15:45:40.299365900Z",
+  "overall": "PASS",
+  "checks": {
+    "plugins_enabled": {
+      "status": "PASS",
+      "detail": "CE / FD / FluidCore / UAA enabled"
+    },
+    "owner_thread": {
+      "status": "PASS",
+      "detail": "region owner"
+    },
+    "recipes": {
+      "status": "PASS",
+      "detail": "native config=4, root=farmersdelight_recipes, pot=28, board=107, fluid=24; removed compatibility behaviors are unregistered"
+    },
+    "bundled_items": {
+      "status": "PASS",
+      "detail": "9 common CE items retain custom identity; golden knife enchantability=22, durability=32"
+    },
+    "wild_blocks_and_features": {
+      "status": "PASS",
+      "detail": "3 custom wild blocks registered and all 4 wild placed-feature holders loaded"
+    },
+    "pale_oak_recipe_version_contract": {
+      "status": "PASS",
+      "detail": "Native pale oak ingredients and CE recipe are registered"
+    },
+    "sleeping_ticker_bridge": {
+      "status": "PASS",
+      "detail": "native-list=true; sleep suppresses business tick and one wake resumes it"
+    },
+    "food_remainder": {
+      "status": "PASS",
+      "detail": "USE_REMAINDER round trip"
+    },
+    "gui_filler": {
+      "status": "PASS",
+      "detail": "hide-tooltip=true, modern item_model supported"
+    },
+    "slot_packets": {
+      "status": "PASS",
+      "detail": "[ClientboundSetPlayerInventoryPacket:0, ClientboundSetPlayerInventoryPacket:8, ClientboundSetPlayerInventoryPacket:40]"
+    },
+    "handheld_packet_rewrite": {
+      "status": "PASS",
+      "detail": "EmbeddedChannel: slots 0/8/40 and full content, display-only copies, bundle preservation and closure verified"
+    },
+    "skewer_non_food_restore": {
+      "status": "PASS",
+      "detail": "native duration=61, count=3, original components restored"
+    },
+    "nourishment_skewer_restore_order": {
+      "status": "PASS",
+      "detail": "native duration=61, count=3, original components restored"
+    },
+    "legacy_skewer_preserves_external_food": {
+      "status": "PASS",
+      "detail": "separate CONSUMABLE: legacy combined-FOOD scenario does not apply"
+    },
+    "villager_food": {
+      "status": "PASS",
+      "detail": "linked native foodLevel, round trip=0"
+    },
+    "tank_component_colors": {
+      "status": "PASS",
+      "detail": "RGB pair updated; additional color / floats / flags / strings / PDC retained"
+    },
+    "fluid_detached_bucket_bottle": {
+      "status": "PASS",
+      "detail": "Native buckets 1000 / bottles 250: projected and committed detached fill/empty preserve all caller items"
+    },
+    "fluid_native_item_persistence": {
+      "status": "PASS",
+      "detail": "Native ItemStack bytes preserve water bottle and CE tank 3750/16000, count, full metadata, CE ID and glass-color PDC"
+    },
+    "fluid_rejected_transfer_conservation": {
+      "status": "PASS",
+      "detail": "999-unit source and full destination return NO_TRANSFER with native item/fluid conservation"
+    },
+    "client_render_and_network": {
+      "status": "SKIP",
+      "detail": "Headless: no real client, real connection delivery or manual menu interaction"
+    }
+  }
+}

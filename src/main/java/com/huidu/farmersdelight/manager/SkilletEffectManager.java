@@ -83,7 +83,7 @@ public class SkilletEffectManager {
         this.effectViewerDistanceSquared = viewerDistance * viewerDistance;
         this.chunkEffectBudgetLimit = Math.max(1, plugin.getConfigInt(50,
                 "performance.budgets.chunk-effect-packet-budget"));
-        this.effectIntervalTicks = Math.max(4, plugin.getConfigInt(4, "skillet.particles.interval_ticks"));
+        this.effectIntervalTicks = Math.max(4, plugin.getConfigInt(4, "skillet.particles.interval-ticks"));
         loadEffectsConfig();
     }
 

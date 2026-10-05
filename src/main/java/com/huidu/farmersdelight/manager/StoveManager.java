@@ -154,7 +154,7 @@ public class StoveManager {
                 "stove.cooking.cooling-decrement",
                 "stove.cooling-decrement"));
         this.chunkEffectBudgetLimit = Math.max(1, plugin.getConfigInt(50, "performance.budgets.chunk-effect-packet-budget"));
-        this.effectIntervalTicks = Math.max(4, plugin.getConfigInt(4, "stove.particles.interval_ticks"));
+        this.effectIntervalTicks = Math.max(4, plugin.getConfigInt(4, "stove.particles.interval-ticks"));
         loadEffectsConfig();
         visualManager.reloadSlotOffsets();
         visualManager.refreshAll(stoves.values());

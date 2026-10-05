@@ -10,7 +10,7 @@ name: Farmersdelight-Plugin-Pro
 provides: [FarmersDelight]
 version: '${version}'
 main: com.huidu.farmersdelight.FarmersDelightPlugin
-api-version: '1.21.4'
+api-version: '1.21'
 folia-supported: true
 description: CraftEngine port of Farmer's Delight by vectorwing (MIT).
 authors:

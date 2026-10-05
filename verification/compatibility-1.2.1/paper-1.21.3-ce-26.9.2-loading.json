@@ -1,0 +1,10 @@
+{
+  "wild_worldgen_native_log": {
+    "status": "PASS",
+    "detail": "No custom wild-block Unknown registry key errors in actual native load log"
+  },
+  "bundled_native_load_errors": {
+    "status": "PASS",
+    "detail": "No bundled item/block/placed-feature errors reported by the actual CE parser"
+  }
+}

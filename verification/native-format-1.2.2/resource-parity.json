@@ -1,0 +1,114 @@
+{
+  "bundled_recipes": {
+    "cooking_pot": 28,
+    "cutting_board": 107,
+    "fluid_tank": 24
+  },
+  "total": 159,
+  "reconstructed_original_bodies_equal": true,
+  "ancillary_advanced_tags_equal": true,
+  "meal_icons": 28,
+  "meal_tool_tests": 3,
+  "ce_configuration_comment_changes": 0,
+  "documentation_examples": [
+    {
+      "file": "CONFIGURATION-RECIPES.zh-CN.md",
+      "example": 1,
+      "roots": [
+        "farmersdelight_recipes"
+      ]
+    },
+    {
+      "file": "CONFIGURATION-RECIPES.zh-CN.md",
+      "example": 2,
+      "roots": [
+        "farmersdelight_recipes"
+      ]
+    },
+    {
+      "file": "CONFIGURATION-RECIPES.zh-CN.md",
+      "example": 3,
+      "roots": [
+        "farmersdelight_recipes"
+      ]
+    },
+    {
+      "file": "CONFIGURATION-RECIPES.zh-CN.md",
+      "example": 4,
+      "roots": [
+        "farmersdelight_recipes"
+      ]
+    },
+    {
+      "file": "CONFIGURATION-RECIPES.zh-CN.md",
+      "example": 5,
+      "roots": [
+        "advanced_tags"
+      ]
+    },
+    {
+      "file": "CONFIGURATION-RECIPES.zh-CN.md",
+      "example": 6,
+      "roots": [
+        "farmersdelight_recipes"
+      ]
+    },
+    {
+      "file": "CONFIGURATION-RECIPES.zh-CN.md",
+      "example": 7,
+      "roots": [
+        "fluid"
+      ]
+    },
+    {
+      "file": "CONFIGURATION-RECIPES.zh-CN.md",
+      "example": 8,
+      "roots": [
+        "fluidcore:fluids"
+      ]
+    },
+    {
+      "file": "CONFIGURATION-RECIPES.zh-CN.md",
+      "example": 9,
+      "roots": [
+        "items"
+      ]
+    },
+    {
+      "file": "FLUID-TANK.zh-CN.md",
+      "example": 1,
+      "roots": [
+        "farmersdelight_recipes"
+      ]
+    },
+    {
+      "file": "FLUID-TANK.zh-CN.md",
+      "example": 2,
+      "roots": [
+        "menu"
+      ]
+    },
+    {
+      "file": "KALEIDOSCOPE-COMPAT.zh-CN.md",
+      "example": 1,
+      "roots": [
+        "farmersdelight_recipes"
+      ]
+    },
+    {
+      "file": "KALEIDOSCOPE-COMPAT.zh-CN.md",
+      "example": 2,
+      "roots": [
+        "food_groups"
+      ]
+    }
+  ],
+  "java_resource_regressions_added": 3,
+  "java_validation": "PASS: included in 836-test full suite",
+  "servers_started": 0,
+  "special_cards_unchanged": 9,
+  "special_card_regressions_added": 2,
+  "native_config_checker_self_tests": "PASS",
+  "native_config_checker_registry_exemptions": "preserved",
+  "native_config_checker_actual_scan": "PASS: 0 problems"
+}

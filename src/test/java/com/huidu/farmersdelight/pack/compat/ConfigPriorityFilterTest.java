@@ -47,9 +47,9 @@ class ConfigPriorityFilterTest {
         ownership.record(own, Files.readAllBytes(own));
         var report = new ContentConflicts(directory.resolve("conflicts.json"));
         var first = new CachedConfigSection(pack("bundle"), own,
-                ConfigSection.of("papersdelight_recipes#food", Map.of("soup", Map.of("type", "cooking"))), Map.of());
+                ConfigSection.of("farmersdelight_recipes#food", Map.of("soup", Map.of("station", "cooking_pot"))), Map.of());
         var second = new CachedConfigSection(pack("operator"), external,
-                ConfigSection.of("papersdelight_recipes", Map.of("food:soup", Map.of("type", "cooking", "time", 1))), Map.of());
+                ConfigSection.of("farmersdelight_recipes", Map.of("food:soup", Map.of("station", "cooking_pot", "process", Map.of("ticks", 1)))), Map.of());
         var selected = ConfigPriorityFilter.filter("farmersdelight:pack_sections", List.of(first, second), List.of(), ownership, report);
         assertEquals(List.of(external), selected.configs().stream().map(CachedConfigSection::path).toList());
         assertEquals(1, ConfigPriorityFilter.filter("craftengine:items", List.of(first), List.of(), ownership, report).configs().size());

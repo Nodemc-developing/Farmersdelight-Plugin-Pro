@@ -1,6 +1,6 @@
 # 森罗物语兼容与模糊配方
 
-Farmersdelight-Plugin-Pro 1.0.4 可选兼容 `KaleidoscopeCookeryPlugin`。森罗未安装时，农夫乐事独立运行；安装后默认启用以下功能。
+Farmersdelight-Plugin-Pro 可选兼容 `KaleidoscopeCookeryPlugin`。森罗未安装时，农夫乐事独立运行；安装后默认启用以下功能。1.2.2 的配方使用本插件独立的 `farmersdelight_recipes` 结构。
 
 ## 菜谱自动投料
 
@@ -31,35 +31,40 @@ Farmersdelight-Plugin-Pro 1.0.4 可选兼容 `KaleidoscopeCookeryPlugin`。森�
 1. 必需食材种类必须齐全；等效开关打开时，同组成员可替代并合并计数。
 2. 打开调味品开关后，调味品不参与配比、份数和品质计算。必需食材不应同时声明为调味品。
 3. 原有精准配方优先。模糊配方先按 `priority`，再按覆盖的必需食材种类和余弦相似度选菜；同分保留配置顺序。
-4. 每种食材能凑齐的完整理想配比取最小值，决定份数；必需种类齐全但份量不足时，至少产出一份。最终数量为基础 `result-count` × 份数，输出区容不下时等待取出。
+4. 每种食材能凑齐的完整理想配比取最小值，决定份数；必需种类齐全但份量不足时，至少产出一份。最终数量为基础 `output.count` × 份数，输出区容不下时等待取出。
 5. 偏差为各必需食材相对本轮完整配比的数量差，再加杂料份数。偏差 0、1、2、≥3 分别对应完美、优秀、普通、生疏，已有的显式食物组件属性倍率分别为 1.2、0.9、0.6、0.3。品质写入成品数据与说明；只继承原版默认食物属性、没有显式食物组件的成品保留原属性。
 
 示例（厨锅配方文件）：
 
 ```yaml
-cooking_pot_recipes:
+farmersdelight_recipes:
   example:meat_stew:
-    match-mode: fuzzy
-    perfect:
-      minecraft:beef: 2
-      farmersdelight:tomato: 1
-    result: farmersdelight:beef_stew
-    result-count: 1
-    container: minecraft:bowl
-    cook-time: 200
+    station: cooking_pot
+    input:
+      container: minecraft:bowl
+    output:
+      item: farmersdelight:beef_stew
+      count: 1
+    process:
+      ticks: 200
+    matching:
+      mode: fuzzy
+      perfect:
+        minecraft:beef: 2
+        farmersdelight:tomato: 1
+      use-equivalent-foods: true
+      use-seasonings: true
+      minimum-score: 0.15
     category: meals
     priority: 0
-    use-equivalent-foods: true
-    use-seasonings: true
-    minimum-score: 0.15
 ```
 
-`perfect` 也接受森罗的旧格式：`['minecraft:beef 2', 'farmersdelight:tomato 1']`。下划线开关 `use_equivalent_foods`、`use_seasonings` 同样可读。
+`matching.perfect` 使用具体物品 ID 与理想份数的映射。`matching` 下的等效食材和调味品开关分别控制分组替代与调味品识别；该配方格式独立于森罗菜谱自动投料接口。
 
 食材分组文件示例：
 
 ```yaml
-groups:
+food_groups:
   example:red_meat:
     kind: equivalent
     items: [minecraft:beef, minecraft:porkchop, minecraft:mutton]

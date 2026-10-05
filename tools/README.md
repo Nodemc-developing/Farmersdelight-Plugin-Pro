@@ -6,7 +6,7 @@ Three checks that enforce the machine-checkable half of this project's maintenan
 | Check | Guards |
 | --- | --- |
 | `strip_ce_comments.py --check` | Shipped CraftEngine configuration under `src/main/resources/craftengine/**/configuration/` carries no comments. Field references live in the wiki, not in the data files. |
-| `meal_icons.py --check` | Every `configuration/meal_icons.yml` entry still corresponds to a cooking pot result that exists, and every such result has an entry with a resolvable 16x16 texture. |
+| `meal_icons.py --check` | Every `configuration/meal_icons.yml` entry corresponds to a `farmersdelight_recipes` cooking-pot output, and every such output has an entry with a resolvable 16x16 texture. |
 | `check_lang_keys.py` | Every language key the Java sources reference is defined in both `lang/en_us.yml` and `lang/zh_cn.yml`, the two locales stay symmetric, and no value is blank. |
 
 All three are read-only with `--check` / `--quiet` and exit non-zero on a real problem, so no separate assertion
@@ -17,6 +17,10 @@ python tools/strip_ce_comments.py --check
 python tools/meal_icons.py --check
 python tools/check_lang_keys.py --quiet
 ```
+
+`python tools/test_meal_icons.py` checks station filtering, suffixed recipe roots and custom cooking-pot groups.
+`generate-fluid-content.py` generates tank item/block definitions only; it leaves workstation recipes in
+`farmersdelight_fluids/configuration/fluid_recipes.yml` untouched.
 
 Without `--check`, `strip_ce_comments.py` and `meal_icons.py` rewrite the files instead of reporting. That is
 the intended way to fix what they find; both keep existing order and only add, prune or de-comment.

@@ -1,6 +1,5 @@
 package com.huidu.farmersdelight.recipe;
 
-import com.huidu.farmersdelight.compat.OtherDelightIds;
 import com.huidu.farmersdelight.FarmersDelightPlugin;
 import com.huidu.farmersdelight.api.config.ConfigSectionReader;
 import com.huidu.farmersdelight.api.recipe.SpecialRecipeInfo;
@@ -12,25 +11,18 @@ import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public final class SpecialRecipeLoader {
 
     private static final String FILE_NAME = "recipes/special_recipes.yml";
     private static final String ROOT_KEY = "special_recipes";
-    private static final Set<String> SUPPORTED_OTHER_DELIGHT_TYPES = Set.of(
-            "cooking", "cutting", "fluid_filling", "fluid_emptying", "soaking");
 
     // Cards the CraftEngine pack layer registered, with the exact instance it registered, so a later pass can
     // replace or drop them again without touching entries an addon or the plugin file owns under the same id.
@@ -129,29 +121,6 @@ public final class SpecialRecipeLoader {
         for (PackSections.Section section : RecipePackFiles.sections(plugin, PackSection.SPECIAL_RECIPE)) {
             parseInto(current, section.yaml(), section.source());
         }
-        for (PackSections.Section section : RecipePackFiles.sections(plugin, PackSection.OTHER_DELIGHT_RECIPES)) {
-            ConfigurationSection root = section.yaml().getConfigurationSection(PackSection.OTHER_DELIGHT_RECIPES.rootKey());
-            if (root == null) continue;
-            for (String id : root.getKeys(false)) {
-                ConfigurationSection body = root.getConfigurationSection(id);
-                if (body == null) {
-                    I18n.logWarning("recipe.special_recipe_parse_failed", "id", id,
-                            "error", section.source() + ": expected a recipe mapping");
-                    continue;
-                }
-                String type = body.getString("type", "");
-                if ("info".equals(type)) {
-                    try { current.putIfAbsent(id, parseOtherDelightInfo(id, body)); }
-                    catch (IllegalArgumentException invalid) {
-                        I18n.logWarning("recipe.special_recipe_parse_failed", "id", id,
-                                "error", section.source() + ": " + invalid.getMessage());
-                    }
-                } else if (!SUPPORTED_OTHER_DELIGHT_TYPES.contains(type)) {
-                    I18n.logWarning(OtherDelightIds.UNSUPPORTED_RECIPE_MESSAGE, "type", type, "id", id, "file", section.source());
-                }
-            }
-        }
-
         for (Map.Entry<String, SpecialRecipeInfo> previous : PACK_REGISTERED.entrySet()) {
             if (!current.containsKey(previous.getKey()) && registry.get(previous.getKey()) == previous.getValue()) {
                 registry.unregister(previous.getKey());
@@ -194,22 +163,6 @@ public final class SpecialRecipeLoader {
 
     private static YamlConfiguration loadConfig(FarmersDelightPlugin plugin) {
         return RecipeFileLoader.loadRecipeFile(plugin, FILE_NAME);
-    }
-
-    public static SpecialRecipeInfo parseOtherDelightInfo(String id, ConfigurationSection section) {
-        Object item = section.get("item");
-        if (!(item instanceof String text) || text.isBlank()) throw new IllegalArgumentException("info.item must name an item");
-        Object description = section.get("description");
-        List<String> lines = new ArrayList<>();
-        if (description != null) {
-            if (!(description instanceof List<?> list)) throw new IllegalArgumentException("info.description must be a list");
-            for (Object line : list) {
-                if (!(line instanceof String textLine)) throw new IllegalArgumentException("info.description entries must be text");
-                lines.add(textLine);
-            }
-        }
-        return new SpecialRecipeInfo(id, "", text, lines, List.of(), List.of(), false, false, false,
-                List.of(), SpecialRecipeInfo.DISPLAY_OTHER_DELIGHT_INFO);
     }
 
     private static YamlConfiguration loadBundled(FarmersDelightPlugin plugin) {

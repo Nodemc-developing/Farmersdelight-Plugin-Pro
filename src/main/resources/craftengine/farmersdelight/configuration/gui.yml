@@ -19,6 +19,16 @@ templates:
         textures:
           layer0: ${__NAMESPACE__}:gui/sprites/icons/${__ID__}
 items:
+  farmersdelight:gui_invisible:
+    material: minecraft:paper
+    data:
+      hide_tooltip: true
+    model:
+      type: minecraft:model
+      path: farmersdelight:gui/invisible
+      generation:
+        parent: minecraft:block/block
+        elements: []
   farmersdelight:cooking_pot_heated:
     template: farmersdelight:icons
     data:

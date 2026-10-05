@@ -2,7 +2,6 @@ package com.huidu.farmersdelight.config;
 
 import com.huidu.farmersdelight.FarmersDelightPlugin;
 import com.huidu.farmersdelight.api.config.ConfigFileUpdater;
-import com.huidu.farmersdelight.api.config.ConfigKeyRename;
 import com.huidu.farmersdelight.api.config.ConfigUpdatePolicy;
 import com.huidu.farmersdelight.i18n.I18n;
 import org.bukkit.configuration.ConfigurationSection;
@@ -24,77 +23,9 @@ public final class ConfigBootstrap {
     private static final String DROPS_FILE = "drops.yml";
     private static final String DISPLAY_OVERRIDES_FILE = "display-overrides.yml";
 
+    static final int CONFIG_VERSION = 4;
     private static final ConfigUpdatePolicy CONFIG_POLICY = ConfigUpdatePolicy.builder()
-            .migrate("knife-config", "drops.knife-items")
-            .migrate("straw-drops", "drops.straw")
-            // The knife list defines what counts as a knife for the cutting board, the skillet, mushroom
-            // colonies, rice harvesting, the recipe viewer and addon drop rules, not only for drops.
-            .migrate("drops.knife-items", "knife-items")
-            // Settings several stations consume return to the top level: the experience reward and the
-            // container returns are also read by addon stations through the public API.
-            .migrate("cooking-pot.experience-reward", "experience-reward")
-            .migrate("cooking-pot.container-returns", "container-returns")
-            // Recipe discovery joins the other recipe settings.
-            .migrate("recipe-discovery", "recipes.discovery")
-            // The per-station hopper flags sat under the same name as the master switch, one as a boolean and one
-            // as a section; they are now allow-hopper.
-            .migrate("cutting-board.hopper-interactions", "cutting-board.allow-hopper")
-            .migrate("cooking-pot.hopper-interactions", "cooking-pot.allow-hopper")
-            .migrate("skillet.hopper-interactions", "skillet.allow-hopper")
-            // The performance knobs group by kind: warnings, per-tick work budgets and proxy display sync.
-            .migrate("performance.warnings-enabled", "performance.warnings.enabled")
-            .migrate("performance.warning-cooldown-seconds", "performance.warnings.cooldown-seconds")
-            .migrate("performance.active-block-warning-threshold", "performance.warnings.active-block-threshold")
-            .migrate("performance.cooking-pot-total-warning-threshold",
-                    "performance.warnings.cooking-pot-total-threshold")
-            .migrate("performance.cooking-pot-density-warning-threshold",
-                    "performance.warnings.cooking-pot-density-threshold")
-            .migrate("performance.craftengine-free-state-warning-threshold",
-                    "performance.warnings.craftengine-free-state-threshold")
-            .migrate("performance.proxy-item-display-view-distance", "performance.proxy-display.view-distance")
-            .migrate("performance.proxy-item-display-sync-interval-ticks",
-                    "performance.proxy-display.sync-interval-ticks")
-            .migrate("performance.proxy-item-display-sync-batch-size",
-                    "performance.proxy-display.sync-batch-size")
-            .migrate("performance.reload-visual-refreshes-per-tick",
-                    "performance.budgets.reload-visual-refreshes-per-tick")
-            .migrate("performance.pet-tempt-tick-budget", "performance.budgets.pet-tempt-tick-budget")
-            .migrate("performance.startup-chunk-loads-per-tick", "performance.budgets.startup-chunk-loads-per-tick")
-            .migrate("performance.chunk-effect-packet-budget", "performance.budgets.chunk-effect-packet-budget")
-            .migrate("performance.effect-tick-interval-ticks", "performance.budgets.effect-tick-interval-ticks")
-            // The four buff sections group under one buff parent.
-            .migrate("buff-persistence", "buff.persistence")
-            .migrate("bossbar", "buff.display")
-            .migrate("comfort-foods", "buff.comfort")
-            .migrate("nourishment-foods", "buff.nourishment")
-            // Comfort and Nourishment report themselves through the buff bossbar, which replaced the chat
-            // reminder that was sent this many ticks before the effect ran out.
-            .retire("buff.comfort.fade-warning-ticks",
-                    "comfort-foods.fade-warning-ticks",
-                    "buff.nourishment.fade-warning-ticks",
-                    "nourishment-foods.fade-warning-ticks",
-                    "tray",
-                    "cooking-pot.tray",
-                    "handle",
-                    "cooking-pot.handle",
-                    // Display visibility/throttling now lives in CraftEngine, which diffs the display text itself,
-                    // so this interval stopped being read and the key was removed from the bundled file.
-                    "cooking-pot.display",
-                    "cooking-pot.display.visibility-check-interval-ticks",
-                    // Placement protection now applies to the placing player's current tick only.
-                    "cooking-pot.place-interaction-cooldown-ms")
-            .registrySection("heat-sources",
-                    // Guarded at the parent, not at the foods child: an admin who disables every food by
-                    // deleting the whole foods block leaves no foods path for a narrower guard to match, and
-                    // the merge would write the bundled entries back one by one. The cost is that a genuinely
-                    // new setting added under these two parents in a later version is not merged into an
-                    // existing file.
-                    "buff.comfort",
-                    "comfort-foods",
-                    "buff.nourishment",
-                    "nourishment-foods",
-                    "container-returns",
-                    "cooking-pot.container-returns")
+            .registrySection("heat-sources", "buff.comfort", "buff.nourishment", "container-returns", "pet-foods")
             .build();
 
     private static final List<String> WORLD_DATA_REGISTRY_SECTIONS = List.of(
@@ -164,7 +95,7 @@ public final class ConfigBootstrap {
     /** Validates only keys present in the operator file against the bundled value type. */
     public void validateConfigTypes() {
         validateFile("config.yml", plugin.getSourceConfig(), readBundledYaml("config.yml"),
-                OtherDelightConfigFormat.canonicalRegistrySections(CONFIG_POLICY.registrySections()));
+                CONFIG_POLICY.registrySections());
         validateExternalTypes(WORLD_DATA_FILE, WORLD_DATA_REGISTRY_SECTIONS);
         validateExternalTypes(DROPS_FILE, DROPS_REGISTRY_SECTIONS);
         validateExternalTypes(DISPLAY_OVERRIDES_FILE, DISPLAY_OVERRIDES_REGISTRY_SECTIONS);
@@ -274,38 +205,15 @@ public final class ConfigBootstrap {
     }
 
     public void migrateConfigKeys() {
-        if (!OtherDelightConfigFormat.mayMigrate(plugin.getSourceConfig())) {
-            plugin.getLogger().warning("config.yml declares a newer config-version; leaving it untouched.");
+        if (!isCurrentSchema(plugin.getSourceConfig())) {
+            plugin.getLogger().warning("config.yml requires config-version: " + CONFIG_VERSION
+                    + "; the existing file is preserved. Replace its settings with the current bundled template.");
+            plugin.invalidateConfigView();
+            mergeMissingGuiKeys();
             return;
         }
-        boolean foreign = OtherDelightConfigFormat.isForeignConfiguration(plugin.getSourceConfig());
-        int previousVersion = ConfigFileUpdater.deployedVersion(plugin.getSourceConfig());
-        if (foreign || previousVersion < OtherDelightConfigFormat.VERSION) {
-            backupQuietly(plugin.getDataFolder().toPath().resolve("config.yml"));
-        }
-        boolean changed = migrateLegacyWorldData() | migrateLegacyEnchantmentGroups()
-                | migrateLegacyDisplayOverrides();
-        List<ConfigKeyRename> migrated =
-                ConfigFileUpdater.applyMigrations(plugin.getSourceConfig(), CONFIG_POLICY.migrations());
-        for (ConfigKeyRename rename : migrated) {
-            I18n.logInfo("plugin.config_key_migrated", "old", rename.oldPath(), "new", rename.newPath());
-            changed = true;
-        }
-        changed |= migrateLegacyDrops();
-        changed |= removeRetiredConfigKeys();
-        changed |= OtherDelightConfigFormat.normalize(plugin.getSourceConfig());
-        if (foreign || previousVersion != OtherDelightConfigFormat.VERSION
-                || !OtherDelightConfigFormat.FORMAT.equals(plugin.getSourceConfig().getString(
-                        OtherDelightConfigFormat.FORMAT_KEY))) {
-            plugin.getSourceConfig().set(ConfigFileUpdater.CONFIG_VERSION_KEY, OtherDelightConfigFormat.VERSION);
-            plugin.getSourceConfig().set(OtherDelightConfigFormat.FORMAT_KEY, OtherDelightConfigFormat.FORMAT);
-            changed = true;
-        }
         int addedKeys = mergeMissingConfigKeys();
-        if (changed || addedKeys > 0) {
-            if (!foreign && previousVersion >= OtherDelightConfigFormat.VERSION) {
-                backupQuietly(plugin.getDataFolder().toPath().resolve("config.yml"));
-            }
+        if (addedKeys > 0) {
             ConfigFileUpdater.tidy(plugin.getSourceConfig());
             try {
                 ConfigFileUpdater.writeStringAtomically(plugin.getDataFolder().toPath().resolve("config.yml"),
@@ -318,10 +226,12 @@ public final class ConfigBootstrap {
             plugin.reloadConfig();
         }
         plugin.invalidateConfigView();
-        for (String option : OtherDelightConfigFormat.unsupportedOptions(plugin.getSourceConfig())) {
-            I18n.logWarning("plugin.config_option_unsupported", "file", "config.yml", "path", option);
-        }
         mergeMissingGuiKeys();
+    }
+
+    static boolean isCurrentSchema(ConfigurationSection source) {
+        return source.contains(ConfigFileUpdater.CONFIG_VERSION_KEY, true)
+                && ConfigFileUpdater.deployedVersion(source) == CONFIG_VERSION;
     }
 
     public YamlConfiguration loadDisplayOverridesConfig() {
@@ -368,122 +278,8 @@ public final class ConfigBootstrap {
         }
     }
 
-    private boolean migrateLegacyDrops() {
-        ConfigurationSection legacy = plugin.getSourceConfig().getConfigurationSection("drops");
-        if (legacy == null) {
-            return false;
-        }
-        Path mainConfigPath = plugin.getDataFolder().toPath().resolve("config.yml");
-        Path dropsPath = plugin.getDataFolder().toPath().resolve(DROPS_FILE);
-        try {
-            backupQuietly(mainConfigPath);
-            backupQuietly(dropsPath);
-            copyLegacyDrops(legacy, dropsPath);
-            plugin.getSourceConfig().set("drops", null);
-            I18n.logInfo("plugin.config_key_migrated", "old", "drops", "new", DROPS_FILE);
-            return true;
-        } catch (Exception e) {
-            I18n.logWarning("plugin.config_merge_failed", "file", DROPS_FILE, "error", e.getMessage());
-            return false;
-        }
-    }
-
-    static void copyLegacyDrops(ConfigurationSection legacy, Path dropsPath)
-            throws IOException, InvalidConfigurationException {
-        YamlConfiguration drops = ConfigFileUpdater.readYamlFile(dropsPath);
-        for (String section : DROPS_REGISTRY_SECTIONS) {
-            drops.set(section, null);
-        }
-        ConfigFileUpdater.copySection(legacy, drops);
-        ConfigFileUpdater.tidy(drops);
-        ConfigFileUpdater.writeStringAtomically(dropsPath, drops.saveToString(), true);
-    }
-
-    private boolean migrateLegacyWorldData() {
-        ConfigurationSection legacy = plugin.getSourceConfig().getConfigurationSection("world-data");
-        if (legacy == null) {
-            return false;
-        }
-        Path mainConfigPath = plugin.getDataFolder().toPath().resolve("config.yml");
-        Path worldDataPath = plugin.getDataFolder().toPath().resolve(WORLD_DATA_FILE);
-        try {
-            backupQuietly(mainConfigPath);
-            backupQuietly(worldDataPath);
-            copyLegacyWorldData(legacy, worldDataPath);
-            plugin.getSourceConfig().set("world-data", null);
-            I18n.logInfo("plugin.config_key_migrated", "old", "world-data", "new", WORLD_DATA_FILE);
-            return true;
-        } catch (Exception e) {
-            I18n.logWarning("plugin.config_merge_failed", "file", WORLD_DATA_FILE, "error", e.getMessage());
-            return false;
-        }
-    }
-
-    static void copyLegacyWorldData(ConfigurationSection legacy, Path worldDataPath)
-            throws IOException, InvalidConfigurationException {
-        YamlConfiguration worldData = ConfigFileUpdater.readYamlFile(worldDataPath);
-        worldData.set("trades", null);
-        ConfigFileUpdater.copySection(legacy, worldData);
-        ConfigFileUpdater.tidy(worldData);
-        ConfigFileUpdater.writeStringAtomically(worldDataPath, worldData.saveToString(), true);
-    }
-
     // The two display tables used to live under cutting-board in config.yml; they move to their own file so the
     // settings there stay readable. An operator's entries are copied over, never regenerated.
-    private boolean migrateLegacyDisplayOverrides() {
-        ConfigurationSection items = plugin.getSourceConfig().getConfigurationSection("cutting-board.display-overrides");
-        ConfigurationSection tags = plugin.getSourceConfig().getConfigurationSection("cutting-board.display-tag-overrides");
-        if (items == null && tags == null) {
-            return false;
-        }
-        Path mainConfigPath = plugin.getDataFolder().toPath().resolve("config.yml");
-        Path overridesPath = plugin.getDataFolder().toPath().resolve(DISPLAY_OVERRIDES_FILE);
-        try {
-            backupQuietly(mainConfigPath);
-            backupQuietly(overridesPath);
-            YamlConfiguration overrides = ConfigFileUpdater.readYamlFile(overridesPath);
-            overrides.set("items", null);
-            overrides.set("tags", null);
-            if (items != null) {
-                ConfigFileUpdater.copySection(items, overrides.createSection("items"));
-            }
-            if (tags != null) {
-                ConfigFileUpdater.copySection(tags, overrides.createSection("tags"));
-            }
-            ConfigFileUpdater.tidy(overrides);
-            ConfigFileUpdater.writeStringAtomically(overridesPath, overrides.saveToString(), true);
-            plugin.getSourceConfig().set("cutting-board.display-overrides", null);
-            plugin.getSourceConfig().set("cutting-board.display-tag-overrides", null);
-            I18n.logInfo("plugin.config_key_migrated", "old", "cutting-board.display-overrides",
-                    "new", DISPLAY_OVERRIDES_FILE);
-            return true;
-        } catch (Exception e) {
-            I18n.logWarning("plugin.config_merge_failed", "file", DISPLAY_OVERRIDES_FILE, "error", e.getMessage());
-            return false;
-        }
-    }
-
-    private boolean migrateLegacyEnchantmentGroups() {
-        boolean tableMigrated = fanOutLegacyEnchantmentPath("table");
-        boolean anvilMigrated = fanOutLegacyEnchantmentPath("anvil");
-        return tableMigrated || anvilMigrated;
-    }
-
-    private boolean fanOutLegacyEnchantmentPath(String childPath) {
-        String sourcePath = "enchantments." + childPath;
-        if (!plugin.getSourceConfig().isSet(sourcePath)) {
-            return false;
-        }
-        for (String group : List.of("knives", "skillet")) {
-            String targetPath = "enchantments.groups." + group + "." + childPath;
-            if (ConfigFileUpdater.copyPathIfMissing(plugin.getSourceConfig(), sourcePath, targetPath)) {
-                I18n.logInfo("plugin.config_key_migrated", "old", sourcePath, "new", targetPath);
-            }
-        }
-        plugin.getSourceConfig().set(sourcePath, null);
-        return true;
-    }
-
     private int mergeMissingConfigKeys() {
         YamlConfiguration bundled = readBundledYaml("config.yml");
         if (bundled == null) {
@@ -491,7 +287,7 @@ public final class ConfigBootstrap {
         }
         try {
             int added = ConfigFileUpdater.copyMissingKeys(bundled, plugin.getSourceConfig(),
-                    OtherDelightConfigFormat.canonicalRegistrySections(CONFIG_POLICY.registrySections()));
+                    CONFIG_POLICY.registrySections());
             if (added > 0) {
                 backupQuietly(plugin.getDataFolder().toPath().resolve("config.yml"));
                 I18n.logInfo("plugin.config_keys_added", "file", "config.yml", "count", added);
@@ -662,18 +458,6 @@ public final class ConfigBootstrap {
      */
     public YamlConfiguration readGuiForLoad(Path guiPath) throws IOException, InvalidConfigurationException {
         return readUserYaml(guiPath, true);
-    }
-
-    private boolean removeRetiredConfigKeys() {
-        List<String> removed = ConfigFileUpdater.removeKeys(plugin.getSourceConfig(), CONFIG_POLICY.retiredKeys());
-        if (removed.isEmpty()) {
-            return false;
-        }
-        // This path discards values the admin wrote, so it takes the same copy the merge path does. The log names
-        // the keys but not what they held, and without the copy the tuned value is unrecoverable.
-        backupQuietly(plugin.getDataFolder().toPath().resolve("config.yml"));
-        I18n.logInfo("plugin.config_keys_retired", "count", removed.size(), "keys", String.join(", ", removed));
-        return true;
     }
 
     private void backupQuietly(Path configPath) {

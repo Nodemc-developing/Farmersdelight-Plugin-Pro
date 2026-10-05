@@ -1,6 +1,5 @@
 package com.huidu.farmersdelight.recipe;
 
-import com.huidu.farmersdelight.compat.OtherDelightIds;
 import com.huidu.farmersdelight.FarmersDelightPlugin;
 import com.huidu.farmersdelight.api.config.ConfigSectionReader;
 import com.huidu.farmersdelight.i18n.I18n;
@@ -217,7 +216,7 @@ public class CookingPotRecipeManager {
                         CookingPotRecipe recipe = parsing.parse(packSection.source(), recipeId, section, () -> parseRecipe(recipeId, section, 6));
                         newRecipes.put(recipeId, recipe);
                         if (packSection.file() != null) sources.put(recipeId, new RecipeSource(packSection.file(),
-                                List.of(packSection.sectionKey(), recipeId), packSection.sectionKey().split("#", 2)[0].equals(OtherDelightIds.RECIPE_SECTION), true));
+                                List.of(packSection.sectionKey(), recipeId), packSection.sectionKey().split("#", 2)[0].equals(NativeRecipeSchema.ROOT), true));
                         packIds.add(recipeId);
                         indexDefaultRecipe(newIngredientToRecipes, recipeId, recipe);
                         indexContainer(newValidContainerKeys, recipe);
@@ -240,7 +239,7 @@ public class CookingPotRecipeManager {
                 for (String id : entries.getKeys(false)) {
                     ConfigurationSection body = entries.getConfigurationSection(id);
                     if (body != null && newCustomRecipes.getOrDefault(group, Map.of()).containsKey(id)) sourceGroup.putIfAbsent(id,
-                            new RecipeSource(packSection.file(), List.of(packSection.sectionKey(), group, id), body.isSet("type"), true));
+                            new RecipeSource(packSection.file(), List.of(packSection.sectionKey(), id), true, true));
                 }
             }
         }

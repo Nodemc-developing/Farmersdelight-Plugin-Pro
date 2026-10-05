@@ -241,10 +241,14 @@ public final class BasketVacuumController extends BlockEntityController {
         // Folia it never reaches into an unowned region; a region-ownership rejection at a chunk edge is caught
         // and the scan is skipped for this tick.
         BoundingBox box = new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
-        if (!Bukkit.isOwnedByCurrentRegion(world,
-                (int) Math.floor(minX) >> 4, (int) Math.floor(minZ) >> 4,
-                (int) Math.floor(maxX) >> 4, (int) Math.floor(maxZ) >> 4)) {
-            return false;
+        int firstChunkX = (int) Math.floor(minX) >> 4;
+        int firstChunkZ = (int) Math.floor(minZ) >> 4;
+        int lastChunkX = (int) Math.floor(maxX) >> 4;
+        int lastChunkZ = (int) Math.floor(maxZ) >> 4;
+        for (int chunkX = firstChunkX; chunkX <= lastChunkX; chunkX++) {
+            for (int chunkZ = firstChunkZ; chunkZ <= lastChunkZ; chunkZ++) {
+                if (!Bukkit.isOwnedByCurrentRegion(world, chunkX, chunkZ)) return false;
+            }
         }
         Collection<Entity> entities;
         try {

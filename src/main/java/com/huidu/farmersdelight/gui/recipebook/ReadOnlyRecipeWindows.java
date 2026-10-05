@@ -31,6 +31,11 @@ public final class ReadOnlyRecipeWindows {
     }
 
     public synchronized boolean initialize() {
+        if (!net.momirealms.craftengine.core.util.VersionHelper.isOrAbove1_21_4) {
+            // The inventory backend keeps recipe navigation available before virtual-window support.
+            unavailable = true;
+            return false;
+        }
         if (unavailable) {
             return false;
         }

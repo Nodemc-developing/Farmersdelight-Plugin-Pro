@@ -1,8 +1,10 @@
 package com.huidu.farmersdelight.effect;
 
 import com.huidu.farmersdelight.FarmersDelightPlugin;
-import io.papermc.paper.datacomponent.DataComponentTypes;
-import io.papermc.paper.datacomponent.item.FoodProperties;
+import com.huidu.farmersdelight.util.compat.CraftEngineItemComponents;
+import net.momirealms.craftengine.bukkit.api.BukkitAdaptor;
+import net.momirealms.craftengine.bukkit.util.ItemStackUtils;
+import net.momirealms.craftengine.core.item.component.DataComponentKeys;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,6 +19,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
@@ -95,27 +98,50 @@ public final class NourishmentFoodListener implements Listener {
     }
     static ItemStack prepare(ItemStack original) {
         if (original == null || original.getType().isAir()) return original;
-        FoodProperties food = original.getData(DataComponentTypes.FOOD);
-        if (food == null || food.canAlwaysEat()) return original;
+        var food = CraftEngineItemComponents.food(original);
+        if (food == null || Boolean.TRUE.equals(food.get("can_always_eat"))) return original;
+        Number nutrition = food.get("nutrition") instanceof Number number ? number : 0;
+        Number saturation = food.get("saturation") instanceof Number number ? number : 0F;
         ItemStack copy = original.clone();
-        int[] saved = new int[]{food.nutrition(), Float.floatToIntBits(food.saturation()), original.isDataOverridden(DataComponentTypes.FOOD) ? 1 : 0};
-        copy.setData(DataComponentTypes.FOOD, food.toBuilder().canAlwaysEat(true).build());
-        copy.editPersistentDataContainer(pdc -> pdc.set(MARKER, PersistentDataType.INTEGER_ARRAY, saved));
+        int[] saved = new int[]{nutrition.intValue(), Float.floatToIntBits(saturation.floatValue()),
+                BukkitAdaptor.adapt(original).hasNonDefaultComponent(DataComponentKeys.FOOD) ? 1 : 0};
+        CraftEngineItemComponents.setAlwaysEat(copy, true);
+        ItemMeta meta = copy.getItemMeta();
+        meta.getPersistentDataContainer().set(MARKER, PersistentDataType.INTEGER_ARRAY, saved);
+        copy.setItemMeta(meta);
         return copy;
     }
     static ItemStack restore(ItemStack current) {
         if (current == null || current.getType().isAir()) return current;
-        int[] saved = current.getPersistentDataContainer().get(MARKER, PersistentDataType.INTEGER_ARRAY);
+        int[] saved = current.getItemMeta().getPersistentDataContainer().get(MARKER, PersistentDataType.INTEGER_ARRAY);
         if (saved == null) return current;
         ItemStack copy = current.clone();
-        FoodProperties food = copy.getData(DataComponentTypes.FOOD);
+        var food = CraftEngineItemComponents.food(copy);
+        int nutrition = food != null && food.get("nutrition") instanceof Number number ? number.intValue() : -1;
+        float saturation = food != null && food.get("saturation") instanceof Number number ? number.floatValue() : Float.NaN;
         // Only retract the exact component this service installed; later edits by another plugin win.
-        if (canRestore(saved, food == null ? -1 : food.nutrition(), food == null ? Float.NaN : food.saturation(), food != null && food.canAlwaysEat())) {
-            if (saved[2] == 0) copy.resetData(DataComponentTypes.FOOD);
-            else copy.setData(DataComponentTypes.FOOD, food.toBuilder().canAlwaysEat(false).build());
+        if (canRestore(saved, nutrition, saturation, food != null && Boolean.TRUE.equals(food.get("can_always_eat")))) {
+            if (saved[2] == 0) {
+                var wrapped = BukkitAdaptor.adapt(copy);
+                var defaults = wrapped.copy();
+                defaults.resetComponent(DataComponentKeys.FOOD);
+                if (sameExceptAlwaysEat(food, CraftEngineItemComponents.getMap(defaults, DataComponentKeys.FOOD))) {
+                    wrapped.resetComponent(DataComponentKeys.FOOD);
+                    copy.setItemMeta(ItemStackUtils.getBukkitStack(wrapped).getItemMeta());
+                } else CraftEngineItemComponents.setAlwaysEat(copy, false);
+            } else CraftEngineItemComponents.setAlwaysEat(copy, false);
         }
-        copy.editPersistentDataContainer(pdc -> pdc.remove(MARKER));
+        ItemMeta meta = copy.getItemMeta();
+        meta.getPersistentDataContainer().remove(MARKER);
+        copy.setItemMeta(meta);
         return copy;
+    }
+    static boolean sameExceptAlwaysEat(java.util.Map<String, Object> current, java.util.Map<String, Object> defaults) {
+        if (current == null || defaults == null) return false;
+        java.util.Map<String, Object> first = new java.util.HashMap<>(current), second = new java.util.HashMap<>(defaults);
+        first.remove("can_always_eat");
+        second.remove("can_always_eat");
+        return first.equals(second);
     }
     static boolean canRestore(int[] saved, int nutrition, float saturation, boolean alwaysEat) {
         return saved != null && saved.length == 3 && (saved[2] == 0 || saved[2] == 1) && alwaysEat

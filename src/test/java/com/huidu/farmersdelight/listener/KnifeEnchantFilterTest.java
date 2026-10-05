@@ -3,11 +3,21 @@ package com.huidu.farmersdelight.listener;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class KnifeEnchantFilterTest {
+
+    @Test
+    void readsEnchantabilityFromBothNativeComponentFormats() {
+        assertEquals(17, KnifeEnchantFilter.enchantabilityValue(17));
+        assertEquals(17, KnifeEnchantFilter.enchantabilityValue(Map.of("value", 17)));
+        assertEquals(0, KnifeEnchantFilter.enchantabilityValue(null));
+        assertEquals(0, KnifeEnchantFilter.enchantabilityValue(Map.of("unknown", 17)));
+        assertEquals(0, KnifeEnchantFilter.enchantabilityValue("17"));
+    }
 
     @Test
     void calculatesAllThreeVanillaStyleOfferCostsFromOneSeed() {

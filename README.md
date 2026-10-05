@@ -8,9 +8,9 @@
 <p align="center">
   <img src="https://img.shields.io/badge/License-AGPL--3.0-blue" alt="AGPL-3.0 license">
   <img src="https://img.shields.io/badge/All_features-Free-3fb950" alt="All features are free">
-  <img src="https://img.shields.io/badge/Paper-26.3-5865F2" alt="Paper 26.3">
-  <img src="https://img.shields.io/badge/Folia-26.2-8b5cf6" alt="Folia 26.2">
-  <img src="https://img.shields.io/badge/Java-25-orange" alt="Java 25 server runtime">
+  <img src="https://img.shields.io/badge/Paper-1.21--26.3-5865F2" alt="Paper 1.21–26.3">
+  <img src="https://img.shields.io/badge/Folia-supported-8b5cf6" alt="Folia supported">
+  <img src="https://img.shields.io/badge/Java-21%20%2F%2025-orange" alt="Java 21 / 25 server runtime">
 </p>
 
 <p align="center">
@@ -48,19 +48,21 @@ Folia-aware scheduling, sleeping block tickers, asynchronous file/database work 
 
 ## 🧩 Requirements
 
+**1.2.2** uses native configuration and recipe formats. Older workstation recipe formats are no longer loaded; use the new templates when upgrading. See the [release notes](RELEASE-NOTES-1.2.2.zh-CN.md) and [recipe guide](CONFIGURATION-RECIPES.zh-CN.md).
+
 | Component | Version | Needed for |
 | --- | --- | --- |
-| Paper or Folia | **Paper 26.3 / Folia 26.2** | Verified server versions |
-| Java | **25** | Server runtime |
-| [CraftEngine](https://github.com/Xiao-MoMi/craft-engine) | **Pinned 26.10 snapshot** | Required; [exact build](docs/DEVELOPMENT.md#supported-environment) |
-| [FluidCore](https://github.com/Nodemc-developing/FluidCore/releases/tag/v0.1.0-SNAPSHOT.2) | 0.1.0-SNAPSHOT, Build 2 | Fluid recipes and tanks |
-| [UltimateAdvancementAPI](https://github.com/Nodemc-developing/UltimateAdvancementAPI/releases/tag/v2.8.1-pro.2) | 2.8.1-pro.2 | Advancements |
+| Paper or Folia | **Minecraft 1.21–26.3** | [Version coverage & limitations](docs/COMPATIBILITY.md); Folia needs an available official build |
+| Java | **21 for 1.21.x; 25 for 26.x** | Server runtime; JDK 25 builds the plugin |
+| [CraftEngine](https://github.com/Xiao-MoMi/craft-engine) | **26.9.2 / verified 26.10 snapshot** | Required; [exact builds](docs/DEVELOPMENT.md#supported-environment) |
+| [FluidCore](https://github.com/Nodemc-developing/FluidCore) | Compatible 0.1.0-SNAPSHOT from `libs/` | Fluid recipes and tanks; use the supplied Java 21 build |
+| [UltimateAdvancementAPI](https://github.com/Nodemc-developing/UltimateAdvancementAPI) | 2.8.1-pro.3 from `libs/` | Advancements across the supported version range |
 | [PlaceholderAPI](https://github.com/PlaceholderAPI/PlaceholderAPI) | Optional | Statistics placeholders |
 
 ## 🚀 Installation
 
 1. Download the [server bundle](https://github.com/Nodemc-developing/Farmersdelight-Plugin-Pro/releases/latest) or the plugin JAR.
-2. Install the pinned CraftEngine build and put this plugin plus the optional dependencies you need into `plugins/`.
+2. Install a supported CraftEngine build and put this plugin plus the optional dependencies you need into `plugins/`.
 3. Start the server and accept its resource pack. Bundled content fills missing definitions; your external packs take priority.
 
 Recipes live in enabled CraftEngine content packs. Old fluid-library world/item data is **not migrated**. See the [setup guide](CONFIGURATION-RECIPES.zh-CN.md) before upgrading an existing server.
@@ -84,7 +86,7 @@ Editing, reloading and runtime statistics require administrator permissions.
 - [Configuration & recipes](CONFIGURATION-RECIPES.zh-CN.md) · [Fluid tanks](FLUID-TANK.zh-CN.md)
 - [Kaleidoscope integration & flexible recipes](KALEIDOSCOPE-COMPAT.zh-CN.md)
 - [Dependencies & corresponding sources](libs/README.md) · [Build & technical notes](docs/DEVELOPMENT.md)
-- [1.2.0 release notes & verification scope](RELEASE-NOTES-1.2.0.zh-CN.md) · [Original wiki](https://github.com/IOVEYOUMC0/FarmersdelightPluginWiKi)
+- [1.2.2 changes & verification scope](RELEASE-NOTES-1.2.2.zh-CN.md) · [Original wiki](https://github.com/IOVEYOUMC0/FarmersdelightPluginWiKi)
 
 ## 🙏 Credits & license
 

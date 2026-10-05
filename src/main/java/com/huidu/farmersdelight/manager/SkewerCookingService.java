@@ -3,14 +3,14 @@ package com.huidu.farmersdelight.manager;
 import com.huidu.farmersdelight.FarmersDelightPlugin;
 import com.huidu.farmersdelight.api.event.ProfessionCookingExperienceEvent;
 import com.huidu.farmersdelight.util.ItemUtils;
+import com.huidu.farmersdelight.util.compat.PlayerInventoryPackets;
+import com.huidu.farmersdelight.util.compat.CraftEngineItemComponents;
 import com.huidu.farmersdelight.util.scheduler.PluginTask;
-import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import net.momirealms.craftengine.bukkit.api.BukkitAdaptor;
 import net.momirealms.craftengine.bukkit.api.CraftEngineBlocks;
 import net.momirealms.craftengine.bukkit.plugin.network.BukkitNetworkManager;
-import net.momirealms.craftengine.proxy.minecraft.network.protocol.game.ClientboundSetPlayerInventoryPacketProxy;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -69,13 +69,9 @@ public final class SkewerCookingService implements Listener {
         ItemStack result = ItemUtils.createItem(spec.result());
         if (proxy == null || result == null || result.getType().isAir()) return false;
         proxy.setAmount(source.getAmount());
-        var food = proxy.getData(DataComponentTypes.FOOD);
-        if (food != null && !food.canAlwaysEat()) proxy.setData(DataComponentTypes.FOOD, food.toBuilder().canAlwaysEat(true).build());
+        CraftEngineItemComponents.setAlwaysEat(proxy, true);
         SkewerUseLease use = SkewerUseLease.prepare(player, source, spec.cookTicks());
-        var consumable = proxy.getData(DataComponentTypes.CONSUMABLE);
-        proxy.setData(DataComponentTypes.CONSUMABLE, (consumable == null
-                ? io.papermc.paper.datacomponent.item.Consumable.consumable() : consumable.toBuilder())
-                .consumeSeconds(Math.nextUp(use.duration() / 20f)).build());
+        CraftEngineItemComponents.setUseDuration(proxy, Math.nextUp(use.duration() / 20f));
         Session session = new Session(player, hand, slot, player.getInventory().getHeldItemSlot(), source.clone(), proxy, result.clone(), spec, use);
         if (player.hasActiveItem()) player.clearActiveItem();
         sessions.put(player.getUniqueId(), session);
@@ -87,7 +83,7 @@ public final class SkewerCookingService implements Listener {
             player.setActiveItemRemainingTime(use.duration());
             var channel = BukkitNetworkManager.instance().getChannel(player);
             if (channel != null && channel.isOpen()) {
-                session.display = new HandheldCookingDisplay(channel, slot, BukkitAdaptor.adapt(source.clone()).minecraftItem());
+                session.display = new HandheldCookingDisplay(channel, slot, BukkitAdaptor.adapt(use.prepared().clone()).minecraftItem());
                 updateDisplay(session);
             }
             ensureTicker();
@@ -158,12 +154,12 @@ public final class SkewerCookingService implements Listener {
     private void updateDisplay(Session session) {
         ItemStack visual = SkilletHandheldCooking.createHandheldDisplay(session.proxy, null, session.progress, session.spec.cookTicks(), true);
         Object nativeItem = BukkitAdaptor.adapt(visual).minecraftItem();
-        session.display.update(nativeItem, ClientboundSetPlayerInventoryPacketProxy.INSTANCE.newInstance(session.slot, nativeItem));
+        session.display.update(nativeItem, PlayerInventoryPackets.slot(session.slot, nativeItem));
     }
     private static void restoreSlot(Player player, int slot) {
         ItemStack present = player.getInventory().getItem(slot);
         var user = BukkitAdaptor.adapt(player);
-        if (user != null) user.sendPacket(ClientboundSetPlayerInventoryPacketProxy.INSTANCE.newInstance(slot,
+        if (user != null) user.sendPacket(PlayerInventoryPackets.slot(slot,
                 BukkitAdaptor.adapt(present == null ? new ItemStack(Material.AIR) : present.clone()).minecraftItem()), false);
     }
     private boolean hasHeat(Player player) {

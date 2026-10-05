@@ -78,19 +78,19 @@ class ContentEffectMutationTest {
         TestBuff unrelated = install(new TestBuff("fixture:discomfort", false, false));
         EffectManager.applyComfort(player, 30, 3);
         CustomBuffRegistry.syncState(player, "farmersdelight:comfort");
-        mutate(ContentEffectFunction.Action.REMOVE, "papersdelight:comfort_effect", 0, 0, 0, false);
+        mutate(ContentEffectFunction.Action.REMOVE, "farmersdelight:comfort_effect", 0, 0, 0, false);
         assertFalse(EffectManager.hasComfort(player));
         assertEquals(2, unrelated.level);
         assertEquals(2, transitions.size());
         assertTrue(transitions.getLast().isLost());
         assertEquals("farmersdelight:comfort", transitions.getLast().getBuffId());
         assertEquals("fixture:nourishment_effect", ContentEffectFunction.canonicalEffectId("fixture:nourishment_effect"));
-        assertEquals("farmersdelight:nourishment", ContentEffectFunction.canonicalEffectId("papersdelight:nourishment_effect"));
+        assertEquals("farmersdelight:nourishment", ContentEffectFunction.canonicalEffectId("farmersdelight:nourishment_effect"));
     }
 
     @Test void builtinUpgradeKeepsExactTicksAndCanReplaceWithALowerLevelOrShorterDuration() {
         EffectManager.applyComfort(player, 30, 3);
-        mutate(ContentEffectFunction.Action.UPGRADE, "papersdelight:comfort_effect", 1, 4, 0, false);
+        mutate(ContentEffectFunction.Action.UPGRADE, "farmersdelight:comfort_effect", 1, 4, 0, false);
         assertEquals(4, EffectManager.comfortLevel(player));
         assertEquals(600, EffectManager.effectTicks(player, "farmersdelight:comfort"));
         mutate(ContentEffectFunction.Action.UPGRADE, "farmersdelight:comfort", Integer.MIN_VALUE, 4, 41, false);

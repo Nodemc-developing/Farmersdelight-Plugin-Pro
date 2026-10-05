@@ -1,0 +1,27 @@
+{
+  "generator": "tools/generate-legacy-decoration-models.py",
+  "source_repository": "https://github.com/Nodemc-developing/Farmersdelight-Plugin-Pro",
+  "source_commit": "4008fac144bcf7ff140fae86b730e3301f630c34",
+  "attribution": "Existing model credits and resource attribution remain unchanged; see ASSET-NOTICE.txt and the plugin NOTICE.txt.",
+  "change": "Provide explicit single-model legacy definitions; retain all existing mesh geometry and texture references without new external assets.",
+  "files": [
+    {
+      "path": "models/block/legacy/full_tatami_mat.json",
+      "sha256": "75026287caf32d13e09479375d98fa88f82b4415b8178a2988421fca302a1001",
+      "source": "models/block/full_tatami_mat.json",
+      "source_sha256": "076ed8bdcfc93644c84b735b2bd6f4a8cdc8e4ac688076fa275060f9cf49c567"
+    },
+    {
+      "path": "models/block/legacy/half_tatami_mat.json",
+      "sha256": "a891163c417f013bdd5d96e1eb6b20c432c08315d6c09e3932c9747b4472541c",
+      "source": "models/block/half_tatami_mat.json",
+      "source_sha256": "2e680e8d20c178029ce092caf8be31700d863f4b3b0ae77ac8b59d6802906cca"
+    },
+    {
+      "path": "models/block/legacy/canvas_rug.json",
+      "sha256": "0fb41e21fcbf255d93857c28479b6c6d08aece14a88c9614c4caf64db5bc5d4f",
+      "source": "models/block/canvas_rug.json",
+      "source_sha256": "b11abd2d14d6dfd19c6f51c47f2d14608e78f94e9e35fc1ab4ad9a7eeef489b1"
+    }
+  ]
+}

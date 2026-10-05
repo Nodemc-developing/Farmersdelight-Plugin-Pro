@@ -1,0 +1,206 @@
+{
+  "date": "2026-10-05",
+  "unit_tests_fd": 846,
+  "unit_tests_fluid": {
+    "core": 73,
+    "platform": 217,
+    "snapshot_platform": 217
+  },
+  "native_pass": 266,
+  "loading_pass": 28,
+  "artifacts": {
+    "Farmersdelight-Plugin-Pro-1.2.1.jar": {
+      "sha256": "e2dfdd1222951b6cbeb6e39e0db10e383079feb604130f17018a6e479e12a932",
+      "bytes": 19151842
+    },
+    "FluidCore-0.1.0-SNAPSHOT.jar": {
+      "sha256": "cb5ae27460a4857202b840e31133ccb95c52e7684904a6af8942dfca15a16f91",
+      "bytes": 2986912
+    },
+    "UltimateAdvancementAPI-Plugin-2.8.1-pro.3.jar": {
+      "sha256": "23c42974685fbdbed4b6be6e29903df4be11bed89b1e46cb0136603bdec8a589",
+      "bytes": 609416
+    }
+  },
+  "scope": "Headless native correctness, no performance benchmark",
+  "limitations": [
+    "No real client rendering",
+    "No actual connected-player delivery",
+    "No manual inventory clicks",
+    "No full placed-tank world save/restart",
+    "No real cross-region player transactions",
+    "Only listed seven precise core/version pairs were run"
+  ],
+  "runs": [
+    {
+      "environment": "paper-1.21.11",
+      "core_build": "1.21.11-132-c5eb079",
+      "java": "21.0.6",
+      "craft_engine": "26.9.2",
+      "craft_engine_sha256": "1f9e0935a11e7d6c7a979f2d521ec24efb715375c876a57ef3cc11e9fb9895aa",
+      "native_pass": 19,
+      "loading_pass": 2,
+      "native_report": "paper-1.21.11-ce-26.9.2.json",
+      "native_report_sha256": "e991f25e3d23ac12b3f8164c9249fa6cd6fb8855d6f9822af185e5f65e58dcfe",
+      "loading_report": "paper-1.21.11-ce-26.9.2-loading.json"
+    },
+    {
+      "environment": "paper-1.21.11",
+      "core_build": "1.21.11-132-c5eb079",
+      "java": "21.0.6",
+      "craft_engine": "26.10",
+      "craft_engine_sha256": "46ebe45f31f3e3f0965179a85cb1f308d8729f53281d6c64f4ef2af5c23d99f6",
+      "native_pass": 19,
+      "loading_pass": 2,
+      "native_report": "paper-1.21.11-ce-26.10.json",
+      "native_report_sha256": "da0b1b6d4f438fe4b5e81ee1121a229f35cbc46426ae1e7b8b5ea830161f9b70",
+      "loading_report": "paper-1.21.11-ce-26.10-loading.json"
+    },
+    {
+      "environment": "paper-26.3",
+      "core_build": "26.3-140-977da0d",
+      "java": "25.0.3",
+      "craft_engine": "26.9.2",
+      "craft_engine_sha256": "1f9e0935a11e7d6c7a979f2d521ec24efb715375c876a57ef3cc11e9fb9895aa",
+      "native_pass": 19,
+      "loading_pass": 2,
+      "native_report": "paper-26.3-ce-26.9.2.json",
+      "native_report_sha256": "1e2e063606a8b67269d3e98fdb7a2e746401eee78ed5ee28299a640e12379f81",
+      "loading_report": "paper-26.3-ce-26.9.2-loading.json"
+    },
+    {
+      "environment": "paper-26.3",
+      "core_build": "26.3-140-977da0d",
+      "java": "25.0.3",
+      "craft_engine": "26.10",
+      "craft_engine_sha256": "46ebe45f31f3e3f0965179a85cb1f308d8729f53281d6c64f4ef2af5c23d99f6",
+      "native_pass": 19,
+      "loading_pass": 2,
+      "native_report": "paper-26.3-ce-26.10.json",
+      "native_report_sha256": "0eebbcc1163b1b86b1f543d01a51aa4392ec7b421e867a5f026ffc3ced57e46f",
+      "loading_report": "paper-26.3-ce-26.10-loading.json"
+    },
+    {
+      "environment": "folia-26.2",
+      "core_build": "26.2-7-14b7fee",
+      "java": "25.0.3",
+      "craft_engine": "26.9.2",
+      "craft_engine_sha256": "1f9e0935a11e7d6c7a979f2d521ec24efb715375c876a57ef3cc11e9fb9895aa",
+      "native_pass": 19,
+      "loading_pass": 2,
+      "native_report": "folia-26.2-ce-26.9.2.json",
+      "native_report_sha256": "bbbe9a348c7019c93d52858b31f619e407cbffef900de7caa8a732ac67ad5f6a",
+      "loading_report": "folia-26.2-ce-26.9.2-loading.json"
+    },
+    {
+      "environment": "folia-26.2",
+      "core_build": "26.2-7-14b7fee",
+      "java": "25.0.3",
+      "craft_engine": "26.10",
+      "craft_engine_sha256": "46ebe45f31f3e3f0965179a85cb1f308d8729f53281d6c64f4ef2af5c23d99f6",
+      "native_pass": 19,
+      "loading_pass": 2,
+      "native_report": "folia-26.2-ce-26.10.json",
+      "native_report_sha256": "78f12c8e3b496582a7054b413e9379b1daf878286dc5c67a7cee95aeff6f2428",
+      "loading_report": "folia-26.2-ce-26.10-loading.json"
+    },
+    {
+      "environment": "folia-1.21.4",
+      "core_build": "1.21.4-6-b785bcc",
+      "java": "21.0.6",
+      "craft_engine": "26.9.2",
+      "craft_engine_sha256": "1f9e0935a11e7d6c7a979f2d521ec24efb715375c876a57ef3cc11e9fb9895aa",
+      "native_pass": 19,
+      "loading_pass": 2,
+      "native_report": "folia-1.21.4-ce-26.9.2.json",
+      "native_report_sha256": "98f898e33ef24faef5eb08c5cee9ee4eb654665000c9d8c8e26ffeb851e45f55",
+      "loading_report": "folia-1.21.4-ce-26.9.2-loading.json"
+    },
+    {
+      "environment": "folia-1.21.4",
+      "core_build": "1.21.4-6-b785bcc",
+      "java": "21.0.6",
+      "craft_engine": "26.10",
+      "craft_engine_sha256": "46ebe45f31f3e3f0965179a85cb1f308d8729f53281d6c64f4ef2af5c23d99f6",
+      "native_pass": 19,
+      "loading_pass": 2,
+      "native_report": "folia-1.21.4-ce-26.10.json",
+      "native_report_sha256": "69feb06aee003a706f875ba68456cd209427ae5caacb309dba7ab2355fab31f2",
+      "loading_report": "folia-1.21.4-ce-26.10-loading.json"
+    },
+    {
+      "environment": "paper-1.21",
+      "core_build": "1.21-130-b1b5d4c",
+      "java": "21.0.6",
+      "craft_engine": "26.9.2",
+      "craft_engine_sha256": "1f9e0935a11e7d6c7a979f2d521ec24efb715375c876a57ef3cc11e9fb9895aa",
+      "native_pass": 19,
+      "loading_pass": 2,
+      "native_report": "paper-1.21-ce-26.9.2.json",
+      "native_report_sha256": "352ccadd9fbc23a6327881b9decf71639900657638ad976c7e2e4521937570d5",
+      "loading_report": "paper-1.21-ce-26.9.2-loading.json"
+    },
+    {
+      "environment": "paper-1.21",
+      "core_build": "1.21-130-b1b5d4c",
+      "java": "21.0.6",
+      "craft_engine": "26.10",
+      "craft_engine_sha256": "46ebe45f31f3e3f0965179a85cb1f308d8729f53281d6c64f4ef2af5c23d99f6",
+      "native_pass": 19,
+      "loading_pass": 2,
+      "native_report": "paper-1.21-ce-26.10.json",
+      "native_report_sha256": "fd12620d70b523fccfaba82d3adfb752792900990ad2d86982944140ce7342bc",
+      "loading_report": "paper-1.21-ce-26.10-loading.json"
+    },
+    {
+      "environment": "paper-1.21.3",
+      "core_build": "1.21.3-83-d6c81da",
+      "java": "21.0.6",
+      "craft_engine": "26.9.2",
+      "craft_engine_sha256": "1f9e0935a11e7d6c7a979f2d521ec24efb715375c876a57ef3cc11e9fb9895aa",
+      "native_pass": 19,
+      "loading_pass": 2,
+      "native_report": "paper-1.21.3-ce-26.9.2.json",
+      "native_report_sha256": "69951cfa121d2b95c4482e53763cfce86eb7e2bfd5bb5d5f330d3c6c2f7ff4e9",
+      "loading_report": "paper-1.21.3-ce-26.9.2-loading.json"
+    },
+    {
+      "environment": "paper-1.21.3",
+      "core_build": "1.21.3-83-d6c81da",
+      "java": "21.0.6",
+      "craft_engine": "26.10",
+      "craft_engine_sha256": "46ebe45f31f3e3f0965179a85cb1f308d8729f53281d6c64f4ef2af5c23d99f6",
+      "native_pass": 19,
+      "loading_pass": 2,
+      "native_report": "paper-1.21.3-ce-26.10.json",
+      "native_report_sha256": "12d2b333897351f520836d98410aff7eeca662257591c2510cc414a3c6dbb46c",
+      "loading_report": "paper-1.21.3-ce-26.10-loading.json"
+    },
+    {
+      "environment": "paper-1.21.4",
+      "core_build": "1.21.4-232-12d8fe0",
+      "java": "21.0.6",
+      "craft_engine": "26.9.2",
+      "craft_engine_sha256": "1f9e0935a11e7d6c7a979f2d521ec24efb715375c876a57ef3cc11e9fb9895aa",
+      "native_pass": 19,
+      "loading_pass": 2,
+      "native_report": "paper-1.21.4-ce-26.9.2.json",
+      "native_report_sha256": "cbe8533ad2acb75606f32b41cef7a52f9a3c65e0da35a45844158ee8dfa86d0a",
+      "loading_report": "paper-1.21.4-ce-26.9.2-loading.json"
+    },
+    {
+      "environment": "paper-1.21.4",
+      "core_build": "1.21.4-232-12d8fe0",
+      "java": "21.0.6",
+      "craft_engine": "26.10",
+      "craft_engine_sha256": "46ebe45f31f3e3f0965179a85cb1f308d8729f53281d6c64f4ef2af5c23d99f6",
+      "native_pass": 19,
+      "loading_pass": 2,
+      "native_report": "paper-1.21.4-ce-26.10.json",
+      "native_report_sha256": "69ba82689bdb06eda86a674a0702e3517aa3471fe9877e6d215ead34e16cdb16",
+      "loading_report": "paper-1.21.4-ce-26.10-loading.json"
+    }
+  ],
+  "environment_restored": true,
+  "new_servers_created": 0
+}

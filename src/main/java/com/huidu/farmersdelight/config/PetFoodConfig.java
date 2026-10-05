@@ -47,6 +47,15 @@ public class PetFoodConfig {
         LOGGER = logger;
     }
 
+    /** Run during plugin enable, before host configuration parsers start their parallel work. */
+    public static void prepareNativeConfigTypes() {
+        // The API constants and Craft implementation initialize each other. Resolve both on one thread.
+        PotionEffectType.SPEED.getKey();
+        Registry.EFFECT.forEach(effect -> effect.getKey());
+        Objects.requireNonNull(Sound.ENTITY_GENERIC_EAT);
+        Registry.SOUNDS.forEach(Objects::requireNonNull);
+    }
+
     public static synchronized void registerCraftEngineSetting() {
         if (registered) {
             return;

@@ -150,12 +150,12 @@ class AddonPackSectionsTest {
         assertTrue(parser.sections("cooking_recipes").isEmpty());
     }
 
-    @Test void otherDelightRootsKeepTypedBodiesAndLiteralDottedRecipeIds() {
+    @Test void nativeRootsKeepStationsAndLiteralDottedRecipeIds() {
         AddonPackSections parser = AddonPackSections.createForTesting(ROOTS);
-        feed(parser, pack("addon", "addon"), "papersdelight_recipes#addon", Map.of("addon:meal.v2", Map.of("type", "cooking")));
+        feed(parser, pack("addon", "addon"), "farmersdelight_recipes#addon", Map.of("addon:meal.v2", Map.of("station", "cooking_pot")));
         parser.loadAll();
-        var section = parser.sections("papersdelight_recipes").getFirst();
-        assertEquals("papersdelight_recipes#addon", section.sectionKey());
-        assertEquals(List.of("addon:meal.v2"), List.copyOf(section.config().getConfigurationSection("papersdelight_recipes").getKeys(false)));
+        var section = parser.sections("farmersdelight_recipes").getFirst();
+        assertEquals("farmersdelight_recipes#addon", section.sectionKey());
+        assertEquals(List.of("addon:meal.v2"), List.copyOf(section.config().getConfigurationSection("farmersdelight_recipes").getKeys(false)));
     }
 }

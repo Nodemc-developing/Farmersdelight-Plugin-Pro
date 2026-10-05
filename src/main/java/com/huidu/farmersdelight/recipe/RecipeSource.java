@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Map;
 
 /** Exact on-disk location of a recipe, independent of Bukkit's dotted path syntax. */
-public record RecipeSource(Path file, List<String> keys, boolean otherDelightFormat, boolean existingNode) {
-    public RecipeSource(Path file, List<String> keys, boolean otherDelightFormat) {
-        this(file, keys, otherDelightFormat, false);
+public record RecipeSource(Path file, List<String> keys, boolean nativeFormat, boolean existingNode) {
+    public RecipeSource(Path file, List<String> keys, boolean nativeFormat) {
+        this(file, keys, nativeFormat, false);
     }
     public RecipeSource {
         file = file.toAbsolutePath().normalize();
@@ -23,6 +23,17 @@ public record RecipeSource(Path file, List<String> keys, boolean otherDelightFor
         Object value = yaml;
         for (String key : keys) value = mapping(value).get(key);
         return new LinkedHashMap<>(mapping(value));
+    }
+
+    /** Includes empty and invalid nodes, so an editor cannot overwrite an occupied identifier. */
+    public boolean exists(YamlConfiguration yaml) {
+        Object value = yaml;
+        for (String key : keys) {
+            Map<String, Object> parent = mapping(value);
+            if (!parent.containsKey(key)) return false;
+            value = parent.get(key);
+        }
+        return true;
     }
 
     /** Rebuilds only the selected ancestors, preserving unrelated and unknown keys. */

@@ -1,6 +1,5 @@
 package com.huidu.farmersdelight.recipe;
 
-import com.huidu.farmersdelight.compat.OtherDelightIds;
 import com.huidu.farmersdelight.FarmersDelightPlugin;
 import com.huidu.farmersdelight.api.config.ConfigFileUpdater;
 import com.huidu.farmersdelight.config.PlainYamlDocuments;
@@ -29,13 +28,13 @@ public final class RecipePackFiles {
     public static final String BOARD_FILE = "recipes/cutting_board_recipes.yml";
     public static final String GROUP_FILE = "recipes/food_groups.yml";
     public static final String SPECIAL_FILE = "recipes/special_recipes.yml";
-    private static final List<String> LEGACY_FILES = List.of(POT_FILE, BOARD_FILE, GROUP_FILE, SPECIAL_FILE);
+    private static final List<String> MANAGED_FILES = List.of(POT_FILE, BOARD_FILE, GROUP_FILE, SPECIAL_FILE);
     private static volatile Map<PackSection, List<PackSections.Section>> preparedSections = Map.of();
     private static volatile Map<Path, String> packNamespaces = Map.of();
     private static volatile List<PackSections.Section> generatedSections = List.of();
     private RecipePackFiles() { }
 
-    public static boolean managed(String name) { return LEGACY_FILES.contains(name); }
+    public static boolean managed(String name) { return MANAGED_FILES.contains(name); }
 
     public static Path configurationFolder(FarmersDelightPlugin plugin) {
         return plugin.getDataFolder().toPath().getParent().resolve("CraftEngine/resources/farmersdelight/configuration")
@@ -47,97 +46,32 @@ public final class RecipePackFiles {
         return configurationFolder(plugin).resolve(name).normalize();
     }
 
-    /** Must run before CraftEngine's initial pack parse. A completed migration never restores deleted entries. */
-    public static void installAndMigrate(FarmersDelightPlugin plugin) throws Exception {
-        Map<String, Boolean> bundledNew = new LinkedHashMap<>();
-        for (String name : LEGACY_FILES) bundledNew.put(name, !Files.exists(file(plugin, name))
-                && !Files.exists(plugin.getDataFolder().toPath().resolve(name)));
-        installAndMigrate(plugin.getDataFolder().toPath(), configurationFolder(plugin), name -> {
+    /** Installs native defaults once; existing operator documents are never converted or replaced. */
+    public static void installDefaults(FarmersDelightPlugin plugin) throws Exception {
+        Path marker = plugin.getDataFolder().toPath().resolve(".native-recipe-defaults-installed");
+        boolean fresh = !Files.exists(marker);
+        for (String name : MANAGED_FILES) {
+            YamlConfiguration document;
             try (InputStream input = plugin.getResource(name)) {
                 if (input == null) throw new IOException("Bundled recipe file missing: " + name);
-                return PlainYamlDocuments.parse(new String(input.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8), true);
+                document = PlainYamlDocuments.parse(new String(input.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8), true);
             }
+            Path target = file(plugin, name);
+            if (installDefaultDocument(target, document, fresh)) {
+                com.huidu.farmersdelight.pack.compat.ExternalContentCoordinator.recordInstalledDefault(plugin, target);
+            }
+            com.huidu.farmersdelight.pack.compat.ExternalContentCoordinator.registerDefaultDocument(plugin, target, document.saveToString());
+        }
+        if (fresh) ConfigFileUpdater.writeStringAtomically(marker, "Native recipes are maintained in CraftEngine content packs.\n", true);
+    }
+
+    static boolean installDefaultDocument(Path target, YamlConfiguration document, boolean fresh) throws Exception {
+        if (!fresh) return false;
+        return YamlFileTransactions.execute(target, () -> {
+            if (Files.exists(target)) return false;
+            ConfigFileUpdater.writeStringAtomically(target, document.saveToString(), true);
+            return true;
         });
-        for (var entry : bundledNew.entrySet()) if (entry.getValue() && Files.isRegularFile(file(plugin, entry.getKey())))
-            com.huidu.farmersdelight.pack.compat.ExternalContentCoordinator.recordInstalledDefault(plugin, file(plugin, entry.getKey()));
-        for (String name : LEGACY_FILES) try (InputStream input = plugin.getResource(name)) {
-            if (input == null) throw new IOException("Bundled recipe file missing: " + name);
-            YamlConfiguration bundled = PlainYamlDocuments.parse(new String(input.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8), true);
-            com.huidu.farmersdelight.pack.compat.ExternalContentCoordinator.registerDefaultDocument(
-                    plugin, file(plugin, name), canonical(bundled, name).saveToString());
-        }
-    }
-
-    @FunctionalInterface interface BundledReader { YamlConfiguration read(String name) throws Exception; }
-
-    static void installAndMigrate(Path dataFolder, Path configurationFolder, BundledReader bundled) throws Exception {
-        Path marker = dataFolder.resolve(".recipes-in-content-pack-v1");
-        if (Files.exists(marker)) return;
-        // Parse every source before writing anything; malformed operator documents are never replaced.
-        Map<String, YamlConfiguration> documents = new LinkedHashMap<>();
-        for (String name : LEGACY_FILES) {
-            Path old = dataFolder.resolve(name);
-            documents.put(name, Files.isRegularFile(old) ? PlainYamlDocuments.readLiteral(old) : bundled.read(name));
-            Path target = configurationFolder.resolve(name);
-            if (Files.isRegularFile(target)) PlainYamlDocuments.readLiteral(target);
-        }
-        for (String name : LEGACY_FILES) {
-            Path old = dataFolder.resolve(name);
-            Path target = configurationFolder.resolve(name).toAbsolutePath().normalize();
-            YamlConfiguration incoming = canonical(documents.get(name), name);
-            YamlFileTransactions.execute(target, () -> {
-                YamlConfiguration existing = Files.isRegularFile(target) ? PlainYamlDocuments.readLiteral(target) : null;
-                if (Files.isRegularFile(old)) ConfigFileUpdater.backup(old);
-                if (existing == null) {
-                    ConfigFileUpdater.writeStringAtomically(target, incoming.saveToString(), true);
-                } else if (Files.isRegularFile(old)) {
-                    // Content-pack definitions retain ownership on conflicts; import only missing legacy nodes.
-                    ConfigFileUpdater.backup(target);
-                    mergeMissing(existing, incoming);
-                    ConfigFileUpdater.writeStringAtomically(target, existing.saveToString(), true);
-                }
-                return null;
-            });
-        }
-        ConfigFileUpdater.writeStringAtomically(marker, "Recipes are maintained in CraftEngine content packs.\n", true);
-    }
-
-    private static void mergeMissing(ConfigurationSection target, ConfigurationSection incoming) {
-        for (var entry : incoming.getValues(false).entrySet()) {
-            String key = entry.getKey();
-            if (!target.isSet(key)) PlainYamlDocuments.setValue(target, key, entry.getValue());
-            else if (entry.getValue() instanceof ConfigurationSection source && target.get(key) instanceof ConfigurationSection destination) {
-                // Registry entries are indivisible: never splice part of a conflicting recipe into a pack's node.
-                if (key.equals(OtherDelightIds.RECIPE_SECTION) || key.equals("food_groups") || key.equals("custom_cooking_pot_recipes")) {
-                    for (var child : source.getValues(false).entrySet()) if (!destination.isSet(child.getKey())) PlainYamlDocuments.setValue(destination, child.getKey(), child.getValue());
-                }
-            }
-        }
-    }
-
-    static YamlConfiguration canonical(YamlConfiguration legacy, String name) {
-        YamlConfiguration out = new YamlConfiguration();
-        out.options().pathSeparator('\u0001');
-        legacy.getValues(false).forEach((key, value) -> PlainYamlDocuments.setValue(out, key, value));
-        if (POT_FILE.equals(name) || BOARD_FILE.equals(name)) {
-            String oldRoot = POT_FILE.equals(name) ? "cooking_pot_recipes" : "cutting_board_recipes";
-            ConfigurationSection root = legacy.getConfigurationSection(oldRoot);
-            ConfigurationSection existing = legacy.getConfigurationSection(OtherDelightIds.RECIPE_SECTION);
-            Map<String, Object> recipes = existing == null ? new LinkedHashMap<>() : new LinkedHashMap<>(existing.getValues(false));
-            if (root != null) root.getValues(false).forEach((id, raw) -> {
-                if (raw instanceof ConfigurationSection section) {
-                    Map<String, Object> body = new LinkedHashMap<>(section.getValues(false));
-                    body = POT_FILE.equals(name) ? RecipeSchemaAdapter.formatPot(body, true) : RecipeSchemaAdapter.formatBoard(body, true);
-                    recipes.putIfAbsent(id, body);
-                }
-            });
-            out.set(oldRoot, null);
-            PlainYamlDocuments.setValue(out, OtherDelightIds.RECIPE_SECTION, recipes);
-        } else if (GROUP_FILE.equals(name)) {
-            if (legacy.isSet("groups") && !legacy.isSet("food_groups")) PlainYamlDocuments.setValue(out, "food_groups", legacy.get("groups"));
-            out.set("groups", null);
-        }
-        return out;
     }
 
     /** Snapshot CE's enabled configuration folders on the owning server thread, before worker I/O. */
@@ -179,10 +113,10 @@ public final class RecipePackFiles {
             YamlConfiguration source = documents.get(section.file());
             if (source == null || !containsFactory(source)) continue;
             if (section.section() == kind) result.add(section);
-            else if (section.section() == PackSection.OTHER_DELIGHT_RECIPES && (kind == PackSection.COOKING_POT || kind == PackSection.CUTTING_BOARD)) {
+            else if (section.section() == PackSection.NATIVE_RECIPES && recipeKind(kind)) {
                 YamlConfiguration raw = new YamlConfiguration();
                 raw.options().pathSeparator('\u0001');
-                PlainYamlDocuments.setValue(raw, section.sectionKey(), section.yaml().get(PackSection.OTHER_DELIGHT_RECIPES.rootKey()));
+                PlainYamlDocuments.setValue(raw, section.sectionKey(), section.yaml().get(PackSection.NATIVE_RECIPES.rootKey()));
                 for (var converted : sections(Map.of(section.file(), raw), null, kind)) result.add(new PackSections.Section(kind,
                         section.source(), section.namespace(), converted.yaml(), section.file(), section.sectionKey(), true));
             }
@@ -214,33 +148,62 @@ public final class RecipePackFiles {
     }
 
     public static YamlConfiguration bridge(YamlConfiguration document, String name) {
-        YamlConfiguration out = new YamlConfiguration();
-        out.options().pathSeparator('\u0001');
-        document.getValues(false).forEach((key, value) -> PlainYamlDocuments.setValue(out, key, value));
+        YamlConfiguration out = new YamlConfiguration(); out.options().pathSeparator('\u0001');
         PackSection kind = POT_FILE.equals(name) ? PackSection.COOKING_POT : BOARD_FILE.equals(name) ? PackSection.CUTTING_BOARD : null;
-        if (kind != null) {
-            Map<String, Object> recipes = new LinkedHashMap<>();
-            for (String key : document.getKeys(false)) {
-                String base = key.split("#", 2)[0];
-                if (base.equals(kind.rootKey()) || base.equals(kind.sectionId()) || base.equals(OtherDelightIds.RECIPE_SECTION)) {
-                    ConfigurationSection root = document.getConfigurationSection(key);
-                    if (root == null) continue;
-                    root.getValues(false).forEach((id, value) -> {
-                        if (value instanceof ConfigurationSection body && (!base.equals(OtherDelightIds.RECIPE_SECTION) || typeMatches(kind, body))) recipes.putIfAbsent(id, value);
-                    });
+        if (kind == null) {
+            document.getValues(false).forEach((key, value) -> PlainYamlDocuments.setValue(out, key, value));
+            if (GROUP_FILE.equals(name)) PlainYamlDocuments.setValue(out, "groups", document.get("food_groups", document.get("groups")));
+            return out;
+        }
+        Map<String, Object> selected = new LinkedHashMap<>(), groups = new LinkedHashMap<>();
+        for (String key : document.getKeys(false)) {
+            if (key.equals("external_recipe_overrides")) PlainYamlDocuments.setValue(out, key, document.get(key));
+            if (!key.split("#", 2)[0].equals(NativeRecipeSchema.ROOT)) continue;
+            PlainYamlDocuments.setValue(out, key, document.get(key));
+            ConfigurationSection root = document.getConfigurationSection(key);
+            if (root == null) continue;
+            for (String id : root.getKeys(false)) {
+                ConfigurationSection body = root.getConfigurationSection(id);
+                if (body == null) continue;
+                if (typeMatches(kind, body)) selected.putIfAbsent(id, body);
+                if (kind == PackSection.COOKING_POT && typeMatches(PackSection.CUSTOM_COOKING_POT, body)) {
+                    @SuppressWarnings("unchecked") Map<String, Object> entries = (Map<String, Object>) groups.computeIfAbsent(body.getString("group"), ignored -> new LinkedHashMap<>());
+                    entries.putIfAbsent(id, body);
                 }
             }
-            PlainYamlDocuments.setValue(out, kind.rootKey(), recipes);
-        } else if (GROUP_FILE.equals(name)) {
-            PlainYamlDocuments.setValue(out, "groups", document.get("food_groups", document.get("groups")));
         }
+        PlainYamlDocuments.setValue(out, kind.rootKey(), selected);
+        if (kind == PackSection.COOKING_POT) PlainYamlDocuments.setValue(out, PackSection.CUSTOM_COOKING_POT.rootKey(), groups);
         return out;
     }
 
+    private static boolean recipeKind(PackSection kind) {
+        return kind == PackSection.COOKING_POT || kind == PackSection.CUTTING_BOARD || kind == PackSection.CUSTOM_COOKING_POT;
+    }
+
+    static void validateNativeDocument(YamlConfiguration document, String source) {
+        for (String key : document.getKeys(false)) {
+            String base = key.split("#", 2)[0];
+            if (!base.equals(NativeRecipeSchema.ROOT)) {
+                if (base.endsWith("_recipes") && !base.equals("special_recipes"))
+                    RecipeFileLoader.reportProblem(source, key, "Unsupported recipe root; use " + NativeRecipeSchema.ROOT);
+                continue;
+            }
+            ConfigurationSection root = document.getConfigurationSection(key);
+            if (root == null) { RecipeFileLoader.reportProblem(source, key, "Recipe registry must be a mapping"); continue; }
+            for (String id : root.getKeys(false)) {
+                ConfigurationSection body = root.getConfigurationSection(id);
+                if (body == null || !Set.of("cooking_pot", "cutting_board", "fluid_tank").contains(NativeRecipeSchema.station(body)))
+                    RecipeFileLoader.reportProblem(source, id, "station must be cooking_pot, cutting_board or fluid_tank");
+            }
+        }
+    }
+
     private static boolean typeMatches(PackSection kind, ConfigurationSection body) {
-        String type = body.getString("type", "").toLowerCase(Locale.ROOT);
-        return kind == PackSection.COOKING_POT ? type.equals("cooking") || type.endsWith(":cooking")
-                : type.equals("cutting") || type.endsWith(":cutting");
+        String station = NativeRecipeSchema.station(body), group = body.getString("group", "");
+        return kind == PackSection.COOKING_POT ? station.equals("cooking_pot") && group.isBlank()
+                : kind == PackSection.CUSTOM_COOKING_POT ? station.equals("cooking_pot") && !group.isBlank()
+                : kind == PackSection.CUTTING_BOARD && station.equals("cutting_board");
     }
 
     public static RecipeSource source(FarmersDelightPlugin plugin, String name, String id, String group) {
@@ -255,21 +218,15 @@ public final class RecipePackFiles {
 
     public static RecipeSource source(FarmersDelightPlugin plugin, String name, String id, String group, YamlConfiguration document) {
         Path path = file(plugin, name);
-        if (group != null && !group.isBlank()) {
-            ConfigurationSection groups = document.getConfigurationSection("custom_cooking_pot_recipes");
-            ConfigurationSection entries = groups == null ? null : groups.getConfigurationSection(group);
-            ConfigurationSection node = entries == null ? null : entries.getConfigurationSection(id);
-            return new RecipeSource(path, List.of("custom_cooking_pot_recipes", group, id), node != null && node.isSet("type"), true);
-        }
         if (GROUP_FILE.equals(name)) return new RecipeSource(path, List.of(document.isSet("food_groups") ? "food_groups" : "groups", id), false, true);
-        PackSection kind = POT_FILE.equals(name) ? PackSection.COOKING_POT : PackSection.CUTTING_BOARD;
         for (String key : document.getKeys(false)) {
+            if (!key.split("#", 2)[0].equals(NativeRecipeSchema.ROOT)) continue;
             ConfigurationSection root = document.getConfigurationSection(key);
-            if (root != null && root.getKeys(false).contains(id) && (key.split("#",2)[0].equals(OtherDelightIds.RECIPE_SECTION) || key.split("#",2)[0].equals(kind.sectionId()) || key.equals(kind.rootKey()))) {
-                return new RecipeSource(path, List.of(key, id), key.split("#",2)[0].equals(OtherDelightIds.RECIPE_SECTION), true);
-            }
+            ConfigurationSection body = root == null ? null : root.getConfigurationSection(id);
+            if (body != null && java.util.Objects.equals(body.getString("group", ""), group == null ? "" : group))
+                return new RecipeSource(path, List.of(key, id), true, true);
         }
-        return new RecipeSource(path, List.of(OtherDelightIds.RECIPE_SECTION, id), true);
+        return new RecipeSource(path, List.of(NativeRecipeSchema.ROOT, id), true);
     }
 
     /** Uses freshly prepared documents for /fd reload and CE's transformed sections for CE reloads. */
@@ -282,12 +239,12 @@ public final class RecipePackFiles {
         for (PackSections.Section section : plugin.packSectionsOf(kind)) {
             if (section.file() == null || !section.file().equals(defaultFile)) result.add(section);
         }
-        if (kind != PackSection.COOKING_POT && kind != PackSection.CUTTING_BOARD) return List.copyOf(result);
-        for (PackSections.Section section : plugin.packSectionsOf(PackSection.OTHER_DELIGHT_RECIPES)) {
+        if (!recipeKind(kind)) return List.copyOf(result);
+        for (PackSections.Section section : plugin.packSectionsOf(PackSection.NATIVE_RECIPES)) {
             if (section.file() == null || section.file().equals(defaultFile)) continue;
             YamlConfiguration raw = new YamlConfiguration();
             raw.options().pathSeparator('\u0001');
-            PlainYamlDocuments.setValue(raw, section.sectionKey(), section.yaml().get(PackSection.OTHER_DELIGHT_RECIPES.rootKey()));
+            PlainYamlDocuments.setValue(raw, section.sectionKey(), section.yaml().get(PackSection.NATIVE_RECIPES.rootKey()));
             for (var converted : sections(Map.of(section.file(), raw), defaultFile, kind)) {
                 result.add(new PackSections.Section(kind, section.source(), section.namespace(), converted.yaml(),
                         section.file(), section.sectionKey(), section.generated()));
@@ -318,15 +275,18 @@ public final class RecipePackFiles {
             YamlConfiguration document = entry.getValue();
             for (String key : document.getKeys(false)) {
                 String base = key.split("#", 2)[0];
-                boolean typedRecipes = kind == PackSection.COOKING_POT || kind == PackSection.CUTTING_BOARD;
-                if (!base.equals(kind.sectionId()) && !base.equals(kind.rootKey()) && !(typedRecipes && base.equals(OtherDelightIds.RECIPE_SECTION))) continue;
+                boolean typedRecipes = recipeKind(kind);
+                if (typedRecipes ? !base.equals(NativeRecipeSchema.ROOT) : !base.equals(kind.sectionId()) && !base.equals(kind.rootKey())) continue;
                 ConfigurationSection root = document.getConfigurationSection(key);
                 if (root == null) continue;
                 Map<String, Object> selected = new LinkedHashMap<>();
                 for (var recipe : root.getValues(false).entrySet()) {
-                    if (kind == PackSection.OTHER_DELIGHT_RECIPES || recipe.getValue() instanceof ConfigurationSection body
-                            && (!typedRecipes || !base.equals(OtherDelightIds.RECIPE_SECTION) || typeMatches(kind, body))) {
-                        selected.put(recipe.getKey(), recipe.getValue());
+                    if (kind == PackSection.NATIVE_RECIPES || recipe.getValue() instanceof ConfigurationSection body
+                            && (!typedRecipes || !base.equals(NativeRecipeSchema.ROOT) || typeMatches(kind, body))) {
+                        if (kind == PackSection.CUSTOM_COOKING_POT && recipe.getValue() instanceof ConfigurationSection custom) {
+                            @SuppressWarnings("unchecked") Map<String, Object> entries = (Map<String, Object>) selected.computeIfAbsent(custom.getString("group"), ignored -> new LinkedHashMap<>());
+                            entries.put(recipe.getKey(), recipe.getValue());
+                        } else selected.put(recipe.getKey(), recipe.getValue());
                     }
                 }
                 if (selected.isEmpty()) continue;

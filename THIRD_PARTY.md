@@ -22,7 +22,7 @@ respectively. Consumers do not need to install either library as a separate serv
 
 # UltimateAdvancementAPI
 
-UltimateAdvancementAPI `2.8.1-pro.2` is a compile-only dependency, distributed in `libs/`
+UltimateAdvancementAPI `2.8.1-pro.3` is a compile-only dependency, distributed in `libs/`
 with its corresponding source archive, build scripts and LGPL-3.0-or-later license texts.
 It must be installed as a separate server plugin and is not bundled into either Farmersdelight JAR.
 See [libs/README.md](libs/README.md) for provenance, artifact hashes and compatibility.

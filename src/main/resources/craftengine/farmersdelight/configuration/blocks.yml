@@ -302,6 +302,8 @@ items:
   farmersdelight:full_tatami_mat_elements:
     data:
       item_name: <!i><lang:block.farmersdelight.full_tatami_mat>
+    legacy_model:
+      path: farmersdelight:block/legacy/full_tatami_mat
     model:
       type: minecraft:select
       property: minecraft:display_context
@@ -336,6 +338,8 @@ items:
   farmersdelight:half_tatami_mat_elements:
     data:
       item_name: <!i><lang:block.farmersdelight.half_tatami_mat>
+    legacy_model:
+      path: farmersdelight:block/legacy/half_tatami_mat
     model:
       type: minecraft:select
       property: minecraft:display_context
@@ -360,6 +364,8 @@ items:
   farmersdelight:canvas_rug_elements:
     data:
       item_name: <!i><lang:block.farmersdelight.canvas_rug>
+    legacy_model:
+      path: farmersdelight:block/legacy/canvas_rug
     model:
       type: minecraft:select
       property: minecraft:display_context

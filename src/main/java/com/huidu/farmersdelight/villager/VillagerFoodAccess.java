@@ -15,7 +15,9 @@ final class VillagerFoodAccess {
     private VillagerFoodAccess(MethodHandle handle, VarHandle food) { this.handle = handle; this.food = food; }
 
     static VillagerFoodAccess link() throws ReflectiveOperationException {
-        Class<?> nativeType = Class.forName("net.minecraft.world.entity.npc.villager.Villager");
+        Class<?> nativeType;
+        try { nativeType = Class.forName("net.minecraft.world.entity.npc.villager.Villager"); }
+        catch (ClassNotFoundException olderPackage) { nativeType = Class.forName("net.minecraft.world.entity.npc.Villager"); }
         Class<?> craftType = Class.forName("org.bukkit.craftbukkit.entity.CraftVillager");
         MethodHandle handle = MethodHandles.publicLookup().findVirtual(craftType, "getHandle", MethodType.methodType(nativeType))
                 .asType(MethodType.methodType(Object.class, Villager.class));

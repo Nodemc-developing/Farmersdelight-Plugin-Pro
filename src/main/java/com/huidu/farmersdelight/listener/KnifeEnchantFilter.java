@@ -10,6 +10,10 @@ import com.huidu.farmersdelight.tool.ToolData;
 import com.huidu.farmersdelight.tool.ToolRegistry;
 import com.huidu.farmersdelight.util.Constants;
 import com.huidu.farmersdelight.util.ItemUtils;
+import net.momirealms.craftengine.bukkit.api.BukkitAdaptor;
+import net.momirealms.craftengine.core.item.component.DataComponentKeys;
+import net.momirealms.craftengine.core.util.VersionHelper;
+import net.momirealms.craftengine.proxy.bukkit.craftbukkit.enchantments.CraftEnchantmentProxy;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.tag.TagKey;
@@ -42,11 +46,16 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 
 public final class KnifeEnchantFilter implements Listener {
 
     private static final int ANVIL_CONFLICT_PENALTY = 1;
     private static final int ANVIL_MINIMUM_REPAIR_COST = 1;
+    private static final MethodHandle ENCHANTMENT_WEIGHT = enchantmentWeightAccessor();
+    private static final MethodHandle LEGACY_ENCHANTMENT_WEIGHT = legacyEnchantmentWeightAccessor();
 
     private final FarmersDelightPlugin plugin;
     private final Map<UUID, PreparedOffers> preparedOffers = new ConcurrentHashMap<>();
@@ -475,7 +484,7 @@ public final class KnifeEnchantFilter implements Listener {
             for (int level = enchantment.getMaxLevel(); level >= enchantment.getStartLevel(); level--) {
                 if (modifiedLevel >= enchantment.getMinModifiedCost(level)
                         && modifiedLevel <= enchantment.getMaxModifiedCost(level)) {
-                    candidates.add(new Candidate(enchantment, level, Math.max(1, enchantment.getWeight())));
+                    candidates.add(new Candidate(enchantment, level, Math.max(1, enchantmentWeight(enchantment))));
                     break;
                 }
             }
@@ -506,11 +515,51 @@ public final class KnifeEnchantFilter implements Listener {
                 return toolData.enchantability();
             }
         }
-        ItemMeta meta = item.getItemMeta();
-        if (meta != null && meta.hasEnchantable() && meta.getEnchantable() > 0) {
-            return meta.getEnchantable();
+        if (VersionHelper.isOrAbove1_21_2) {
+            Object component = BukkitAdaptor.adapt(item).getComponentAsJava(DataComponentKeys.ENCHANTABLE);
+            int value = enchantabilityValue(component);
+            if (value > 0) return value;
         }
         return table.defaultEnchantability();
+    }
+
+    static int enchantabilityValue(Object component) {
+        Object value = component instanceof Map<?, ?> map ? map.get("value") : component;
+        return value instanceof Number number ? number.intValue() : 0;
+    }
+
+    private static MethodHandle enchantmentWeightAccessor() {
+        try {
+            return MethodHandles.publicLookup().findVirtual(Enchantment.class, "getWeight", MethodType.methodType(int.class));
+        } catch (NoSuchMethodException | IllegalAccessException unavailable) {
+            return null;
+        }
+    }
+
+    private static MethodHandle legacyEnchantmentWeightAccessor() {
+        if (ENCHANTMENT_WEIGHT != null) return null;
+        try {
+            Class<?> nativeClass = Class.forName("net.minecraft.world.item.enchantment.Enchantment");
+            return MethodHandles.publicLookup().findVirtual(nativeClass, "getWeight", MethodType.methodType(int.class))
+                    .asType(MethodType.methodType(int.class, Object.class));
+        } catch (ReflectiveOperationException unavailable) {
+            return null;
+        }
+    }
+
+    private static int enchantmentWeight(Enchantment enchantment) {
+        try {
+            if (ENCHANTMENT_WEIGHT != null) return (int) ENCHANTMENT_WEIGHT.invokeExact(enchantment);
+            if (LEGACY_ENCHANTMENT_WEIGHT != null) {
+                Object nativeEnchantment = CraftEnchantmentProxy.INSTANCE.getHandle(enchantment);
+                return (int) LEGACY_ENCHANTMENT_WEIGHT.invokeExact(nativeEnchantment);
+            }
+            throw new IllegalStateException("The server exposes no enchantment weight accessor");
+        } catch (RuntimeException | Error failure) {
+            throw failure;
+        } catch (Throwable failure) {
+            throw new IllegalStateException("Cannot read enchantment weight", failure);
+        }
     }
 
     private EnchantmentSettings.GroupId enchantmentGroup(ItemStack item) {

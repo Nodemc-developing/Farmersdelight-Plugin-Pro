@@ -66,10 +66,15 @@ public final class PreparedRecipeFiles implements RecipeReloadCoordinator.Batch 
                 Revision before = Revision.read(path);
                 YamlConfiguration document = com.huidu.farmersdelight.config.PlainYamlDocuments.readLiteral(path);
                 if (!before.equals(Revision.read(path))) throw new IOException("Recipe file changed during preparation: " + path);
+                RecipePackFiles.validateNativeDocument(document, path.toString());
                 boolean relevant = document.getKeys(false).stream().anyMatch(key -> {
                     String base = key.split("#", 2)[0];
-                    for (var kind : com.huidu.farmersdelight.pack.PackSection.values()) if (base.equals(kind.sectionId()) || base.equals(kind.rootKey())) return true;
-                    return base.equals("food_groups") || base.equals("custom_cooking_pot_recipes") || RecipePackFiles.containsFactory(document);
+                    for (var kind : com.huidu.farmersdelight.pack.PackSection.values()) {
+                        if (kind == com.huidu.farmersdelight.pack.PackSection.COOKING_POT || kind == com.huidu.farmersdelight.pack.PackSection.CUTTING_BOARD
+                                || kind == com.huidu.farmersdelight.pack.PackSection.CUSTOM_COOKING_POT) continue;
+                        if (base.equals(kind.sectionId()) || base.equals(kind.rootKey())) return true;
+                    }
+                    return base.equals("food_groups") || RecipePackFiles.containsFactory(document);
                 });
                 if (relevant) { documents.put(path, document); revisions.put(path, before); }
                 return null;

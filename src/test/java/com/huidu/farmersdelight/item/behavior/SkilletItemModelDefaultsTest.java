@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class SkilletItemModelDefaultsTest {
     @Test void minimalPortableItemHasUsableCookingAndFoodOverlayDefaults() {
         var item = SkilletItemBehavior.FACTORY.create(null, Path.of("minimal.yml"), Key.of("farmersdelight:skillet"),
-                ConfigSection.ofRoot(Map.of("type", "papersdelight:skillet_item", "block", "farmersdelight:skillet")));
+                ConfigSection.ofRoot(Map.of("type", "farmersdelight:skillet_item", "block", "farmersdelight:skillet")));
         assertEquals(NamespacedKey.fromString("farmersdelight:skillet_cooking"), item.cookingModel());
         assertEquals(NamespacedKey.fromString("farmersdelight:item/skillet_food"), item.ingredientOverlayModel());
         assertTrue(item.usesDefaultCookingModel());

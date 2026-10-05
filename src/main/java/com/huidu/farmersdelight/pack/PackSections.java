@@ -66,6 +66,8 @@ public final class PackSections {
     private static Map<String, String> roots() {
         Map<String, String> roots = new LinkedHashMap<>();
         for (PackSection section : PackSection.values()) {
+            // These are internal manager views, never accepted as content-pack file formats.
+            if (section == PackSection.COOKING_POT || section == PackSection.CUTTING_BOARD || section == PackSection.CUSTOM_COOKING_POT) continue;
             roots.put(section.sectionId(), section.rootKey());
         }
         return roots;

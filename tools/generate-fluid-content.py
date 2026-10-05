@@ -1,4 +1,4 @@
-"""Generate owner-rendered tank definitions; fluid level and colors remain entity snapshots."""
+"""Generate tank items and blocks. Workstation recipes live in the separate fluid_recipes.yml file."""
 from pathlib import Path
 import yaml
 
@@ -21,12 +21,17 @@ def model(path, index=None):
 def tank(item_id, name, shell_path, glass):
     prefix = item_id + '_visual'
     shell = model(shell_path, 0 if glass else None)
-    ITEMS[prefix + '/empty'] = {'material': 'minecraft:paper', 'model': shell}
-    ITEMS[prefix + '/waterlogged/empty'] = {'material': 'minecraft:paper', 'model': shell}
+    legacy_shell = 'farmersdelight:block/glass_jug' if glass else shell_path
+    ITEMS[prefix + '/empty'] = {'material': 'minecraft:paper', 'model': shell, 'legacy_model': {'path': legacy_shell}}
+    ITEMS[prefix + '/waterlogged/empty'] = {'material': 'minecraft:paper', 'model': shell, 'legacy_model': {'path': legacy_shell}}
     for level in range(1, 17):
         fluid = model(f'farmersdelight:block/jug_fluid/glass_jug_fluid_model_{level:02}', 1)
-        ITEMS[prefix + f'/level_{level:02}'] = {'material': 'minecraft:paper', 'model': {'type': 'minecraft:composite', 'models': [shell, fluid]}}
-        ITEMS[prefix + f'/waterlogged/level_{level:02}'] = {'material': 'minecraft:paper', 'model': {'type': 'minecraft:composite', 'models': [shell, fluid]}}
+        legacy_path = f'farmersdelight:block/jug_legacy/{"glass_jug" if glass else "jug"}_level_{level:02}'
+        for suffix in (f'/level_{level:02}', f'/waterlogged/level_{level:02}'):
+            ITEMS[prefix + suffix] = {
+                'material': 'minecraft:paper',
+                'model': {'type': 'minecraft:composite', 'models': [shell, fluid]},
+                'legacy_model': {'path': legacy_path}}
     appearances, variants = {}, {}
     for facing, yaw in [('north', 0), ('east', 90), ('south', 180), ('west', 270)]:
         for wet in [False, True]:
@@ -46,6 +51,7 @@ def tank(item_id, name, shell_path, glass):
             '<!i><gray>容量：16 桶 / 16000 mB', '<!i><gray>桶或瓶右键转移；空手打开容器',
             '<!i><gray>输入输出支持漏斗；拆除保留流体' + ('；染料右键染色' if glass else '')], 'max_stack_size': 1},
         'model': shell,
+        'legacy_model': {'path': legacy_shell},
         'settings': {'fluidcore:container': {'capacity': 16000}},
         'behavior': [
             {'type': 'fluidcore:container', 'item-model': prefix},

@@ -1,203 +1,302 @@
 advanced_tags:
   c:crops/wheat:
     values:
-      - minecraft:wheat
-
-papersdelight_recipes:
+    - minecraft:wheat
+farmersdelight_recipes:
   farmersdelight:fluid_filling/water_bucket:
-    type: fluid_filling
-    fluid: "#c:water"
-    amount: 1000
-    empty_input: minecraft:bucket
-    filled_result: minecraft:water_bucket
+    station: fluid_tank
+    operation: fill
+    input:
+      item: minecraft:bucket
+    output:
+      item: minecraft:water_bucket
+    fluid:
+      match: '#c:water'
+      amount-mb: 1000
   farmersdelight:fluid_emptying/water_bucket:
-    type: fluid_emptying
-    fluid: minecraft:water
-    amount: 1000
-    filled_input: minecraft:water_bucket
-    empty_result: minecraft:bucket
+    station: fluid_tank
+    operation: drain
+    input:
+      item: minecraft:water_bucket
+    output:
+      item: minecraft:bucket
+    fluid:
+      match: minecraft:water
+      amount-mb: 1000
   farmersdelight:fluid_filling/milk_bottle:
-    type: fluid_filling
-    fluid: "#c:milk"
-    amount: 250
-    empty_input: minecraft:glass_bottle
-    filled_result: farmersdelight:milk_bottle
+    station: fluid_tank
+    operation: fill
+    input:
+      item: minecraft:glass_bottle
+    output:
+      item: farmersdelight:milk_bottle
+    fluid:
+      match: '#c:milk'
+      amount-mb: 250
   farmersdelight:fluid_filling/honey_bottle:
-    type: fluid_filling
-    fluid: "#c:honey"
-    amount: 250
-    empty_input: minecraft:glass_bottle
-    filled_result: minecraft:honey_bottle
+    station: fluid_tank
+    operation: fill
+    input:
+      item: minecraft:glass_bottle
+    output:
+      item: minecraft:honey_bottle
+    fluid:
+      match: '#c:honey'
+      amount-mb: 250
   farmersdelight:fluid_emptying/milk_bottle:
-    type: fluid_emptying
-    fluid: minecraft:milk
-    amount: 250
-    filled_input: farmersdelight:milk_bottle
-    empty_result: minecraft:glass_bottle
+    station: fluid_tank
+    operation: drain
+    input:
+      item: farmersdelight:milk_bottle
+    output:
+      item: minecraft:glass_bottle
+    fluid:
+      match: minecraft:milk
+      amount-mb: 250
   farmersdelight:soaking/wet_sponge:
-    type: soaking
-    ingredient: minecraft:sponge
-    fluid: "#c:water"
-    amount: 1000
-    result: minecraft:wet_sponge
-    time: 20
-    consume_fluid: true
+    station: fluid_tank
+    operation: soak
+    input:
+      item: minecraft:sponge
+    output:
+      item: minecraft:wet_sponge
+    fluid:
+      match: '#c:water'
+      amount-mb: 1000
+      consume: true
+    process:
+      ticks: 20
   farmersdelight:soaking/wheat_dough:
-    type: soaking
-    ingredient: advtag:c:crops/wheat
-    fluid: "#c:water"
-    amount: 1
-    result: farmersdelight:wheat_dough
-    time: 20
-    consume_fluid: false
+    station: fluid_tank
+    operation: soak
+    input:
+      item: advtag:c:crops/wheat
+    output:
+      item: farmersdelight:wheat_dough
+    fluid:
+      match: '#c:water'
+      amount-mb: 1
+      consume: false
+    process:
+      ticks: 20
   farmersdelight:soaking/mud:
-    type: soaking
-    ingredient: minecraft:dirt
-    fluid: "#c:water"
-    amount: 1
-    result: minecraft:mud
-    time: 20
-    consume_fluid: false
+    station: fluid_tank
+    operation: soak
+    input:
+      item: minecraft:dirt
+    output:
+      item: minecraft:mud
+    fluid:
+      match: '#c:water'
+      amount-mb: 1
+      consume: false
+    process:
+      ticks: 20
   farmersdelight:soaking/white_concrete:
-    type: soaking
-    ingredient: minecraft:white_concrete_powder
-    fluid: "#c:water"
-    amount: 1
-    result: minecraft:white_concrete
-    time: 20
-    consume_fluid: false
-
+    station: fluid_tank
+    operation: soak
+    input:
+      item: minecraft:white_concrete_powder
+    output:
+      item: minecraft:white_concrete
+    fluid:
+      match: '#c:water'
+      amount-mb: 1
+      consume: false
+    process:
+      ticks: 20
   farmersdelight:soaking/orange_concrete:
-    type: soaking
-    ingredient: minecraft:orange_concrete_powder
-    fluid: "#c:water"
-    amount: 1
-    result: minecraft:orange_concrete
-    time: 20
-    consume_fluid: false
-
+    station: fluid_tank
+    operation: soak
+    input:
+      item: minecraft:orange_concrete_powder
+    output:
+      item: minecraft:orange_concrete
+    fluid:
+      match: '#c:water'
+      amount-mb: 1
+      consume: false
+    process:
+      ticks: 20
   farmersdelight:soaking/magenta_concrete:
-    type: soaking
-    ingredient: minecraft:magenta_concrete_powder
-    fluid: "#c:water"
-    amount: 1
-    result: minecraft:magenta_concrete
-    time: 20
-    consume_fluid: false
-
+    station: fluid_tank
+    operation: soak
+    input:
+      item: minecraft:magenta_concrete_powder
+    output:
+      item: minecraft:magenta_concrete
+    fluid:
+      match: '#c:water'
+      amount-mb: 1
+      consume: false
+    process:
+      ticks: 20
   farmersdelight:soaking/light_blue_concrete:
-    type: soaking
-    ingredient: minecraft:light_blue_concrete_powder
-    fluid: "#c:water"
-    amount: 1
-    result: minecraft:light_blue_concrete
-    time: 20
-    consume_fluid: false
-
+    station: fluid_tank
+    operation: soak
+    input:
+      item: minecraft:light_blue_concrete_powder
+    output:
+      item: minecraft:light_blue_concrete
+    fluid:
+      match: '#c:water'
+      amount-mb: 1
+      consume: false
+    process:
+      ticks: 20
   farmersdelight:soaking/yellow_concrete:
-    type: soaking
-    ingredient: minecraft:yellow_concrete_powder
-    fluid: "#c:water"
-    amount: 1
-    result: minecraft:yellow_concrete
-    time: 20
-    consume_fluid: false
-
+    station: fluid_tank
+    operation: soak
+    input:
+      item: minecraft:yellow_concrete_powder
+    output:
+      item: minecraft:yellow_concrete
+    fluid:
+      match: '#c:water'
+      amount-mb: 1
+      consume: false
+    process:
+      ticks: 20
   farmersdelight:soaking/lime_concrete:
-    type: soaking
-    ingredient: minecraft:lime_concrete_powder
-    fluid: "#c:water"
-    amount: 1
-    result: minecraft:lime_concrete
-    time: 20
-    consume_fluid: false
-
+    station: fluid_tank
+    operation: soak
+    input:
+      item: minecraft:lime_concrete_powder
+    output:
+      item: minecraft:lime_concrete
+    fluid:
+      match: '#c:water'
+      amount-mb: 1
+      consume: false
+    process:
+      ticks: 20
   farmersdelight:soaking/pink_concrete:
-    type: soaking
-    ingredient: minecraft:pink_concrete_powder
-    fluid: "#c:water"
-    amount: 1
-    result: minecraft:pink_concrete
-    time: 20
-    consume_fluid: false
-
+    station: fluid_tank
+    operation: soak
+    input:
+      item: minecraft:pink_concrete_powder
+    output:
+      item: minecraft:pink_concrete
+    fluid:
+      match: '#c:water'
+      amount-mb: 1
+      consume: false
+    process:
+      ticks: 20
   farmersdelight:soaking/gray_concrete:
-    type: soaking
-    ingredient: minecraft:gray_concrete_powder
-    fluid: "#c:water"
-    amount: 1
-    result: minecraft:gray_concrete
-    time: 20
-    consume_fluid: false
-
+    station: fluid_tank
+    operation: soak
+    input:
+      item: minecraft:gray_concrete_powder
+    output:
+      item: minecraft:gray_concrete
+    fluid:
+      match: '#c:water'
+      amount-mb: 1
+      consume: false
+    process:
+      ticks: 20
   farmersdelight:soaking/light_gray_concrete:
-    type: soaking
-    ingredient: minecraft:light_gray_concrete_powder
-    fluid: "#c:water"
-    amount: 1
-    result: minecraft:light_gray_concrete
-    time: 20
-    consume_fluid: false
-
+    station: fluid_tank
+    operation: soak
+    input:
+      item: minecraft:light_gray_concrete_powder
+    output:
+      item: minecraft:light_gray_concrete
+    fluid:
+      match: '#c:water'
+      amount-mb: 1
+      consume: false
+    process:
+      ticks: 20
   farmersdelight:soaking/cyan_concrete:
-    type: soaking
-    ingredient: minecraft:cyan_concrete_powder
-    fluid: "#c:water"
-    amount: 1
-    result: minecraft:cyan_concrete
-    time: 20
-    consume_fluid: false
-
+    station: fluid_tank
+    operation: soak
+    input:
+      item: minecraft:cyan_concrete_powder
+    output:
+      item: minecraft:cyan_concrete
+    fluid:
+      match: '#c:water'
+      amount-mb: 1
+      consume: false
+    process:
+      ticks: 20
   farmersdelight:soaking/purple_concrete:
-    type: soaking
-    ingredient: minecraft:purple_concrete_powder
-    fluid: "#c:water"
-    amount: 1
-    result: minecraft:purple_concrete
-    time: 20
-    consume_fluid: false
-
+    station: fluid_tank
+    operation: soak
+    input:
+      item: minecraft:purple_concrete_powder
+    output:
+      item: minecraft:purple_concrete
+    fluid:
+      match: '#c:water'
+      amount-mb: 1
+      consume: false
+    process:
+      ticks: 20
   farmersdelight:soaking/blue_concrete:
-    type: soaking
-    ingredient: minecraft:blue_concrete_powder
-    fluid: "#c:water"
-    amount: 1
-    result: minecraft:blue_concrete
-    time: 20
-    consume_fluid: false
-
+    station: fluid_tank
+    operation: soak
+    input:
+      item: minecraft:blue_concrete_powder
+    output:
+      item: minecraft:blue_concrete
+    fluid:
+      match: '#c:water'
+      amount-mb: 1
+      consume: false
+    process:
+      ticks: 20
   farmersdelight:soaking/brown_concrete:
-    type: soaking
-    ingredient: minecraft:brown_concrete_powder
-    fluid: "#c:water"
-    amount: 1
-    result: minecraft:brown_concrete
-    time: 20
-    consume_fluid: false
-
+    station: fluid_tank
+    operation: soak
+    input:
+      item: minecraft:brown_concrete_powder
+    output:
+      item: minecraft:brown_concrete
+    fluid:
+      match: '#c:water'
+      amount-mb: 1
+      consume: false
+    process:
+      ticks: 20
   farmersdelight:soaking/green_concrete:
-    type: soaking
-    ingredient: minecraft:green_concrete_powder
-    fluid: "#c:water"
-    amount: 1
-    result: minecraft:green_concrete
-    time: 20
-    consume_fluid: false
-
+    station: fluid_tank
+    operation: soak
+    input:
+      item: minecraft:green_concrete_powder
+    output:
+      item: minecraft:green_concrete
+    fluid:
+      match: '#c:water'
+      amount-mb: 1
+      consume: false
+    process:
+      ticks: 20
   farmersdelight:soaking/red_concrete:
-    type: soaking
-    ingredient: minecraft:red_concrete_powder
-    fluid: "#c:water"
-    amount: 1
-    result: minecraft:red_concrete
-    time: 20
-    consume_fluid: false
-
+    station: fluid_tank
+    operation: soak
+    input:
+      item: minecraft:red_concrete_powder
+    output:
+      item: minecraft:red_concrete
+    fluid:
+      match: '#c:water'
+      amount-mb: 1
+      consume: false
+    process:
+      ticks: 20
   farmersdelight:soaking/black_concrete:
-    type: soaking
-    ingredient: minecraft:black_concrete_powder
-    fluid: "#c:water"
-    amount: 1
-    result: minecraft:black_concrete
-    time: 20
-    consume_fluid: false
+    station: fluid_tank
+    operation: soak
+    input:
+      item: minecraft:black_concrete_powder
+    output:
+      item: minecraft:black_concrete
+    fluid:
+      match: '#c:water'
+      amount-mb: 1
+      consume: false
+    process:
+      ticks: 20

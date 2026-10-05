@@ -2,6 +2,7 @@ package com.huidu.farmersdelight.gui;
 
 import com.huidu.farmersdelight.FarmersDelightPlugin;
 import com.huidu.farmersdelight.api.recipe.SpecialRecipeInfo;
+import com.huidu.farmersdelight.api.util.CompatItemMeta;
 import com.huidu.farmersdelight.i18n.I18n;
 import com.huidu.farmersdelight.util.ItemUtils;
 import net.kyori.adventure.text.Component;
@@ -36,12 +37,8 @@ final class SpecialRecipeRenderer {
             icon = new ItemStack(Material.KNOWLEDGE_BOOK);
         }
         ItemMeta meta = icon.getItemMeta();
-        boolean otherDelightInfo = SpecialRecipeInfo.DISPLAY_OTHER_DELIGHT_INFO.equals(info.displayType());
-        if (!otherDelightInfo) meta.displayName(translatable(info.titleKey(), NamedTextColor.GOLD));
-        List<Component> lore = new ArrayList<>(otherDelightInfo
-                ? info.descriptionKeys().stream().map(line -> net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(line)
-                        .decoration(TextDecoration.ITALIC, false)).toList()
-                : translatableKeys(info.descriptionKeys(), NamedTextColor.GRAY));
+        meta.displayName(translatable(info.titleKey(), NamedTextColor.GOLD));
+        List<Component> lore = new ArrayList<>(translatableKeys(info.descriptionKeys(), NamedTextColor.GRAY));
         if (!isListOnlySpecial(info)) {
             lore.add(Component.text(""));
             lore.add(gui.tr("gui.recipe.click_to_view", NamedTextColor.YELLOW));
@@ -53,8 +50,7 @@ final class SpecialRecipeRenderer {
     }
 
     boolean isListOnlySpecial(SpecialRecipeInfo info) {
-        return info != null && (SpecialRecipeInfo.DISPLAY_ITEM_DESCRIPTION.equalsIgnoreCase(info.displayType())
-                || SpecialRecipeInfo.DISPLAY_OTHER_DELIGHT_INFO.equalsIgnoreCase(info.displayType()));
+        return info != null && SpecialRecipeInfo.DISPLAY_ITEM_DESCRIPTION.equalsIgnoreCase(info.displayType());
     }
 
     // Shared translatable-component builders: every condition/description label disables italics the same
@@ -129,11 +125,11 @@ final class SpecialRecipeRenderer {
     }
 
     ItemStack createCombinedDescriptionItem(List<String> translationKeys, Player player) {
-        ItemStack item = new ItemStack(Material.PAPER);
+        ItemStack item = invisibleCarrier(Material.PAPER);
         ItemMeta meta = item.getItemMeta();
         // Hide the carrier: the description is text shown on hover, so render the slot with the
         // transparent "air" item model instead of a visible paper icon.
-        meta.setItemModel(new NamespacedKey("minecraft", "air"));
+        CompatItemMeta.setItemModel(meta, new NamespacedKey("minecraft", "air"));
         if (translationKeys.isEmpty()) {
             meta.displayName(Component.text(""));
             meta.lore(List.of());
@@ -205,14 +201,22 @@ final class SpecialRecipeRenderer {
     // hover text. A near-invisible pane with the "air" item model keeps the grid slot clear while still
     // offering the translated name/lore on hover.
     private ItemStack createLoreCarrierItem(String nameKey, String loreKey, NamedTextColor nameColor) {
-        ItemStack item = new ItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
+        ItemStack item = invisibleCarrier(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
         ItemMeta meta = item.getItemMeta();
-        meta.setItemModel(new NamespacedKey("minecraft", "air"));
+        CompatItemMeta.setItemModel(meta, new NamespacedKey("minecraft", "air"));
         meta.displayName(translatable(nameKey, nameColor));
         meta.lore(translatableLore(loreKey, NamedTextColor.GRAY));
         GuiTextStyle.normalizeDisplayMeta(meta);
         item.setItemMeta(meta);
         return item;
+    }
+
+    private static ItemStack invisibleCarrier(Material fallback) {
+        if (!CompatItemMeta.isSupported()) {
+            ItemStack configured = ItemUtils.createItem("farmersdelight:gui_invisible");
+            if (configured != null && !configured.getType().isAir()) return configured;
+        }
+        return new ItemStack(fallback);
     }
 
     private ItemStack createPredefinedConditionItem(String itemId, String nameKey, String loreKey, NamedTextColor nameColor) {

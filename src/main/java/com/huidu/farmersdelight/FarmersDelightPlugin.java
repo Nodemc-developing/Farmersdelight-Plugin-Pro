@@ -407,7 +407,7 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
         // early and the load-phase detail lines below can be surfaced by their category like the rest.
         loadDebugFlags();
         try {
-            com.huidu.farmersdelight.recipe.RecipePackFiles.installAndMigrate(this);
+            com.huidu.farmersdelight.recipe.RecipePackFiles.installDefaults(this);
         } catch (Exception failure) {
             throw new IllegalStateException("Could not migrate recipes to the CraftEngine content pack", failure);
         }
@@ -438,6 +438,8 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
             return;
         }
         System.setProperty(RELOAD_GUARD_PROPERTY, "1");
+
+        PetFoodConfig.prepareNativeConfigTypes();
 
         enabled = true;
 
@@ -992,35 +994,15 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
     }
 
     @Override
-    public FileConfiguration getConfig() {
-        FileConfiguration source = getSourceConfig();
-        FileConfiguration view = runtimeConfigView;
-        if (view == null || runtimeConfigSource != source) {
-            synchronized (this) {
-                source = getSourceConfig();
-                if (runtimeConfigView == null || runtimeConfigSource != source) {
-                    runtimeConfigView = com.huidu.farmersdelight.config.OtherDelightConfigFormat.runtimeView(source);
-                    runtimeConfigSource = source;
-                }
-                view = runtimeConfigView;
-            }
-        }
-        return view;
-    }
+    public FileConfiguration getConfig() { return getSourceConfig(); }
 
-    private volatile FileConfiguration runtimeConfigSource;
-    private volatile FileConfiguration runtimeConfigView;
-
-    /** The canonical document used for migrations and persistence, without runtime compatibility aliases. */
+    /** The native configuration document published by the prepared reload batch. */
     public FileConfiguration getSourceConfig() {
         FileConfiguration prepared = preparedMainConfig;
         return prepared == null ? super.getConfig() : prepared;
     }
 
-    public void invalidateConfigView() {
-        runtimeConfigSource = null;
-        runtimeConfigView = null;
-    }
+    public void invalidateConfigView() { }
 
     public boolean isCookingPotRecipeBookEnabled() {
         StationSettings settings = stationSettings;

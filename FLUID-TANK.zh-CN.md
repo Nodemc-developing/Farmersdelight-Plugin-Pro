@@ -1,6 +1,6 @@
 # 流体罐
 
-流体罐需要 FluidCore 和固定的 CraftEngine 26.10 快照（见 README）。安装后，插件会释放独立的 `farmersdelight_fluids` 内容包；重载或生成 CraftEngine 资源包后，客户端才能显示罐模型。
+流体罐需要 FluidCore，以及 CraftEngine 26.9.2 或已验证的 26.10 快照（见[兼容说明](docs/COMPATIBILITY.md)）。安装后，插件会释放独立的 `farmersdelight_fluids` 内容包；重载或生成 CraftEngine 资源包后，客户端才能显示罐模型。
 
 ## 获取
 
@@ -59,11 +59,11 @@ Folia 中，玩家与储罐处于不同区域时，右键会先打开菜单；�
 
 正常关闭背包后，输入和输出继续留在罐内。储罐已拆除、所在区块卸载、距离过远、失去权限或重载失效时安全关闭；区块重新加载也不会恢复旧的返回句柄。四行储罐主题保留上述六个位置，不占用桶数位置放置配方按钮。配方编辑仍通过 `/fd recipe edit`，并要求编辑权限。漏斗默认每 8 tick 搬运一件；输出已满时不扣输入或流体。
 
-输入槽依次尝试显式排空、显式灌装、通用容器排空、通用容器灌装，最后处理浸泡。容器转换即时处理一件，不等待配方的 `time`；只有浸泡使用时长。通用路径也支持通过 FluidCore API 注册的自定义容器，无需为它额外添加灌装或排空配方。输出放不下时，输入和流体保持不变。
+输入槽依次尝试显式排空、显式灌装、通用容器排空、通用容器灌装，最后处理浸泡。容器转换即时处理一件，不等待配方的 `process.ticks`；只有浸泡使用时长。通用路径也支持通过 FluidCore API 注册的自定义容器，无需为它额外添加灌装或排空配方。输出放不下时，输入和流体保持不变。
 
 跨 Folia 区域搬运使用原物品核对、预留、目标确认及失败补偿。无法确认交付状态时保留恢复记录，不自行复制或丢弃物品。日志中的恢复提示应先检查，再重试原操作。
 
-内容包自带 22 条基础流体配方及 2 条水桶配方。FluidCore 注册蜂蜜及原版桶瓶处理；未显式写 `time` 的浸泡配方立即处理（0 tick），自带海绵配方显式指定 20 tick。
+内容包自带 24 条流体配方：3 条灌装、2 条排空和 19 条浸泡。FluidCore 注册蜂蜜及原版桶瓶处理；未显式写 `process.ticks` 的浸泡配方立即处理（0 tick），自带海绵配方显式指定 20 tick。
 
 ## 配置与编辑
 
@@ -79,6 +79,24 @@ plugins/CraftEngine/resources/farmersdelight_fluids/
 ```
 
 修改方块、容量、模型或合成配方后使用 `/ce reload`。通过 `/fd recipe edit` 选择灌装、排空或浸泡分类，可以编辑配方并保存到原节点；字段说明见[配置与配方指南](CONFIGURATION-RECIPES.zh-CN.md)。
+
+1.2.2 的流体配方与厨锅、砧板共用 `farmersdelight_recipes` 区块，灌装示例：
+
+```yaml
+farmersdelight_recipes:
+  example:milk_bottle:
+    station: fluid_tank
+    operation: fill
+    input:
+      item: minecraft:glass_bottle
+    output:
+      item: farmersdelight:milk_bottle
+    fluid:
+      match: "#c:milk"
+      amount-mb: 250
+```
+
+`operation` 使用 `fill`、`drain` 或 `soak`，`fluid.match` 指定实际流体条件。浸泡的等待时间放在 `process.ticks`；不耗流体的浸泡使用 `fluid.consume: false`，仍需足量流体。灌装和排空可省略 `output`，采用容器处理器的真实转换结果，保留流体组件。新结构只整理字段，原有守恒、输入输出和线程规则保持不变。
 
 方块 behavior 下的 `menu` 控制菜单主题。自带罐使用普通图标；外部内容包可以引用自己已经注册的 CE 图片与物品，无需将图片复制进插件：
 

@@ -22,6 +22,17 @@ class SleepingTickerBridgeTest {
         AtomicInteger businessCalls = new AtomicInteger();
         AtomicInteger dispatchCalls = new AtomicInteger();
         SleepingTickerBridge<BlockEntityController> bridge = SleepingTickerBridge.create((w, p, s, c) -> businessCalls.incrementAndGet());
+        if (!bridge.usesNativeSleepList()) {
+            bridge.ticker().tick(null, null, null, null);
+            bridge.sleep();
+            for (int i = 0; i < 100; i++) bridge.ticker().tick(null, null, null, null);
+            assertEquals(1, businessCalls.get());
+            bridge.wakeUp();
+            assertEquals(1, businessCalls.get(), "Wake must not invoke cooking inline");
+            bridge.ticker().tick(null, null, null, null);
+            assertEquals(2, businessCalls.get());
+            return;
+        }
         ClassLoader loader = bridge.ticker().getClass().getClassLoader();
         String packageName = "net.momirealms.craftengine.core.block.entity.tick.";
         Class<?> entryType = Class.forName(packageName + "TickingBlockEntity", true, loader);
@@ -59,6 +70,24 @@ class SleepingTickerBridgeTest {
         schedulerType.getMethod("tick").invoke(scheduler);
         assertEquals(2, dispatchCalls.get());
         assertEquals(2, businessCalls.get());
+    }
+
+    @Test void olderHostsRetainSleepAndWakeWithoutLoadingNewTickerTypes() {
+        AtomicInteger calls = new AtomicInteger();
+        SleepingTickerBridge<BlockEntityController> bridge = SleepingTickerBridge.legacy((w, p, s, c) -> calls.incrementAndGet());
+        assertFalse(bridge.usesNativeSleepList());
+        bridge.ticker().tick(null, null, null, null);
+        bridge.sleep();
+        bridge.sleep();
+        for (int i = 0; i < 100; i++) bridge.ticker().tick(null, null, null, null);
+        assertEquals(1, calls.get());
+        bridge.wakeUp();
+        bridge.wakeUp();
+        assertEquals(1, calls.get());
+        assertEquals(1, bridge.sleepCount());
+        assertEquals(1, bridge.wakeCount());
+        bridge.ticker().tick(null, null, null, null);
+        assertEquals(2, calls.get());
     }
 
     @Test

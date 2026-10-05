@@ -1,6 +1,7 @@
 package com.huidu.farmersdelight.fluid;
 
 import com.huidu.farmersdelight.recipe.RecipeIngredient;
+import com.huidu.farmersdelight.recipe.NativeRecipeSchema;
 import com.huidu.farmersdelight.recipe.RecipeParsingSupport;
 import net.momirealms.craftengine.core.util.Key;
 import org.bukkit.configuration.ConfigurationSection;
@@ -45,6 +46,13 @@ public record FluidRecipeSpec(String id, String type, RecipeIngredient ingredien
     }
 
     public static FluidRecipeSpec parse(String id, Map<String, Object> body) {
+        if (!"fluid_tank".equals(body.get("station"))) {
+            throw new IllegalArgumentException("Fluid recipe station must be fluid_tank");
+        }
+        return parseCanonical(id, NativeRecipeSchema.normalizeFluid(body));
+    }
+
+    private static FluidRecipeSpec parseCanonical(String id, Map<String, Object> body) {
         String type = Objects.toString(body.get("type"), "").trim().toLowerCase(Locale.ROOT);
         String inputKey = switch (type) {
             case "fluid_filling" -> "empty_input";
@@ -73,7 +81,7 @@ public record FluidRecipeSpec(String id, String type, RecipeIngredient ingredien
         }
         return new FluidRecipeSpec(id, type, RecipeParsingSupport.parseIngredientValue(input(input, 0)), resultMap(output),
                 fluid, tag, amount, exactLong(body.get("time"), 0, "time"),
-                consume, Math.toIntExact(exactLong(body.get("priority"), 0, "priority")), fluidValue);
+                consume, exactInt(body.get("priority"), 0, "priority"), fluidValue);
     }
     private static Object input(Object raw, int depth) {
         if (depth > 32) throw new IllegalArgumentException("Input ingredient is nested too deeply");
@@ -147,6 +155,13 @@ public record FluidRecipeSpec(String id, String type, RecipeIngredient ingredien
         try { return new BigDecimal(value.toString()).longValueExact(); }
         catch (ArithmeticException | NumberFormatException invalid) {
             throw new IllegalArgumentException(field + " must be a whole number within the signed long range", invalid);
+        }
+    }
+
+    private static int exactInt(Object value, int fallback, String field) {
+        try { return Math.toIntExact(exactLong(value, fallback, field)); }
+        catch (ArithmeticException invalid) {
+            throw new IllegalArgumentException(field + " must be within the signed int range", invalid);
         }
     }
 

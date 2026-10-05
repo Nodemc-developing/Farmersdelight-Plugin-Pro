@@ -1,399 +1,406 @@
-# ========================================
-# Cooking pot recipe configuration
-# ========================================
-#
-# Format:
-#   <recipe_id>:
-#     ingredients:           # ingredient list, up to 6 entries
-#       - <item_id_or_tag>   # tags must start with #; MMOItems ids use "mmoitems:<TYPE>:<ID>"
-#                            # tag exclusion: "#namespace:tag,!namespace:item,!#namespace:other_tag"
-#                            # alternatives for the same slot: "item_a|item_b|#namespace:tag"
-#     container: <item_id>   # optional when the result declares its own remainder (bowl/bottle/etc.): the plugin
-#                            # infers the required container from the result through the same use_remainder /
-#                            # craft-remainder / vanilla remainder resolution the pot uses for ingredient returns,
-#                            # so the field only has to be written to override the inference; write
-#                            # "container: none" to require no container at all. Tool remainders (a corn dog's
-#                            # stick, a ham's bone) are never taken as a container — see
-#                            # cooking-pot.container-inference in config.yml, including the switch that turns
-#                            # the whole inference off
-#     result: <item_id>      # vanilla, CraftEngine custom, or MMOItems ("mmoitems:<TYPE>:<ID>")
-#     result-count: <count>  # optional, default 1
-#     experience: <number>   # optional, default 0
-#     cook-time: <ticks>     # optional; default and bounds are in cooking-pot.cooking in config.yml
-#     category: <type>       # optional: meals, drinks, misc
-#     priority: <number>     # optional; when recipes overlap, the higher priority wins
-#
-# Item id formats:
-#   minecraft:stone_axe            vanilla item
-#   farmersdelight:beef_stew       CraftEngine custom item
-#   mmoitems:AXE:TEST              MMOItems item (TYPE:ID); MMOItems must be installed
-#
-# A result/container may also be an object when the item needs extra data (e.g. an MMOItems item
-# built from custom_data instead of via the MMOItems id):
-#   result:
-#     item: minecraft:stone_axe
-#     components:
-#       minecraft:custom_data: "(snbt) {MMOITEMS_ITEM_ID: 'TEST', MMOITEMS_ITEM_TYPE: 'AXE'}"
-#
-# Custom cooking pot recipes:
-#   Use custom_cooking_pot_recipes.<id>, where <id> must match
-#   behavior.custom.id in the CraftEngine block behavior. The recipe body is the same as above,
-#   but a custom pot may use more than 6 ingredients when its input-slots allow it.
-#   Custom pots can still use the default cooking_pot_recipes. Recipes in a custom group
-#   are checked first, and a custom recipe with the same id overrides
-#   the default recipe in the recipe GUI.
-# Example:
-# custom_cooking_pot_recipes:
-#   custom:
-#     large_stew:
-#       ingredients:
-#         - "minecraft:beef"
-#         - "minecraft:carrot"
-#       container: "minecraft:bowl"
-#       result: "farmersdelight:beef_stew"
-
-cooking_pot_recipes:
-  # ========================================
-  # Main dishes
-  # ========================================
-  
+farmersdelight_recipes:
   beef_stew:
-    ingredients:
-      - "#c:foods/raw_beef"
-      - "#c:crops/carrot"
-      - "#c:crops/potato"
-    container: "minecraft:bowl"
-    result: "farmersdelight:beef_stew"
-    experience: 1.0
-    cook-time: 200
+    station: cooking_pot
+    input:
+      items:
+      - '#c:foods/raw_beef'
+      - '#c:crops/carrot'
+      - '#c:crops/potato'
+      container: minecraft:bowl
+    output:
+      item: farmersdelight:beef_stew
+    process:
+      ticks: 200
+      experience: 1.0
     category: meals
-  
   vegetable_soup:
-    ingredients:
-      - "#c:crops/carrot"
-      - "#c:crops/potato"
-      - "#c:crops/beetroot"
-      - "#c:foods/leafy_green"
-    container: "minecraft:bowl"
-    result: "farmersdelight:vegetable_soup"
-    experience: 1.0
-    cook-time: 200
+    station: cooking_pot
+    input:
+      items:
+      - '#c:crops/carrot'
+      - '#c:crops/potato'
+      - '#c:crops/beetroot'
+      - '#c:foods/leafy_green'
+      container: minecraft:bowl
+    output:
+      item: farmersdelight:vegetable_soup
+    process:
+      ticks: 200
+      experience: 1.0
     category: meals
-  
   chicken_soup:
-    ingredients:
-      - "#c:foods/raw_chicken"
-      - "#c:crops/carrot"
-      - "#c:foods/leafy_green"
-      - "#c:foods/vegetable,!minecraft:melon_slice"
-    container: "minecraft:bowl"
-    result: "farmersdelight:chicken_soup"
-    experience: 1.0
-    cook-time: 200
+    station: cooking_pot
+    input:
+      items:
+      - '#c:foods/raw_chicken'
+      - '#c:crops/carrot'
+      - '#c:foods/leafy_green'
+      - '#c:foods/vegetable,!minecraft:melon_slice'
+      container: minecraft:bowl
+    output:
+      item: farmersdelight:chicken_soup
+    process:
+      ticks: 200
+      experience: 1.0
     category: meals
-  
   fish_stew:
-    ingredients:
-      - "#c:foods/safe_raw_fish"
-      - "farmersdelight:tomato_sauce"
-      - "#c:crops/onion"
-    container: "minecraft:bowl"
-    result: "farmersdelight:fish_stew"
-    experience: 1.0
-    cook-time: 200
+    station: cooking_pot
+    input:
+      items:
+      - '#c:foods/safe_raw_fish'
+      - farmersdelight:tomato_sauce
+      - '#c:crops/onion'
+      container: minecraft:bowl
+    output:
+      item: farmersdelight:fish_stew
+    process:
+      ticks: 200
+      experience: 1.0
     category: meals
-  
   baked_cod_stew:
-    ingredients:
-      - "#c:foods/raw_cod"
-      - "#c:crops/potato"
-      - "#c:eggs"
-      - "#c:crops/tomato"
-    container: "minecraft:bowl"
-    result: "farmersdelight:baked_cod_stew"
-    experience: 1.0
-    cook-time: 200
+    station: cooking_pot
+    input:
+      items:
+      - '#c:foods/raw_cod'
+      - '#c:crops/potato'
+      - '#c:eggs'
+      - '#c:crops/tomato'
+      container: minecraft:bowl
+    output:
+      item: farmersdelight:baked_cod_stew
+    process:
+      ticks: 200
+      experience: 1.0
     category: meals
-  
   pumpkin_soup:
-    ingredients:
-      - "farmersdelight:pumpkin_slice"
-      - "#c:foods/leafy_green"
-      - "#c:foods/raw_pork"
-      - "#c:drinks/milk"
-    container: "minecraft:bowl"
-    result: "farmersdelight:pumpkin_soup"
-    experience: 1.0
-    cook-time: 200
+    station: cooking_pot
+    input:
+      items:
+      - farmersdelight:pumpkin_slice
+      - '#c:foods/leafy_green'
+      - '#c:foods/raw_pork'
+      - '#c:drinks/milk'
+      container: minecraft:bowl
+    output:
+      item: farmersdelight:pumpkin_soup
+    process:
+      ticks: 200
+      experience: 1.0
     category: meals
-  
   beetroot_soup:
-    ingredients:
-      - "#c:crops/beetroot"
-      - "#c:crops/beetroot"
-      - "#c:crops/beetroot"
-    container: "minecraft:bowl"
-    result: "minecraft:beetroot_soup"
-    experience: 1.0
-    cook-time: 200
+    station: cooking_pot
+    input:
+      items:
+      - '#c:crops/beetroot'
+      - '#c:crops/beetroot'
+      - '#c:crops/beetroot'
+      container: minecraft:bowl
+    output:
+      item: minecraft:beetroot_soup
+    process:
+      ticks: 200
+      experience: 1.0
     category: meals
-  
   mushroom_stew:
-    ingredients:
-      - "minecraft:brown_mushroom"
-      - "minecraft:red_mushroom"
-    container: "minecraft:bowl"
-    result: "minecraft:mushroom_stew"
-    experience: 1.0
-    cook-time: 200
+    station: cooking_pot
+    input:
+      items:
+      - minecraft:brown_mushroom
+      - minecraft:red_mushroom
+      container: minecraft:bowl
+    output:
+      item: minecraft:mushroom_stew
+    process:
+      ticks: 200
+      experience: 1.0
     category: meals
-  
   rabbit_stew:
-    ingredients:
-      - "minecraft:rabbit"
-      - "#c:crops/carrot"
-      - "#c:crops/potato"
-      - "minecraft:brown_mushroom|minecraft:red_mushroom"
-    container: "minecraft:bowl"
-    result: "minecraft:rabbit_stew"
-    experience: 1.0
-    cook-time: 200
+    station: cooking_pot
+    input:
+      items:
+      - minecraft:rabbit
+      - '#c:crops/carrot'
+      - '#c:crops/potato'
+      - minecraft:brown_mushroom|minecraft:red_mushroom
+      container: minecraft:bowl
+    output:
+      item: minecraft:rabbit_stew
+    process:
+      ticks: 200
+      experience: 1.0
     category: meals
-  
   bone_broth:
-    ingredients:
-      - "#c:bones"
-      - "minecraft:glow_berries|#c:mushrooms|minecraft:hanging_roots|minecraft:glow_lichen"
-    container: "minecraft:bowl"
-    result: "farmersdelight:bone_broth"
-    experience: 0.35
-    cook-time: 200
+    station: cooking_pot
+    input:
+      items:
+      - '#c:bones'
+      - minecraft:glow_berries|#c:mushrooms|minecraft:hanging_roots|minecraft:glow_lichen
+      container: minecraft:bowl
+    output:
+      item: farmersdelight:bone_broth
+    process:
+      ticks: 200
+      experience: 0.35
     category: meals
-
   onion_soup:
-    ingredients:
-      - "#c:crops/onion"
-      - "#c:crops/onion"
-      - "#c:foods/bread"
-      - "#c:drinks/milk"
-    container: "minecraft:bowl"
-    result: "farmersdelight:onion_soup"
-    experience: 1.0
-    cook-time: 200
+    station: cooking_pot
+    input:
+      items:
+      - '#c:crops/onion'
+      - '#c:crops/onion'
+      - '#c:foods/bread'
+      - '#c:drinks/milk'
+      container: minecraft:bowl
+    output:
+      item: farmersdelight:onion_soup
+    process:
+      ticks: 200
+      experience: 1.0
     category: meals
-
-  # ========================================
-  # Rice dishes
-  # ========================================
-  
   cooked_rice:
-    ingredients:
-      - "#c:crops/rice"
-    container: "minecraft:bowl"
-    result: "farmersdelight:cooked_rice"
-    experience: 0.35
-    cook-time: 100
+    station: cooking_pot
+    input:
+      items:
+      - '#c:crops/rice'
+      container: minecraft:bowl
+    output:
+      item: farmersdelight:cooked_rice
+    process:
+      ticks: 100
+      experience: 0.35
     category: misc
-  
   mushroom_rice:
-    ingredients:
-      - "minecraft:brown_mushroom"
-      - "minecraft:red_mushroom"
-      - "#c:crops/rice"
-      - "minecraft:carrot|minecraft:potato"
-    container: "minecraft:bowl"
-    result: "farmersdelight:mushroom_rice"
-    experience: 1.0
-    cook-time: 200
+    station: cooking_pot
+    input:
+      items:
+      - minecraft:brown_mushroom
+      - minecraft:red_mushroom
+      - '#c:crops/rice'
+      - minecraft:carrot|minecraft:potato
+      container: minecraft:bowl
+    output:
+      item: farmersdelight:mushroom_rice
+    process:
+      ticks: 200
+      experience: 1.0
     category: meals
-  
   fried_rice:
-    ingredients:
-      - "#c:crops/rice"
-      - "#c:eggs"
-      - "#c:crops/carrot"
-      - "#c:crops/onion"
-    container: "minecraft:bowl"
-    result: "farmersdelight:fried_rice"
-    experience: 1.0
-    cook-time: 200
+    station: cooking_pot
+    input:
+      items:
+      - '#c:crops/rice'
+      - '#c:eggs'
+      - '#c:crops/carrot'
+      - '#c:crops/onion'
+      container: minecraft:bowl
+    output:
+      item: farmersdelight:fried_rice
+    process:
+      ticks: 200
+      experience: 1.0
     category: meals
-  
-  # ========================================
-  # Noodles and pasta
-  # ========================================
-  
   vegetable_noodles:
-    ingredients:
-      - "#c:crops/carrot"
-      - "#c:mushrooms"
-      - "#c:foods/pasta"
-      - "#c:foods/leafy_green"
-      - "#c:foods/vegetable,!minecraft:melon_slice"
-    container: "minecraft:bowl"
-    result: "farmersdelight:vegetable_noodles"
-    experience: 1.0
-    cook-time: 200
+    station: cooking_pot
+    input:
+      items:
+      - '#c:crops/carrot'
+      - '#c:mushrooms'
+      - '#c:foods/pasta'
+      - '#c:foods/leafy_green'
+      - '#c:foods/vegetable,!minecraft:melon_slice'
+      container: minecraft:bowl
+    output:
+      item: farmersdelight:vegetable_noodles
+    process:
+      ticks: 200
+      experience: 1.0
     category: meals
-  
   pasta_with_meatballs:
-    ingredients:
-      - "#c:foods/pasta"
-      - "farmersdelight:minced_beef"
-      - "farmersdelight:tomato_sauce"
-    container: "minecraft:bowl"
-    result: "farmersdelight:pasta_with_meatballs"
-    experience: 1.0
-    cook-time: 200
+    station: cooking_pot
+    input:
+      items:
+      - '#c:foods/pasta'
+      - farmersdelight:minced_beef
+      - farmersdelight:tomato_sauce
+      container: minecraft:bowl
+    output:
+      item: farmersdelight:pasta_with_meatballs
+    process:
+      ticks: 200
+      experience: 1.0
     category: meals
-  
   pasta_with_mutton_chop:
-    ingredients:
-      - "#c:foods/pasta"
-      - "#c:foods/raw_mutton"
-      - "farmersdelight:tomato_sauce"
-    container: "minecraft:bowl"
-    result: "farmersdelight:pasta_with_mutton_chop"
-    experience: 1.0
-    cook-time: 200
+    station: cooking_pot
+    input:
+      items:
+      - '#c:foods/pasta'
+      - '#c:foods/raw_mutton'
+      - farmersdelight:tomato_sauce
+      container: minecraft:bowl
+    output:
+      item: farmersdelight:pasta_with_mutton_chop
+    process:
+      ticks: 200
+      experience: 1.0
     category: meals
-  
   squid_ink_pasta:
-    ingredients:
-      - "#c:foods/safe_raw_fish"
-      - "#c:foods/pasta"
-      - "#c:crops/tomato"
-      - "minecraft:ink_sac"
-    container: "minecraft:bowl"
-    result: "farmersdelight:squid_ink_pasta"
-    experience: 1.0
-    cook-time: 200
+    station: cooking_pot
+    input:
+      items:
+      - '#c:foods/safe_raw_fish'
+      - '#c:foods/pasta'
+      - '#c:crops/tomato'
+      - minecraft:ink_sac
+      container: minecraft:bowl
+    output:
+      item: farmersdelight:squid_ink_pasta
+    process:
+      ticks: 200
+      experience: 1.0
     category: meals
-  
   noodle_soup:
-    ingredients:
-      - "#c:foods/pasta"
-      - "#c:eggs"
-      - "minecraft:dried_kelp"
-      - "#c:foods/raw_pork"
-    container: "minecraft:bowl"
-    result: "farmersdelight:noodle_soup"
-    experience: 1.0
-    cook-time: 200
+    station: cooking_pot
+    input:
+      items:
+      - '#c:foods/pasta'
+      - '#c:eggs'
+      - minecraft:dried_kelp
+      - '#c:foods/raw_pork'
+      container: minecraft:bowl
+    output:
+      item: farmersdelight:noodle_soup
+    process:
+      ticks: 200
+      experience: 1.0
     category: meals
-  
-  # ========================================
-  # Sauces
-  # ========================================
-  
   tomato_sauce:
-    ingredients:
-      - "#c:crops/tomato"
-      - "#c:crops/tomato"
-    container: "minecraft:bowl"
-    result: "farmersdelight:tomato_sauce"
-    experience: 0.35
-    cook-time: 100
+    station: cooking_pot
+    input:
+      items:
+      - '#c:crops/tomato'
+      - '#c:crops/tomato'
+      container: minecraft:bowl
+    output:
+      item: farmersdelight:tomato_sauce
+    process:
+      ticks: 100
+      experience: 0.35
     category: misc
-  
-  # ========================================
-  # Drinks
-  # ========================================
-  
   hot_cocoa:
-    ingredients:
-      - "#c:drinks/milk"
-      - "minecraft:sugar"
-      - "minecraft:cocoa_beans"
-      - "minecraft:cocoa_beans"
-    container: "minecraft:glass_bottle"
-    result: "farmersdelight:hot_cocoa"
-    experience: 1.0
-    cook-time: 200
+    station: cooking_pot
+    input:
+      items:
+      - '#c:drinks/milk'
+      - minecraft:sugar
+      - minecraft:cocoa_beans
+      - minecraft:cocoa_beans
+      container: minecraft:glass_bottle
+    output:
+      item: farmersdelight:hot_cocoa
+    process:
+      ticks: 200
+      experience: 1.0
     category: drinks
-  
   apple_cider:
-    ingredients:
-      - "minecraft:apple"
-      - "minecraft:apple"
-      - "minecraft:sugar"
-    container: "minecraft:glass_bottle"
-    result: "farmersdelight:apple_cider"
-    experience: 1.0
-    cook-time: 200
+    station: cooking_pot
+    input:
+      items:
+      - minecraft:apple
+      - minecraft:apple
+      - minecraft:sugar
+      container: minecraft:glass_bottle
+    output:
+      item: farmersdelight:apple_cider
+    process:
+      ticks: 200
+      experience: 1.0
     category: drinks
-  
   glow_berry_custard:
-    ingredients:
-      - "#c:drinks/milk"
-      - "minecraft:glow_berries"
-      - "#c:eggs"
-      - "minecraft:sugar"
-    container: "minecraft:glass_bottle"
-    result: "farmersdelight:glow_berry_custard"
-    experience: 1.0
-    cook-time: 200
+    station: cooking_pot
+    input:
+      items:
+      - '#c:drinks/milk'
+      - minecraft:glow_berries
+      - '#c:eggs'
+      - minecraft:sugar
+      container: minecraft:glass_bottle
+    output:
+      item: farmersdelight:glow_berry_custard
+    process:
+      ticks: 200
+      experience: 1.0
     category: misc
-  
-  # ========================================
-  # Other
-  # ========================================
-
   dumplings:
-    ingredients:
-      - "#c:foods/dough"
-      - "#c:crops/cabbage"
-      - "#c:crops/onion"
-      - "#c:foods/raw_chicken|#c:foods/raw_pork|#c:foods/raw_beef|minecraft:brown_mushroom"
-    result: "farmersdelight:dumplings"
-    result-count: 2
-    experience: 1.0
-    cook-time: 200
+    station: cooking_pot
+    input:
+      items:
+      - '#c:foods/dough'
+      - '#c:crops/cabbage'
+      - '#c:crops/onion'
+      - '#c:foods/raw_chicken|#c:foods/raw_pork|#c:foods/raw_beef|minecraft:brown_mushroom'
+    output:
+      item: farmersdelight:dumplings
+      count: 2
+    process:
+      ticks: 200
+      experience: 1.0
     category: misc
-  
   cabbage_rolls:
-    ingredients:
-      - "#c:crops/cabbage"
-      - "#c:foods/raw_meat|#c:foods/safe_raw_fish|#c:foods/vegetable|#c:mushrooms"
-    result: "farmersdelight:cabbage_rolls"
-    experience: 0.35
-    cook-time: 100
+    station: cooking_pot
+    input:
+      items:
+      - '#c:crops/cabbage'
+      - '#c:foods/raw_meat|#c:foods/safe_raw_fish|#c:foods/vegetable|#c:mushrooms'
+    output:
+      item: farmersdelight:cabbage_rolls
+    process:
+      ticks: 100
+      experience: 0.35
     category: misc
-  
   ratatouille:
-    ingredients:
-      - "#c:crops/tomato"
-      - "#c:crops/onion"
-      - "#c:crops/beetroot"
-      - "#c:foods/vegetable,!minecraft:melon_slice"
-    container: "minecraft:bowl"
-    result: "farmersdelight:ratatouille"
-    experience: 1.0
-    cook-time: 200
+    station: cooking_pot
+    input:
+      items:
+      - '#c:crops/tomato'
+      - '#c:crops/onion'
+      - '#c:crops/beetroot'
+      - '#c:foods/vegetable,!minecraft:melon_slice'
+      container: minecraft:bowl
+    output:
+      item: farmersdelight:ratatouille
+    process:
+      ticks: 200
+      experience: 1.0
     category: meals
-  
   dog_food:
-    ingredients:
-      - "minecraft:rotten_flesh"
-      - "minecraft:bone_meal"
-      - "#c:foods/raw_meat"
-      - "#c:crops/rice"
-    container: "minecraft:bowl"
-    result: "farmersdelight:dog_food"
-    experience: 1.0
-    cook-time: 200
+    station: cooking_pot
+    input:
+      items:
+      - minecraft:rotten_flesh
+      - minecraft:bone_meal
+      - '#c:foods/raw_meat'
+      - '#c:crops/rice'
+      container: minecraft:bowl
+    output:
+      item: farmersdelight:dog_food
+    process:
+      ticks: 200
+      experience: 1.0
     category: misc
-
   stuffed_pumpkin_block:
-    ingredients:
-      - "#c:crops/rice"
-      - "#c:crops/onion"
-      - "minecraft:brown_mushroom"
-      - "#c:crops/potato"
-      - "#c:foods/berry"
-      - "#c:foods/vegetable,!minecraft:melon_slice"
-    container: "minecraft:pumpkin"
-    result: "farmersdelight:stuffed_pumpkin_block"
-    experience: 2.0
-    cook-time: 400
+    station: cooking_pot
+    input:
+      items:
+      - '#c:crops/rice'
+      - '#c:crops/onion'
+      - minecraft:brown_mushroom
+      - '#c:crops/potato'
+      - '#c:foods/berry'
+      - '#c:foods/vegetable,!minecraft:melon_slice'
+      container: minecraft:pumpkin
+    output:
+      item: farmersdelight:stuffed_pumpkin_block
+    process:
+      ticks: 400
+      experience: 2.0
     category: meals

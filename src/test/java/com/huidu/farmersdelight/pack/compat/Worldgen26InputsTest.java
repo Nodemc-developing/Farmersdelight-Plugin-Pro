@@ -97,14 +97,40 @@ class Worldgen26InputsTest {
         assertTrue(result.changes().stream().allMatch(change -> change.action().equals("refused")));
     }
 
-    @Test void olderRuntimeGetsAnIndependentCopyWithNoSchemaConversion() {
+    @Test void olderRuntimeGetsAnIndependentCopyWithNoVanillaSchemaConversion() {
         var input = Map.<String, Object>of("test:a", Map.of("feature", Map.of("type", "minecraft:simple_block", "config",
                 Map.of("to_place", Map.of("type", "minecraft:simple_state_provider", "state", Map.of("Name", "farmersdelight:rice"))))));
-        var result = Worldgen26Inputs.adapt(input, false, ignored -> { fail("Old runtime must not consult new provider conversion"); return true; });
+        var result = Worldgen26Inputs.adapt(input, false, ignored -> false);
         assertEquals(input, result.values());
         assertNotSame(input, result.values());
         assertNotSame(input.get("test:a"), result.values().get("test:a"));
         assertTrue(result.changes().isEmpty());
+    }
+
+    @Test void olderRuntimeUsesRegisteredCustomProvidersWithoutMovingNativeFeatureFields() {
+        var vanilla = Map.of("type", "minecraft:simple_state_provider", "state", Map.of("Name", "minecraft:stone"));
+        var custom = Map.of("type", "minecraft:simple_state_provider", "state",
+                Map.of("Name", "farmersdelight:rice", "Properties", Map.of("age", "3")));
+        var weighted = Map.of("type", "minecraft:weighted_state_provider", "entries", List.of(
+                Map.of("weight", 2, "data", Map.of("Name", "farmersdelight:rice"))));
+        var mixed = Map.of("type", "minecraft:weighted_state_provider", "entries", List.of(
+                Map.of("weight", 2, "data", Map.of("Name", "farmersdelight:rice")),
+                Map.of("weight", 1, "data", Map.of("Name", "minecraft:stone"))));
+        var input = Map.<String, Object>of("test:old", Map.of("feature", Map.of("type", "minecraft:simple_block",
+                "config", Map.of("to_place", custom)), "vanilla", vanilla, "weighted", weighted, "mixed", mixed,
+                "offset", Map.of("type", "minecraft:random_offset", "xz_spread", 2, "y_spread", 1)));
+        var result = Worldgen26Inputs.adapt(input, false, "farmersdelight:rice"::equals);
+        var definition = (Map<?, ?>) result.values().get("test:old");
+        var feature = (Map<?, ?>) definition.get("feature");
+        var provider = (Map<?, ?>) ((Map<?, ?>) feature.get("config")).get("to_place");
+        assertEquals("craftengine:simple_state_provider", provider.get("type"));
+        assertEquals(custom.get("state"), provider.get("state"));
+        assertEquals("craftengine:weighted_state_provider", ((Map<?, ?>) definition.get("weighted")).get("type"));
+        assertEquals(vanilla, definition.get("vanilla"));
+        assertEquals(mixed, definition.get("mixed"));
+        assertEquals(((Map<?, ?>) input.get("test:old")).get("offset"), definition.get("offset"));
+        assertTrue(result.changes().stream().anyMatch(change -> change.action().equals("refused")));
+        assertEquals("minecraft:simple_state_provider", custom.get("type"));
     }
 
     @Test void ruleProviderUsesTheNativeRegistryIdWithoutChangingRulesFallbackOrPredicateOrder() {

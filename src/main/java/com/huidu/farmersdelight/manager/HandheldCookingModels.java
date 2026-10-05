@@ -20,6 +20,7 @@ import net.momirealms.craftengine.core.item.Item;
 import net.momirealms.craftengine.core.pack.AbstractPackManager;
 import net.momirealms.craftengine.core.util.MinecraftVersion;
 import net.momirealms.craftengine.core.util.Key;
+import net.momirealms.craftengine.core.util.VersionHelper;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -87,6 +88,7 @@ public final class HandheldCookingModels implements Listener {
     }
 
     NamespacedKey resolve(Player player, NamespacedKey cooking, NamespacedKey overlay, ItemStack ingredient) {
+        if (!VersionHelper.isOrAbove1_21_4) return null;
         if (!enabled.getAsBoolean() || cooking == null || overlay == null || available.isEmpty()) return cooking;
         var serverItem = BukkitAdaptor.adapt(ingredient.clone());
         Item clientItem;
@@ -116,6 +118,10 @@ public final class HandheldCookingModels implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public synchronized void onPackCache(AsyncResourcePackCacheEvent event) {
+        if (!VersionHelper.isOrAbove1_21_4) {
+            available = Set.of();
+            return;
+        }
         if (!enabled.getAsBoolean()) return;
         try {
             Files.createDirectories(folder);

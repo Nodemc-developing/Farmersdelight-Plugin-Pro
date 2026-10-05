@@ -10,6 +10,8 @@ import com.huidu.farmersdelight.util.CampfireRecipeCache;
 import com.huidu.farmersdelight.util.Constants;
 import com.huidu.farmersdelight.util.ItemUtils;
 import com.huidu.farmersdelight.util.compat.CraftEngineModelMappings;
+import com.huidu.farmersdelight.util.compat.PlayerInventoryPackets;
+import com.huidu.farmersdelight.api.util.CompatItemMeta;
 import com.huidu.farmersdelight.util.scheduler.PluginTask;
 import net.momirealms.craftengine.bukkit.api.BukkitAdaptor;
 import net.momirealms.craftengine.bukkit.api.CraftEngineBlocks;
@@ -17,7 +19,6 @@ import net.momirealms.craftengine.bukkit.plugin.network.BukkitNetworkManager;
 import net.momirealms.craftengine.core.item.component.DataComponentKeys;
 import net.momirealms.craftengine.core.util.Key;
 import net.momirealms.craftengine.core.util.VersionHelper;
-import net.momirealms.craftengine.proxy.minecraft.network.protocol.game.ClientboundSetPlayerInventoryPacketProxy;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -239,7 +240,7 @@ final class SkilletHandheldCooking {
         unit.setAmount(1);
         String ingredientId = ItemUtils.getCustomItemId(ingredient);
         if (ingredientId == null) ingredientId = ItemUtils.getVanillaMaterialItemId(ingredient);
-        NamespacedKey model = ingredientModels.get(ingredientId);
+        NamespacedKey model = VersionHelper.isOrAbove1_21_4 ? ingredientModels.get(ingredientId) : null;
         if (model == null) model = handheldModels.resolve(player, cookingModel, overlayModel, unit);
         int hotbarSlot = player.getInventory().getHeldItemSlot();
         HandheldSession session = new HandheldSession(skilletHand,
@@ -453,10 +454,9 @@ final class SkilletHandheldCooking {
     private void sendHandheldSlot(Player player, int slot, ItemStack item) {
         var user = BukkitAdaptor.adapt(player);
         if (user == null) return;
-        // Equipment packets do not reliably refresh the local hotbar. This packet uses inventory
-        // slots (0-8 for the hotbar, 40 for offhand) and exists throughout our 1.21.4+ baseline.
+        // Equipment packets do not reliably refresh the local hotbar; use a local inventory update.
         ItemStack display = item == null ? new ItemStack(Material.AIR) : item.clone();
-        user.sendPacket(ClientboundSetPlayerInventoryPacketProxy.INSTANCE.newInstance(
+        user.sendPacket(PlayerInventoryPackets.slot(
                 slot, BukkitAdaptor.adapt(display).minecraftItem()), false);
     }
 
@@ -496,7 +496,7 @@ final class SkilletHandheldCooking {
             }
         }
         Object item = wrapped.minecraftItem();
-        session.display.update(item, ClientboundSetPlayerInventoryPacketProxy.INSTANCE.newInstance(session.slot, item));
+        session.display.update(item, PlayerInventoryPackets.slot(session.slot, item));
         session.displayedProgress = showProgress;
         session.displayedModel = model;
     }
@@ -578,7 +578,7 @@ final class SkilletHandheldCooking {
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
         String original = pdc.get(HANDHELD_ORIGINAL_MODEL_KEY, PersistentDataType.STRING);
         if (original == null) return;
-        meta.setItemModel(original.isEmpty() ? null : NamespacedKey.fromString(original));
+        CompatItemMeta.setItemModel(meta, original.isEmpty() ? null : NamespacedKey.fromString(original));
         pdc.remove(HANDHELD_ORIGINAL_MODEL_KEY);
     }
 
@@ -586,7 +586,7 @@ final class SkilletHandheldCooking {
                                            boolean showProgress) {
         ItemStack display = skillet.clone();
         ItemMeta meta = display.getItemMeta();
-        if (model != null) meta.setItemModel(model);
+        if (model != null) CompatItemMeta.setItemModel(meta, model);
         if (showProgress && duration > 0 && meta instanceof Damageable damageable) {
             int maxDamage = damageable.hasMaxDamage() ? damageable.getMaxDamage() : skillet.getType().getMaxDurability();
             if (maxDamage <= 0) {

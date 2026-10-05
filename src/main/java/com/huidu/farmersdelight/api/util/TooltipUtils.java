@@ -2,6 +2,7 @@ package com.huidu.farmersdelight.api.util;
 
 import net.momirealms.craftengine.core.item.Item;
 import net.momirealms.craftengine.core.item.component.DataComponentKeys;
+import net.momirealms.craftengine.core.util.VersionHelper;
 
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +14,8 @@ public final class TooltipUtils {
     private TooltipUtils() {}
 
     public static void hideDurabilityLine(Item wrapped) {
+        // Earlier clients cannot hide just the advanced durability lines. Keep names and lore readable.
+        if (!VersionHelper.isOrAbove1_21_5) return;
         List<String> hidden = List.of(
                 DataComponentKeys.DAMAGE.asString(),
                 DataComponentKeys.MAX_DAMAGE.asString()

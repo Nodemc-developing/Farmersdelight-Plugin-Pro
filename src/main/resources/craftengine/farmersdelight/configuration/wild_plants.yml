@@ -67,7 +67,7 @@ blocks:
         bone-meal:
           is-target: true
     state:
-      auto_state: sugar_cane
+      auto_state: higher_tripwire
       models:
         - path: farmersdelight:block/wild_cabbages
     loot:
@@ -129,7 +129,7 @@ blocks:
         bone-meal:
           is-target: true
     state:
-      auto_state: sugar_cane
+      auto_state: higher_tripwire
       models:
         - path: farmersdelight:block/wild_onions
     loot:
@@ -179,7 +179,7 @@ blocks:
         bone-meal:
           is-target: true
     state:
-      auto_state: sugar_cane
+      auto_state: higher_tripwire
       models:
         - path: farmersdelight:block/wild_tomatoes
     loot:

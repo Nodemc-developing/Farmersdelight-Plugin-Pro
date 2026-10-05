@@ -1,144 +1,230 @@
 # 配置、配方与内容包
 
-本页介绍 Farmersdelight-Plugin-Pro 的配置、内容包配方和食材表达式。配方由已启用的 CraftEngine 内容包加载，游戏内编辑会写回来源节点。文件能够解析与玩法能够执行需要分别确认，未实现的类型会保留原文件并输出诊断。
+Farmersdelight-Plugin-Pro 1.2.2 使用独立的 `farmersdelight_recipes` 配方格式。厨锅、砧板和流体加工共用清晰的 `input`、`output`、`process` 分组，由 `station` 指定工作站。格式整理不改变已有食材、产出、加工和自动化规则。
 
-以下示例使用原版物品和本插件的配方区块。
+主配置要求 `config-version: 4`，功能字段使用连字符命名，例如 `cooking-pot`、`recipe-book.tag-cycle-interval-ticks`。版本不符时明确报告，不自动迁移既有配置；使用本版本自带模板配置服务器。
 
-## 内容包位置
+## 文件位置
 
-默认配方放在 CraftEngine 内容包内：
+配方仍放在已启用的 CraftEngine 内容包中：
 
 ```text
-plugins/CraftEngine/resources/farmersdelight/
-  pack.yml
-  configuration/
-    recipes/
-      cooking_pot_recipes.yml
-      cutting_board_recipes.yml
-      food_groups.yml
+plugins/CraftEngine/resources/farmersdelight/configuration/recipes/
+  cooking_pot_recipes.yml
+  cutting_board_recipes.yml
+  food_groups.yml
+
+plugins/CraftEngine/resources/farmersdelight_fluids/configuration/
+  fluid_recipes.yml
 ```
 
-其他已启用内容包也可在其 `configuration/` 目录下放置配方 YAML。文件名和子目录用于组织文件；顶层配置区块决定配方类别，各字段定义食材、成品及加工条件。
+文件名和子目录用于整理内容；解析由顶层区块决定。其他内容包也可在自己的 `configuration/` 下提供配方。工作台、熔炉等原版合成仍使用 CraftEngine 的 `recipes` 区块；本插件的工作站配方使用 `farmersdelight_recipes`。
 
-厨锅使用 `cooking_recipes`，砧板使用 `cutting_recipes`；两者与 CraftEngine 自身的 `recipes` 区块分别加载。不要将这些区块互相替换。
+## 统一结构
 
-## 配方格式
+```yaml
+farmersdelight_recipes:
+  example:recipe_id:
+    station: cooking_pot
+    input: {}
+    output: {}
+    process: {}
+```
 
-每条配方以唯一 ID 为键。建议使用 `命名空间:路径`，例如 `example:cooking/carrot`。同一个文件可同时包含厨锅、砧板及其他内容包区块。也可以通过 `/fd recipe edit` 创建和编辑配方。
+每条配方以唯一 ID 为键，建议使用 `命名空间:路径`。同一文件可以混合不同工作站，根节点支持 `farmersdelight_recipes#分组名`；后缀用于区分区块，不改变工作站类型。配方的 `group` 字段指定自定义厨锅组。
 
-| 配方区块 | 对应机制 |
+| 字段 | 作用 |
 | --- | --- |
-| `cooking_recipes` | 厨锅烹饪 |
-| `cutting_recipes` | 砧板切割 |
-| `custom_cooking_pot_recipes` | 自定义厨锅组 |
-| `advanced_tags` | 高级食材标签 |
+| `station` | `cooking_pot`、`cutting_board` 或 `fluid_tank` |
+| `input` | 原料、厨锅容器或砧板工具条件 |
+| `output` | 成品及数量；砧板使用成品列表 |
+| `process` | 时间、经验或声音；只填写该工作站支持的字段 |
+| `matching` | 厨锅精准或模糊匹配设置 |
+| `fluid`、`operation` | 流体罐的流体条件和加工方向 |
+| `priority`、`category`、`group` | 选择优先级、分类及自定义厨锅组；不需要时省略 |
 
-### 厨锅
+本版本只加载本插件的统一格式。未知工作站、未知匹配条件或不支持的消耗条件会报告文件、配方 ID 和字段；不会将它们当作无条件配方运行。`extensions` 和 `x-` 前缀的数据用于扩展，保存时保留，不代表插件会执行该数据。
+
+## 厨锅
 
 ```yaml
-cooking_recipes:
-  example:cooking/carrot:
-    ingredients:
-      - minecraft:carrot
-      - "minecraft:potato|minecraft:beetroot"
-    result: minecraft:baked_potato
-    result-count: 1
-    container: none
-    cooking_time: 120
-    experience: 0.1
+farmersdelight_recipes:
+  example:cooking/vegetables:
+    station: cooking_pot
+    input:
+      items:
+        - minecraft:carrot
+        - {items: [minecraft:potato, minecraft:beetroot]}
+      container: none
+    output:
+      item: minecraft:baked_potato
+      count: 1
+    process:
+      ticks: 120
+      experience: 0.1
+    category: meals
+    priority: 0
 ```
 
-这是演示解析结构的配方；可根据服务器玩法修改成品和食材。
+这是结构示例，实际成品和食材由服务器自行设定。
 
-| 字段 | 格式 | 默认值及单位 |
-| --- | --- | --- |
-| `ingredients` | 非空列表，每项为字符串或 `{items: [...]}` | 普通厨锅最多 6 个原料槽 |
-| `result` | 物品 ID 字符串，或包含 `item` 与组件数据的物品对象 | 必填 |
-| `result-count` | 整数 | 字符串成品的数量，默认 1 |
-| `container` | 容器物品 ID | 省略时无显式容器要求 |
-| `cooking_time` | 整数 | 缺省值和上下限由厨锅配置决定；20 tick = 1 秒 |
-| `experience` | 小数 | 0.0 |
+| 字段 | 格式及默认规则 |
+| --- | --- |
+| `input.items` | 非空食材列表；普通厨锅最多 6 个原料格 |
+| `input.container` | 容器物品；`none` 明确不需要容器，省略时沿用成品剩余物自动推断 |
+| `output.item` | 成品 ID，必填；成品对象也可带 `count`、`nbt`、`components` |
+| `output.count` | 正整数，默认 1；基础产出数量 |
+| `process.ticks` | 整数 tick；缺省值及上下限使用厨锅配置，20 tick = 1 秒 |
+| `process.experience` | 经验值，默认 0.0 |
+| `priority` | 优先级，默认 0 |
+| `category` | 分类，默认 `misc` |
+| `group` | 自定义厨锅组，省略时属于默认组 |
 
-`container: none` 用于显式关闭容器要求。容器自动推断、容器归还及自定义大厨锅遵循 Farmersdelight-Plugin-Pro 的对应配置。
+需要两份相同食材时，在 `input.items` 中列出两项。候选项只是“多选一”，不会增加本轮的食材份数。
 
-### 砧板
+### 模糊匹配
 
 ```yaml
-cutting_recipes:
+farmersdelight_recipes:
+  example:cooking/meat_stew:
+    station: cooking_pot
+    input:
+      container: minecraft:bowl
+    output:
+      item: farmersdelight:beef_stew
+      count: 1
+    process:
+      ticks: 200
+    matching:
+      mode: fuzzy
+      perfect:
+        minecraft:beef: 2
+        farmersdelight:tomato: 1
+      use-equivalent-foods: true
+      use-seasonings: true
+      minimum-score: 0.15
+```
+
+`matching.mode` 默认 `exact`。`fuzzy` 使用 `matching.perfect` 中的具体物品及理想份数，份数必须为正整数；食材种类不超过当前厨锅限制。等效食材、调味品和品质仍按现有规则处理，精准配方优先。`use-equivalent-foods` 与 `use-seasonings` 默认开启，`minimum-score` 默认为 0.15，范围为 0–1。
+
+## 砧板
+
+```yaml
+farmersdelight_recipes:
   example:cutting/carrot:
-    input: "minecraft:carrot|minecraft:golden_carrot"
-    tools:
-      - "#minecraft:axes"
-      - minecraft:shears
-    results:
+    station: cutting_board
+    input:
+      item: {items: [minecraft:carrot, minecraft:golden_carrot]}
+      tools:
+        - "#minecraft:axes"
+        - minecraft:shears
+    output:
       - item: minecraft:orange_dye
         count: 2
       - item: minecraft:wheat_seeds
         chance: 0.25
-    sound: minecraft:block.wood.break
-    sound-volume: 0.8
-    sound-pitch: 1.0
+    process:
+      sound:
+        id: minecraft:block.wood.break
+        volume: 0.8
+        pitch: 1.0
 ```
 
-| 字段 | 格式 | 默认值 |
-| --- | --- | --- |
-| `input` | 物品或标签表达式，可用 `|` 指定多选一 | 必填；每次处理一个输入物品 |
-| `results` | 非空列表，每项为 `{item, count, chance}` | `count: 1`、`chance: 1.0` |
-| `tools` | 非空的物品/标签字符串列表；单个工具也可使用 `tool` 字段 | 必填工具条件 |
-| `sound` | 音效 ID 字符串 | 省略时使用默认切割音效 |
-| `sound-volume`、`sound-pitch` | 小数 | 省略时使用砧板音效配置 |
+| 字段 | 格式及默认规则 |
+| --- | --- |
+| `input.item` | 一个食材表达式；每次处理一件物品 |
+| `input.tools` | 非空工具 ID 或标签列表 |
+| `output` | 非空成品列表；每项支持 `item`、`count`、`chance`、`nbt`、`components` |
+| `output[].count` | 默认 1；小于 1 时沿用现有边界处理 |
+| `output[].chance` | 默认 1.0；概率限制在 0–1 |
+| `process.sound` | `{id, volume, pitch}`；省略时沿用砧板配置的音效 |
 
-产出数量小于 1 时按 1 处理；概率小于 0 或大于 1 时按边界处理。解析时同时检查无效数值。
+切割的时运、工具损耗和自动化规则保持不变；格式不会额外引入输入数量或工具消耗字段。
 
-注意：砧板配方的 `sound` 是音效 ID；主配置里的音效对象使用 `sound` 子字段，例如 `cutting_board.sounds.place_item.sound`。
-
-## 物品、标签与候选项
+## 食材表达式与组件
 
 | 表达式 | 含义 | 示例 |
 | --- | --- | --- |
 | `minecraft:物品` | 原版物品 | `minecraft:carrot` |
-| `命名空间:物品` | CraftEngine 自定义物品 | `example:carrot_slice` |
-| `#命名空间:标签` | 原版或自定义物品标签 | `"#minecraft:planks"` |
-| `advtag:命名空间:标签` | 独立高级标签表达式 | `advtag:example:vegetables` |
-| `{items: [...]}` | 候选项中的任意一项符合即可 | `{items: [minecraft:carrot, minecraft:potato]}` |
+| `命名空间:物品` | 自定义物品 | `example:carrot_slice` |
+| `#命名空间:标签` | 物品标签 | `"#minecraft:planks"` |
+| `advtag:命名空间:标签` | 独立高级标签 | `advtag:example:vegetables` |
+| `{items: [...]}` | 列表中任意一个候选符合即可 | `{items: [minecraft:carrot, minecraft:potato]}` |
+| `{item: ..., nbt: ...}` | ID 及编辑器保存的完整物品快照 | 由编辑器保存自定义物品 |
+| `"#标签,!物品,!#标签"` | 标签成员排除 | `"#minecraft:planks,!minecraft:oak_planks"` |
 
-以 `#` 开头的值应加引号，避免被 YAML 视为注释。候选项是“多选一”，不表示需要同时投入列表中的全部物品。重复候选项不会提高材料数量；需要两份相同食材时，应在 `ingredients` 中写两项。
+`#` 开头的字符串需要引号，避免成为 YAML 注释。候选可以嵌套，重复候选不会增加需求量。`advtag:` 由高级标签解析器处理，与普通 `#` 标签分别注册。
 
-匹配表达式会去除两端空格并转为小写。`advtag:` 由独立高级标签解析器处理，与普通 `#` 标签不是同一种注册方式。引用食材分组或标签时，应同时提供其定义，并核对最终展开结果。
+结果物品的 `components` 支持 CE 组件数据；完整 `nbt` 快照用于保留编辑器捕获的物品属性。厨锅、砧板和流体加工的**物品输入**沿用 ID、标签、候选和完整快照匹配，尚未实现的物品输入 `components` 或 `exact-components` 条件会明确拒绝。下文 `fluid.match` 的组件条件作用于**流体变体**，由 FluidCore 执行真实匹配。
 
-内容包高级标签使用单独的 `advanced_tags` 区块，`values` 中可以引用其他高级标签：
+高级标签单独声明，原有定义方式不变：
 
 ```yaml
 advanced_tags:
   example:roots:
-    values:
-      - minecraft:carrot
-      - minecraft:potato
+    values: [minecraft:carrot, minecraft:potato]
   example:vegetables:
-    values:
-      - advtag:example:roots
-      - minecraft:beetroot
+    values: [advtag:example:roots, minecraft:beetroot]
 ```
 
-高级标签应在所有内容包定义收集后展开。未定义的引用、循环引用和空成员需要输出诊断，不能自动当成原版物品或普通标签。
+所有定义收集后再展开；未定义引用、循环引用或空成员会输出诊断。食材分组使用独立的 `food_groups` 区块，详细规则见[森罗兼容与模糊配方](KALEIDOSCOPE-COMPAT.zh-CN.md)。
 
-## 流体灌装、排空与浸泡
+## 流体罐：灌装、排空与浸泡
 
-加工使用可选的 FluidCore 插件，并且只访问其实际注册的储罐。FluidCore 方块实体需要 CraftEngine 26.10。流体数量为整数 **mB**：一桶为 1000 mB，一瓶为 250 mB；`time` 为 tick。
+流体加工需要 FluidCore。支持的 CE 版本为 26.9.2 和已验证的 26.10 快照，精确制品与版本限制见[兼容说明](docs/COMPATIBILITY.md)。
 
-使用 `/fd recipe edit` 的流体配方分类创建和编辑这些配方。编辑器保存时记录来源文件、区块和完整 ID。
+```yaml
+farmersdelight_recipes:
+  example:fluid/wet_sponge:
+    station: fluid_tank
+    operation: soak
+    input:
+      item: minecraft:sponge
+    output:
+      item: minecraft:wet_sponge
+    fluid:
+      match: "#c:water"
+      amount-mb: 1000
+      consume: true
+    process:
+      ticks: 20
+```
 
-| 加工类型 | 输入与输出 | 用途 |
-| --- | --- | --- |
-| `fluid_filling` | `empty_input` → `filled_result` | 从储罐灌装物品 |
-| `fluid_emptying` | `filled_input` → `empty_result` | 将容器内流体排入储罐 |
-| `soaking` | `ingredient` → `result` | 浸泡物品；`consume_fluid` 控制是否消耗流体 |
+| 字段 | 作用及默认规则 |
+| --- | --- |
+| `operation` | `fill` 从罐灌装、`drain` 将容器流体排入罐、`soak` 浸泡 |
+| `input.item` | 每次处理一件输入物品；可使用食材表达式 |
+| `output` | 成品对象；浸泡必填，灌装或排空可省略并采用真实容器处理器的产物 |
+| `fluid.match` | 流体 ID、流体标签或高级流体条件；必填 |
+| `fluid.amount-mb` | 正整数 mB，默认 1000；一桶 1000 mB，一瓶 250 mB |
+| `fluid.consume` | 默认 `true`；仅浸泡允许 `false`，仍要求罐中有完整指定数量 |
+| `process.ticks` | 默认 0；原生储罐输入的灌装、排空即时执行，浸泡使用此时长 |
+| `priority` | 默认 0，数值较大的配方优先 |
 
-三个类型均使用 `fluid` 和 `amount` 指定流体条件及数量；`time` 和 `priority` 分别设置加工时间和优先级。
+高级流体条件仍使用 FluidCore 匹配接口，例如：
 
-`fluid` 为流体 ID 或带 `#` 的流体标签，不是物品标签。可使用 FluidCore 中实际定义的 `c:water`、`c:milk`、`c:lava`、`c:honey`。未注册流体或标签不执行配方。
+```yaml
+fluid:
+  match:
+    any-of:
+      - id: minecraft:water
+        components:
+          example:quality: clean
+        exact-components: false
+      - tag: c:milk
+  amount-mb: 250
+  consume: true
+```
 
-FluidCore 默认注册蜂蜜及原版桶瓶处理。服务器可添加或覆写流体元数据；已有定义只需补标签，避免重复注册同名流体：
+`fluid.match` 中可指定 `id`、`tag` 或 `any-of`，以及 `components` 和 `exact-components`。`exact-components: true` 要求组件集合精确相同，`false` 只核对声明的组件。组件键必须是完整 ID；实际流体及组件必须已由相应扩展注册。所有候选使用同一个转移数量，不允许候选暗中覆盖 `fluid.amount-mb`。
+
+自带包包含 **24 条流体配方**：3 条灌装、2 条排空和 19 条浸泡。已有海绵和其他浸泡配方显式使用 20 tick，格式转换保留这些等待时间。FluidCore 默认注册水、牛奶、岩浆、蜂蜜及对应标签，支持原版桶瓶处理。
+
+罐容量不足、输入不符、数量不足、输出已满、权限被拒绝或物品流体数据受保护时，整次加工取消，物品和流体均不提前扣除。排空读取容器实际流体及组件，再核对 `fluid.match`，不能从标签猜测流体；显式固定成品也不能丢弃组件或容器剩余流体。
+
+等待期间不持有流体事务。完成前重新核对输入、流体、权限和目标状态，再在所属线程提交；不修改既有 Folia 归属、补偿和自动化规则。旧流体库的世界、物品存档不自动转换，已识别的未知载荷保留并保护。
+
+服务器也可补充流体元数据；定义不是向罐中生成流体：
 
 ```yaml
 "fluidcore:fluids":
@@ -147,22 +233,6 @@ FluidCore 默认注册蜂蜜及原版桶瓶处理。服务器可添加或覆写�
     tags: [c:honey]
     color: "#FFE8AA2B"
 ```
-
-定义让配方能够识别蜂蜜，不会自动往储罐里生成蜂蜜。仍需通过服务器自己的流体容器、生产机制或管理工具向储罐添加该流体。
-
-未显式指定 `time` 时，浸泡的默认值是 **0 tick**。自带包包含 22 条基础配方及 2 条水桶配方；部分自带配方明确设置等待时间，不受缺省值影响。
-
-流体配方的原料可使用 ID、标签、多选及 `components` / `exact-components` 条件。组件条件由 FluidCore 的类型接口匹配，不仅用于显示；普通厨锅和砧板尚未支持的匹配字段会拒绝该配方并指出字段，不把它们当作普通 ID 配方执行。结果的无效组件或损坏 NBT 同样拒绝加载。
-
-`consume_fluid: false` 仅适用于浸泡：仍要求储罐中有完整的指定数量，但完成加工时保留流体。灌装和排空始终转移完整数量。数量不足、储罐容量不足、库存没有成品空间或物品流体数据受保护时，整条加工取消，不提前消耗、不把溢出成品丢到地面。创造模式同样实际替换输入物品。
-
-等待期间不保留流体事务。时间结束后，应再次核对玩家、原槽物品、距离和储罐所有权，再同步提交流体与物品变化。切换物品、离开储罐或卸载储罐应取消加工。
-
-本插件还允许灌装或排空省略显式产出，直接采用 FluidCore 容器处理器返回的物品，并保留其流体组件。显式固定产出的配方不适用于带额外流体组件的容器转换，也不会丢弃输入容器中剩余的流体。
-
-排空读取输入容器实际持有的流体及组件，再检查 ID 或标签条件。没有可验证的容器处理器时不能从标签猜测流体。带组件的流体不能通过固定成品声明丢弃组件，输入容器剩余内容也不能丢失。
-
-**不转换旧流体库的世界与物品存档**。识别到旧载荷时保留并拒绝覆盖，不把旧罐视为空罐；先备份并在原环境处理已有内容。无法安全确定自身掉落条目的新配置会明确报错。
 
 以下为完整的 FluidCore 储罐定义，放在已启用的 CE 内容包 `configuration/` 中即可。它使用原版铁块模型，容量为 16000 mB，掉落表只有一个自身物品条目；先固定数量为 1，再保存储罐数据：
 
@@ -256,7 +326,7 @@ farmersdelight:integer_comparator
 
 ## 累计统计与占位符
 
-`stats.enabled` 默认开启，`stats.flush_interval_seconds` 默认 30 秒。SQLite 工作在专用后台线程，玩家上线预热缓存；读取占位符不会查数据库。停止接受新提交后，落盘与其他关服存档共用 `performance.shutdown_wait_millis` 的期限，默认 5000 ms。
+`stats.enabled` 默认开启，`stats.flush-interval-seconds` 默认 30 秒。SQLite 工作在专用后台线程，玩家上线预热缓存；读取占位符不会查数据库。停止接受新提交后，落盘与其他关服存档共用 `performance.shutdown-wait-millis` 的期限，默认 5000 ms。
 
 | 示例 | 查询 |
 | --- | --- |
@@ -267,13 +337,13 @@ farmersdelight:integer_comparator
 
 未知、尚未预热或已关闭的查询返回 `-`。加工在物品与流体成功提交后计数；失败、取消和输出已满不计。厨锅制作使用 `cooking`，玩家取出使用 `cooking_pot`，两者为不同活动，不应相加后当作制作次数。
 
-`stats.cache_player_limit` 默认 2048，后台只淘汰已落盘的离线缓存；在线玩家及待写、待重试的记录保留。预热队列最多同时接受 256 个玩家，未就绪时查询仍返回 `-`；淘汰不删除数据库历史。
+`stats.cache-player-limit` 默认 2048，后台只淘汰已落盘的离线缓存；在线玩家及待写、待重试的记录保留。预热队列最多同时接受 256 个玩家，未就绪时查询仍返回 `-`；淘汰不删除数据库历史。
 
 ## 容器、显示与热源
 
-`container.tick_interval_ticks` 控制重处理间隔（默认 4，范围 1–20 tick），进度按实际经过 tick 结算。FluidCore 漏斗默认独立使用 8 tick 单件节流。显示位置与覆盖、砧板时运、工具音效、煎锅音调范围、炉灶烟粒子概率及手持火焰参数可以配置；粒子密度和连接预算仍共同限制实际交付。
+`container.tick-interval-ticks` 控制重处理间隔（默认 4，范围 1–20 tick），进度按实际经过 tick 结算。FluidCore 漏斗默认独立使用 8 tick 单件节流。显示位置与覆盖、砧板时运、工具音效、煎锅音调范围、炉灶烟粒子概率及手持火焰参数可以配置；粒子密度和连接预算仍共同限制实际交付。
 
-`performance.connection_particle_packet_budget` 默认 64，限制每连接每 200 ms 的粒子包准入和发送。包构造前先检查受众与准入，发送前再次检查连接和预算；该预算只用于本插件粒子，不能表示整台服务器的发包量。
+`performance.connection-particle-packet-budget` 默认 64，限制每连接每 200 ms 的粒子包准入和发送。包构造前先检查受众与准入，发送前再次检查连接和预算；该预算只用于本插件粒子，不能表示整台服务器的发包量。
 
 ## 内容优先级与编辑
 

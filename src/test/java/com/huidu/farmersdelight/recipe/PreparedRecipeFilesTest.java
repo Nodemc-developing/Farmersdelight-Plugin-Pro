@@ -144,10 +144,10 @@ class PreparedRecipeFilesTest {
     }
 
     @Test void literalContentPackIdentifiersRemainIntactDuringOwnerMaterialization() throws Exception {
-        var plain = PlainYamlDocuments.parse("papersdelight_recipes#addon: {addon:soup.v2: {type: cooking, result: minecraft:carrot}}\n", true);
+        var plain = PlainYamlDocuments.parse("farmersdelight_recipes#addon: {addon:soup.v2: {station: cooking_pot, result: minecraft:carrot}}\n", true);
         var materialized = PreparedRecipeFiles.materialize(plain);
-        assertEquals(java.util.List.of("addon:soup.v2"), java.util.List.copyOf(materialized.getConfigurationSection("papersdelight_recipes#addon").getKeys(false)));
-        assertEquals("minecraft:carrot", materialized.getConfigurationSection("papersdelight_recipes#addon").getConfigurationSection("addon:soup.v2").getString("result"));
+        assertEquals(java.util.List.of("addon:soup.v2"), java.util.List.copyOf(materialized.getConfigurationSection("farmersdelight_recipes#addon").getKeys(false)));
+        assertEquals("minecraft:carrot", materialized.getConfigurationSection("farmersdelight_recipes#addon").getConfigurationSection("addon:soup.v2").getString("result"));
     }
 
     @Test void directoryRevisionsRejectFilesAddedWhilePublicationWaits() throws Exception {
@@ -161,14 +161,14 @@ class PreparedRecipeFilesTest {
         directories.setAccessible(true);
         directories.set(prepared, Map.of(folder, read.invoke(null, folder)));
         prepared.validateCurrent();
-        Files.writeString(folder.resolve("new.yml"), "papersdelight_recipes: {}\n");
+        Files.writeString(folder.resolve("new.yml"), "farmersdelight_recipes: {}\n");
         Files.setLastModifiedTime(folder, java.nio.file.attribute.FileTime.fromMillis(System.currentTimeMillis() + 2_000));
         assertThrows(IOException.class, prepared::validateCurrent);
     }
 
     @Test void preparedSourcesAreVisibleDuringPublicationAndRetainedAfterwards() throws Exception {
         Path file = directory.resolve("configuration/addon.yml");
-        var prepared = batch(Map.of(file, PlainYamlDocuments.parse("papersdelight_recipes: {addon:soup.v2: {type: cooking, result: minecraft:carrot}}\n", true)), Map.of());
+        var prepared = batch(Map.of(file, PlainYamlDocuments.parse("farmersdelight_recipes: {addon:soup.v2: {station: cooking_pot, result: minecraft:carrot}}\n", true)), Map.of());
         var defaultConfiguration = PreparedRecipeFiles.class.getDeclaredField("defaultConfiguration");
         defaultConfiguration.setAccessible(true);
         defaultConfiguration.set(prepared, directory.resolve("configuration"));

@@ -38,8 +38,8 @@ public record StationSettings(
                 "cooking-pot.progress-display.visibility-distance",
                 "cooking-pot-progress-display.visibility-distance"));
         return new StationSettings(
-                plugin.getConfigBoolean(true, "cooking_pot.recipe_book"),
-                previewCallbacks(plugin.getConfigInt(80, "recipe_book.tag_cycle_interval_ticks")),
+                plugin.getConfigBoolean(true, "cooking-pot.recipe-book"),
+                previewCallbacks(plugin.getConfigInt(80, "recipe-book.tag-cycle-interval-ticks")),
                 plugin.getConfigBoolean(true, "cooking-pot.progress-display.enabled",
                         "cooking-pot-progress-display.enabled"),
                 plugin.getConfigBoolean(false, "cooking-pot.progress-display.show-recipe-name",

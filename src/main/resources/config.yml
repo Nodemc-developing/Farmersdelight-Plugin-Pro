@@ -1,217 +1,270 @@
-# Farmersdelight-Plugin-Pro / 农夫乐事配置
-# Public options use snake_case groups. Legacy option names migrate on startup.
-# 配置采用 snake_case 分组；旧版选项启动时自动备份并迁移。
-# config-version/config_format identify this plugin's format; do not copy another plugin's version counter.
-# config-version/config_format 标识本插件格式，请勿手工套用其他插件的配置版本号。
-# No license key or paid-feature switches are required. / 本插件无需授权码，全部功能免费。
-#
-# Supported common options: lang, heat_sources, station particles/display/cooking, cutting-board
-# hopper/dispenser/tool sounds, comfort/nourishment bossbars and enchantment.enable.
-# 兼容项包括语言、热源、工作站粒子/显示/烹饪、砧板漏斗/发射器/工具音效、状态效果显示和附魔开关。
-# All remaining groups extend this format with this project's features and performance controls.
-# 其他分组为本项目扩展功能及性能预算。第三方专有功能保留原配置并在日志提示，不会伪装为已实现。
-# Item IDs/tags are unchanged, including any '-' or '_' within their namespace/path.
-# 物品 ID/标签原样保留，命名空间或路径中的 '-'、'_' 不会被改写。
-# GUI layouts remain in gui.yml; display-overrides.yml contains per-item/per-tag overrides.
-# 界面仍由 gui.yml 配置；逐物品/标签显示覆盖表位于 display-overrides.yml。
-# Recipes load from CraftEngine content packs; see CONFIGURATION-RECIPES.zh-CN.md for migration.
-# 配方从 CraftEngine 内容包加载；迁移说明见 CONFIGURATION-RECIPES.zh-CN.md。
+# Farmersdelight-Plugin-Pro | Server settings
+# All features are free and open source. / 全部功能免费开源。
+# Recipes: CraftEngine content packs / 配方：CraftEngine 内容包
+# Menus: gui.yml / 界面：gui.yml
+# Kebab-case setting keys; item IDs and tags retain their spelling.
+# 选项使用短横线命名；物品 ID 和标签保持原样。
 
-config-version: 3
-config_format: Farmersdelight-Plugin-Pro
-# Console language: empty follows the system; player text follows the client language. / 控制台语言；空值跟随系统，玩家文本跟随客户端。
-lang: ''
-# Merge standard browsing categories in a private loading copy; source packs remain unchanged.
-# 将标准浏览分类合并为一个入口，仅处理加载副本，不改写原内容包文件。
+config-version: 4
+
+language: ''
+
 craftengine-resources:
   unified-categories: true
-# Ordered rules, first match wins; material or ce_block/ce_block_tag, optional states, heat_source, conductor and tray.
-# 按顺序首个匹配生效；可用原版材质或 CE 方块/标签，并设置状态、是否发热、是否导热及托盘要求。
-heat_sources:
-- states:
-    lit: 'false'
-  heat_source: false
-  material: CAMPFIRE
-- states:
-    lit: 'false'
-  heat_source: false
-  material: SOUL_CAMPFIRE
-- vanilla_block_tag: minecraft:campfires
-- material: MAGMA_BLOCK
-- material: LAVA_CAULDRON
-- material: LAVA
-- material: FIRE
-- material: SOUL_FIRE
-- states:
-    fire: 'true'
-  ce_block: farmersdelight:stove
-- ce_block_tag: farmersdelight:heat_sources
-- conductor: true
-  material: HOPPER
-  heat_source: false
-# Cooking times are ticks. Particle interval_ticks is rounded up to a 4-tick dispatch pass. / 烹饪时长单位 tick；粒子间隔向上对齐 4 tick。
-cooking_pot:
-  recipe_book: true
-  cooking:
-    default_cook_time: 200
-    min_cook_time: 20
-    max_cook_time: 6000
-  container_inference:
-    enabled: true
-    excluded_remainders:
-    - minecraft:stick
-    - minecraft:bone
-  tick_budget: 512
-  allow_hopper: true
-  pack_contents_on_break: true
-  progress_display:
+  auto-completion: true
+
+datapacks:
+  tags-enabled: true
+
+recipes:
+  discovery:
     enabled: false
-    show_recipe_name: false
-    y_offset: 1.2
-    scale: 0.5
-    visibility_distance: 10.0
-    look_dot_threshold: 0.95
-    update_interval_ticks: 8
-    disable_above_active_pots: 512
+    notify: true
+    locked-display: placeholder
+    locked-icon: BARRIER
+    unlock-on-obtain: true
+  merge-missing-bundled: false
+
+recipe-book:
+  tag-cycle-interval-ticks: 80
+
+recipe-editor:
+  enabled: true
+
+recipe-navigation:
+  jumps: true
+
+knife-items:
+  tags:
+  - farmersdelight:tools/knives
+  items:
+  - farmersdelight:flint_knife
+  - farmersdelight:iron_knife
+  - farmersdelight:golden_knife
+  - farmersdelight:diamond_knife
+  - farmersdelight:netherite_knife
+
+experience-reward:
+  mode: vanilla
+  auraskills:
+    skill: farming
+    multiplier: 1.0
+    raw: false
+
+container-returns:
+  farmersdelight:milk_bottle: minecraft:glass_bottle
+
+# Heat sources / 热源
+heat-sources:
+  entries:
+  - states:
+      lit: 'false'
+    vanilla-block: minecraft:campfire
+    heat-source: false
+  - states:
+      lit: 'false'
+    vanilla-block: minecraft:soul_campfire
+    heat-source: false
+  - vanilla-block-tag: minecraft:campfires
+  - vanilla-block: minecraft:magma_block
+  - vanilla-block: minecraft:lava_cauldron
+  - vanilla-block: minecraft:lava
+  - vanilla-block: minecraft:fire
+  - vanilla-block: minecraft:soul_fire
+  - states:
+      fire: 'true'
+    custom-block: farmersdelight:stove
+  - custom-block-tag: farmersdelight:heat_sources
+  - conductor: true
+    vanilla-block: minecraft:hopper
+    heat-source: false
+  tags: []
+  vanilla-blocks: []
+  vanilla-tags: []
+  custom-blocks: []
+  conductors: []
+  conductor-tags: []
+
+# Cooking pot / 厨锅
+cooking-pot:
+  recipe-book: true
+  cooking:
+    default-cook-time: 200
+    min-cook-time: 20
+    max-cook-time: 6000
   effects:
     bubble:
       enabled: true
       type: BUBBLE_POP
       chance: 0.2
       count: 1
-      y_offset: 0.02
-      offset_x: 0.0
-      offset_y: 0.0
-      offset_z: 0.0
       speed: 0.01
+      y-offset: 0.02
+      offset-x: 0.0
+      offset-y: 0.0
+      offset-z: 0.0
     steam:
       enabled: true
       type: CLOUD
       chance: 0.05
       count: 1
-      y_offset: 0.08
-      offset_x: 0.0
-      offset_y: 0.03
-      offset_z: 0.0
       speed: 0.02
       secondary:
         enabled: false
         type: SMOKE
         count: 1
-        y_offset: 0.05
-        offset_x: 0.0
-        offset_y: 0.025
-        offset_z: 0.0
         speed: 0.02
+        y-offset: 0.05
+        offset-x: 0.0
+        offset-y: 0.025
+        offset-z: 0.0
+      y-offset: 0.08
+      offset-x: 0.0
+      offset-y: 0.03
+      offset-z: 0.0
+    viewer-distance: 32.0
+    interval: 1
   particles:
-    view_distance_blocks: 32.0
-    interval_ticks: 4
-# display translations are offsets added to the board pose; stack_xz_offset is the maximum random X/Z spread.
-# 显示位移叠加至砧板姿态；stack_xz_offset 表示随机 X/Z 偏移幅度。逐物品位置在 display-overrides.yml。
-cutting_board:
-  default_tools: ["#farmersdelight:tools/knives"]
-  interaction_mode: stacking
-  recipe_only_placement: false
+    view-distance-blocks: 32.0
+    interval-ticks: 4
+  container-inference:
+    enabled: true
+    excluded-remainders:
+    - minecraft:stick
+    - minecraft:bone
+  tick-budget: 512
+  allow-hopper: true
+  pack-contents-on-break: true
+  progress-display:
+    enabled: false
+    scale: 0.5
+    show-recipe-name: false
+    y-offset: 1.2
+    visibility-distance: 10.0
+    look-dot-threshold: 0.95
+    update-interval-ticks: 8
+    disable-above-active-pots: 512
+
+# Cutting board / 砧板
+cutting-board:
   sounds:
     fallback:
       sound: minecraft:block.wood.break
       volume: 1.0
       pitch: 0.8
-    remove_item:
+    remove-item:
       volume: 0.25
       pitch: 0.5
-  hopper_interaction: true
-  dispenser_cutting: true
-  tool_sounds:
-    minecraft:shears:
-      sound: minecraft:entity.sheep.shear
-      volume: 1.0
-      pitch: 1.0
-    '#farmersdelight:tools/knives':
-      sound: farmersdelight:block.cutting_board.knife_cut
-      volume: 0.8
-      pitch_min: 0.9
-      pitch_max: 1.1
+    retrieve-volume: 0.25
+    retrieve-pitch: 0.5
+    tool-sounds:
+      minecraft:shears:
+        sound: minecraft:entity.sheep.shear
+        volume: 1.0
+        pitch: 1.0
+      '#farmersdelight:tools/knives':
+        sound: farmersdelight:block.cutting_board.knife_cut
+        volume: 0.8
+        pitch-min: 0.9
+        pitch-max: 1.1
   display:
-    translate_x: 0.0
-    translate_y: -0.03
-    translate_z: 0.0
-    stack_xz_offset: 0.05
-# Handheld cooking, hopper input, cooling and fine-grained effects are project extensions. / 手持烹饪、漏斗投料、冷却及精细特效为本项目扩展。
+    translate-x: 0.0
+    translate-y: -0.03
+    translate-z: 0.0
+    stack-xz-offset: 0.05
+  default-tools:
+  - '#farmersdelight:tools/knives'
+  interaction-mode: stacking
+  recipe-only-placement: false
+  allow-hopper: true
+  dispenser-behavior: true
+  default-display-offset:
+  - 0.0
+  - -0.03
+  - 0.0
+  display-item-spread: 0.1
+
+# Skillet / 煎锅
 skillet:
   handheld:
     enabled: true
-    jump_flip:
+    jump-flip:
       enabled: true
-    progress_display:
+    progress-display:
       enabled: true
-  allow_hopper: true
-  tick_budget: 512
   cooking:
-    default_cook_time: 600
-    min_cook_time: 60
-    cook_time_multiplier: 0.2
-    fire_aspect_bonus: 0.05
-    cooling_decrement: 2
+    default-cook-time: 600
+    min-cook-time: 60
+    cook-time-multiplier: 0.2
+    fire-aspect-bonus: 0.05
+    cooling-decrement: 2
   heat:
-    allow_conductors: true
-  # Empty overrides preserve each cooking mode's own sound and volume. Optional fields: sound, volume, pitch, pitch_min, pitch_max.
-  # 空覆盖沿用各烹饪模式原有声音和音量；可设置上述字段，统一音调或指定音调范围。
+    allow-conductors: true
   sounds:
-    add_food: {}
-    add_food_cold: {}
     sizzle: {}
-  fire_aspect_particle:
-    xz_spread: 0.6
-    velocity_y_base: 0.3
-    velocity_y_extra: 0.8
-    velocity_xz: 0.3
-    origin_x: 0.5
-    origin_y: 0.3
-    origin_z: 0.5
+    add-food: {}
+    add-food-cold: {}
   effects:
     smoke:
       enabled: true
       type: SMOKE
       chance: 0.1
       count: 2
-      y_offset: 0.2
-      offset_x: 0.1
-      offset_y: 0.1
-      offset_z: 0.1
       speed: 0.02
+      y-offset: 0.2
+      offset-x: 0.1
+      offset-y: 0.1
+      offset-z: 0.1
     sizzle:
       enabled: true
       chance: 0.03
       volume: 0.5
       pitch: 1.0
+    viewer-distance: 32.0
   display:
     scale: 0.5
-    translate_y: 0.1
-    stack_xz_offset: 0.075
+    translate-y: 0.1
+    stack-xz-offset: 0.075
+    y-offset: 0.1
+    position:
+    - 0.0
+    - 0.1
+    - 0.0
+    item-spread: 0.15
   particles:
-    interval_ticks: 4
-    view_distance_blocks: 32.0
-# display.slot_offsets preserves arbitrary per-slot positions. / slot_offsets 保留逐槽位自由位置；也兼容 slot_1_x/slot_1_z/col_spacing/row_spacing 格式。
+    interval-ticks: 4
+    view-distance-blocks: 32.0
+  allow-hopper: true
+  tick-budget: 512
+  fire-aspect-particle:
+    xz-spread: 0.6
+    velocity-y-base: 0.3
+    velocity-y-extra: 0.8
+    velocity-xz: 0.3
+    origin-x: 0.5
+    origin-y: 0.3
+    origin-z: 0.5
+  handheld-jump-flip:
+    enabled: true
+
+# Stove / 炉灶
 stove:
-  tick_budget: 512
-  # Empty overrides retain the original placement sound, volume and pitch. / 空覆盖沿用原有放置声音、音量和音调。
   sounds:
-    place_food: {}
+    place-food: {}
   cooking:
-    default_cook_time: 600
-    cooling_decrement: 2
+    default-cook-time: 600
+    cooling-decrement: 2
   effects:
     smoke:
       enabled: true
       type: SMOKE
       chance: 0.05
       count: 1
-      y_offset: 0.0
-      offset_x: 0.0
-      offset_y: 0.0
-      offset_z: 0.0
       speed: 0.02
+      y-offset: 0.0
+      offset-x: 0.0
+      offset-y: 0.0
+      offset-z: 0.0
     crackle:
       enabled: true
       chance: 0.0125
@@ -220,9 +273,10 @@ stove:
     fire:
       enabled: true
       chance: 0.125
+    viewer-distance: 32.0
   display:
     scale: 0.375
-    slot_offsets:
+    slot-offsets:
     - 0.3,1.02,0.2
     - 0.0,1.02,0.2
     - -0.3,1.02,0.2
@@ -230,39 +284,92 @@ stove:
     - 0.0,1.02,-0.2
     - -0.3,1.02,-0.2
   particles:
-    interval_ticks: 4
-    view_distance_blocks: 32.0
-    item_smoke_chance: 0.05
-    item_smoke_count: 1
-# Ingredient/tool/catalyst icon rotation in game ticks. Legacy default stays 80; values round up to a 4-tick GUI callback.
-# 原料/工具/催化剂图标轮换间隔（游戏 tick）。沿用原默认 80 tick；向上对齐 4 tick 的界面回调。
-recipe_book:
-  tag_cycle_interval_ticks: 80
-# Per-effect enable applies to consumption, commands, restored state and API calls. / 单独开关同时适用于食用、命令、状态恢复与 API。
-nourishment_effect:
+    interval-ticks: 4
+    view-distance-blocks: 32.0
+    item-smoke-chance: 0.05
+    item-smoke-count: 1
+  tick-budget: 512
+
+skewer:
+  handheld:
+    enabled: true
+
+container:
+  tick-interval-ticks: 4
+
+# Food effects / 食物效果
+buff:
+  enabled: true
+  persistence:
+    restore-retry-delay-ticks: 40
+  display:
+    enabled: true
+    channels:
+    - bossbar
+    actionbar-separator: '   '
+    layout-mode: stacked
+    rotation-interval-ticks: 80
+    actionbar-refresh-ticks: 30
+    styles:
+      comfort:
+        color: BLUE
+        overlay: PROGRESS
+      nourishment:
+        color: GREEN
+        overlay: PROGRESS
+  comfort:
+    heal-interval-ticks: 80
+    heal-amount: 1.0
+    enabled: true
+  nourishment:
+    always-eat: true
+    enabled: true
+
+# Villagers / 村民
+villager:
   enable: true
-  always_eat: true
-  bossbar:
-    color: GREEN
-    style: SOLID
-# heal_interval_ticks=0 disables healing while retaining the effect status. / 设为 0 只禁用治疗，保留效果状态。
-comfort_effect:
-  heal_interval_ticks: 80
-  heal_amount: 1.0
-  enable: true
-  bossbar:
-    color: BLUE
-    style: SOLID
-enchantment:
-  install_datapack: true
+  harvest:
+    enable: true
+    block-budget: 64
+    planting: {}
+  pickup:
+    enable: true
+    scan-interval-ticks: 20
+    radius: 2.5
+  breed:
+    enable: true
+    scan-interval-ticks: 40
+    share-food: true
+    food-points: {}
+  idle-interval-ticks: 200
+  farmers-buy-crops:
+    enable: true
+    trades: []
+  wandering-trader-sells:
+    enable: true
+    items: []
+
+rope:
+  max-bell-distance: 24
+
+mushroom-colonies:
+  placement:
+    always-valid-supports:
+    - minecraft:mycelium
+    - minecraft:podzol
+    - minecraft:crimson_nylium
+    - minecraft:warped_nylium
+    - minecraft:mushroom_stem
+    allow-solid-supports-below-max-light: true
+    max-light: 12
+
+enchantments:
   compatibility:
-    auto_disable_on_conflict: true
+    auto-disable-on-conflict: true
   groups:
     knives:
       table:
         enabled: true
-        override_offers: true
-        default_enchantability: 12
         enchantments:
         - minecraft:sharpness
         - minecraft:smite
@@ -274,15 +381,15 @@ enchantment:
         - minecraft:fortune
         - minecraft:vanishing_curse
         - $backstabbing
+        override-offers: true
+        default-enchantability: 12
       anvil:
         enabled: true
-        extra_enchantments:
+        extra-enchantments:
         - minecraft:mending
     skillet:
       table:
         enabled: true
-        override_offers: true
-        default_enchantability: 14
         enchantments:
         - minecraft:sharpness
         - minecraft:smite
@@ -292,184 +399,100 @@ enchantment:
         - minecraft:knockback
         - minecraft:looting
         - minecraft:vanishing_curse
+        override-offers: true
+        default-enchantability: 14
       anvil:
         enabled: true
-        extra_enchantments:
+        extra-enchantments:
         - minecraft:mending
     durable:
       table:
         enabled: true
-        override_offers: true
-        default_enchantability: 14
         enchantments:
         - minecraft:unbreaking
         - minecraft:vanishing_curse
+        override-offers: true
+        default-enchantability: 14
       anvil:
         enabled: true
-        extra_enchantments:
+        extra-enchantments:
         - minecraft:mending
   backstabbing:
     enabled: true
     id: farmersdelight:backstabbing
     definition:
       weight: 5
-      max_level: 3
+      max-level: 3
     combat:
-      players_only: true
-      require_knife: true
-      multiplier_base: 1.4
-      multiplier_per_level: 0.2
+      players-only: true
+      require-knife: true
+      multiplier-base: 1.4
+      multiplier-per-level: 0.2
   enable: true
-# Custom crops and foods supplement vanilla villager behavior. / 自定义作物与食物补充原版村民行为。
-villager:
-  enable: true
-  harvest:
-    enable: true
-    block_budget: 64
-    # Seed item ID -> managed crop block ID; empty uses each crop definition. / 种子物品 ID -> 受管作物方块 ID；留空使用作物定义。
-    planting: {}
-  pickup:
-    enable: true
-    scan_interval_ticks: 20
-    radius: 2.5
-  breed:
-    enable: true
-    scan_interval_ticks: 40
-    share_food: true
-    # Item ID -> food points; zero disables that food. / 物品 ID -> 食物点；零禁用该食物。
-    food_points: {}
-  # Work shares the shorter pickup/breed interval, clamped to 5..200 ticks. / 工作共用拾取和繁殖中的较短间隔，限制为 5..200 tick。
-  idle_interval_ticks: 200
-  farmers_buy_crops:
-    enable: true
-    # Rows: item, amount, level, max_uses, villager_xp, price_multiplier, chance. / 每行可设置这些买入参数。
-    trades: []
-  wandering_trader_sells:
-    enable: true
-    # Item IDs or rows with item, emerald_cost, amount, max_uses, villager_xp, price_multiplier, chance.
-    # 物品 ID 列表，或包含上述出售参数的行；空列表不新增交易，world-data.yml 交易继续独立加载。
-    items: []
-# Successful operations are cached immediately and written by a SQLite worker. / 成功操作立即计入缓存，由后台批量落盘。
-# shutdown_wait_millis is shared by all shutdown persistence. / 关服期限由全部落盘步骤共享。
-stats:
+  install-datapack: true
   enabled: true
-  flush_interval_seconds: 30
-  cache_player_limit: 2048
-  shutdown_wait_millis: 5000
-container:
-  tick_interval_ticks: 4
-particle_throttle:
-  stove_threshold: 8
-  stove_max_rate: 0.1
-  cooking_pot_threshold: 4
-  cooking_pot_max_rate: 0.05
-  ambient_sound_threshold: 4
-  ambient_sound_max_rate: 0.001
-skewer:
-  handheld:
-    enabled: true
-# Registry packs install once in the primary world; Folia requires a restart for registry changes. / 注册数据包只安装至主世界，Folia 修改注册表后需重启。
-datapacks:
-  tags_enabled: true
-debug:
-  enabled: false
-  categories: []
-damage_type:
-  install_datapack: true
-reload:
-  cooldown_seconds: 2
+
 advancements:
   enabled: true
-  auto_disable_missing: true
-  force_enable: []
-  force_disable: []
-craftengine_resources:
-  auto_completion: true
-# false keeps intentionally deleted bundled recipes deleted. Discovery only controls recipe-book visibility.
-# 关闭补齐可保留主动删除的自带配方；配方发现只控制配方书展示，不限制实际制作。
-recipes:
-  merge_missing_bundled: false
-  discovery:
-    enabled: false
-    locked_display: placeholder
-    locked_icon: BARRIER
-    unlock_on_obtain: true
-    notify: true
-# Runtime maintenance/packet budgets. / 运行期维护与发包预算。
-performance:
-  connection_particle_packet_budget: 64
-  warnings:
-    enabled: true
-    cooldown_seconds: 600
-    active_block_threshold: 1000
-    cooking_pot_total_threshold: 1000
-    cooking_pot_density_threshold: 64
-    craftengine_free_state_threshold: 32
-  budgets:
-    reload_visual_refreshes_per_tick: 32
-    pet_tempt_tick_budget: 128
-    startup_chunk_loads_per_tick: 16
-    chunk_effect_packet_budget: 50
-    effect_tick_interval_ticks: 4
-  proxy_display:
-    view_distance: 64.0
-    sync_interval_ticks: 20
-    sync_batch_size: 256
-hopper_interactions:
-  enabled: true
-# Optional Senro recipe-book autofill, item tags, food groups and kitchen knives. / 可选森罗配方书自动投料、标签、食材组与厨刀兼容。
+  auto-disable-missing: true
+  force-enable: []
+  force-disable: []
+
 compatibility:
   kaleidoscope:
     enabled: true
-    recipe_auto_fill: true
-    item_tags: true
-    food_groups: true
     knives: true
-    knife_tags:
+    recipe-auto-fill: true
+    item-tags: true
+    food-groups: true
+    knife-tags:
     - kaleidoscopecookery:kitchen_knife
-knife_items:
-  tags:
-  - farmersdelight:tools/knives
-  items:
-  - farmersdelight:flint_knife
-  - farmersdelight:iron_knife
-  - farmersdelight:golden_knife
-  - farmersdelight:diamond_knife
-  - farmersdelight:netherite_knife
-experience_reward:
-  mode: vanilla
-  auraskills:
-    skill: farming
-    multiplier: 1.0
-    raw: false
-container_returns:
-  farmersdelight:milk_bottle: minecraft:glass_bottle
-mushroom_colonies:
-  placement:
-    always_valid_supports:
-    - minecraft:mycelium
-    - minecraft:podzol
-    - minecraft:crimson_nylium
-    - minecraft:warped_nylium
-    - minecraft:mushroom_stem
-    allow_solid_supports_below_max_light: true
-    max_light: 12
-rope:
-  bell_ring_max_distance: 24
-# Shared buff master switch, persistence and display channels. / 全局状态效果开关、持久化与展示渠道。
-buff:
+
+# Statistics / 统计
+stats:
+  cache-player-limit: 2048
   enabled: true
-  persistence:
-    restore_retry_delay_ticks: 40
-  display:
+  flush-interval-seconds: 30
+
+particle-throttle:
+  stove-threshold: 8
+  stove-max-rate: 0.1
+  cooking-pot-threshold: 4
+  cooking-pot-max-rate: 0.05
+  ambient-sound-threshold: 4
+  ambient-sound-max-rate: 0.001
+
+hopper-interactions:
+  enabled: true
+
+# Scheduling and budgets / 调度与预算
+performance:
+  warnings:
     enabled: true
-    channels:
-    - bossbar
-    actionbar_separator: '   '
-    layout_mode: stacked
-    rotation_interval_ticks: 80
-    actionbar_refresh_ticks: 30
-recipe_editor:
-  enabled: true
-recipe_navigation:
-  jumps: true
+    cooldown-seconds: 600
+    active-block-threshold: 1000
+    cooking-pot-total-threshold: 1000
+    cooking-pot-density-threshold: 64
+    craftengine-free-state-threshold: 32
+  budgets:
+    reload-visual-refreshes-per-tick: 32
+    pet-tempt-tick-budget: 128
+    startup-chunk-loads-per-tick: 16
+    chunk-effect-packet-budget: 50
+    effect-tick-interval-ticks: 4
+  connection-particle-packet-budget: 64
+  proxy-display:
+    view-distance: 64.0
+    sync-interval-ticks: 20
+    sync-batch-size: 256
+  shutdown-wait-millis: 5000
+
+reload:
+  cooldown-seconds: 2
+
+debug:
+  enabled: false
+  categories: []
+
+damage-type:
+  install-datapack: true

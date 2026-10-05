@@ -1,6 +1,5 @@
 package com.huidu.farmersdelight.recipe;
 
-import com.huidu.farmersdelight.compat.OtherDelightIds;
 import com.huidu.farmersdelight.pack.PackSection;
 import com.huidu.farmersdelight.pack.compat.ExternalContentCoordinator;
 import org.bukkit.configuration.ConfigurationSection;
@@ -35,11 +34,6 @@ final class RecipeDefinitionSelection {
                 for (String id : root.getKeys(false)) {
                     ConfigurationSection body = root.getConfigurationSection(id);
                     if (body == null) continue;
-                    if (rootName.equals("custom_cooking_pot_recipes")) {
-                        for (String recipe : body.getKeys(false)) add(categories, "custom_cooking:" + fullId(namespace, id),
-                                fullId(namespace, recipe), document.getKey(), rootKey + "/" + id, body, recipe);
-                        continue;
-                    }
                     String category = category(rootName, body);
                     if (category != null) add(categories, category, fullId(namespace, id), document.getKey(), rootKey, root, id);
                 }
@@ -61,12 +55,18 @@ final class RecipeDefinitionSelection {
     }
 
     private static String category(String root, ConfigurationSection body) {
-        if (root.equals(OtherDelightIds.RECIPE_SECTION)) {
-            String type = body.getString("type", "");
-            int separator = type.indexOf(':');
-            return separator < 0 ? type : type.substring(separator + 1);
+        if (root.equals(NativeRecipeSchema.ROOT)) {
+            String station = NativeRecipeSchema.station(body);
+            String group = body.getString("group", "");
+            return switch (station) {
+                case "cooking_pot" -> group.isBlank() ? "cooking" : "custom_cooking:" + group;
+                case "cutting_board" -> "cutting";
+                case "fluid_tank" -> "fluid:" + body.getString("operation", "");
+                default -> null;
+            };
         }
         for (PackSection kind : PackSection.values()) if (root.equals(kind.sectionId()) || root.equals(kind.rootKey())) {
+            if (kind == PackSection.COOKING_POT || kind == PackSection.CUTTING_BOARD || kind == PackSection.CUSTOM_COOKING_POT) return null;
             return kind == PackSection.COOKING_POT ? "cooking" : kind == PackSection.CUTTING_BOARD ? "cutting" : kind.name();
         }
         return root.equals("food_groups") ? "FOOD_GROUPS" : null;

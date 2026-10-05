@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class FluidRecipeTransactionTest {
     @Test void foreignFluidRecordsRemainProtectedWhileNativeCoreRecordsAreAllowed() {
         assertTrue(FluidCoreBridge.foreignFluidKey("libuid:saved_jug"));
-        assertTrue(FluidCoreBridge.foreignFluidKey("papersdelight:jug"));
+        assertTrue(FluidCoreBridge.foreignFluidKey("addon:fluid_data"));
         assertTrue(FluidCoreBridge.foreignFluidKey("another:fluid_data"));
         assertTrue(FluidCoreBridge.foreignFluidKey("another:LIQUID_CONTENTS"));
         assertFalse(FluidCoreBridge.foreignFluidKey("fluidcore:item_fluid"));

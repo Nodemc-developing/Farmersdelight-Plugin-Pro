@@ -58,7 +58,7 @@ final class HandheldCookingDisplay extends ChannelOutboundHandlerAdapter {
     }
 
     private Object rewrite(Object packet) {
-        if (packet.getClass() == ClientboundSetPlayerInventoryPacketProxy.CLASS) {
+        if (VersionHelper.isOrAbove1_21_2 && packet.getClass() == ClientboundSetPlayerInventoryPacketProxy.CLASS) {
             var proxy = ClientboundSetPlayerInventoryPacketProxy.INSTANCE;
             if (proxy.getSlot(packet) == slot && matches(proxy.getContents(packet))) {
                 return proxy.newInstance(slot, copyDisplay());
