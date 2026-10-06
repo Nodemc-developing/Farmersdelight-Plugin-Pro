@@ -5,7 +5,7 @@
 
 | 配置 | 功能 |
 | --- | --- |
-| `villager.enable` | 村民功能总开关 |
+| `villager.enable` | 内置自动化、新增配置交易和背包的总开关 |
 | `villager.harvest.enable` | 自定义作物收获 |
 | `villager.harvest.replant` | 使用背包中的种子补种 |
 | `villager.pickup.enable` | 拾取自定义种子与产物 |
@@ -16,8 +16,12 @@
 | `villager.backpack.enabled` | 村民背包入口 |
 | `villager.backpack.editable` | 允许有编辑权限的管理员修改背包 |
 | `villager.backpack.open-on-sneak` | 潜行右键打开背包 |
+| `villager.farmers-buy-crops.enable` | 新增配置中的农民收购条目 |
+| `villager.wandering-trader-sells.enable` | 新增配置中的游商销售条目 |
 
 修改后使用 `/fd reload`。配置版本仍是 4，新增普通选项会补齐；已有注册表和自定义值保留。
+`world-data.yml` 的原有村民与游商交易池独立配置，不受这些新增交易开关影响。
+拾取与喂食分别使用自己的 `scan-interval-ticks`，范围为 5～1200 ticks；额外唤醒不会绕过间隔。
 `crops: {}` 可移除显式普通作物清单；管理作物继续服从其自身设置和 `disabled-crops`。
 喂食默认点数为卷心菜、番茄、洋葱各 1，稻米 2，稻穗 0。`food-points` 是覆盖表，空表保留内置点数；设为 0 可使某种产物只拾取不食用。
 

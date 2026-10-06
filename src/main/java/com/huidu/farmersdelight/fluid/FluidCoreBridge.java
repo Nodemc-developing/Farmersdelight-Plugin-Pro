@@ -5,6 +5,7 @@ import com.huidu.farmersdelight.recipe.RecipeIngredient;
 import com.huidu.farmersdelight.recipe.RecipeItemCodec;
 import com.huidu.farmersdelight.util.ItemUtils;
 import net.momirealms.craftengine.bukkit.item.BukkitItemManager;
+import net.momirealms.craftengine.core.block.ImmutableBlockState;
 import net.momirealms.craftengine.core.item.component.DataComponentKeys;
 import net.momirealms.craftengine.libraries.nbt.CompoundTag;
 import org.bukkit.Bukkit;
@@ -51,6 +52,21 @@ public final class FluidCoreBridge {
         FluidCoreAccess bound = bindings();
         if (bound == null || location == null || location.getWorld() == null || !Bukkit.isOwnedByCurrentRegion(location)) return false;
         try { return bound.isNativeTank(location); } catch (RuntimeException unavailable) { return false; }
+    }
+
+    /** Destination behavior is available before placement; no world write or namespace guess is needed. */
+    public boolean isNativeTankState(ImmutableBlockState state) {
+        FluidCoreAccess bound = bindings();
+        return bound != null && state != null && bound.isNativeTankState(state);
+    }
+
+    /** Only native record carriers pay for the decoder's lossless diagnostic snapshot. */
+    public boolean hasProtectedNativeFluidRecord(ItemStack item) {
+        if (item == null || !requiresNativeFluidRecordValidation(item)) return false;
+        FluidCoreAccess bound = bindings();
+        if (bound == null) return true;
+        try { return bound.protectedNativeRecord(item); }
+        catch (RuntimeException | LinkageError unavailable) { return true; }
     }
     public Outcome process(Player player, int slot, Location location, FluidRecipeSpec recipe) { return process(player, slot, location, recipe, false); }
     public Outcome process(Player player, int slot, Location location, FluidRecipeSpec recipe, boolean simulate) {

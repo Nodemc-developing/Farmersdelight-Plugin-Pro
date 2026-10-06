@@ -77,6 +77,7 @@
 | `/fd recipe edit` | 选择厨具并编辑配方 |
 | `/fd reload` | 重载插件配置与配方 |
 | `/fd stats` | 查看运行时统计 |
+| `/fd villager inventory` | 查看或编辑附近村民的背包 |
 | `/ce reload` | 重载 CraftEngine 内容与资源 |
 
 编辑、重载和运行时统计需要管理员权限。

@@ -3,7 +3,9 @@ package com.huidu.farmersdelight.fluid;
 import com.ydxc20091.fluidcore.BukkitFluidCoreService;
 import com.ydxc20091.fluidcore.api.*;
 import com.ydxc20091.fluidcore.bukkit.*;
+import com.ydxc20091.fluidcore.ce.FluidTankBehavior;
 import com.ydxc20091.fluidcore.core.*;
+import net.momirealms.craftengine.core.block.ImmutableBlockState;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -37,6 +39,14 @@ final class TypedFluidCoreAccess implements FluidCoreAccess {
     @Override public boolean isNativeTank(Location location) {
         return location != null && location.getWorld() != null && Bukkit.isOwnedByCurrentRegion(location)
                 && service.bridge().resolver().controller(location).isPresent();
+    }
+
+    @Override public boolean isNativeTankState(ImmutableBlockState state) {
+        var behavior = state == null ? null : state.behavior();
+        return behavior != null && behavior.getFirst(FluidTankBehavior.class) != null;
+    }
+    @Override public boolean protectedNativeRecord(ItemStack item) {
+        return service.itemData().read(item).protectedData();
     }
     boolean canUseHeld(Player player, Location location) {
         return player != null && location != null && location.getWorld() != null && owner.isEnabled()

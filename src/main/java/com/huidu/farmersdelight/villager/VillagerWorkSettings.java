@@ -6,11 +6,11 @@ record VillagerWorkSettings(boolean harvest, boolean pickup, boolean breed, bool
                             int activeTicks, int idleTicks, int blockBudget, double pickupRadius,
                             boolean planting, boolean bonemeal, boolean compost, boolean workHoursOnly,
                             int bonemealInterval, int shareInterval, int minimumFoodToShare,
-                            boolean pauseWithExternal) {
+                            boolean pauseWithExternal, int pickupInterval, int breedInterval) {
     static VillagerWorkSettings read(ConfigurationSection config) {
         boolean enabled = config.getBoolean("villager.enable", true);
-        int pickup = config.getInt("villager.pickup.scan-interval-ticks", 20);
-        int breed = config.getInt("villager.breed.scan-interval-ticks", 40);
+        int pickup = scanInterval(config, "villager.pickup.scan-interval-ticks", 20);
+        int breed = scanInterval(config, "villager.breed.scan-interval-ticks", 40);
         return new VillagerWorkSettings(enabled && config.getBoolean("villager.harvest.enable", true),
                 enabled && config.getBoolean("villager.pickup.enable", true),
                 enabled && config.getBoolean("villager.breed.enable", true),
@@ -26,7 +26,10 @@ record VillagerWorkSettings(boolean harvest, boolean pickup, boolean breed, bool
                 Math.max(20, Math.min(1200, config.getInt("villager.bonemeal.retry-delay-ticks", 40))),
                 Math.max(20, Math.min(1200, config.getInt("villager.breed.share-interval-ticks", 100))),
                 Math.max(12, Math.min(4096, config.getInt("villager.breed.minimum-food-to-share", 24))),
-                config.getBoolean("villager.coexistence.pause-with-external-plugin", true));
+                config.getBoolean("villager.coexistence.pause-with-external-plugin", true), pickup, breed);
+    }
+    private static int scanInterval(ConfigurationSection config, String path, int fallback) {
+        return Math.max(5, Math.min(1200, config.getInt(path, fallback)));
     }
     boolean anyWork() { return harvest || pickup || breed || share || bonemeal || compost; }
 }

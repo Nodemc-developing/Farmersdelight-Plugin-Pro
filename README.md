@@ -77,6 +77,7 @@ Recipes live in enabled CraftEngine content packs. Old fluid-library world/item 
 | `/fd recipe edit` | Select a station and edit its recipes |
 | `/fd reload` | Reload plugin settings and recipes |
 | `/fd stats` | View runtime statistics |
+| `/fd villager inventory` | Inspect or edit a nearby villager's backpack |
 | `/ce reload` | Reload CraftEngine content and resources |
 
 Editing, reloading and runtime statistics require administrator permissions.

@@ -203,14 +203,24 @@ public final class VillagerAutomationService implements Listener, AutoCloseable 
         VillagerContentSnapshot current = snapshot;
         if (externalPaused || locked(villager) || !current.settings().anyWork() || !villager.hasAI()
                 || villager.getPose() == Pose.SLEEPING || villager.getTrader() != null) return false;
-        boolean worked = current.settings().breed() && feed(villager, current);
+        long ticks = villager.getTicksLived();
+        boolean worked = false;
+        if (current.settings().breed() && ticks >= tracker.nextBreed) {
+            tracker.nextBreed = ticks + current.settings().breedInterval();
+            worked = feed(villager, current);
+        }
         if (Boolean.TRUE.equals(villager.getWorld().getGameRuleValue(GameRule.MOB_GRIEFING))) {
-            if (current.settings().pickup()) worked |= pickup(tracker, current);
-            boolean farmer = villager.getAge() >= 0 && villager.getProfession() == Villager.Profession.FARMER;
-            boolean workTime = !current.settings().workHoursOnly() || villager.getWorld().getTime() % 24000 < 12000;
-            if (farmer && workTime) {
-                if (current.settings().harvest() || current.settings().bonemeal()) worked |= farm(tracker, current);
-                if (current.settings().compost()) worked |= compost.work(villager, current.compost(), current.foodRules());
+            if (current.settings().pickup() && ticks >= tracker.nextPickup) {
+                tracker.nextPickup = ticks + current.settings().pickupInterval();
+                worked |= pickup(tracker, current);
+            }
+            if (current.settings().harvest() || current.settings().bonemeal() || current.settings().compost()) {
+                boolean farmer = villager.getAge() >= 0 && villager.getProfession() == Villager.Profession.FARMER;
+                boolean workTime = !current.settings().workHoursOnly() || villager.getWorld().getTime() % 24000 < 12000;
+                if (farmer && workTime) {
+                    if (current.settings().harvest() || current.settings().bonemeal()) worked |= farm(tracker, current);
+                    if (current.settings().compost()) worked |= compost.work(villager, current.compost(), current.foodRules());
+                }
             }
             if (current.settings().share() && villager.getTicksLived() >= tracker.nextShare) {
                 tracker.nextShare = (long) villager.getTicksLived() + current.settings().shareInterval();
@@ -252,7 +262,6 @@ public final class VillagerAutomationService implements Listener, AutoCloseable 
             if (taken == expected.getAmount()) item.remove();
             else { ItemStack remainder = expected.clone(); remainder.setAmount(expected.getAmount() - taken); item.setItemStack(remainder); }
             changed = true;
-            if (current.settings().breed()) feed(villager, current);
         }
         return changed || pending;
     }
@@ -418,7 +427,7 @@ public final class VillagerAutomationService implements Listener, AutoCloseable 
         private long ticket;
         private boolean processing, wakeQueued, wakeRequested, stopped;
         private int scanCursor, itemCursor, targetTries;
-        private long nextBonemeal, nextShare;
+        private long nextBonemeal, nextShare, nextPickup, nextBreed;
         private Block target;
         Tracker(Villager villager) { this.villager = villager; scanCursor = Math.floorMod(villager.getUniqueId().hashCode(), 147); }
         synchronized void begin() { if (!stopped && task == null && !processing) schedule(1 + Math.floorMod(villager.getUniqueId().hashCode(), 20)); }
