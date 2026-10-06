@@ -49,11 +49,16 @@ public final class FluidRecipeListener implements Listener, AutoCloseable {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onAttemptPlace(CustomBlockAttemptPlaceEvent event) {
-        if (!manager.bridge().available()) return;
+        if (event.isCancelled() || !manager.bridge().available()) return;
         Player player = event.getPlayer();
         ItemStack held = event.hand() == InteractionHand.MAIN_HAND
                 ? player.getInventory().getItemInMainHand() : player.getInventory().getItemInOffHand();
-        if (FluidCoreBridge.hasForeignFluidData(held)) {
+        // Only FluidCore destinations interpret foreign contents. Other plugins own their native
+        // placement data; genuine FluidCore records still cannot be discarded into unrelated blocks.
+        boolean protectedData = manager.bridge().isNativeTankState(event.blockState())
+                ? FluidCoreBridge.hasForeignFluidData(held)
+                : FluidCoreBridge.requiresNativeFluidRecordValidation(held);
+        if (protectedData) {
             event.setCancelled(true);
             report(player, FluidCoreBridge.Outcome.PROTECTED_DATA);
         }

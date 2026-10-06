@@ -9,6 +9,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import net.momirealms.craftengine.core.block.ImmutableBlockState;
+import com.ydxc20091.fluidcore.ce.FluidTankBehavior;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,6 +39,11 @@ final class TypedFluidCoreAccess implements FluidCoreAccess {
     @Override public boolean isNativeTank(Location location) {
         return location != null && location.getWorld() != null && Bukkit.isOwnedByCurrentRegion(location)
                 && service.bridge().resolver().controller(location).isPresent();
+    }
+
+    @Override public boolean isNativeTankState(ImmutableBlockState state) {
+        return state != null && state.behavior() != null
+                && state.behavior().getFirst(FluidTankBehavior.class) != null;
     }
     boolean canUseHeld(Player player, Location location) {
         return player != null && location != null && location.getWorld() != null && owner.isEnabled()
