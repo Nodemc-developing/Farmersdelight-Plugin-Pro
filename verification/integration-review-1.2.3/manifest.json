@@ -1,0 +1,77 @@
+{
+  "version": "1.2.3",
+  "code_commit": "99f93f4e27777fc354eaace6ff1742d4cc31fe94",
+  "runtime_sha256": "481eb6025c91716c2277238e734d1ad677fbeb041c3cc6a7a76086771a80dd72",
+  "compiled_with_craftengine": "26.9.2",
+  "bytecode": 21,
+  "unit": {
+    "26.9.2": {
+      "failures": 0,
+      "skipped": 0,
+      "tests": 888,
+      "errors": 0
+    },
+    "26.10": {
+      "skipped": 0,
+      "errors": 0,
+      "failures": 0,
+      "tests": 888
+    }
+  },
+  "contract_checks": [
+    {
+      "check": "strip_ce_comments",
+      "exit_code": 0
+    },
+    {
+      "check": "meal_icons",
+      "exit_code": 0
+    },
+    {
+      "check": "check_lang_keys",
+      "exit_code": 0
+    },
+    {
+      "check": "check_api_boundary",
+      "exit_code": 0
+    },
+    {
+      "check": "check_config_paths",
+      "exit_code": 0
+    }
+  ],
+  "native_runs": [
+    {
+      "environment": "paper-26.3-ce-26.9.2",
+      "native_pass": 26,
+      "load_log_pass": 2,
+      "restored": true,
+      "worlds_or_databases_replaced": false
+    },
+    {
+      "environment": "folia-26.2-ce-26.10",
+      "native_pass": 26,
+      "load_log_pass": 2,
+      "restored": true,
+      "worlds_or_databases_replaced": false
+    }
+  ],
+  "changes": [
+    "Scoped fluid placement by actual behavior ownership",
+    "Read-only native FluidCore record protection",
+    "Separate villager pickup and feeding cooldowns",
+    "Shared service refresh path"
+  ],
+  "prior_records": [
+    "verification/teapot-placement/results.json",
+    "verification/villager-merge-1.2.3/manifest.json"
+  ],
+  "excluded": [
+    "Real-client GUI and full player placement",
+    "Live cross-region player migration",
+    "CustomCrops runtime",
+    "New complete version matrix",
+    "Performance benchmarks"
+  ],
+  "new_servers_created": 0
+}
