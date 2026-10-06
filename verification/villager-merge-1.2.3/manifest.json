@@ -1,0 +1,46 @@
+{
+  "version": "1.2.3",
+  "status": "local_review",
+  "base_commit": "7a9b329a1ff8b71a53ab06764a3bc5474cedcc0e",
+  "runtime_sha256": "2165baac40a97768c7d05bc08e5070863151a74f837844fb54de09b1307e7737",
+  "java_bytecode": 21,
+  "unit": {
+    "tests": 878,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "native_runs": [
+    {
+      "environment": "paper-26.3-ce-26.9.2",
+      "server": "26.3-140-977da0d (MC: 26.3)",
+      "java": "25.0.3",
+      "native_pass": 25,
+      "load_log_pass": 2,
+      "original_files_restored": true,
+      "content_cache_restored": true,
+      "worlds_or_databases_replaced": false
+    },
+    {
+      "environment": "folia-26.2-ce-26.10",
+      "server": "26.2-7-14b7fee (MC: 26.2)",
+      "java": "25.0.3",
+      "native_pass": 25,
+      "load_log_pass": 2,
+      "original_files_restored": true,
+      "content_cache_restored": true,
+      "worlds_or_databases_replaced": false
+    }
+  ],
+  "scope": "Integrated villager rules, real crop planting/rollback and cancel/harvest loot, aggregate seed reserve, cancelled/successful compost extraction; existing FD loading regressions.",
+  "excluded": [
+    "Real-client backpack/network handling",
+    "Live player region migration",
+    "CustomCrops runtime integration",
+    "Every individual 1.21.x version",
+    "Performance benchmarks"
+  ],
+  "servers_created": 0,
+  "github_pushed": false,
+  "source": "VillagersDelight26148f212bf893af232320b0deacbbfb5a2e3fb4: AGPL-3.0-only, original authorship retained"
+}

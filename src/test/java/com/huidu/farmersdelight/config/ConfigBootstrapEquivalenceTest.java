@@ -9,6 +9,7 @@ import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -78,13 +79,19 @@ class ConfigBootstrapEquivalenceTest {
                 container-returns: {}
                 pet-foods: {}
                 stats: {enabled: false, flush-interval-seconds: 90}
+                villager:
+                  harvest: {crops: {}, planting: {}, harvest-drops: {}}
+                  breed: {food-points: {example: 0}}
+                  compost: {chances: {}}
                 """, false);
         assertTrue(config.isConfigurationSection("buff.comfort"));
         assertFalse(config.getBoolean("buff.comfort.enabled"));
         var policy = livePolicy();
         assertTrue(policy.migrations().isEmpty());
         assertTrue(policy.retiredKeys().isEmpty());
-        assertEquals(Set.of("heat-sources", "buff.comfort", "buff.nourishment", "container-returns", "pet-foods"),
+        assertEquals(Set.of("heat-sources", "buff.comfort", "buff.nourishment", "container-returns", "pet-foods",
+                        "villager.harvest.crops", "villager.harvest.planting", "villager.harvest.harvest-drops",
+                        "villager.breed.food-points", "villager.compost.chances"),
                 Set.copyOf(policy.registrySections()));
         assertTrue(ConfigFileUpdater.copyMissingKeys(bundled(), config, policy.registrySections()) > 0);
         assertTrue(config.getMapList("heat-sources.entries").isEmpty());
@@ -93,6 +100,9 @@ class ConfigBootstrapEquivalenceTest {
         assertFalse(config.getBoolean("stats.enabled"));
         assertEquals(90, config.getInt("stats.flush-interval-seconds"));
         assertEquals(2048, config.getInt("stats.cache-player-limit"));
+        assertTrue(config.getConfigurationSection("villager.harvest.crops").getKeys(false).isEmpty());
+        assertEquals(Map.of("example", 0), config.getConfigurationSection("villager.breed.food-points").getValues(false));
+        assertTrue(config.getBoolean("villager.backpack.enabled"));
         assertEquals(0, ConfigFileUpdater.copyMissingKeys(bundled(), config, policy.registrySections()));
     }
 

@@ -42,6 +42,10 @@ dependencies:
       load: BEFORE
       required: false
       join-classpath: true
+    CustomCrops:
+      load: BEFORE
+      required: false
+      join-classpath: true
     PlaceholderAPI:
       load: BEFORE
       required: false
@@ -166,6 +170,12 @@ dependencies:
       join-classpath: true
 
 permissions:
+  farmersdelight.villager.inventory:
+    description: Inspect the targeted villager's backpack.
+    default: op
+  farmersdelight.villager.inventory.edit:
+    description: Edit a nearby villager's backpack on its owning region.
+    default: op
   farmersdelight.command:
     description: Allow to use main command
     default: true

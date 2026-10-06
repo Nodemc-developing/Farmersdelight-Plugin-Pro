@@ -147,7 +147,7 @@ public class TomatoVineBlockBehavior extends FarmersDelightBlockBehavior impleme
 
     private static final Map<Key, TomatoVineBlockBehavior> BEHAVIORS = new ConcurrentHashMap<>();
 
-    private record Config(
+    public record Config(
             Key buddingBlockId,
             Key tomatoesBlockId,
             Key cropOnRopeBlockId,
@@ -211,6 +211,10 @@ public class TomatoVineBlockBehavior extends FarmersDelightBlockBehavior impleme
     public static TomatoVineBlockBehavior getBehavior(Key blockId) {
         return blockId == null ? null : BEHAVIORS.get(blockId);
     }
+
+    /** Immutable settings used to prepare villager growth without invoking native handles. */
+    public Config villagerSettings() { return config; }
+    public int villagerMaximumHeight() { return effectiveMaxStackHeight(); }
 
     public static void warmAll() {
         for (TomatoVineBlockBehavior behavior : BEHAVIORS.values()) {

@@ -1,7 +1,6 @@
 package com.huidu.farmersdelight.villager;
 
 import com.huidu.farmersdelight.FarmersDelightPlugin;
-import com.huidu.farmersdelight.block.behavior.ManagedCropBlockBehavior;
 import com.huidu.farmersdelight.util.CustomBlockUtils;
 import com.huidu.farmersdelight.util.ItemUtils;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
@@ -29,6 +28,8 @@ import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.world.EntitiesLoadEvent;
 import org.bukkit.event.world.EntitiesUnloadEvent;
+import org.bukkit.event.server.PluginEnableEvent;
+import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -41,13 +42,22 @@ public final class VillagerAutomationService implements Listener, AutoCloseable 
     private final FarmersDelightPlugin plugin;
     private final Map<UUID, Tracker> villagers = new ConcurrentHashMap<>();
     private final VillagerConfiguredTrades trades = new VillagerConfiguredTrades();
+    private final VillagerCompostService compost;
     private final ThreadLocal<EntityPickupItemEvent> manualPickup = new ThreadLocal<>();
     private final ThreadLocal<EntityChangeBlockEvent> manualBlockChange = new ThreadLocal<>();
     private volatile VillagerContentSnapshot snapshot;
     private volatile VillagerFoodAccess food;
     private volatile boolean running;
+    private volatile boolean externalPaused;
 
-    public VillagerAutomationService(FarmersDelightPlugin plugin) { this.plugin = plugin; }
+    public VillagerAutomationService(FarmersDelightPlugin plugin) { this.plugin = plugin; compost = new VillagerCompostService(plugin); }
+
+    public void wake(Villager villager) {
+        if (!running || !plugin.isEnabled()) return;
+        track(villager);
+        Tracker tracker = villagers.get(villager.getUniqueId());
+        if (tracker != null) tracker.wake();
+    }
 
     /** Call onEnable after CraftEngine has loaded its definitions. */
     public synchronized void start() {
@@ -60,6 +70,7 @@ public final class VillagerAutomationService implements Listener, AutoCloseable 
         }
         running = true;
         Bukkit.getPluginManager().registerEvents(this, plugin);
+        updateExternalMode();
         // Only the initial resident chunks are enumerated. Routine work never scans all worlds/entities.
         discoverResidentVillagers();
     }
@@ -79,11 +90,35 @@ public final class VillagerAutomationService implements Listener, AutoCloseable 
         VillagerContentSnapshot incoming = VillagerContentSnapshot.read(plugin);
         trades.reload(plugin.getConfig());
         snapshot = incoming;
-        if (!incoming.settings().anyWork()) { villagers.values().forEach(Tracker::stop); villagers.clear(); }
+        updateExternalMode();
+        if (!incoming.settings().anyWork() || externalPaused) { villagers.values().forEach(Tracker::stop); villagers.clear(); }
         else if (running) {
             if (previous == null || !previous.settings().anyWork()) discoverResidentVillagers();
             villagers.values().forEach(Tracker::wake);
         }
+    }
+
+    @EventHandler public void externalEnabled(PluginEnableEvent event) {
+        if (event.getPlugin().getName().equals("VillagersDelight")) updateExternalMode();
+    }
+    @EventHandler public void externalDisabled(PluginDisableEvent event) {
+        if (event.getPlugin().getName().equals("VillagersDelight")) {
+            externalPaused = false;
+            if (running) discoverResidentVillagers();
+        }
+    }
+    private void updateExternalMode() {
+        boolean next = snapshot != null && snapshot.settings().pauseWithExternal()
+                && Bukkit.getPluginManager().isPluginEnabled("VillagersDelight");
+        if (next && !externalPaused) plugin.getLogger().warning("VillagersDelight is also enabled; integrated villager automation is paused to avoid duplicate processing.");
+        boolean previous = externalPaused;
+        externalPaused = next;
+        if (next) { villagers.values().forEach(Tracker::stop); villagers.clear(); }
+        else if (previous && running) discoverResidentVillagers();
+    }
+    private boolean locked(Villager villager) {
+        var backpacks = plugin.getVillagerBackpackService();
+        return backpacks != null && backpacks.isLocked(villager.getUniqueId());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -98,7 +133,7 @@ public final class VillagerAutomationService implements Listener, AutoCloseable 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void itemSpawned(ItemSpawnEvent event) {
         VillagerContentSnapshot current = snapshot;
-        if (!running || current == null || !current.settings().pickup()
+        if (!running || externalPaused || current == null || !current.settings().pickup()
                 || !current.pickupItems().contains(ItemUtils.resolveItemId(event.getEntity().getItemStack()))) return;
         Location location = event.getLocation();
         for (Entity nearby : location.getWorld().getNearbyEntities(location, 4, 2, 4))
@@ -109,7 +144,8 @@ public final class VillagerAutomationService implements Listener, AutoCloseable 
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void nativePickup(EntityPickupItemEvent event) {
-        if (manualPickup.get() == event || !(event.getEntity() instanceof Villager villager) || !running) return;
+        if (manualPickup.get() == event || !(event.getEntity() instanceof Villager villager) || !running || externalPaused) return;
+        if (locked(villager)) { event.setCancelled(true); return; }
         VillagerContentSnapshot current = snapshot;
         if (!current.settings().pickup() || !current.pickupItems().contains(ItemUtils.resolveItemId(event.getItem().getItemStack()))) return;
         // Custom carrier items must not be planted/consumed by the vanilla material-only path.
@@ -120,12 +156,13 @@ public final class VillagerAutomationService implements Listener, AutoCloseable 
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void nativeCropChange(EntityChangeBlockEvent event) {
-        if (manualBlockChange.get() == event || !running || !(event.getEntity() instanceof Villager villager)
-                || !snapshot.settings().harvest()) return;
+        if (manualBlockChange.get() == event || !running || externalPaused || !(event.getEntity() instanceof Villager villager)) return;
+        if (locked(villager)) { event.setCancelled(true); return; }
+        if (!snapshot.settings().harvest()) return;
         Block block = event.getBlock();
         if (!resident(block)) return;
-        ImmutableBlockState present = CustomBlockUtils.getStateIfResident(block);
-        if (present != null && !present.isEmpty() && ManagedCropBlockBehavior.byId(present.owner().value().id()) != null) {
+        VillagerCrop known = snapshot.crops().find(block);
+        if (known != null && !known.isVanilla()) {
             event.setCancelled(true); track(villager);
             Tracker tracker = villagers.get(villager.getUniqueId()); if (tracker != null) { tracker.target = block; tracker.wake(); }
             return;
@@ -149,7 +186,7 @@ public final class VillagerAutomationService implements Listener, AutoCloseable 
     }
 
     private void track(Villager villager) {
-        if (!running || snapshot == null || !snapshot.settings().anyWork()) return;
+        if (!running || externalPaused || snapshot == null || !snapshot.settings().anyWork()) return;
         Tracker tracker = villagers.computeIfAbsent(villager.getUniqueId(), ignored -> new Tracker(villager));
         tracker.begin();
     }
@@ -164,14 +201,21 @@ public final class VillagerAutomationService implements Listener, AutoCloseable 
         Villager villager = tracker.villager;
         if (!running || !villager.isValid() || villager.isDead()) { remove(villager.getUniqueId()); return false; }
         VillagerContentSnapshot current = snapshot;
-        if (!current.settings().anyWork() || !villager.hasAI() || villager.getAge() < 0
+        if (externalPaused || locked(villager) || !current.settings().anyWork() || !villager.hasAI()
                 || villager.getPose() == Pose.SLEEPING || villager.getTrader() != null) return false;
         boolean worked = current.settings().breed() && feed(villager, current);
         if (Boolean.TRUE.equals(villager.getWorld().getGameRuleValue(GameRule.MOB_GRIEFING))) {
             if (current.settings().pickup()) worked |= pickup(tracker, current);
-            if (current.settings().harvest() && villager.getProfession() == Villager.Profession.FARMER
-                    && villager.getWorld().getTime() < 12000) worked |= farm(tracker, current);
-            if (current.settings().share() && current.settings().breed()) worked |= share(villager, current);
+            boolean farmer = villager.getAge() >= 0 && villager.getProfession() == Villager.Profession.FARMER;
+            boolean workTime = !current.settings().workHoursOnly() || villager.getWorld().getTime() % 24000 < 12000;
+            if (farmer && workTime) {
+                if (current.settings().harvest() || current.settings().bonemeal()) worked |= farm(tracker, current);
+                if (current.settings().compost()) worked |= compost.work(villager, current.compost(), current.foodRules());
+            }
+            if (current.settings().share() && villager.getTicksLived() >= tracker.nextShare) {
+                tracker.nextShare = (long) villager.getTicksLived() + current.settings().shareInterval();
+                worked |= share(villager, current);
+            }
         }
         return worked;
     }
@@ -189,6 +233,7 @@ public final class VillagerAutomationService implements Listener, AutoCloseable 
             if (!item.isValid()) continue;
             ItemStack expected = item.getItemStack().clone();
             if (!current.pickupItems().contains(ItemUtils.resolveItemId(expected))) continue;
+            if (!owned(villager) || locked(villager)) return changed;
             if (item.getPickupDelay() > 0) { pending = true; continue; }
             Inventory inventory = villager.getInventory();
             int accepted = VillagerInventoryMath.capacity(inventory.getStorageContents(), expected);
@@ -213,6 +258,7 @@ public final class VillagerAutomationService implements Listener, AutoCloseable 
     }
 
     private boolean feed(Villager villager, VillagerContentSnapshot current) {
+        if (villager.getAge() < 0) return false;
         VillagerFoodAccess access = food;
         if (access == null) return false;
         int points = access.get(villager);
@@ -221,9 +267,12 @@ public final class VillagerAutomationService implements Listener, AutoCloseable 
         for (int slot = 0; slot < inventory.getSize() && points < VillagerFoodAccess.BREEDING_THRESHOLD; slot++) {
             ItemStack stack = inventory.getItem(slot);
             if (stack == null || stack.isEmpty()) continue;
-            Integer perItem = current.foodPoints().get(ItemUtils.resolveItemId(stack));
+            String id = ItemUtils.resolveItemId(stack);
+            Integer perItem = current.foodPoints().get(id);
             if (perItem == null || perItem <= 0) continue;
-            int count = VillagerInventoryMath.unitsToReach(points, perItem, stack.getAmount(), VillagerFoodAccess.BREEDING_THRESHOLD);
+            int count = Math.min(stack.getAmount(), current.foodRules().consumable(id,
+                    VillagerCompostService.count(inventory, id), VillagerFoodAccess.BREEDING_THRESHOLD - points,
+                    villager.getProfession() == Villager.Profession.FARMER));
             if (count == 0) continue;
             ItemStack before = stack.clone(); ItemStack after = stack.clone(); after.setAmount(stack.getAmount() - count);
             inventory.setItem(slot, after.getAmount() == 0 ? null : after);
@@ -237,13 +286,14 @@ public final class VillagerAutomationService implements Listener, AutoCloseable 
     private boolean farm(Tracker tracker, VillagerContentSnapshot current) {
         Villager villager = tracker.villager;
         if (tracker.target != null && resident(tracker.target)) {
-            ImmutableBlockState state = CustomBlockUtils.getStateIfResident(tracker.target);
-            var crop = state == null || state.isEmpty() ? null : ManagedCropBlockBehavior.byId(state.owner().value().id());
-            if (crop != null && crop.isMature(state) && tracker.targetTries++ < 10) {
+            var crop = current.crops().find(tracker.target);
+            if (crop != null && current.settings().harvest() && crop.isMature(tracker.target) && tracker.targetTries++ < 10) {
                 if (villager.getLocation().distanceSquared(tracker.target.getLocation().add(.5, .5, .5)) > 4) {
                     villager.getPathfinder().moveTo(tracker.target.getLocation().add(.5, 0, .5), .6); return true;
                 }
-                Block target = tracker.target; tracker.target = null; return harvest(villager, target, crop);
+                Block target = tracker.target; tracker.target = null;
+                var plan = crop.prepareHarvest(target, villager);
+                return plan != null && crop.harvest(plan, this::callChange);
             }
         }
         tracker.target = null; tracker.targetTries = 0;
@@ -253,35 +303,18 @@ public final class VillagerAutomationService implements Listener, AutoCloseable 
             int dx = position % 7 - 3, dz = position / 7 % 7 - 3, dy = position / 49 - 1;
             Block target = center.getWorld().getBlockAt(center.getBlockX() + dx, center.getBlockY() + dy, center.getBlockZ() + dz);
             if (!resident(target)) continue;
-            ImmutableBlockState state = CustomBlockUtils.getStateIfResident(target);
-            var crop = state == null || state.isEmpty() ? null : ManagedCropBlockBehavior.byId(state.owner().value().id());
-            if (crop != null && crop.isMature(state)) { tracker.target = target; return true; }
-            if (target.getType().isAir() && center.distanceSquared(target.getLocation().add(.5, .5, .5)) <= 4
+            var crop = current.crops().find(target);
+            if (crop != null && current.settings().harvest() && crop.isMature(target)) { tracker.target = target; return true; }
+            if (crop != null && current.settings().bonemeal() && villager.getTicksLived() >= tracker.nextBonemeal
+                    && center.distanceSquared(target.getLocation().add(.5, .5, .5)) <= 4 && bonemeal(villager, target, crop)) {
+                tracker.nextBonemeal = (long) villager.getTicksLived() + current.settings().bonemealInterval();
+                return true;
+            }
+            if (current.settings().harvest() && current.settings().planting() && (target.getType().isAir() || target.getType() == Material.WATER)
+                    && center.distanceSquared(target.getLocation().add(.5, .5, .5)) <= 4
                     && plant(villager, target, current)) return true;
         }
         return false;
-    }
-
-    private boolean harvest(Villager villager, Block target, ManagedCropBlockBehavior crop) {
-        if (!crop.options().villageHarvest()) return false;
-        var prepared = crop.prepareHarvest(target, villager);
-        if (prepared == null) return false;
-        var reset = crop.resetState(prepared.expected());
-        EntityChangeBlockEvent change = new EntityChangeBlockEvent(villager, target,
-                BlockStateUtils.fromBlockData(reset.customBlockState().minecraftState()));
-        callChange(change); if (change.isCancelled()) return false;
-        if (prepared.expectedPartner() != null) {
-            Block partner = target.getRelative(BlockFace.UP);
-            if (!resident(partner)) return false;
-            ImmutableBlockState other = CustomBlockUtils.getStateIfResident(partner);
-            if (other == prepared.expectedPartner()) {
-                EntityChangeBlockEvent remove = new EntityChangeBlockEvent(villager, partner, Bukkit.createBlockData(Material.AIR));
-                callChange(remove); if (remove.isCancelled()) return false;
-            }
-        }
-        if (!crop.commitHarvest(target, prepared)) return false;
-        for (ItemStack output : prepared.drops()) if (!output.isEmpty()) target.getWorld().dropItemNaturally(target.getLocation().add(.5, .5, .5), output);
-        return true;
     }
 
     private boolean plant(Villager villager, Block target, VillagerContentSnapshot current) {
@@ -291,19 +324,40 @@ public final class VillagerAutomationService implements Listener, AutoCloseable 
             var candidates = current.plants().get(ItemUtils.resolveItemId(stack)); if (candidates == null) continue;
             for (var crop : candidates) {
                 if (!crop.canPlantAt(target)) continue;
-                ItemStack expected = stack.clone(); ImmutableBlockState state = crop.plantingState();
-                EntityChangeBlockEvent change = new EntityChangeBlockEvent(villager, target,
-                        BlockStateUtils.fromBlockData(state.customBlockState().minecraftState()));
-                callChange(change);
-                if (change.isCancelled() || !target.getType().isAir() || !sameStack(inventory.getItem(slot), expected)) continue;
-                if (!CraftEngineBlocks.place(target.getLocation(), state, true)) continue;
+                ItemStack expected = stack.clone();
+                var plan = crop.preparePlant(target, villager);
+                if (plan == null) continue;
+                int seedSlot = slot;
+                if (!crop.plant(plan, event -> {
+                    callChange(event);
+                    if (!sameStack(inventory.getItem(seedSlot), expected) || locked(villager)) event.setCancelled(true);
+                })) continue;
                 if (!sameStack(inventory.getItem(slot), expected)) {
-                    if (CustomBlockUtils.getStateIfResident(target) == state) CraftEngineBlocks.remove(target);
+                    if (!crop.rollbackPlant(plan)) plugin.getLogger().severe("Villager planting rollback rejected an externally changed crop at " + target.getLocation());
                     return false;
                 }
                 ItemStack remainder = expected.clone(); remainder.setAmount(expected.getAmount() - 1);
                 inventory.setItem(slot, remainder.getAmount() == 0 ? null : remainder); return true;
             }
+        }
+        return false;
+    }
+
+    private boolean bonemeal(Villager villager, Block target, VillagerCrop crop) {
+        Inventory inventory = villager.getInventory();
+        for (int slot = 0; slot < inventory.getSize(); slot++) {
+            ItemStack stack = inventory.getItem(slot);
+            if (stack == null || stack.isEmpty() || stack.getType() != Material.BONE_MEAL
+                    || ItemUtils.getCustomItemId(stack) != null) continue;
+            ItemStack expected = stack.clone(); int mealSlot = slot;
+            if (!crop.bonemeal(target, villager, event -> {
+                callChange(event);
+                if (!sameStack(inventory.getItem(mealSlot), expected) || locked(villager)) event.setCancelled(true);
+            })) return false;
+            if (!sameStack(inventory.getItem(slot), expected)) return false;
+            ItemStack after = expected.clone(); after.setAmount(expected.getAmount() - 1);
+            inventory.setItem(slot, after.getAmount() == 0 ? null : after);
+            return true;
         }
         return false;
     }
@@ -315,28 +369,35 @@ public final class VillagerAutomationService implements Listener, AutoCloseable 
     }
 
     private boolean share(Villager donor, VillagerContentSnapshot current) {
-        if (food == null) return false;
+        if (food == null || donor.getAge() < 0 || locked(donor)) return false;
         Inventory inventory = donor.getInventory(); int total = 0;
         for (ItemStack stack : inventory.getStorageContents()) if (stack != null && !stack.isEmpty())
             total += current.foodPoints().getOrDefault(ItemUtils.resolveItemId(stack), 0) * stack.getAmount();
-        if (total < 24) return false;
+        if (total < current.settings().minimumFoodToShare()) return false;
         Villager receiver = null;
         for (Entity nearby : donor.getNearbyEntities(3, 1.5, 3))
-            if (nearby instanceof Villager other && owned(other) && other.getAge() >= 0 && food.get(other) < 12) { receiver = other; break; }
+            if (nearby instanceof Villager other && owned(other) && !locked(other) && other.getAge() >= 0 && food.get(other) < 12) { receiver = other; break; }
         if (receiver == null) return false;
         for (int slot = 0; slot < inventory.getSize(); slot++) {
             ItemStack stack = inventory.getItem(slot); if (stack == null || stack.isEmpty()) continue;
             String id = ItemUtils.resolveItemId(stack); Integer points = current.foodPoints().get(id);
-            if (points == null || points <= 0 || current.plants().containsKey(id) && stack.getAmount() <= 16) continue;
+            if (points == null || points <= 0 || current.foodRules().shareable(id, VillagerCompostService.count(inventory, id),
+                    donor.getProfession() == Villager.Profession.FARMER) == 0) continue;
             ItemStack before = stack.clone(); ItemStack remainder = stack.clone(); remainder.setAmount(stack.getAmount() - 1);
-            inventory.setItem(slot, remainder.getAmount() == 0 ? null : remainder);
             ItemStack offered = before.clone(); offered.setAmount(1);
             Item dropped;
             try { dropped = donor.getWorld().dropItem(donor.getLocation().add(0, 1, 0), offered); }
-            catch (RuntimeException failure) { inventory.setItem(slot, before); throw failure; }
-            if (!dropped.isValid()) { inventory.setItem(slot, before); return false; }
+            catch (RuntimeException failure) { throw failure; }
+            if (!dropped.isValid()) return false;
+            if (!sameStack(inventory.getItem(slot), before)) {
+                plugin.scheduler().runForEntity(dropped, () -> {
+                    if (dropped.isValid() && sameStack(dropped.getItemStack(), offered)) dropped.remove();
+                });
+                return false;
+            }
+            inventory.setItem(slot, remainder.getAmount() == 0 ? null : remainder);
             var vector = receiver.getLocation().toVector().subtract(donor.getLocation().toVector());
-            if (vector.lengthSquared() > 0) dropped.setVelocity(vector.normalize().multiply(.2).setY(.1));
+            if (vector.lengthSquared() > 0 && owned(dropped)) dropped.setVelocity(vector.normalize().multiply(.2).setY(.1));
             track(receiver); Tracker tracker = villagers.get(receiver.getUniqueId()); if (tracker != null) tracker.wake();
             return true;
         }
@@ -348,7 +409,7 @@ public final class VillagerAutomationService implements Listener, AutoCloseable 
     }
 
     @Override public synchronized void close() {
-        running = false; HandlerList.unregisterAll(this); villagers.values().forEach(Tracker::stop); villagers.clear(); trades.close();
+        running = false; HandlerList.unregisterAll(this); villagers.values().forEach(Tracker::stop); villagers.clear(); trades.close(); compost.clear();
     }
 
     private final class Tracker {
@@ -357,6 +418,7 @@ public final class VillagerAutomationService implements Listener, AutoCloseable 
         private long ticket;
         private boolean processing, wakeQueued, wakeRequested, stopped;
         private int scanCursor, itemCursor, targetTries;
+        private long nextBonemeal, nextShare;
         private Block target;
         Tracker(Villager villager) { this.villager = villager; scanCursor = Math.floorMod(villager.getUniqueId().hashCode(), 147); }
         synchronized void begin() { if (!stopped && task == null && !processing) schedule(1 + Math.floorMod(villager.getUniqueId().hashCode(), 20)); }

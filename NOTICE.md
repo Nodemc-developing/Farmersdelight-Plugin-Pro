@@ -20,6 +20,7 @@ AGPL 第 13 条还要求：**如果你修改后的版本通过网络对外提供
 | 贴图、配方、数值、游戏行为 | Farmer's Delight（Minecraft 模组） | vectorwing | MIT |
 | AntiGriefLib（shade 进 jar，重定位到 `com.huidu.farmersdelight.libs`） | AntiGriefLib | XiaoMoMi | MIT |
 | bStats（shade 进 jar，重定位到 `com.huidu.farmersdelight.libs`） | bStats | Bastian Oppermann | MIT |
+| 村民食物点数与种子留存规则的整合 | VillagersDelight，固定提交 `26148f212bf893af232320b0deacbbfb5a2e3fb4` | HuiDu_OwO；整合修改 ydxc2009 | AGPL-3.0-only |
 
 MIT 与 AGPL-3.0 兼容，第三方内容的 MIT 声明随 jar 分发，完整文本见
 `src/main/resources/NOTICE.txt`（也就是打进发布 jar 的那一份）。
@@ -53,3 +54,7 @@ MIT 与 AGPL-3.0 兼容，第三方内容的 MIT 声明随 jar 分发，完整�
 
 SQLite JDBC 3.53.4.0 随主 JAR 提供，其 Apache-2.0、原驱动及原生依赖声明保留于
 `META-INF/maven/org.xerial/sqlite-jdbc/`。其他打包依赖见 [THIRD_PARTY.md](THIRD_PARTY.md)。
+
+村民功能整合使用 [VillagersDelight](https://github.com/IOVEYOUMC0/VillagersDelight/tree/26148f212bf893af232320b0deacbbfb5a2e3fb4)
+的公开功能规格与食物留存规则，在本插件的所属线程调度、CE 作物接口和菜单机制内实现。
+未打包独立 VillagersDelight JAR 或其旧版 NMS 模块；原作者归属与 AGPL 全文随源码和制品保留。

@@ -117,7 +117,7 @@ public class TallCropBlockBehavior extends FarmersDelightBlockBehavior implement
     }
 
 
-    private record Config(
+    public record Config(
             Property<Integer> ageProperty,
             Property<?> halfProperty,
             Property<Boolean> supportingProperty,
@@ -311,6 +311,9 @@ public class TallCropBlockBehavior extends FarmersDelightBlockBehavior implement
         return config.maxAgeLower();
     }
 
+    /** Immutable settings used by the villager adapter before authorizing a multi-block change. */
+    public Config villagerSettings() { return config; }
+
     public boolean resetsOnHarvest() {
         return config.resetOnHarvest();
     }
@@ -496,6 +499,8 @@ public class TallCropBlockBehavior extends FarmersDelightBlockBehavior implement
             BlockPos pos = CraftEngineAdapter.toBlockPos(args[2]);
 
             if (state != null && !state.isEmpty() && world != null && pos != null) {
+                if (com.huidu.farmersdelight.villager.VillagerCrop.controlsRemoval(
+                        world.getBlockAt(pos.x(), pos.y(), pos.z()), state)) return;
                 Object half = getHalf(state);
 
                 if (matchesHalfValue(half, config.halfLowerValue())) {

@@ -39,7 +39,7 @@
 | 🥕 灵活配方 | 等效食材、嵌套分组、标签、组件、调味品、配比与优先级 | 免费 |
 | 📦 内容包 | CraftEngine 配方加载、外部内容优先、分类合并与来源文件保存 | 免费 |
 | 🫙 流体 | 普通罐与玻璃罐、染色、灌装、排空、浸泡、漏斗加工与内容保留 | 免费 |
-| 🏡 村民 | 自定义作物收获补种、食物共享、繁殖条件与可配置交易 | 免费 |
+| 🏡 村民 | 作物收获补种、种子留存、食物共享、堆肥催熟、背包管理与可配置交易 | 免费 |
 | 📊 统计 | 玩家与物品累计统计、异步 SQLite、PlaceholderAPI 查询 | 免费 |
 | 📖 配方发现 | 配方书、关联配方与可选森罗物语自动投料 | 免费 |
 | 🏆 成就 | UltimateAdvancementAPI 接入、自动布局与增量同步 | 免费 |
@@ -86,6 +86,7 @@
 - [配置与配方](CONFIGURATION-RECIPES.zh-CN.md) · [流体罐操作](FLUID-TANK.zh-CN.md)
 - [森罗物语联动与模糊配方](KALEIDOSCOPE-COMPAT.zh-CN.md)
 - [依赖与对应源码](libs/README.md) · [构建与技术说明](docs/DEVELOPMENT.zh-cn.md)
+- [内置村民功能与独立开关](VILLAGER.zh-CN.md)
 - [1.2.2 更新与验证范围](RELEASE-NOTES-1.2.2.zh-CN.md) · [原项目 Wiki](https://github.com/IOVEYOUMC0/FarmersdelightPluginWiKi)
 
 ## 🙏 致谢与授权

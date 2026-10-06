@@ -39,7 +39,7 @@ An independently maintained **hard fork** of [Farmersdelight-Plugin](https://git
 | 🥕 Flexible ingredients | Equivalent ingredients, nested groups, tags, components, seasonings, ratios and priorities | Free |
 | 📦 Content packs | CraftEngine recipe loading, external-pack priority, merged categories and source-file saving | Free |
 | 🫙 Fluids | Normal/glass tanks, dyeing, filling, emptying, soaking, hopper processing and preserved tank contents | Free |
-| 🏡 Villagers | Custom crop harvesting/replanting, food sharing, breeding rules and configurable trades | Free |
+| 🏡 Villagers | Harvesting/replanting, seed reserves, food sharing, composting, bone meal, inventory management and configurable trades | Free |
 | 📊 Statistics | Persistent player/item statistics, asynchronous SQLite and PlaceholderAPI queries | Free |
 | 📖 Recipe discovery | Recipe books, linked recipes and optional Kaleidoscope automatic ingredient filling | Free |
 | 🏆 Advancements | UltimateAdvancementAPI integration, automatic layout and incremental updates | Free |
@@ -86,6 +86,7 @@ Editing, reloading and runtime statistics require administrator permissions.
 - [Configuration & recipes](CONFIGURATION-RECIPES.zh-CN.md) · [Fluid tanks](FLUID-TANK.zh-CN.md)
 - [Kaleidoscope integration & flexible recipes](KALEIDOSCOPE-COMPAT.zh-CN.md)
 - [Dependencies & corresponding sources](libs/README.md) · [Build & technical notes](docs/DEVELOPMENT.md)
+- [Integrated villager features and switches](VILLAGER.zh-CN.md)
 - [1.2.2 changes & verification scope](RELEASE-NOTES-1.2.2.zh-CN.md) · [Original wiki](https://github.com/IOVEYOUMC0/FarmersdelightPluginWiKi)
 
 ## 🙏 Credits & license

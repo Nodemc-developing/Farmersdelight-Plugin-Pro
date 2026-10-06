@@ -19,7 +19,7 @@ class VillagerWorkRulesTest {
 
     @Test void featureSwitchesAndBudgetsAreIndependentAndBounded() {
         var config = new YamlConfiguration(); config.set("villager.harvest.enable", false);
-        config.set("villager.harvest.block_budget", 100000); config.set("villager.pickup.scan_interval_ticks", 0);
+        config.set("villager.harvest.block-budget", 100000); config.set("villager.pickup.scan-interval-ticks", 0);
         var settings = VillagerWorkSettings.read(config);
         assertFalse(settings.harvest()); assertTrue(settings.pickup()); assertTrue(settings.breed());
         assertEquals(128, settings.blockBudget()); assertEquals(5, settings.activeTicks());

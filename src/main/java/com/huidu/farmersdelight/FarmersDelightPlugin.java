@@ -152,6 +152,8 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
     private com.huidu.farmersdelight.effect.NourishmentFoodListener nourishmentFoodListener;
     private com.huidu.farmersdelight.manager.SkewerCookingService skewerCookingService;
     private com.huidu.farmersdelight.villager.VillagerAutomationService villagerAutomationService;
+    private com.huidu.farmersdelight.villager.VillagerBackpackService villagerBackpackService;
+    public com.huidu.farmersdelight.villager.VillagerBackpackService getVillagerBackpackService() { return villagerBackpackService; }
     public com.huidu.farmersdelight.manager.SkewerCookingService getSkewerCookingService() { return skewerCookingService; }
 
     public com.huidu.farmersdelight.statistics.StatisticsService statistics() { return statistics; }
@@ -534,6 +536,9 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
         skilletManager = new SkilletManager(this);
         skewerCookingService = new com.huidu.farmersdelight.manager.SkewerCookingService(this);
         villagerAutomationService = new com.huidu.farmersdelight.villager.VillagerAutomationService(this);
+        villagerBackpackService = new com.huidu.farmersdelight.villager.VillagerBackpackService(this,
+                villager -> { if (isEnabled() && villagerAutomationService != null) villagerAutomationService.wake(villager); });
+        villagerBackpackService.start();
         getServer().getPluginManager().registerEvents(skewerCookingService, this);
         getServer().getPluginManager().registerEvents(
                 new com.huidu.farmersdelight.manager.HandheldSkilletFlipListener(skilletManager::markHandheldJump), this);
@@ -619,6 +624,7 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
         if (nourishmentFoodListener != null) nourishmentFoodListener.close();
         if (skewerCookingService != null) skewerCookingService.close();
         if (villagerAutomationService != null) villagerAutomationService.close();
+        if (villagerBackpackService != null) villagerBackpackService.close();
         com.huidu.farmersdelight.block.behavior.ManagedCropBlockBehavior.clear();
         if (statistics != null) statistics.shutdown(disableBudget);
 
@@ -1410,15 +1416,7 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
     }
 
     public void reloadTags() {
-        CommonTagResolver.reload(this);
-        if (particleDispatcher != null) particleDispatcher.reloadConfig();
-        if (skewerCookingService != null) skewerCookingService.reload();
-        if (villagerAutomationService != null) villagerAutomationService.reload();
-        if (statistics != null) {
-            statistics.cachePlayerLimit(getConfigInt(2048, "stats.cache-player-limit"));
-            statistics.configure(getConfigBoolean(true, "stats.enabled"), getConfigInt(30, "stats.flush-interval-seconds"));
-        }
-        com.huidu.farmersdelight.effect.NourishmentFoodListener.configurationChanged();
+        refreshConfiguredServices();
         refreshTagDependentRecipes();
         // Refresh the exported vanilla-member tag data pack; Bukkit/Paper reloads it automatically.
         listeners.refreshTagDatapack();
@@ -1559,10 +1557,15 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
                 getFirstConfigSection("experience-reward", "cooking-pot.experience-reward"));
         WorldDataConfig.reload(this, worldDataConfig);
         // Load the c: common-tag mapping before recipes load; it feeds recipe tag matching/indexing.
+        refreshConfiguredServices();
+    }
+
+    private void refreshConfiguredServices() {
         CommonTagResolver.reload(this);
         if (particleDispatcher != null) particleDispatcher.reloadConfig();
         if (skewerCookingService != null) skewerCookingService.reload();
         if (villagerAutomationService != null) villagerAutomationService.reload();
+        if (villagerBackpackService != null) villagerBackpackService.reload();
         if (statistics != null) {
             statistics.cachePlayerLimit(getConfigInt(2048, "stats.cache-player-limit"));
             statistics.configure(getConfigBoolean(true, "stats.enabled"), getConfigInt(30, "stats.flush-interval-seconds"));

@@ -85,6 +85,10 @@ public final class ManagedCropBlockBehavior extends FarmersDelightBlockBehavior 
     public static void clear() { BEHAVIORS.clear(); }
     public CropBehaviorOptions options() { return options; }
     public Shape shape() { return shape; }
+    public Property<Integer> ageProperty() { return age; }
+    public Property<?> halfProperty() { return half; }
+    public Property<Boolean> supportProperty() { return support; }
+    public int bonemealAgeBonus() { return Math.max(0, bonemealBonus.getInt()); }
     public ImmutableBlockState plantingState() {
         ImmutableBlockState state = block().defaultState().with(age, 0);
         if (half != null) state = ImmutableBlockState.with(state, half, half.valueByName("lower"));
@@ -320,6 +324,7 @@ public final class ManagedCropBlockBehavior extends FarmersDelightBlockBehavior 
         ImmutableBlockState old = BlockStateUtils.getOptionalCustomBlockState(args[0]).orElse(null);
         if (world == null || pos == null || !same(old)) return;
         Block target = world.getBlockAt(pos.x(), pos.y(), pos.z());
+        if (com.huidu.farmersdelight.villager.VillagerCrop.controlsRemoval(target, old)) return;
         Block partner = target.getRelative(BlockFace.UP);
         if (shape == Shape.DOUBLE && !upper(old) && resident(partner)) {
             ImmutableBlockState partnerState = CraftEngineBlocks.getCustomBlockState(partner);

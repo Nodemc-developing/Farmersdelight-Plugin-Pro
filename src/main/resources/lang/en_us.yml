@@ -526,7 +526,22 @@ console:
     active_blocks_exceeded: "Active blocks count exceeds {threshold} ({count}), consider optimizing."
     cooking_pot_total: "World '{world}' has {count} loaded cooking pots, threshold={threshold}. If TPS drops, reduce active cooking pots or lower cooking-pot.tick-budget."
     cooking_pot_density: "Chunk {chunk_x},{chunk_z} in world '{world}' has {count} loaded cooking pots, threshold={threshold}. Dense cooking pot areas can increase tick cost and display updates."
+villager:
+  backpack:
+    title: "<dark_gray>Villager inventory"
+    title_read_only: "<dark_gray>Villager inventory · View"
+    disabled: "<gray>Villager inventory access is disabled."
+    target_required: "<yellow>Look at a nearby villager before using this command."
+    too_far: "<red>The villager is too far away or in another world."
+    busy: "<yellow>Another administrator is editing this villager's inventory."
+    read_only: "<gray>View mode. Editing requires permission and ownership of both entities in the same region."
+    closed: "<gray>Villager inventory closed."
+    filler: "Menu background"
+    usage: "<yellow>/fd villager inventory <gray>Inspect the targeted villager's inventory"
+    changed: "<yellow>The contents changed. Affected slots were refreshed; try again."
+    editing_hint: "<gray>Use left/right click, Shift or hotbar swaps. Dragging, dropping and double-click collection are disabled."
 command:
+  help_villager: "Inspect or edit a nearby villager's inventory"
   player_only: "<red>This command can only be used by a player."
   reload_usage: "<yellow>/fd reload <{targets}></yellow>"
   reload_busy: "<dark_gray>» </dark_gray><gradient:gold:yellow><b>Farmersdelight-Plugin-Pro</b></gradient> <gray>•</gray> <red>A reload is still running, please wait."

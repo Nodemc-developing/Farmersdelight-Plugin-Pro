@@ -1,5 +1,7 @@
 # 配置、配方与内容包
 
+内置村民耕作、种子留存、堆肥、催熟和背包开关见 [村民配置说明](VILLAGER.zh-CN.md)。
+
 Farmersdelight-Plugin-Pro 1.2.2 使用独立的 `farmersdelight_recipes` 配方格式。厨锅、砧板和流体加工共用清晰的 `input`、`output`、`process` 分组，由 `station` 指定工作站。格式整理不改变已有食材、产出、加工和自动化规则。
 
 主配置要求 `config-version: 4`，功能字段使用连字符命名，例如 `cooking-pot`、`recipe-book.tag-cycle-interval-ticks`。版本不符时明确报告，不自动迁移既有配置；使用本版本自带模板配置服务器。

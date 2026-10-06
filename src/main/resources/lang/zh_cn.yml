@@ -526,7 +526,22 @@ console:
     active_blocks_exceeded: "活跃方块数量超过 {threshold}（当前 {count}），建议优化。"
     cooking_pot_total: "世界 '{world}' 当前加载了 {count} 个厨锅，阈值为 {threshold}。如果 TPS 下降，建议减少活跃厨锅或调低 cooking-pot.tick-budget。"
     cooking_pot_density: "世界 '{world}' 的区块 {chunk_x},{chunk_z} 当前加载了 {count} 个厨锅，阈值为 {threshold}。过密厨锅区域可能增加 tick 和显示更新开销。"
+villager:
+  backpack:
+    title: "<dark_gray>村民背包"
+    title_read_only: "<dark_gray>村民背包 · 查看"
+    disabled: "<gray>村民背包功能已关闭。"
+    target_required: "<yellow>请看向附近的村民后使用此命令。"
+    too_far: "<red>村民距离过远或已不在当前世界。"
+    busy: "<yellow>这位村民的背包正在被其他管理员编辑。"
+    read_only: "<gray>当前为查看模式；编辑需要权限且双方位于同一所属区域。"
+    closed: "<gray>村民背包已关闭。"
+    filler: "菜单背景"
+    usage: "<yellow>/fd villager inventory <gray>查看目标村民的背包"
+    changed: "<yellow>背包内容已变化，已刷新相关槽位，请重新操作。"
+    editing_hint: "<gray>支持左右键、Shift 和快捷栏交换；拖拽、丢弃及双击收集已关闭。"
 command:
+  help_villager: "查看或编辑附近村民的背包"
   player_only: "<red>这个命令只能由玩家执行。"
   reload_usage: "<yellow>/fd reload <{targets}></yellow>"
   reload_busy: "<dark_gray>» </dark_gray><gradient:gold:yellow><b>Farmersdelight-Plugin-Pro</b></gradient> <gray>•</gray> <red>上一次重载还在进行中，请稍候。"

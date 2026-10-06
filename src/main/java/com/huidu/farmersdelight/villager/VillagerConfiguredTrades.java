@@ -17,12 +17,12 @@ final class VillagerConfiguredTrades implements AutoCloseable {
     void reload(ConfigurationSection config) {
         Map<String, WorldDataConfig.TradeOffer> incoming = new LinkedHashMap<>();
         if (config.getBoolean("villager.enable", true)) {
-            if (config.getBoolean("villager.farmers_buy_crops.enable", true)) {
-                List<Map<?, ?>> rows = config.getMapList("villager.farmers_buy_crops.trades");
+            if (config.getBoolean("villager.farmers-buy-crops.enable", true)) {
+                List<Map<?, ?>> rows = config.getMapList("villager.farmers-buy-crops.trades");
                 for (int index = 0; index < rows.size(); index++) {
                     Map<?, ?> row = rows.get(index);
                     String item = string(row, "item", "");
-                    validateItem(item, "villager.farmers_buy_crops.trades[" + index + "].item");
+                    validateItem(item, "villager.farmers-buy-crops.trades[" + index + "].item");
                     int level = integer(row, "level", 1, 1, 5);
                     incoming.put("farmersdelight:configured_farmer_buy_" + index, new WorldDataConfig.TradeOffer("farmer", level,
                             item, integer(row, "amount", 16, 1, 64), "minecraft:emerald", 1,
@@ -30,13 +30,13 @@ final class VillagerConfiguredTrades implements AutoCloseable {
                             (float) decimal(row, "price_multiplier", .05, 0, 1), decimal(row, "chance", .35 / Math.max(1, rows.size()), 0, 1)));
                 }
             }
-            if (config.getBoolean("villager.wandering_trader_sells.enable", true)) {
-                List<?> rows = config.getList("villager.wandering_trader_sells.items", List.of());
+            if (config.getBoolean("villager.wandering-trader-sells.enable", true)) {
+                List<?> rows = config.getList("villager.wandering-trader-sells.items", List.of());
                 for (int index = 0; index < rows.size(); index++) {
                     Object raw = rows.get(index);
                     Map<?, ?> row = raw instanceof Map<?, ?> map ? map : Map.of("item", String.valueOf(raw));
                     String item = string(row, "item", "");
-                    validateItem(item, "villager.wandering_trader_sells.items[" + index + "].item");
+                    validateItem(item, "villager.wandering-trader-sells.items[" + index + "].item");
                     incoming.put("farmersdelight:configured_wandering_sell_" + index, new WorldDataConfig.TradeOffer(null, 0,
                             "minecraft:emerald", integer(row, "emerald_cost", 1, 1, 64), item,
                             integer(row, "amount", 1, 1, 64), integer(row, "max_uses", 12, 1, 10000),

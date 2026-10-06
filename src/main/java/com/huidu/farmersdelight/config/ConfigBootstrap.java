@@ -25,7 +25,9 @@ public final class ConfigBootstrap {
 
     static final int CONFIG_VERSION = 4;
     private static final ConfigUpdatePolicy CONFIG_POLICY = ConfigUpdatePolicy.builder()
-            .registrySection("heat-sources", "buff.comfort", "buff.nourishment", "container-returns", "pet-foods")
+            .registrySection("heat-sources", "buff.comfort", "buff.nourishment", "container-returns", "pet-foods",
+                    "villager.harvest.crops", "villager.harvest.planting", "villager.harvest.harvest-drops",
+                    "villager.breed.food-points", "villager.compost.chances")
             .build();
 
     private static final List<String> WORLD_DATA_REGISTRY_SECTIONS = List.of(

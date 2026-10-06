@@ -328,19 +328,100 @@ buff:
 # Villagers / 村民
 villager:
   enable: true
+  # Pause our automation when the separate VillagersDelight plugin is still installed.
+  coexistence:
+    pause-with-external-plugin: true
   harvest:
     enable: true
+    replant: true
+    work-hours-only: true
     block-budget: 64
     planting: {}
+    disabled-crops: []
+    extra-soils:
+    - farmersdelight:rich_soil_farmland
+    custom-crops: false
+    crops:
+      farmersdelight:wheat:
+        seed: minecraft:wheat_seeds
+      farmersdelight:beetroots:
+        seed: minecraft:beetroot_seeds
+      farmersdelight:carrots:
+        seed: minecraft:carrot
+      farmersdelight:potatoes:
+        seed: minecraft:potato
+      farmersdelight:cabbages:
+        seed: farmersdelight:cabbage_seeds
+      farmersdelight:onions:
+        seed: farmersdelight:onion
+      farmersdelight:tomatoes:
+        seed: farmersdelight:tomato_seeds
+        harvest-mode: pick
+        plant-block: farmersdelight:budding_tomatoes
+      farmersdelight:rice:
+        seed: farmersdelight:rice
+        harvest-mode: tall
+        water: minecraft:water
+        soils:
+        - '#minecraft:dirt'
+        - minecraft:grass_block
+    harvest-drops:
+      farmersdelight:wheat: [minecraft:wheat, minecraft:wheat_seeds]
+      farmersdelight:beetroots: [minecraft:beetroot, minecraft:beetroot_seeds]
+      farmersdelight:carrots: [minecraft:carrot]
+      farmersdelight:potatoes: [minecraft:potato]
+      farmersdelight:cabbages: [farmersdelight:cabbage, farmersdelight:cabbage_seeds]
+      farmersdelight:onions: [farmersdelight:onion]
+      farmersdelight:tomatoes: [farmersdelight:tomato, farmersdelight:tomato_seeds]
+      farmersdelight:rice: [farmersdelight:rice, farmersdelight:rice_panicle]
   pickup:
     enable: true
     scan-interval-ticks: 20
     radius: 2.5
+    discover-plantable-seeds: true
+    include-harvest-drops: true
+    foods:
+    - farmersdelight:cabbage
+    - farmersdelight:tomato
+    - farmersdelight:onion
+    - farmersdelight:rice
+    - farmersdelight:rice_panicle
+    extra-items: []
   breed:
     enable: true
     scan-interval-ticks: 40
     share-food: true
-    food-points: {}
+    share-interval-ticks: 100
+    minimum-food-to-share: 24
+    discover-foods: false
+    protect-custom-seeds: true
+    minimum-kept-seeds: 32
+    food-points:
+      farmersdelight:cabbage: 1
+      farmersdelight:tomato: 1
+      farmersdelight:onion: 1
+      farmersdelight:rice: 2
+      farmersdelight:rice_panicle: 0
+  compost:
+    enabled: true
+    max-items-per-work: 20
+    minimum-kept-per-item: 32
+    default-chance: 0.3
+    chances: {}
+    items:
+    - farmersdelight:cabbage
+    - farmersdelight:tomato
+    - farmersdelight:onion
+    - farmersdelight:rice_panicle
+  bonemeal:
+    enabled: true
+    retry-delay-ticks: 40
+  # Inventory inspection/editing requires separate administrator permissions.
+  backpack:
+    enabled: true
+    editable: true
+    open-on-sneak: true
+    maximum-distance-blocks: 6
   idle-interval-ticks: 200
   farmers-buy-crops:
     enable: true

@@ -1,5 +1,10 @@
 # Bundled libraries
 
+Integrated villager food and planting-reserve rules derive from VillagersDelight
+by HuiDu_OwO at `26148f212bf893af232320b0deacbbfb5a2e3fb4` (AGPL-3.0-only).
+These rules are adapted inside the plugin; no separate VillagersDelight binary or
+versioned NMS layer is bundled. Attribution and the complete AGPL text accompany the JAR.
+
 The plugin bundles and relocates the following libraries into its own namespace:
 
 | Library | Version | Upstream source | License |
