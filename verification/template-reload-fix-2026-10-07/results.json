@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-07",
+  "scope": "Deduplicate identical loading inputs from the same source; preserve definition conflicts",
+  "unit": {
+    "26.9.2": {
+      "errors": 0,
+      "skipped": 0,
+      "tests": 903,
+      "failures": 0
+    },
+    "26.10": {
+      "tests": 903,
+      "errors": 0,
+      "skipped": 0,
+      "failures": 0
+    }
+  },
+  "new_regression_tests": 13,
+  "contract_checks_passed": 5,
+  "native": {
+    "environment": "Paper 26.3 / CraftEngine 26.9.2",
+    "native_checks_passed": 32,
+    "additional_loading_log_check_passed": true,
+    "full_resource_reload_cycles": 2,
+    "actual_browser_title_initialized": true,
+    "original_plugins_and_config_restored": true,
+    "original_content_cache_restored": true,
+    "worlds_or_databases_replaced": false
+  },
+  "cleanup": {
+    "artifact_fingerprint_case_normalized_in_local_runner": true,
+    "all_candidate_files_byte_matched_before_restore": true
+  },
+  "runtime_jar_sha256": "3bd9433aa5c72e648e889ac88624ccbcf25bf0fced7248a9ebbdcd73b104d30d",
+  "excluded": [
+    "Real client interaction",
+    "Performance benchmarks",
+    "Recovery after unrelated fatal CE loading errors with edited cached definitions"
+  ],
+  "servers_created": 0
+}

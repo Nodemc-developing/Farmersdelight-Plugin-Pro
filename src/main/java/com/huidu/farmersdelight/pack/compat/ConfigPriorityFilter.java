@@ -9,10 +9,13 @@ import net.momirealms.craftengine.core.util.Key;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 final class ConfigPriorityFilter {
@@ -38,7 +41,7 @@ final class ConfigPriorityFilter {
                 String identity = stateId != null && stateId >= 0 ? "registry:" + stateId : "unresolved:" + unresolved++;
                 all.add(new DefinitionPriority.Definition<>(identity,
                         cached.path() + "#" + cached.config().path() + "." + key,
-                        bundled, new Location(cached, key, null)));
+                        bundled, new Location(cached, key, null), payload(cached, key)));
             }
         }
         List<DefinitionPriority.Definition<Location>> selected;
@@ -51,7 +54,9 @@ final class ConfigPriorityFilter {
                     .put(location.key(), copy(location.cached().config().get(location.key())));
         }
         List<CachedConfigSection> retainedConfigs = new ArrayList<>();
+        Set<CachedConfigSection> emitted = Collections.newSetFromMap(new IdentityHashMap<>());
         for (CachedConfigSection cached : configs) {
+            if (!emitted.add(cached)) continue;
             Map<String, Object> values = retained.get(cached);
             if (values != null && !values.isEmpty()) retainedConfigs.add(new CachedConfigSection(cached.pack(),
                     cached.path(), ConfigSection.of(cached.config().path(), values), copyArguments(cached.arguments())));
@@ -80,12 +85,13 @@ final class ConfigPriorityFilter {
                 String root = cached.config().path().split("#", 2)[0];
                 String scope = type.equals("farmersdelight:pack_sections") ? root + "/" : "";
                 all.add(new DefinitionPriority.Definition<>(scope + id, cached.path() + "#" + cached.config().path(),
-                        bundled, new Location(cached, key, null)));
+                        bundled, new Location(cached, key, null), payload(cached, key)));
             }
         }
         for (PendingConfigSection entry : pending) all.add(new DefinitionPriority.Definition<>(entry.id().toString(),
                 entry.path() + "#" + entry.section().path(), bundled(ownership, own, entry.path()),
-                new Location(null, null, entry)));
+                new Location(null, null, entry), Arrays.asList(copyMap(entry.section().values()), null,
+                        entry.pack().namespace())));
         List<DefinitionPriority.Definition<Location>> selected;
         try { selected = DefinitionPriority.select(type, all, report); }
         finally { report.save(); }
@@ -101,12 +107,19 @@ final class ConfigPriorityFilter {
                     .put(location.key(), copy(location.cached().config().get(location.key())));
         }
         List<CachedConfigSection> retainedConfigs = new ArrayList<>();
+        Set<CachedConfigSection> emitted = Collections.newSetFromMap(new IdentityHashMap<>());
         for (var cached : configs) {
+            if (!emitted.add(cached)) continue;
             Map<String, Object> values = retained.get(cached);
             if (values != null && !values.isEmpty()) retainedConfigs.add(new CachedConfigSection(cached.pack(),
                     cached.path(), ConfigSection.of(cached.config().path(), values), copyArguments(cached.arguments())));
         }
         return new Result(retainedConfigs, retainedPending);
+    }
+
+    private static Object payload(CachedConfigSection cached, String key) {
+        // Loading locations have object identity; compare the original definition and its expansion context instead.
+        return Arrays.asList(copy(cached.config().get(key)), copyArguments(cached.arguments()), cached.pack().namespace());
     }
 
     static CachedConfigSection loadingCopy(CachedConfigSection cached) {

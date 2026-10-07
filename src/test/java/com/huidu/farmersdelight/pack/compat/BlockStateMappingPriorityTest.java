@@ -19,6 +19,19 @@ import static org.junit.jupiter.api.Assertions.*;
 class BlockStateMappingPriorityTest {
     @TempDir Path directory;
 
+    @Test void aRepeatedResolvedMappingIsForwardedOnlyOnce() throws Exception {
+        Path path = file("mappings.yml");
+        var ownership = new BundledContentManifest(directory.resolve("ownership.json"));
+        var first = section(path, "food", Map.of("source", "target"));
+        var reparsed = section(path, "food", Map.of("source", "target"));
+        for (var input : List.of(List.of(first, first), List.of(first, reparsed))) {
+            var selected = ConfigPriorityFilter.filterBlockStateMappings(input, key -> 42, ownership,
+                    new ContentConflicts(directory.resolve("conflicts.json")));
+            assertEquals(1, selected.configs().size());
+            assertEquals(Map.of("source", "target"), selected.configs().getFirst().config().values());
+        }
+    }
+
     @Test void nativeStateIdentitySelectsTheExternalMappingInEitherLoadOrderWithoutEditingSources() throws Exception {
         Path bundled = file("bundled.yml"), external = file("external.yml");
         byte[] originalBundled = Files.readAllBytes(bundled), originalExternal = Files.readAllBytes(external);

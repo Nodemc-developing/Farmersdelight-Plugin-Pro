@@ -6,11 +6,13 @@ import net.momirealms.craftengine.core.pack.PackMeta;
 import net.momirealms.craftengine.core.plugin.config.ConfigSection;
 import net.momirealms.craftengine.core.plugin.config.Config;
 import net.momirealms.craftengine.core.plugin.config.IdSectionConfigParser;
+import net.momirealms.craftengine.core.plugin.config.IdConfigParser;
 import net.momirealms.craftengine.core.plugin.config.SectionConfigParser;
 import net.momirealms.craftengine.core.plugin.config.lifecycle.LoadingStage;
 import net.momirealms.craftengine.core.plugin.config.lifecycle.LoadingStages;
 import net.momirealms.craftengine.core.plugin.config.template.argument.PlainStringTemplateArgument;
 import net.momirealms.craftengine.core.plugin.config.template.argument.TemplateArgument;
+import net.momirealms.craftengine.core.plugin.config.template.TemplateManagerImpl;
 import net.momirealms.craftengine.core.util.Key;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
@@ -44,6 +46,44 @@ class HostLoadingInputsTest {
 
     @AfterAll static void restoreTheHostConfigurationInstance() throws Exception {
         if (hostConfigInstance != null) hostConfigInstance.set(null, previousHostConfig);
+    }
+
+    @Test void realHostTemplateParserRegistersRepeatedInputsOnceAcrossReloadsWithoutPrematureExpansion() throws Exception {
+        var constructor = TemplateManagerImpl.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        TemplateManagerImpl manager = constructor.newInstance();
+        var parser = (IdConfigParser) manager.parser();
+        var errors = new java.util.ArrayList<Object>();
+        parser.setErrorHandler(errors::add);
+        Path file = directory.resolve("models.yml");
+        Files.writeString(file, "source preserved across loading cycles");
+        var ownership = new BundledContentManifest(directory.resolve("ownership.json"));
+        var defaults = new Pack(directory, new PackMeta("default", "test", "1", "default"), true, new String[0]);
+        Map<String, Object> values = Map.of("model/cube_all", Map.of("textures", Map.of("all", "${texture}")),
+                "value", "${texture}", "values", List.of("${texture}", "unchanged"));
+        var cached = new CachedConfigSection(defaults, file, ConfigSection.of("templates#models#block", values), null);
+        var templatesField = TemplateManagerImpl.class.getDeclaredField("templates");
+        templatesField.setAccessible(true);
+        try {
+            for (int cycle = 0; cycle < 2; cycle++) {
+                manager.unload(); parser.clearConfigs(); parser.clearIdToPath();
+                var selected = ConfigPriorityFilter.filter("craftengine:template", List.of(cached, cached), List.of(), ownership,
+                        new ContentConflicts(directory.resolve("conflicts.json")));
+                selected.configs().forEach(parser::addConfig);
+                parser.loadAll();
+                assertEquals(3, parser.count());
+                assertTrue(errors.isEmpty(), () -> "Unexpected native parser errors: " + errors);
+                @SuppressWarnings("unchecked") Map<Key, Object> registered = (Map<Key, Object>) templatesField.get(manager);
+                Map<String, TemplateArgument> arguments = Map.of("texture", PlainStringTemplateArgument.plain("test:block/stone"));
+                assertEquals(Map.of("textures", Map.of("all", "test:block/stone")),
+                        manager.processUnknownValue("consumer", registered.get(Key.of("default:model/cube_all")), arguments));
+                assertEquals("test:block/stone", manager.processUnknownValue("consumer", registered.get(Key.of("default:value")), arguments));
+                assertEquals(List.of("test:block/stone", "unchanged"),
+                        manager.processUnknownValue("consumer", registered.get(Key.of("default:values")), arguments));
+                assertEquals(values, cached.config().values());
+                assertEquals("source preserved across loading cycles", Files.readString(file));
+            }
+        } finally { manager.unload(); parser.clearConfigs(); parser.clearIdToPath(); }
     }
 
     @Test void actualHostLoadAllInjectsReservedFactoryArgumentsOnlyIntoTheMutableLoadingCopy() {
