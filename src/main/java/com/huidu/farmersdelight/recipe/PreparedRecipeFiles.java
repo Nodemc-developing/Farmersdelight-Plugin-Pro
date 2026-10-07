@@ -53,6 +53,8 @@ public final class PreparedRecipeFiles implements RecipeReloadCoordinator.Batch 
     public static PreparedRecipeFiles read(FarmersDelightPlugin plugin, boolean mergeMissing, List<Path> roots) throws Exception {
         Map<Path, YamlConfiguration> documents = new LinkedHashMap<>();
         Map<Path, Revision> revisions = new LinkedHashMap<>();
+        java.util.Set<Path> managedFiles = FILES.stream().map(name -> RecipePackFiles.file(plugin, name))
+                .collect(java.util.stream.Collectors.toUnmodifiableSet());
         List<Path> files = RecipePackFiles.files(roots);
         Map<Path, Revision> directories = new LinkedHashMap<>();
         for (Path root : roots) {
@@ -64,19 +66,12 @@ public final class PreparedRecipeFiles implements RecipeReloadCoordinator.Batch 
         for (Path path : files) {
             YamlFileTransactions.execute(path, () -> {
                 Revision before = Revision.read(path);
-                YamlConfiguration document = com.huidu.farmersdelight.config.PlainYamlDocuments.readLiteral(path);
+                YamlConfiguration document = RecipeDocumentProbe.parse(path, Files.readString(path), managedFiles.contains(path));
                 if (!before.equals(Revision.read(path))) throw new IOException("Recipe file changed during preparation: " + path);
+                if (document == null) return null;
                 RecipePackFiles.validateNativeDocument(document, path.toString());
-                boolean relevant = document.getKeys(false).stream().anyMatch(key -> {
-                    String base = key.split("#", 2)[0];
-                    for (var kind : com.huidu.farmersdelight.pack.PackSection.values()) {
-                        if (kind == com.huidu.farmersdelight.pack.PackSection.COOKING_POT || kind == com.huidu.farmersdelight.pack.PackSection.CUTTING_BOARD
-                                || kind == com.huidu.farmersdelight.pack.PackSection.CUSTOM_COOKING_POT) continue;
-                        if (base.equals(kind.sectionId()) || base.equals(kind.rootKey())) return true;
-                    }
-                    return base.equals("food_groups") || RecipePackFiles.containsFactory(document);
-                });
-                if (relevant) { documents.put(path, document); revisions.put(path, before); }
+                documents.put(path, document);
+                revisions.put(path, before);
                 return null;
             });
         }

@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-07",
+  "scope": "Identify owned YAML roots before constructing strict recipe documents",
+  "unit": {
+    "26.9.2": {
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 913
+    },
+    "26.10": {
+      "tests": 913,
+      "errors": 0,
+      "skipped": 0,
+      "failures": 0
+    }
+  },
+  "new_regression_tests": 10,
+  "contract_checks_passed": 5,
+  "native": {
+    "environment": "Paper 26.3 / CraftEngine 26.9.2",
+    "native_checks_passed": 33,
+    "additional_loading_log_checks_passed": 2,
+    "foreign_duplicate_translation_fixture": true,
+    "real_asynchronous_recipe_preparation_and_owner_publication": "PASS",
+    "full_resource_reload_cycles": 2,
+    "actual_browser_title_initialized": true,
+    "original_plugins_and_config_restored": true,
+    "original_content_cache_restored": true,
+    "temporary_fixture_removed": true,
+    "worlds_or_databases_replaced": false
+  },
+  "runtime_jar_sha256": "9e53d32caf82c6943302d2d706468cd836dfe009f2d87be20e9e3ce21afc2942",
+  "excluded": [
+    "Real client interaction",
+    "Performance benchmarks",
+    "Diagnosis of the remote CE browser-title null without its GUI settings or complete reload log"
+  ],
+  "servers_created": 0
+}
