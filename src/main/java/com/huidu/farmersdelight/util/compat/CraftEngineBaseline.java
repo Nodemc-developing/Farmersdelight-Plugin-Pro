@@ -3,74 +3,63 @@ package com.huidu.farmersdelight.util.compat;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.HexFormat;
-import java.util.Map;
+import java.util.regex.Pattern;
 
-/** Verifies the load-time host contract before any content factories are registered. */
+/** Checks the host's version and required loading APIs without reading its JAR. */
 public final class CraftEngineBaseline {
-    public static final String VERSION = "26.10-20260929.192451-4";
-    public static final String SHA256 = "46ebe45f31f3e3f0965179a85cb1f308d8729f53281d6c64f4ef2af5c23d99f6";
     public static final String STABLE_VERSION = "26.9.2";
-    public static final String STABLE_SHA256 = "1f9e0935a11e7d6c7a979f2d521ec24efb715375c876a57ef3cc11e9fb9895aa";
-    public static final String STABLE_ARCHIVE_SHA256 = "19535f1987e8a27ebe8c6d811e7deae9a1f05dbd3ef3359435aff5a3d819e0f9";
-    private static final Map<String, String> SUPPORTED_BUILDS = Map.of(
-            STABLE_SHA256, STABLE_VERSION, STABLE_ARCHIVE_SHA256, STABLE_VERSION, SHA256, VERSION);
+    public static final String SNAPSHOT_VERSION = "26.10";
+    private static final Pattern SUPPORTED_VERSION = Pattern.compile("(26\\.9\\.2|26\\.10)(?:[-+][A-Za-z0-9][A-Za-z0-9._+-]*)?");
+    private static final String CORE = "net.momirealms.craftengine.core.";
 
     private CraftEngineBaseline() { }
 
     public static void verify(JavaPlugin plugin) {
-        Plugin host = plugin.getServer().getPluginManager().getPlugin("CraftEngine");
+        verifyHost(plugin.getServer().getPluginManager().getPlugin("CraftEngine"));
+    }
+
+    public static String verifyHost(Plugin host) {
         if (host == null) throw new IllegalStateException("CraftEngine must load before this plugin.");
-        verifyHostArtifact(host.getClass());
-    }
-
-    /** Both loading bridges use the same verified original artifact, including Paper's remapped location. */
-    public static String verifyHostArtifact(Class<?> hostType) {
-        try {
-            Path artifact = originalArtifact(Path.of(hostType.getProtectionDomain().getCodeSource().getLocation().toURI()));
-            return versionForHash(digest(artifact));
-        } catch (IOException | URISyntaxException failure) {
-            throw new IllegalStateException("Cannot verify the required CraftEngine artifact (26.9.2 or the supported 26.10 snapshot).", failure);
-        }
-    }
-
-    static Path originalArtifact(Path location) {
-        Path artifact = location.toAbsolutePath().normalize();
-        Path parent = artifact.getParent();
-        if (parent != null && parent.getFileName() != null && parent.getFileName().toString().equals(".paper-remapped")) {
-            return parent.getParent().resolve(artifact.getFileName());
-        }
-        return artifact;
-    }
-
-    static String versionForHash(String actual) {
-        String version = SUPPORTED_BUILDS.get(actual);
-        if (version == null) throw new IllegalStateException("Unsupported CraftEngine build: received SHA-256 " + actual
-                + "; supported builds are " + STABLE_VERSION + " (" + STABLE_SHA256 + ", " + STABLE_ARCHIVE_SHA256
-                + ") and " + VERSION + " (" + SHA256 + "). "
-                + "Verify the updated host API before changing the supported baselines.");
+        String version = versionFamily(host.getPluginMeta().getVersion());
+        verifyApi(host.getClass().getClassLoader());
         return version;
     }
 
-    static String digest(Path artifact) throws IOException {
+    static String versionFamily(String version) {
+        var match = SUPPORTED_VERSION.matcher(version == null ? "" : version.trim());
+        if (!match.matches()) throw new IllegalStateException("Unsupported CraftEngine version: " + version
+                + "; use 26.9.2 or 26.10 with the required APIs.");
+        return match.group(1);
+    }
+
+    /** Only bootstrap checks use reflection; gameplay keeps the existing typed and cached bindings. */
+    static void verifyApi(ClassLoader loader) {
         try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            try (InputStream stream = Files.newInputStream(artifact)) {
-                byte[] buffer = new byte[32 * 1024];
-                for (int count; (count = stream.read(buffer)) >= 0;) {
-                    if (count > 0) digest.update(buffer, 0, count);
-                }
-            }
-            return HexFormat.of().formatHex(digest.digest());
-        } catch (NoSuchAlgorithmException impossible) {
-            throw new IllegalStateException("SHA-256 is unavailable", impossible);
+            Class<?> engine = load(CORE + "plugin.CraftEngine", loader);
+            Class<?> state = load(CORE + "block.ImmutableBlockState", loader);
+            Class<?> behavior = load(CORE + "block.behavior.BlockBehavior", loader);
+            Class<?> hand = load(CORE + "entity.player.InteractionHand", loader);
+            Class<?> event = load("net.momirealms.craftengine.bukkit.api.event.CustomBlockAttemptPlaceEvent", loader);
+            load(CORE + "pack.PackManager", loader);
+            load(CORE + "pack.PackCacheData", loader).getDeclaredConstructor(engine);
+            requireReturn(state, "behavior", behavior);
+            requireReturn(event, "blockState", state);
+            requireReturn(event, "hand", hand);
+            requireReturn(behavior, "getFirst", Object.class, Class.class);
+            load(CORE + "block.entity.tick.BlockEntityTicker", loader);
+        } catch (ReflectiveOperationException | LinkageError missing) {
+            throw new IllegalStateException("CraftEngine required loading API is unavailable: " + missing.getMessage(), missing);
         }
+    }
+
+    private static Class<?> load(String name, ClassLoader loader) throws ClassNotFoundException {
+        return Class.forName(name, false, loader);
+    }
+
+    private static void requireReturn(Class<?> owner, String name, Class<?> expected, Class<?>... parameters)
+            throws NoSuchMethodException {
+        var method = owner.getMethod(name, parameters);
+        if (method.getReturnType() != expected) throw new NoSuchMethodException(owner.getName() + "." + name
+                + " must return " + expected.getName());
     }
 }

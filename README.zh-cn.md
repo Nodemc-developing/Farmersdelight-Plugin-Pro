@@ -54,7 +54,7 @@
 | --- | --- | --- |
 | Paper 或 Folia | **Minecraft 1.21–26.3** | [版本覆盖及限制](docs/COMPATIBILITY.md)；Folia 需有对应的官方核心构建 |
 | Java | **1.21.x 用 21；26.x 用 25** | 服务端运行环境；构建使用 JDK 25 |
-| [CraftEngine](https://github.com/Xiao-MoMi/craft-engine) | **26.9.2 / 已验证的 26.10 快照** | 必选；[具体构建](docs/DEVELOPMENT.zh-cn.md#支持环境) |
+| [CraftEngine](https://github.com/Xiao-MoMi/craft-engine) | **26.9.2 / 26.10** | 必选；[版本与 API](docs/DEVELOPMENT.zh-cn.md#支持环境) |
 | [FluidCore](https://github.com/Nodemc-developing/FluidCore) | `libs/` 中的兼容版 0.1.0-SNAPSHOT | 流体配方与储罐；旧服必须使用随附的 Java 21 构建 |
 | [UltimateAdvancementAPI](https://github.com/Nodemc-developing/UltimateAdvancementAPI) | `libs/` 中的 2.8.1-pro.3 | 覆盖支持版本范围的成就功能 |
 | [PlaceholderAPI](https://github.com/PlaceholderAPI/PlaceholderAPI) | 可选 | 统计占位符 |

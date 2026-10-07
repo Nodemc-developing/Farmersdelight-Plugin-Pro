@@ -6,10 +6,12 @@
 
 - Target range: **Minecraft 1.21–26.3 on Paper/Folia**. Exact tested builds and old-client presentation differences are listed in [COMPATIBILITY.md](COMPATIBILITY.md). An implemented version branch does not prove every server build has been tested.
 - Server runtime: **Java 21 for 1.21.x; Java 25 for 26.x**. The build toolchain uses JDK 25; Farmersdelight-Plugin-Pro and FluidCore emit Java 21 bytecode. Shared FD gameplay compiles against the Paper 1.21 API.
-- CraftEngine **26.9.2** and **26.10-SNAPSHOT build `26.10-20260929.192451-4`** are supported. Startup verifies the original JAR digest against the documented builds. Other builds require adaptation and validation; a version label alone does not imply support for every repackaged JAR or snapshot.
+- CraftEngine **26.9.2** is supported by version and required API capabilities, including rebuilds with the same version. The existing **26.10** branch uses the same capability checks. Startup does not read the CE JAR or compare its SHA-256. Content loading validates its parser and resource structures before replacing live bindings.
 - Fluid mechanics require the compatible **FluidCore 0.1.0-SNAPSHOT** supplied in `libs/`. Advancements require **UltimateAdvancementAPI 2.8.1-pro.3**, which contains ten native adapter families. Neither dependency is bundled into the plugin or its API JAR. Old dependency builds do not acquire this coverage by upgrading FD alone.
 
 Dependency artifacts, corresponding sources, build instructions and licenses are listed in [libs/README.md](../libs/README.md).
+
+The 26.9.2 API baseline follows the official [version definition](https://github.com/Xiao-MoMi/craft-engine/blob/e826194921bb21ff6cd6ee5d9661cce0856b4c3f/gradle.properties) and [block behavior API](https://github.com/Xiao-MoMi/craft-engine/blob/e826194921bb21ff6cd6ee5d9661cce0856b4c3f/core/src/main/java/net/momirealms/craftengine/core/block/behavior/BlockBehavior.java).
 
 ## Build
 
@@ -31,7 +33,7 @@ To supply local dependencies:
 ./gradlew build -PceJar=<supported-CraftEngine-jar> -PceLibraries=<CraftEngine/libs-directory> -PfluidCoreJar=<FluidCore-jar>
 ```
 
-`ceLibraries` supplies CraftEngine's remapped runtime libraries. Without a local JAR, compilation uses the latest published stable Maven APIs, 26.9.1; the official repository had not published 26.9.2 Maven modules at verification time. Use `-PceJar` to compile against the exact 26.9.2 server JAR. `-PceVersion=26.10-SNAPSHOT` selects the snapshot compile dependency. Compile dependency versions do not widen the runtime digest allowlist.
+`ceLibraries` supplies CraftEngine's remapped runtime libraries. Without a local JAR, compilation uses the published stable Maven API baseline, 26.9.1; the official repository had not published 26.9.2 Maven modules at the original verification time. Use `-PceJar` to compile against a 26.9.2 server JAR, or `-PceVersion=26.10-SNAPSHOT` for the snapshot dependency. Runtime compatibility uses the host's version metadata and APIs, with no artifact hash allowlist.
 
 The build produces the plugin JAR and an API-only JAR for addon compilation. The API package is `com.huidu.farmersdelight.api`; use the API JAR as `compileOnly`. The existing addon build arrangement expects addon checkouts beside this repository.
 

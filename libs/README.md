@@ -39,7 +39,7 @@ The plugin bundles Sparrow YAML 1.0.22. Its actual corresponding source, full fi
 
 ## FluidCore dependency
 
-`FluidCore-0.1.0-SNAPSHOT.jar` is the compile-only dependency used by this version of Farmersdelight-Plugin-Pro. It is not shaded into either Farmersdelight JAR. Install it separately in the server's `plugins/` directory to enable fluid recipes and tanks. It targets Java 21 bytecode and supports CraftEngine 26.9.2 plus the verified 26.10 snapshot described in the main README. The compatible build supplied here must replace older Java 25-only FluidCore builds when running Minecraft 1.21.x.
+`FluidCore-0.1.0-SNAPSHOT.jar` is the compile-only dependency used by this version of Farmersdelight-Plugin-Pro. It is not shaded into either Farmersdelight JAR. Install it separately in the server's `plugins/` directory to enable fluid recipes and tanks. It targets Java 21 bytecode and supports CraftEngine 26.9.2 and the existing 26.10 API branch. The compatible build supplied here must replace older Java 25-only FluidCore builds when running Minecraft 1.21.x.
 
 FluidCore is maintained by **ydxc20091**. Its implementation modules are **GPL-3.0-only**, while its API module is **Apache-2.0**. The complete corresponding source, build scripts, Gradle wrapper, dependency source and original notices are included in `FluidCore-0.1.0-SNAPSHOT-sources.zip`. The two license texts are also provided as `FluidCore-GPL-3.0.txt` and `FluidCore-API-Apache-2.0.txt`.
 
@@ -48,4 +48,6 @@ This compatible distribution is available as [Build 3](https://github.com/Nodemc
 | Artifact | SHA-256 |
 | --- | --- |
 | `FluidCore-0.1.0-SNAPSHOT.jar` | `ae4c584cf18c1c11d716fed395bb8cdcdf05a204d1fcb68b784128220933f04a` |
-| `FluidCore-0.1.0-SNAPSHOT-sources.zip` | `67209b3f203c4c48c82a0d0bbf5c92be1a8aceef6792020c81da14a3d0ddfd84` |
+| `FluidCore-0.1.0-SNAPSHOT-sources.zip` | `332ef7bd7919ef8989242c25e9baf2e7600f6c0b7b5251ce034406466bdbbfe3` |
+
+The runtime remains the Build 3 distribution. The current source archive also includes the version/API build validator update: same-version CE rebuilds do not need an artifact hash allowlist. The digests above identify dependency files and do not restrict which compatible CE build can be installed.

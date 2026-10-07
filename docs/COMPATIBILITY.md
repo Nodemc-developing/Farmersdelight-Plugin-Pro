@@ -1,6 +1,6 @@
-# Minecraft compatibility — 1.2.2
+# Minecraft compatibility
 
-This version targets **Minecraft 1.21 through 26.3 on Paper and Folia** with CraftEngine **26.9.2** or the verified **26.10 snapshot**. Install the compatible FluidCore build supplied in `libs/` for fluids and UltimateAdvancementAPI **2.8.1-pro.3** for advancements. Upgrading FD alone does not replace those plugins. UltimateAdvancementAPI is independent of CraftEngine.
+This version targets **Minecraft 1.21 through 26.3 on Paper and Folia** with CraftEngine **26.9.2** or **26.10** with the required APIs. Install the compatible FluidCore build supplied in `libs/` for fluids and UltimateAdvancementAPI **2.8.1-pro.3** for advancements. Upgrading FD alone does not replace those plugins. UltimateAdvancementAPI is independent of CraftEngine.
 
 | Server version | Java runtime | Gameplay and menus |
 | --- | --- | --- |
@@ -30,13 +30,7 @@ FD gameplay compiles against **Paper 1.21** and emits Java 21 bytecode. FluidCor
 
 CraftEngine 26.10 uses its native sleeping ticker list. CraftEngine 26.9.2 uses a compatible ticker that skips sleeping business work; it still receives the host's ticker callback. FluidCore substitutes indexed chunk-load notifications for the newer native subscription API. These differences are selected during initialization, without reflection in each gameplay tick.
 
-| CraftEngine build | Original JAR SHA-256 |
-| --- | --- |
-| 26.9.2, supplied stable build | `1f9e0935a11e7d6c7a979f2d521ec24efb715375c876a57ef3cc11e9fb9895aa` |
-| 26.9.2, earlier official stable build | `19535f1987e8a27ebe8c6d811e7deae9a1f05dbd3ef3359435aff5a3d819e0f9` |
-| 26.10-20260929.192451-4 | `46ebe45f31f3e3f0965179a85cb1f308d8729f53281d6c64f4ef2af5c23d99f6` |
-
-The earlier 26.9.2 build passed loading-contract inspection; native verification uses the supplied stable build and the listed snapshot.
+Startup accepts CE 26.9.2 and its build suffixes based on plugin version metadata and required APIs, and retains the 26.10 adapter. It does not read or hash the CE JAR, so Paper remapping or a same-version rebuild does not create a compatibility rejection. Missing loading APIs or incompatible parser/resource structures are reported directly. Artifact digests in historical verification records identify the tested files; they are not installation requirements.
 
 Native villager food access links once against either package name. Item metadata and enchantment differences use cached method handles. Inventory packets select the version's real native format. No new per-tick reflection, inventory-wide refresh or benchmark instrumentation is included in the plugin.
 

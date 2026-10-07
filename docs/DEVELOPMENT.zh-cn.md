@@ -6,10 +6,12 @@
 
 - 目标范围：**Paper/Folia，Minecraft 1.21–26.3**。具体已验证构建和旧客户端表现差异见 [COMPATIBILITY.md](COMPATIBILITY.md)；适配分支存在不代表逐一验证了所有核心构建。
 - 服务端 **1.21.x 使用 Java 21，26.x 使用 Java 25**；构建工具链使用 JDK 25。FD 与 FluidCore 均输出 Java 21 字节码，FD 通用业务按 Paper 1.21 API 编译。
-- 支持 CraftEngine **26.9.2** 和 **26.10-SNAPSHOT，构建 `26.10-20260929.192451-4`**。启动时按已记录构建核对原始 JAR 哈希；其他构建需要适配和验证，相同版本名不代表支持任意重新打包制品或快照。
+- CraftEngine **26.9.2** 按版本号和必要 API 兼容，同版本重新构建无需更新白名单。既有 **26.10** 分支也按 API 能力判断。启动时不读取 CE JAR、不比较 SHA-256；内容加载在替换实际绑定前验证解析器和资源结构。
 - 流体玩法需单独安装 `libs/` 中的兼容版 **FluidCore 0.1.0-SNAPSHOT**；成就需单独安装 **UltimateAdvancementAPI 2.8.1-pro.3**，其中包含十组原生适配器。两项依赖均不打入本插件或 API JAR；仅升级 FD 不会让旧依赖自动获得版本覆盖。
 
 依赖构建、对应源码、构建步骤与授权见 [libs/README.md](../libs/README.md)。
+
+26.9.2 API 基线核对官方仓库的[版本定义](https://github.com/Xiao-MoMi/craft-engine/blob/e826194921bb21ff6cd6ee5d9661cce0856b4c3f/gradle.properties)和[方块行为 API](https://github.com/Xiao-MoMi/craft-engine/blob/e826194921bb21ff6cd6ee5d9661cce0856b4c3f/core/src/main/java/net/momirealms/craftengine/core/block/behavior/BlockBehavior.java)。
 
 ## 构建
 
@@ -31,7 +33,7 @@ git clone https://github.com/IOVEYOUMC0/FarmersdelightPluginWiKi.git wiki
 ./gradlew build -PceJar=<受支持的CraftEngine-JAR> -PceLibraries=<CraftEngine/libs目录> -PfluidCoreJar=<FluidCore构建JAR>
 ```
 
-`ceLibraries` 提供 CraftEngine 的重映射运行库。不指定本地 JAR 时使用最新已发布的稳定 Maven API 26.9.1；验证时官方仓库尚未发布 26.9.2 的 Maven 模块。使用 `-PceJar` 可按实际 26.9.2 服务端 JAR 编译，也可用 `-PceVersion=26.10-SNAPSHOT` 选择快照编译依赖。编译坐标不会扩大运行时允许的构建范围。
+`ceLibraries` 提供 CraftEngine 的重映射运行库。不指定本地 JAR 时使用已发布的稳定 Maven API 基线 26.9.1；最初验证时官方仓库尚未发布 26.9.2 的 Maven 模块。使用 `-PceJar` 可按 26.9.2 服务端 JAR 编译，也可用 `-PceVersion=26.10-SNAPSHOT` 选择快照依赖。运行时按 CE 版本信息与 API 判断兼容，不设制品哈希白名单。
 
 构建产物包括主插件 JAR 和供附属编译的 API-only JAR。API 包为 `com.huidu.farmersdelight.api`，附属以 `compileOnly` 引用 API JAR。现有附属构建方式要求其源码检出至本仓库的同级目录。
 

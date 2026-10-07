@@ -49,11 +49,10 @@ import java.util.function.BiFunction;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * A loading-only adapter for the verified host builds. No reflective access runs in gameplay tasks.
+ * A loading-only adapter for the supported host APIs. No reflective access runs in gameplay tasks.
  * The adapter preserves parser stages and never adds a competing task to the loading pyramid.
  */
 public final class ExternalContentCoordinator implements AutoCloseable, Listener {
-    public static final String SUPPORTED_SHA256 = CraftEngineBaseline.SHA256;
     private static volatile ExternalContentCoordinator active;
     private static final List<BiFunction<String, CachedConfigSection, CachedConfigSection>> TRANSFORMERS = new CopyOnWriteArrayList<>();
     private static final Map<Path, Map<String, Object>> EXTRA_DEFAULTS = new java.util.concurrent.ConcurrentHashMap<>();
@@ -131,7 +130,7 @@ public final class ExternalContentCoordinator implements AutoCloseable, Listener
             return coordinator;
         } catch (Exception failure) {
             if (coordinator != null) coordinator.close();
-            throw new IllegalStateException("External content priority requires a verified CraftEngine 26.9.2 or 26.10 build; "
+            throw new IllegalStateException("External content priority requires the CraftEngine 26.9.2 or 26.10 loading API; "
                     + "compatibility loading was refused: " + failure.getMessage(), failure);
         }
     }
@@ -173,7 +172,7 @@ public final class ExternalContentCoordinator implements AutoCloseable, Listener
         this.plugin = plugin;
         BukkitCraftEngine engine = BukkitCraftEngine.instance();
         if (engine == null || engine.packManager() == null) throw new IllegalStateException("CraftEngine is not loaded");
-        CraftEngineBaseline.verifyHostArtifact(BukkitCraftEngine.class);
+        CraftEngineBaseline.verify(plugin);
         this.manager = engine.packManager();
         var blockManager = engine.blockManager();
         itemManager = engine.itemManager();

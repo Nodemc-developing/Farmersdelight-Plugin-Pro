@@ -54,7 +54,7 @@ Folia-aware scheduling, sleeping block tickers, asynchronous file/database work 
 | --- | --- | --- |
 | Paper or Folia | **Minecraft 1.21–26.3** | [Version coverage & limitations](docs/COMPATIBILITY.md); Folia needs an available official build |
 | Java | **21 for 1.21.x; 25 for 26.x** | Server runtime; JDK 25 builds the plugin |
-| [CraftEngine](https://github.com/Xiao-MoMi/craft-engine) | **26.9.2 / verified 26.10 snapshot** | Required; [exact builds](docs/DEVELOPMENT.md#supported-environment) |
+| [CraftEngine](https://github.com/Xiao-MoMi/craft-engine) | **26.9.2 / 26.10** | Required; [versions and APIs](docs/DEVELOPMENT.md#supported-environment) |
 | [FluidCore](https://github.com/Nodemc-developing/FluidCore) | Compatible 0.1.0-SNAPSHOT from `libs/` | Fluid recipes and tanks; use the supplied Java 21 build |
 | [UltimateAdvancementAPI](https://github.com/Nodemc-developing/UltimateAdvancementAPI) | 2.8.1-pro.3 from `libs/` | Advancements across the supported version range |
 | [PlaceholderAPI](https://github.com/PlaceholderAPI/PlaceholderAPI) | Optional | Statistics placeholders |

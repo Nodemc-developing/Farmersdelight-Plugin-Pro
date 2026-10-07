@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-07",
+  "scope": "CE version/API compatibility; no runtime or build artifact hash allowlist",
+  "official_ce_revision": "e826194921bb21ff6cd6ee5d9661cce0856b4c3f",
+  "unit": {
+    "26.9.2": {
+      "errors": 0,
+      "failures": 0,
+      "tests": 890,
+      "skipped": 0
+    },
+    "26.10": {
+      "skipped": 0,
+      "errors": 0,
+      "failures": 0,
+      "tests": 890
+    }
+  },
+  "contract_checks_passed": 5,
+  "native": {
+    "environment": "Paper 26.3 / CE 26.9.2",
+    "native_pass": 26,
+    "loading_log_pass": 2,
+    "restored": true,
+    "worlds_replaced": false
+  },
+  "cleanup": {
+    "recovered_after_legacy_script_error": true,
+    "detail": "Old cleanup compared a CE checksum with the new metadata-only marker"
+  },
+  "fluidcore": {
+    "build_validator_fixtures_passed": 13,
+    "runtime_changed": false,
+    "source_build_validator_updated": true
+  },
+  "excluded": [
+    "New full version matrix",
+    "New Folia runtime run",
+    "Performance benchmarks",
+    "Real client interaction"
+  ],
+  "servers_created": 0
+}
