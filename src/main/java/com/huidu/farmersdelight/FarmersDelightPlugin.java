@@ -408,11 +408,7 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
         // ensureConfigDefaults has just guaranteed config.yml exists, so the debug switch is readable this
         // early and the load-phase detail lines below can be surfaced by their category like the rest.
         loadDebugFlags();
-        try {
-            com.huidu.farmersdelight.recipe.RecipePackFiles.installDefaults(this);
-        } catch (Exception failure) {
-            throw new IllegalStateException("Could not migrate recipes to the CraftEngine content pack", failure);
-        }
+        getLogger().info("Content packs are installed manually in plugins/CraftEngine/resources/; startup and reload do not extract bundled content.");
         com.huidu.farmersdelight.villager.VillagerFoodSetting.register();
         packSections = loadPhaseRegistrar.register();
         CommonTagResolver.prepareHostReloadAsync(this).join();
@@ -485,6 +481,8 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
 
         knifeDropHandler = new KnifeDropHandler(this);
         getServer().getPluginManager().registerEvents(knifeDropHandler, this);
+        getServer().getPluginManager().registerEvents(
+                new com.huidu.farmersdelight.listener.CakeSliceListener(this), this);
 
         cookingPotRecipeManager = new CookingPotRecipeManager(this);
 
@@ -1042,7 +1040,7 @@ public class FarmersDelightPlugin extends JavaPlugin implements Listener {
     public CompletableFuture<Void> reloadTargetAsync(ReloadTarget target) {
         CompletableFuture<Void> result = new CompletableFuture<>();
         long generation = configurationGeneration.get();
-        boolean mergeRecipeDefaults = getConfigBoolean(false, "recipes.merge-missing-bundled");
+        boolean mergeRecipeDefaults = false;
         List<Path> recipePackRoots = com.huidu.farmersdelight.recipe.RecipePackFiles.configurationRoots(this);
         boolean prepareRecipes = target == ReloadTarget.ALL || target == ReloadTarget.RECIPES;
         Path directory = getDataFolder().toPath();

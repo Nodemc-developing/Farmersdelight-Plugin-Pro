@@ -1292,80 +1292,11 @@ block:
         facing=west:
           appearance: west
   farmersdelight:basket:
-    template:
-    - farmersdelight:block_loot_template
-    settings:
-      hardness: 1.5
-      resistance: 1.5
-      push-reaction: block
-      propagate-skylight: true
-      is-randomly-ticking: false
-      tags:
-      - minecraft:mineable/axe
-      sounds:
-        break: minecraft:block.scaffolding.break
-        fall: minecraft:block.scaffolding.fall
-        hit: minecraft:block.scaffolding.hit
-        place: minecraft:block.scaffolding.place
-        step: minecraft:block.scaffolding.step
-    behavior:
-    - type: simple_storage_block
-      title: <!i><lang:block.farmersdelight.basket>
-      rows: 3
-      allow-input: true
-      allow-output: true
-    - type: farmersdelight:basket
-    states:
-      properties:
-        facing:
-          type: direction
-          default: up
-      appearances:
-        east:
-          auto_state: non_tintable_leaves
-          model:
-            path: ${__NAMESPACE__}:block/${__ID__}
-            x: 90
-            y: 90
-        north:
-          auto_state: non_tintable_leaves
-          model:
-            path: ${__NAMESPACE__}:block/${__ID__}
-            x: 90
-        south:
-          auto_state: non_tintable_leaves
-          model:
-            path: ${__NAMESPACE__}:block/${__ID__}
-            x: 90
-            y: 180
-        west:
-          auto_state: non_tintable_leaves
-          model:
-            path: ${__NAMESPACE__}:block/${__ID__}
-            x: 90
-            y: 270
-        up:
-          state: composter[level=7]
-          model:
-            path: ${__NAMESPACE__}:block/${__ID__}
-        down:
-          auto_state: non_tintable_leaves
-          model:
-            path: ${__NAMESPACE__}:block/${__ID__}
-            x: 180
-      variants:
-        facing=east:
-          appearance: east
-        facing=north:
-          appearance: north
-        facing=south:
-          appearance: south
-        facing=west:
-          appearance: west
-        facing=up:
-          appearance: up
-        facing=down:
-          appearance: down
+    template: farmersdelight:storage_basket
+    arguments:
+      basket_model: farmersdelight:block/basket
+      basket_sound: scaffolding
+      basket_outline_state: composter[level=7]
   farmersdelight:carrot_crate:
     template:
     - farmersdelight:block_crate_template
@@ -1707,6 +1638,8 @@ block:
           appearance: waterlogged=false
         waterlogged=true:
           appearance: waterlogged=true
+          settings:
+            fluid_state: water
   farmersdelight:canvas_rug:
     template:
     - farmersdelight:block_loot_template
@@ -2161,7 +2094,7 @@ recipes:
       B: minecraft:bamboo
       C: farmersdelight:canvas
     result:
-      id: farmersdelight:basket
+      id: farmersdelight:bamboo_basket
       count: 1
   farmersdelight:carrot_crate:
     type: shaped
@@ -2371,7 +2304,7 @@ recipes:
       S: farmersdelight:straw
     result:
       id: farmersdelight:tatami
-      count: 1
+      count: 2
   farmersdelight:tatami_2:
     type: shaped
     category: building
@@ -2384,7 +2317,7 @@ recipes:
       S: farmersdelight:straw
     result:
       id: farmersdelight:tatami
-      count: 1
+      count: 2
   farmersdelight:tatami_mat:
     type: shaped
     category: building

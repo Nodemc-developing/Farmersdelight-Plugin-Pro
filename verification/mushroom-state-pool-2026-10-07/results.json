@@ -1,0 +1,171 @@
+{
+  "version": "1.2.6",
+  "unit_tests": {
+    "26.9.2": {
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 926
+    }
+  },
+  "native_profiles": [
+    {
+      "environment": "paper-1.21.11",
+      "craft_engine": "26.9.2",
+      "status": "PASS",
+      "report": ".local/version-compatibility/reports/mushroom-pool-20261007T134811Z/paper-1.21.11-ce-26.9.2",
+      "checks": {
+        "initial_no_auto_pack": {
+          "detail": "No extracted pack, implicit skillet definition or JAR asset fallback",
+          "status": "PASS"
+        },
+        "reload_no_auto_pack": {
+          "detail": "No extracted pack, implicit skillet definition or JAR asset fallback",
+          "status": "PASS"
+        },
+        "manual_install": {
+          "detail": "Standalone content ZIP loads through CE reload",
+          "status": "PASS"
+        },
+        "pressure_pool": {
+          "detail": "Sugar cane 14/15; both pressure blocks and mature sapling visuals registered",
+          "status": "PASS"
+        },
+        "mushroom_worldgen": {
+          "detail": "Both brown/red colonies and both placed features decode on the native server",
+          "status": "PASS"
+        },
+        "manual_assets": {
+          "detail": "Installed skillet texture included",
+          "status": "PASS"
+        },
+        "campfire_support": {
+          "detail": "Shipped config creates tray on a lit campfire with omitted tray flag",
+          "status": "PASS"
+        },
+        "extinguish_preserves_input": {
+          "detail": "Physics update clears tray without losing the three ingredients",
+          "status": "PASS"
+        },
+        "reignite_coalesced": {
+          "detail": "Twenty notifications coalesce; tray returns and items remain",
+          "status": "PASS"
+        },
+        "shape_and_air": {
+          "detail": "Full magma block and air do not produce a tray",
+          "status": "PASS"
+        },
+        "chunk_load_refresh": {
+          "detail": "FD chunk-load handler repairs stale support without losing ingredients (existing loaded CE chunk)",
+          "status": "PASS"
+        },
+        "intentional_deletion": {
+          "detail": "CE and FD reload preserve deleted recipe/texture; JAR does not backfill assets",
+          "status": "PASS"
+        },
+        "wild_worldgen_native_log": {
+          "status": "PASS",
+          "detail": "No custom wild-block Unknown registry key errors in actual native load log"
+        },
+        "bundled_native_load_errors": {
+          "status": "PASS",
+          "detail": "No bundled item/block/placed-feature errors reported by the actual CE parser"
+        },
+        "no_premature_recipe_warning": {
+          "status": "PASS",
+          "detail": "No missing-section warning while CE packs have not yet loaded"
+        }
+      },
+      "original_plugins_restored": true,
+      "finished": "2026-10-07T13:48:56.385333+00:00",
+      "ce_config_restored": true
+    },
+    {
+      "environment": "paper-26.3",
+      "craft_engine": "26.10",
+      "status": "PASS",
+      "report": ".local/version-compatibility/reports/mushroom-pool-20261007T134932Z/paper-26.3-ce-26.10",
+      "checks": {
+        "initial_no_auto_pack": {
+          "status": "PASS",
+          "detail": "No extracted pack, implicit skillet definition or JAR asset fallback"
+        },
+        "reload_no_auto_pack": {
+          "status": "PASS",
+          "detail": "No extracted pack, implicit skillet definition or JAR asset fallback"
+        },
+        "manual_install": {
+          "status": "PASS",
+          "detail": "Standalone content ZIP loads through CE reload"
+        },
+        "pressure_pool": {
+          "status": "PASS",
+          "detail": "Sugar cane 14/15; both pressure blocks and mature sapling visuals registered"
+        },
+        "mushroom_worldgen": {
+          "status": "PASS",
+          "detail": "Both brown/red colonies and both placed features decode on the native server"
+        },
+        "manual_assets": {
+          "status": "PASS",
+          "detail": "Installed skillet texture included"
+        },
+        "campfire_support": {
+          "status": "PASS",
+          "detail": "Shipped config creates tray on a lit campfire with omitted tray flag"
+        },
+        "extinguish_preserves_input": {
+          "status": "PASS",
+          "detail": "Physics update clears tray without losing the three ingredients"
+        },
+        "reignite_coalesced": {
+          "status": "PASS",
+          "detail": "Twenty notifications coalesce; tray returns and items remain"
+        },
+        "shape_and_air": {
+          "status": "PASS",
+          "detail": "Full magma block and air do not produce a tray"
+        },
+        "chunk_load_refresh": {
+          "status": "PASS",
+          "detail": "FD chunk-load handler repairs stale support without losing ingredients (existing loaded CE chunk)"
+        },
+        "intentional_deletion": {
+          "status": "PASS",
+          "detail": "CE and FD reload preserve deleted recipe/texture; JAR does not backfill assets"
+        },
+        "wild_worldgen_native_log": {
+          "status": "PASS",
+          "detail": "No custom wild-block Unknown registry key errors in actual native load log"
+        },
+        "bundled_native_load_errors": {
+          "status": "PASS",
+          "detail": "No bundled item/block/placed-feature errors reported by the actual CE parser"
+        },
+        "no_premature_recipe_warning": {
+          "status": "PASS",
+          "detail": "No missing-section warning while CE packs have not yet loaded"
+        }
+      },
+      "original_plugins_restored": true,
+      "finished": "2026-10-07T13:50:07.807782+00:00",
+      "ce_config_restored": true
+    }
+  ],
+  "fixture": {
+    "additional_sugar_cane_blocks": 2,
+    "sugar_cane_visuals_in_use_after_manual_install": 14,
+    "sugar_cane_visual_capacity": 15,
+    "mature_colony_visual_group": "sapling",
+    "source": "FdVersionVerification.java",
+    "deployment": "Dedicated registered acceptance profiles only; never install the probe on a daily server."
+  },
+  "limitations": [
+    "Customer Leaf build and full customer content-pack composition were not reproduced.",
+    "No real client visual/selection-outline validation was performed.",
+    "Chunk-load regression directly invokes the FD listener on an already loaded CE chunk, not a disk unload/reload cycle.",
+    "Tray regression exercises the skillet; no separate cooking-pot native placement case was added.",
+    "No performance benchmark was run.",
+    "26.10 was tested on the native server in this revision; the 926-unit-test rerun used 26.9.2."
+  ]
+}

@@ -1,0 +1,196 @@
+{
+  "version": "1.2.5",
+  "unit_tests": {
+    "26.9.2": {
+      "skipped": 0,
+      "errors": 0,
+      "failures": 0,
+      "tests": 926
+    },
+    "26.10": {
+      "skipped": 0,
+      "errors": 0,
+      "tests": 926,
+      "failures": 0
+    }
+  },
+  "native_profiles": [
+    {
+      "environment": "paper-26.3",
+      "craft_engine": "26.9.2",
+      "status": "PASS",
+      "checks": {
+        "initial_no_auto_pack": {
+          "status": "PASS",
+          "detail": "No extracted pack, implicit skillet definition or JAR asset fallback"
+        },
+        "reload_no_auto_pack": {
+          "status": "PASS",
+          "detail": "No extracted pack, implicit skillet definition or JAR asset fallback"
+        },
+        "manual_install": {
+          "status": "PASS",
+          "detail": "Standalone content ZIP loads through CE reload"
+        },
+        "manual_assets": {
+          "status": "PASS",
+          "detail": "Installed skillet texture included"
+        },
+        "campfire_support": {
+          "status": "PASS",
+          "detail": "Shipped config creates tray on a lit campfire with omitted tray flag"
+        },
+        "extinguish_preserves_input": {
+          "status": "PASS",
+          "detail": "Physics update clears tray without losing the three ingredients"
+        },
+        "reignite_coalesced": {
+          "status": "PASS",
+          "detail": "Twenty notifications coalesce; tray returns and items remain"
+        },
+        "shape_and_air": {
+          "status": "PASS",
+          "detail": "Full magma block and air do not produce a tray"
+        },
+        "chunk_load_refresh": {
+          "status": "PASS",
+          "detail": "FD chunk-load handler repairs stale support without losing ingredients (existing loaded CE chunk)"
+        },
+        "intentional_deletion": {
+          "status": "PASS",
+          "detail": "CE and FD reload preserve deleted recipe/texture; JAR does not backfill assets"
+        },
+        "wild_worldgen_native_log": {
+          "status": "PASS",
+          "detail": "No custom wild-block Unknown registry key errors in actual native load log"
+        },
+        "bundled_native_load_errors": {
+          "status": "PASS",
+          "detail": "No bundled item/block/placed-feature errors reported by the actual CE parser"
+        }
+      },
+      "restored": true,
+      "raw_report": ".local/version-compatibility/reports/manual-pack-20261007T122255Z"
+    },
+    {
+      "environment": "paper-26.3",
+      "craft_engine": "26.10",
+      "status": "PASS",
+      "checks": {
+        "initial_no_auto_pack": {
+          "status": "PASS",
+          "detail": "No extracted pack, implicit skillet definition or JAR asset fallback"
+        },
+        "reload_no_auto_pack": {
+          "status": "PASS",
+          "detail": "No extracted pack, implicit skillet definition or JAR asset fallback"
+        },
+        "manual_install": {
+          "status": "PASS",
+          "detail": "Standalone content ZIP loads through CE reload"
+        },
+        "manual_assets": {
+          "status": "PASS",
+          "detail": "Installed skillet texture included"
+        },
+        "campfire_support": {
+          "status": "PASS",
+          "detail": "Shipped config creates tray on a lit campfire with omitted tray flag"
+        },
+        "extinguish_preserves_input": {
+          "status": "PASS",
+          "detail": "Physics update clears tray without losing the three ingredients"
+        },
+        "reignite_coalesced": {
+          "status": "PASS",
+          "detail": "Twenty notifications coalesce; tray returns and items remain"
+        },
+        "shape_and_air": {
+          "status": "PASS",
+          "detail": "Full magma block and air do not produce a tray"
+        },
+        "chunk_load_refresh": {
+          "status": "PASS",
+          "detail": "FD chunk-load handler repairs stale support without losing ingredients (existing loaded CE chunk)"
+        },
+        "intentional_deletion": {
+          "status": "PASS",
+          "detail": "CE and FD reload preserve deleted recipe/texture; JAR does not backfill assets"
+        },
+        "wild_worldgen_native_log": {
+          "status": "PASS",
+          "detail": "No custom wild-block Unknown registry key errors in actual native load log"
+        },
+        "bundled_native_load_errors": {
+          "status": "PASS",
+          "detail": "No bundled item/block/placed-feature errors reported by the actual CE parser"
+        }
+      },
+      "restored": true,
+      "raw_report": ".local/version-compatibility/reports/manual-pack-20261007T122528Z"
+    },
+    {
+      "environment": "paper-1.21.8",
+      "craft_engine": "26.9.2",
+      "status": "PASS",
+      "checks": {
+        "initial_no_auto_pack": {
+          "detail": "No extracted pack, implicit skillet definition or JAR asset fallback",
+          "status": "PASS"
+        },
+        "reload_no_auto_pack": {
+          "detail": "No extracted pack, implicit skillet definition or JAR asset fallback",
+          "status": "PASS"
+        },
+        "manual_install": {
+          "detail": "Standalone content ZIP loads through CE reload",
+          "status": "PASS"
+        },
+        "manual_assets": {
+          "detail": "Installed skillet texture included",
+          "status": "PASS"
+        },
+        "campfire_support": {
+          "detail": "Shipped config creates tray on a lit campfire with omitted tray flag",
+          "status": "PASS"
+        },
+        "extinguish_preserves_input": {
+          "detail": "Physics update clears tray without losing the three ingredients",
+          "status": "PASS"
+        },
+        "reignite_coalesced": {
+          "detail": "Twenty notifications coalesce; tray returns and items remain",
+          "status": "PASS"
+        },
+        "shape_and_air": {
+          "detail": "Full magma block and air do not produce a tray",
+          "status": "PASS"
+        },
+        "chunk_load_refresh": {
+          "detail": "FD chunk-load handler repairs stale support without losing ingredients (existing loaded CE chunk)",
+          "status": "PASS"
+        },
+        "intentional_deletion": {
+          "detail": "CE and FD reload preserve deleted recipe/texture; JAR does not backfill assets",
+          "status": "PASS"
+        },
+        "wild_worldgen_native_log": {
+          "status": "PASS",
+          "detail": "No custom wild-block Unknown registry key errors in actual native load log"
+        },
+        "bundled_native_load_errors": {
+          "status": "PASS",
+          "detail": "No bundled item/block/placed-feature errors reported by the actual CE parser"
+        }
+      },
+      "restored": true,
+      "raw_report": ".local/version-compatibility/reports/manual-pack-20261007T122626Z"
+    }
+  ],
+  "limits": [
+    "No real client",
+    "Chunk-load check invokes FD handler on existing CE chunk, not full disk unload/reload",
+    "No performance benchmark or fresh Folia/full-version-matrix run"
+  ],
+  "published": false
+}

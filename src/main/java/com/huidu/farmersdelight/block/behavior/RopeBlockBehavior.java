@@ -8,8 +8,13 @@ import com.huidu.farmersdelight.util.ItemUtils;
 import com.huidu.farmersdelight.util.compat.CraftEngineAdapter;
 import com.huidu.farmersdelight.util.compat.ProtectionCompat;
 import net.momirealms.craftengine.bukkit.api.CraftEngineBlocks;
+import net.momirealms.craftengine.bukkit.api.event.CustomBlockPlaceEvent;
+import net.momirealms.craftengine.bukkit.block.behavior.BukkitBlockBehavior;
+import net.momirealms.craftengine.bukkit.util.BlockStateUtils;
+import net.momirealms.craftengine.bukkit.util.DirectionUtils;
 import net.momirealms.craftengine.core.block.BlockDefinition;
 import net.momirealms.craftengine.core.block.ImmutableBlockState;
+import net.momirealms.craftengine.core.block.UpdateFlags;
 import net.momirealms.craftengine.core.block.behavior.BlockBehaviorFactory;
 import net.momirealms.craftengine.core.plugin.config.ConfigSection;
 import net.momirealms.craftengine.core.block.property.Property;
@@ -30,6 +35,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockSupport;
 import org.bukkit.block.Bell;
 import org.bukkit.block.data.Directional;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -39,12 +45,15 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.Map;
 
-public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
+public class RopeBlockBehavior extends BukkitBlockBehavior {
 
     @Override
     public boolean isPathFindable(Object thisBlock, Object[] args) {
-        return false;
+        return true;
     }
+
+    @Override public void fallOn(Object thisBlock, Object[] args) { }
+    @Override public void updateEntityMovementAfterFallOn(Object thisBlock, Object[] args) { }
 
     private static final String PROP_NORTH = "north";
     private static final String PROP_SOUTH = "south";
@@ -116,10 +125,6 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
         }
     }
 
-    private final Property<Boolean> northProperty;
-    private final Property<Boolean> southProperty;
-    private final Property<Boolean> eastProperty;
-    private final Property<Boolean> westProperty;
     private final PlacementMode placementMode;
     private final ConnectionMode connectionMode;
     private final ConfiguredBlockSet connectorBlocks;
@@ -127,31 +132,23 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
     private final ConfiguredBlockSet exceptionBlocks;
     private final int bellSearchRange;
     private final Key reelItem;
-    private final Property<Boolean> bellProperty;
+    private final String bellPropertyName;
 
     private RopeBlockBehavior(FarmersDelightPlugin plugin,
                               BlockDefinition block,
-                              Property<Boolean> northProperty,
-                              Property<Boolean> southProperty,
-                              Property<Boolean> eastProperty,
-                              Property<Boolean> westProperty,
                               PlacementMode placementMode,
                               ConnectionMode connectionMode,
                               ConfiguredBlockSet connectorBlocks,
-                              ConfiguredBlockSet exceptionBlocks, int bellSearchRange, Key reelItem, Property<Boolean> bellProperty) {
+                              ConfiguredBlockSet exceptionBlocks, int bellSearchRange, Key reelItem, String bellPropertyName) {
         super(block);
         this.plugin = plugin;
-        this.northProperty = northProperty;
-        this.southProperty = southProperty;
-        this.eastProperty = eastProperty;
-        this.westProperty = westProperty;
         this.placementMode = placementMode;
         this.connectionMode = connectionMode;
         this.connectorBlocks = connectorBlocks;
         this.exceptionBlocks = exceptionBlocks;
         this.bellSearchRange = bellSearchRange;
         this.reelItem = reelItem;
-        this.bellProperty = bellProperty;
+        this.bellPropertyName = bellPropertyName;
     }
 
     // The four connection properties stay optional: a rope that declares none of them is a plain single-model
@@ -170,50 +167,37 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
         return new RopeBlockBehavior(
                 plugin,
                 block,
-                BlockBehaviorFactory.getOptionalProperty(block, PROP_NORTH, Boolean.class),
-                BlockBehaviorFactory.getOptionalProperty(block, PROP_SOUTH, Boolean.class),
-                BlockBehaviorFactory.getOptionalProperty(block, PROP_EAST, Boolean.class),
-                BlockBehaviorFactory.getOptionalProperty(block, PROP_WEST, Boolean.class),
                 PlacementMode.parse(BehaviorArgParser.getString(arguments, "placement-mode", "vanilla")),
                 ConnectionMode.parse(BehaviorArgParser.getString(arguments, "connection-mode", "restricted")),
                 connectorRaw == null ? ConfiguredBlockSet.EMPTY : ConfiguredBlockSet.parse(connectorRaw),
                 exceptionRaw == null ? null : ConfiguredBlockSet.parse(exceptionRaw),
                 bellRange,
                 Key.of(BehaviorArgParser.getString(arguments, "reel-item", block.id().toString())),
-                BlockBehaviorFactory.getOptionalProperty(block, BehaviorArgParser.getString(arguments, "tied-to-bell-property", "tied_to_bell"), Boolean.class)
+                BehaviorArgParser.getString(arguments, "tied-to-bell-property", "tied_to_bell")
         );
     };
 
-    // Connections are decided once, here, and never re-derived afterwards. Clicking a horizontal face lets the
-    // rope tie to anything that offers a full solid face on that side; clicking a vertical face restricts it to
-    // ropes, panes, bars and walls. A later neighbour update always falls back to the restricted test, so a tie
-    // to a solid block only ever exists as long as nothing on that side changes.
     @Override
     public ImmutableBlockState updateStateForPlacement(BlockPlaceContext context, ImmutableBlockState state) {
         BlockPos pos = context.getClickedPos();
         World world = (World) context.getLevel().platformWorld();
+        if (!RopeWorldAccess.available(world, pos)) return state;
         boolean horizontalPlacement = context.getClickedFace().axis().isHorizontal();
 
         ImmutableBlockState result = state;
-        if (northProperty != null) {
-            result = result.with(northProperty, connectsOnPlacement(world, pos, BlockFace.NORTH, horizontalPlacement));
-        }
-        if (southProperty != null) {
-            result = result.with(southProperty, connectsOnPlacement(world, pos, BlockFace.SOUTH, horizontalPlacement));
-        }
-        if (eastProperty != null) {
-            result = result.with(eastProperty, connectsOnPlacement(world, pos, BlockFace.EAST, horizontalPlacement));
-        }
-        if (westProperty != null) {
-            result = result.with(westProperty, connectsOnPlacement(world, pos, BlockFace.WEST, horizontalPlacement));
+        for (BlockFace face : HORIZONTAL_FACES) {
+            Property<Boolean> property = connectionProperty(state, face);
+            if (property != null) result = result.with(property, connectsOnPlacement(world, pos, face, horizontalPlacement));
         }
 
+        Property<Boolean> waterlogged = RopeStateProperties.property(state, "waterlogged", Boolean.class);
+        if (waterlogged != null) result = result.with(waterlogged, context.isWaterSource());
         return updateBellConnection(result, world, pos);
     }
 
     @Override
     public void placeMultiState(Object thisBlock, Object[] args) {
-        
+
     }
 
     // A rope re-derives its connection towards whatever changed next to it. These are the NMS hooks the
@@ -223,7 +207,7 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
     // and the refresh queue collapses a double hit on the same position.
     @Override
     public void neighborChanged(Object thisBlock, Object[] args) {
-        if (args.length < 3) {
+        if (args == null || args.length < 3) {
             return;
         }
         RopeBlockListener.queueNeighborRefresh(
@@ -232,12 +216,25 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
 
     @Override
     public Object updateShape(Object thisBlock, Object[] args) {
-        if (args.length < 7) {
-            return args[0];
+        if (args == null || args.length <= Math.max(updateShape$level, updateShape$blockPos)) return args == null || args.length == 0 ? null : args[0];
+        World world = CraftEngineAdapter.toWorld(args[updateShape$level]);
+        BlockPos pos = CraftEngineAdapter.toBlockPos(args[updateShape$blockPos]);
+        if (!RopeWorldAccess.available(world, pos)) return args[0];
+        ImmutableBlockState state = BlockStateUtils.getNullableCustomBlockState(args[0]);
+        if (state == null || state.owner().value() != block()) return args[0];
+        net.momirealms.craftengine.core.util.Direction direction = DirectionUtils.fromNMSDirection(args[updateShape$direction]);
+        ImmutableBlockState updated = state;
+        if (direction.axis().isHorizontal()) {
+            BlockFace face = BlockFace.valueOf(direction.name());
+            Block neighbor = RopeWorldAccess.block(world, new BlockPos(pos.x() + face.getModX(), pos.y(), pos.z() + face.getModZ()));
+            Property<Boolean> property = connectionProperty(state, face);
+            if (neighbor != null && property != null) updated = updated.with(property, connectsToNeighbor(neighbor, face.getOppositeFace()));
+        } else if (direction == net.momirealms.craftengine.core.util.Direction.UP) {
+            updated = updateBellConnection(state, world, pos);
         }
         RopeBlockListener.queueNeighborRefresh(
-                CraftEngineAdapter.toWorld(args[1]), CraftEngineAdapter.toBlockPos(args[3]));
-        return args[0];
+                world, pos);
+        return updated == state ? args[0] : updated.customBlockState().minecraftState();
     }
 
 
@@ -247,6 +244,7 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
 
         Player bukkitPlayer = ItemUtils.getBukkitPlayer(context.getPlayer());
         if (bukkitPlayer == null) return InteractionResult.PASS;
+        if (!playerOwned(bukkitPlayer)) return InteractionResult.FAIL;
 
         ItemStack hand = ItemUtils.getItemInHand(bukkitPlayer, context.getHand());
         // Empty hand is the bell-ringing case, which lives in useWithoutItem. CraftEngine only calls that method
@@ -260,6 +258,7 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
 
         BlockPos pos = context.getClickedPos();
         World world = (World) context.getLevel().platformWorld();
+        if (!RopeWorldAccess.available(world, pos)) return InteractionResult.FAIL;
 
         // Reel straight down from the clicked rope. CraftEngine skips block behaviors for
         // sneaking players holding items, so that input is handled by item placement instead.
@@ -268,8 +267,10 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
         int cz = pos.z();
 
         while (cy >= world.getMinHeight()) {
-            Block target = world.getBlockAt(cx, cy, cz);
-            if (CustomBlockUtils.hasBehavior(target, RopeBlockBehavior.class)) {
+            BlockPos bp = new BlockPos(cx, cy, cz);
+            Block target = RopeWorldAccess.block(world, bp);
+            if (target == null) return InteractionResult.FAIL;
+            if (sameRope(state, CustomBlockUtils.getStateIfResident(target))) {
                 cy--;
                 continue;
             }
@@ -283,18 +284,33 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
             BlockDefinition ropeBlock = CraftEngineBlocks.byId(state.owner().value().id());
             if (ropeBlock == null) return InteractionResult.FAIL;
 
-            BlockPos bp = new BlockPos(cx, cy, cz);
             ImmutableBlockState placementState = computeConnectionState(ropeBlock.defaultState(), world, bp);
+            Property<Boolean> wet = RopeStateProperties.property(placementState, "waterlogged", Boolean.class);
+            if (wet != null) placementState = placementState.with(wet, target.getType() == Material.WATER);
 
             // This path cancels native interaction and places directly through CraftEngineBlocks.place.
             // Check protection here because the native placement permission check will not run.
-            if (!ProtectionCompat.canPlace(bukkitPlayer, target, ProtectionCompat.Feature.ROPE)) {
-                return InteractionResult.FAIL;
-            }
-
             Location placeLoc = new Location(world, cx + 0.5, cy, cz + 0.5);
-            // The place call already emits the block's configured place sound, so none is played here.
-            if (!CraftEngineBlocks.place(placeLoc, placementState, true)) return InteractionResult.FAIL;
+            BlockData before = target.getBlockData().clone();
+            ItemStack beforeHand = hand.clone();
+            GameMode beforeMode = bukkitPlayer.getGameMode();
+            ImmutableBlockState toPlace = placementState;
+            boolean placed = RopeOperation.commitWithCompensation(
+                    () -> allowReelPlacement(bukkitPlayer, target, toPlace, context.getHand()),
+                    () -> RopeWorldAccess.available(world, bp) && target.getBlockData().equals(before)
+                            && playerOwned(bukkitPlayer) && bukkitPlayer.getGameMode() == beforeMode
+                            && ProtectionCompat.canPlace(bukkitPlayer, target, ProtectionCompat.Feature.ROPE)
+                            && ItemUtils.getItemInHand(bukkitPlayer, context.getHand()).equals(beforeHand),
+                    () -> CraftEngineBlocks.place(placeLoc, toPlace, true),
+                    () -> consumeReelItem(bukkitPlayer, context.getHand(), beforeHand),
+                    () -> {
+                        if (!RopeWorldAccess.available(world, bp) || !sameRope(toPlace, CustomBlockUtils.getStateIfResident(target))) return false;
+                        if (!CraftEngineBlocks.remove(target)) return false;
+                        target.setBlockData(before, false);
+                        RopeBlockListener.syncRopeIndex(world, bp);
+                        return true;
+                    });
+            if (!placed) return InteractionResult.FAIL;
 
             ItemUtils.swingHand(bukkitPlayer, context.getHand());
 
@@ -304,14 +320,6 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
 
             if (plugin != null) {
                 plugin.scheduler().runAt(placeLoc, () -> refreshAdjacentRopes(world, bp));
-            }
-
-            if (bukkitPlayer.getGameMode() != GameMode.CREATIVE) {
-                hand.setAmount(hand.getAmount() - 1);
-                if (hand.getAmount() <= 0) {
-                    bukkitPlayer.getInventory().setItem(context.getHand() == InteractionHand.OFF_HAND
-                            ? EquipmentSlot.OFF_HAND : EquipmentSlot.HAND, null);
-                }
             }
 
             return InteractionResult.SUCCESS_AND_CANCEL;
@@ -326,14 +334,17 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
             return InteractionResult.PASS;
         }
         Player bukkitPlayer = ItemUtils.getBukkitPlayer(context.getPlayer());
-        // Non-sneaking empty hand rings a bell above (as in vanilla RopeBlock); sneaking empty hand is the reel
-        // path handled by RopeBlockListener, so leave it alone here.
-        if (bukkitPlayer == null || bukkitPlayer.isSneaking()) {
+        if (bukkitPlayer == null || !playerOwned(bukkitPlayer)) {
             return InteractionResult.PASS;
         }
 
         World world = (World) context.getLevel().platformWorld();
         BlockPos pos = context.getClickedPos();
+        if (bukkitPlayer.isSneaking()) {
+            Block clicked = RopeWorldAccess.block(world, pos);
+            return context.getHand() == InteractionHand.MAIN_HAND && clicked != null && RopeBlockListener.retractRope(bukkitPlayer, clicked, state)
+                    ? InteractionResult.SUCCESS_AND_CANCEL : InteractionResult.PASS;
+        }
 
         // Mirror vanilla RopeBlock.useWithoutItem: walk up through a contiguous rope column (max 24 blocks) and
         // ring the first bell found. Any gap, or any block that is neither a rope nor a bell, stops the search.
@@ -341,7 +352,8 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
         int z = pos.z();
         int maxDistance = bellSearchRange;
         for (int i = 1, y = pos.y() + 1; i <= maxDistance && y < world.getMaxHeight(); i++, y++) {
-            Block above = world.getBlockAt(x, y, z);
+            Block above = RopeWorldAccess.block(world, new BlockPos(x, y, z));
+            if (above == null) return InteractionResult.PASS;
             if (above.getType() == Material.BELL) {
                 // The bell can sit up to the configured distance away, so it needs its own use check: the click
                 // itself is covered by the protection plugin cancelling the interact event on the rope, but the
@@ -355,7 +367,7 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
                 bukkitPlayer.swingMainHand();
                 return InteractionResult.SUCCESS;
             }
-            if (!CustomBlockUtils.hasBehavior(above, RopeBlockBehavior.class)) {
+            if (!sameRope(state, CustomBlockUtils.getStateIfResident(above))) {
                 return InteractionResult.PASS;
             }
         }
@@ -364,6 +376,7 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
 
     private void ringBell(Block bell, Player player) {
         Runnable ring = () -> {
+            if (!RopeWorldAccess.available(bell.getWorld(), new BlockPos(bell.getX(), bell.getY(), bell.getZ())) || !playerOwned(player)) return;
             if (bell.getType() != Material.BELL || !(bell.getState() instanceof Bell bellState)) {
                 return;
             }
@@ -395,6 +408,31 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
             return null;
         }
         return ItemUtils.createItem(state.owner().value().id());
+    }
+
+    public static boolean sameRope(ImmutableBlockState source, ImmutableBlockState candidate) {
+        return source != null && candidate != null && !candidate.isEmpty()
+                && source.owner().value() == candidate.owner().value()
+                && CustomBlockUtils.hasBehavior(candidate, RopeBlockBehavior.class);
+    }
+
+    public static boolean playerOwned(Player player) {
+        return Bukkit.isOwnedByCurrentRegion(player);
+    }
+
+    private boolean allowReelPlacement(Player player, Block target, ImmutableBlockState state, InteractionHand hand) {
+        if (!ProtectionCompat.canPlace(player, target, ProtectionCompat.Feature.ROPE)) return false;
+        CustomBlockPlaceEvent event = new CustomBlockPlaceEvent(player, target.getLocation(), state, target, hand);
+        Bukkit.getPluginManager().callEvent(event);
+        return !event.isCancelled();
+    }
+
+    private static boolean consumeReelItem(Player player, InteractionHand hand, ItemStack before) {
+        if (player.getGameMode() == GameMode.CREATIVE) return true;
+        if (!playerOwned(player)) return false;
+        ItemStack result = before.clone(); result.setAmount(before.getAmount() - 1);
+        int slot = hand == InteractionHand.OFF_HAND ? 40 : player.getInventory().getHeldItemSlot();
+        return RopeInventoryCommit.write(player.getInventory(), slot, before, result.getAmount() == 0 ? null : result);
     }
 
     // Ropes remain connected to ropes, bars, panes and walls. Identify custom ropes by behavior
@@ -431,11 +469,8 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
     }
 
     private boolean connectsOnPlacement(World world, BlockPos pos, BlockFace direction, boolean horizontalPlacement) {
-        Block neighbor = world.getBlockAt(
-                pos.x() + direction.getModX(),
-                pos.y() + direction.getModY(),
-                pos.z() + direction.getModZ()
-        );
+        Block neighbor = RopeWorldAccess.block(world, new BlockPos(pos.x() + direction.getModX(), pos.y(), pos.z() + direction.getModZ()));
+        if (neighbor == null) return false;
         return switch (placementMode) {
             case RESTRICTED -> tieToRopeAndWalls(neighbor);
             case SOLID_FACE -> tieToAnythingValid(neighbor, direction.getOppositeFace());
@@ -456,7 +491,7 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
         if (name == null) {
             return null;
         }
-        return BlockBehaviorFactory.getOptionalProperty(state.owner().value(), name, Boolean.class);
+        return RopeStateProperties.property(state, name, Boolean.class);
     }
 
     // Programmatic placement, including downward reeling and harvested tomato supports,
@@ -471,30 +506,25 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
 
     private ImmutableBlockState computeConnectionStateInternal(ImmutableBlockState state, World world, BlockPos pos) {
         ImmutableBlockState result = state;
+        if (!RopeWorldAccess.available(world, pos)) return state;
         for (BlockFace face : HORIZONTAL_FACES) {
             Property<Boolean> property = connectionProperty(state, face);
             if (property == null) {
                 continue;
             }
-            Block neighbor = world.getBlockAt(
-                    pos.x() + face.getModX(),
-                    pos.y() + face.getModY(),
-                    pos.z() + face.getModZ()
-            );
+            Block neighbor = RopeWorldAccess.block(world, new BlockPos(pos.x() + face.getModX(), pos.y(), pos.z() + face.getModZ()));
+            if (neighbor == null) continue;
             result = result.with(property, connectsToNeighbor(neighbor, face.getOppositeFace()));
         }
         return updateBellConnection(result, world, pos);
     }
 
     private ImmutableBlockState updateBellConnection(ImmutableBlockState state, World world, BlockPos pos) {
+        Property<Boolean> bellProperty = RopeStateProperties.property(state, bellPropertyName, Boolean.class);
         if (bellProperty == null) return state;
-        boolean tied = false;
-        for (int distance = 1; distance <= bellSearchRange && pos.y() + distance < world.getMaxHeight(); ++distance) {
-            Block next = world.getBlockAt(pos.x(), pos.y() + distance, pos.z());
-            if (next.getType() == Material.BELL) { tied = true; break; }
-            if (!CustomBlockUtils.hasBehavior(next, RopeBlockBehavior.class)) break;
-        }
-        return state.with(bellProperty, tied);
+        if (pos.y() + 1 >= world.getMaxHeight()) return state.with(bellProperty, false);
+        Block next = RopeWorldAccess.block(world, new BlockPos(pos.x(), pos.y() + 1, pos.z()));
+        return next == null ? state : state.with(bellProperty, next.getType() == Material.BELL);
     }
 
     @Override public boolean canUseOnBlockIfSecondaryUseActive(UseOnContext context, ImmutableBlockState state) { return true; }
@@ -510,18 +540,23 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
     // made at placement time and is never restored by a neighbour update, while the connections a rope holds on
     // its other three sides are none of this update's business.
     public static void refreshAdjacentRopes(World world, BlockPos pos) {
+        if (!RopeWorldAccess.available(world, pos)) return;
         // Raw CraftEngine writes fire no place or break event, so this is also where the rope index learns
         // whether pos still holds a rope. Every programmatic rope write is followed by a refresh from here.
         RopeBlockListener.syncRopeIndex(world, pos);
 
         Block changed = world.getBlockAt(pos.x(), pos.y(), pos.z());
+        refreshBellState(changed);
+        RopeFenceBlockBehavior.refresh(changed);
+        RopeFenceGateBlockBehavior.refresh(changed);
+        Block below = RopeWorldAccess.block(world, new BlockPos(pos.x(), pos.y() - 1, pos.z()));
+        if (below != null) refreshBellState(below);
 
         for (BlockFace face : HORIZONTAL_FACES) {
-            Block neighbor = world.getBlockAt(
-                    pos.x() + face.getModX(),
-                    pos.y() + face.getModY(),
-                    pos.z() + face.getModZ()
-            );
+            Block neighbor = RopeWorldAccess.block(world, new BlockPos(pos.x() + face.getModX(), pos.y(), pos.z() + face.getModZ()));
+            if (neighbor == null) continue;
+            RopeFenceBlockBehavior.refresh(neighbor);
+            RopeFenceGateBlockBehavior.refresh(neighbor);
             // Neighbours on a chunk border are read and rewritten only while their chunk is resident: the CE
             // lookup would otherwise load it and the place below would cross into another region.
             ImmutableBlockState state = CustomBlockUtils.getStateIfResident(neighbor);
@@ -547,7 +582,17 @@ public class RopeBlockBehavior extends FarmersDelightBlockBehavior {
                 continue;
             }
 
-            CraftEngineBlocks.place(neighbor.getLocation(), updated, false);
+            CraftEngineBlocks.place(neighbor.getLocation(), updated, UpdateFlags.UPDATE_CLIENTS, false);
         }
+    }
+
+    public static void refreshBellState(Block block) {
+        BlockPos pos = new BlockPos(block.getX(), block.getY(), block.getZ());
+        if (!RopeWorldAccess.available(block.getWorld(), pos)) return;
+        ImmutableBlockState state = CustomBlockUtils.getStateIfResident(block);
+        RopeBlockBehavior behavior = CustomBlockUtils.getBehavior(state, RopeBlockBehavior.class);
+        if (behavior == null) return;
+        ImmutableBlockState updated = behavior.updateBellConnection(state, block.getWorld(), pos);
+        if (updated != state) CraftEngineBlocks.place(block.getLocation(), updated, UpdateFlags.UPDATE_CLIENTS, false);
     }
 }

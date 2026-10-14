@@ -3,11 +3,8 @@ package com.huidu.farmersdelight.pack.compat;
 import net.momirealms.craftengine.core.pack.CachedConfigSection;
 import net.momirealms.craftengine.core.pack.Pack;
 import net.momirealms.craftengine.core.plugin.config.ConfigSection;
-import net.momirealms.sparrow.yaml.SparrowYaml;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,42 +12,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.zip.ZipFile;
 
-/** Current defaults replace verified historical defaults only in private loading inputs. */
+/** Explicitly registered defaults replace verified historical defaults in private loading inputs. */
 final class BundledPackOverlay {
     private final Map<Path, Map<String, Object>> documents = new LinkedHashMap<>();
-    private final List<ManagedResourceLayer.Source> assets = new ArrayList<>();
 
     BundledPackOverlay(Map<Path, Map<String, Object>> documents) {
         documents.forEach((path, values) -> this.documents.put(path.toAbsolutePath().normalize(), ConfigPriorityFilter.copyMap(values)));
     }
-
-    BundledPackOverlay(JavaPlugin plugin) throws Exception {
-        Path jar = Path.of(plugin.getClass().getProtectionDomain().getCodeSource().getLocation().toURI());
-        Path resources = plugin.getDataFolder().toPath().getParent().resolve("CraftEngine/resources").toAbsolutePath().normalize();
-        Set<String> assetPrefixes = new java.util.TreeSet<>();
-        if (!java.nio.file.Files.isRegularFile(jar)) return;
-        try (ZipFile zip = new ZipFile(jar.toFile())) {
-            var entries = zip.entries();
-            while (entries.hasMoreElements()) {
-                var entry = entries.nextElement(); String name = entry.getName();
-                if (entry.isDirectory() || !name.startsWith("craftengine/")) continue;
-                int asset = name.indexOf("/resourcepack/");
-                if (asset >= 0) { assetPrefixes.add(name.substring(0, asset + "/resourcepack/".length())); continue; }
-                if (!name.contains("/configuration/") || !(name.endsWith(".yml") || name.endsWith(".yaml") || name.endsWith(".json"))) continue;
-                Path target = resources.resolve(name.substring("craftengine/".length())).normalize();
-                if (!target.startsWith(resources)) throw new IOException("Unsafe bundled configuration path " + name);
-                try (var input = zip.getInputStream(entry)) {
-                    documents.put(target, ConfigPriorityFilter.copyMap(SparrowYaml.create()
-                            .load(new String(input.readAllBytes(), StandardCharsets.UTF_8)).getValues()));
-                }
-            }
-        }
-        assetPrefixes.forEach(prefix -> assets.add(new ManagedResourceLayer.Source(jar, true, prefix, true)));
-    }
-
-    List<ManagedResourceLayer.Source> assets() { return List.copyOf(assets); }
 
     Map<String, Object> document(Path file, BundledContentManifest ownership) throws IOException {
         Map<String, Object> current = ExternalContentCoordinator.registeredDefault(file);

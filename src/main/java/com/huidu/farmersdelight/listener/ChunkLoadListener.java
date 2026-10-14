@@ -123,6 +123,10 @@ public class ChunkLoadListener implements Listener {
                     SkilletBlockEntityController::loadPendingDataIfReady);
             blockEntity.controller.let(StoveBlockEntityController.class,
                     StoveBlockEntityController::loadPendingDataIfReady);
+            if (plugin.getTrayManager() != null) {
+                plugin.getTrayManager().requestRefresh(new org.bukkit.Location(world,
+                        blockEntity.pos.x(), blockEntity.pos.y(), blockEntity.pos.z()));
+            }
         }
     }
 

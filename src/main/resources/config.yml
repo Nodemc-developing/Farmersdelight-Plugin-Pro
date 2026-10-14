@@ -10,8 +10,9 @@ config-version: 4
 language: ''
 
 craftengine-resources:
+  # Install the separate content-pack ZIP manually into plugins/CraftEngine/resources/.
+  # 内容包请从独立 ZIP 手动安装到 plugins/CraftEngine/resources/；不会自动释放或补齐。
   unified-categories: true
-  auto-completion: true
 
 datapacks:
   tags-enabled: true
@@ -23,7 +24,6 @@ recipes:
     locked-display: placeholder
     locked-icon: BARRIER
     unlock-on-obtain: true
-  merge-missing-bundled: false
 
 recipe-book:
   tag-cycle-interval-ticks: 80
@@ -56,6 +56,8 @@ container-returns:
 
 # Heat sources / 热源
 heat-sources:
+  # tray: omit for automatic shape detection; true forces support, false hides it (a heat source is still required).
+  # tray 留空按热源形状自动判断；true 显示支架，false 隐藏，均需满足热源条件。
   entries:
   - states:
       lit: 'false'

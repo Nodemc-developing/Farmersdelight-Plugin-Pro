@@ -4,3 +4,15 @@ The three models under models/block/legacy retain the complete geometry, texture
 No additional third-party models or textures are imported. ASSET-ORIGINS-LEGACY.json records the source repository, source revision, source file hashes and generated file hashes.
 Original resource attribution and MIT terms remain in the plugin NOTICE.txt, including Copyright (c) 2020 vectorwing for Farmer's Delight assets. Original plugin authorship remains HuiDu_OwO; this modification is maintained by ydxc2009.
 The generation script is this project's AGPL-3.0-only code. Model credits, upstream asset licences and this plugin's AGPL distribution terms remain unchanged.
+
+Official missing-content restoration
+
+Baskets, rope fences, egg cartons, skewers and wild-plant models/textures are downloaded directly from vectorwing/FarmersDelight, fixed revision 0b424c370dc48197a9231771d55f0dcc3a36844e (feature-1.21/jug). The original files, model credits and Copyright (c) 2020 vectorwing remain unchanged. Redistribution is under MIT; the exact upstream text is FARMERSDELIGHT-MIT-LICENSE.txt. ASSET-ORIGINS-RECOVERY.json records each upstream path and hash.
+The checked official 1.21 and 26.1 branches contain baskets, rope fences and these wild plants. Egg cartons and skewers are experimental features in the fixed feature snapshot, rather than a claim of stable mod parity.
+No foreign plugin implementation, model modifications or content configuration are imported by this restoration. Vanilla model parents remain Minecraft client resources.
+
+Copper knife is a plugin extension, not an upstream mod asset. Its independently defined item model reuses the verified official MIT iron-knife texture and receives a copper tint in this project's CraftEngine definition. No unverified copper texture is imported. See independent_extensions in ASSET-ORIGINS-RECOVERY.json.
+
+Expanded crate and bag restoration uses the same official feature snapshot: cocoa-bean, glow-berry and sweet-berry bags; apple, chorus-fruit, brown/red-mushroom, golden-apple and golden-carrot crates. Their fixed models, textures and shared crate/bag texture dependencies are unmodified official MIT files, rather than a claim of stable-branch content or imported third-party plugin assets.
+
+The rope bell-tie model is an unmodified official MIT asset from vectorwing/FarmersDelight revision dd8b9b0bfec916a2da88a6d64e3a37f4a02c3259 (1.21). Its exact path and file hash are recorded in ASSET-ORIGINS-RECOVERY.json.

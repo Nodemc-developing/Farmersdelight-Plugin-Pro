@@ -1,0 +1,79 @@
+[
+  {
+    "version": "1.21",
+    "player_items": 166,
+    "contract_player_items": 167,
+    "items": 356,
+    "blocks": 85,
+    "recipes": 361,
+    "model_visits": 859,
+    "texture_checks": 2436,
+    "errors": []
+  },
+  {
+    "version": "1.21.8",
+    "player_items": 166,
+    "contract_player_items": 167,
+    "items": 356,
+    "blocks": 85,
+    "recipes": 366,
+    "model_visits": 859,
+    "texture_checks": 2436,
+    "errors": []
+  },
+  {
+    "version": "1.21.9",
+    "player_items": 167,
+    "contract_player_items": 167,
+    "items": 357,
+    "blocks": 85,
+    "recipes": 367,
+    "model_visits": 860,
+    "texture_checks": 2437,
+    "errors": []
+  },
+  {
+    "version": "1.21.11",
+    "player_items": 167,
+    "contract_player_items": 167,
+    "items": 357,
+    "blocks": 85,
+    "recipes": 367,
+    "model_visits": 860,
+    "texture_checks": 2437,
+    "errors": []
+  },
+  {
+    "version": "26.1",
+    "player_items": 167,
+    "contract_player_items": 167,
+    "items": 357,
+    "blocks": 85,
+    "recipes": 367,
+    "model_visits": 860,
+    "texture_checks": 2437,
+    "errors": []
+  },
+  {
+    "version": "26.2",
+    "player_items": 167,
+    "contract_player_items": 167,
+    "items": 357,
+    "blocks": 85,
+    "recipes": 367,
+    "model_visits": 860,
+    "texture_checks": 2437,
+    "errors": []
+  },
+  {
+    "version": "26.3",
+    "player_items": 167,
+    "contract_player_items": 167,
+    "items": 357,
+    "blocks": 85,
+    "recipes": 367,
+    "model_visits": 860,
+    "texture_checks": 2437,
+    "errors": []
+  }
+]

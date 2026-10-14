@@ -230,7 +230,7 @@ public class HeatSourceConfig {
     }
 
     /** One configured heat-source rule: how to match a block, and what matching it means. */
-    private record HeatEntry(EntryMatcher matcher, boolean heatSource, boolean conductor, boolean tray) {
+    private record HeatEntry(EntryMatcher matcher, boolean heatSource, boolean conductor, Boolean tray) {
     }
 
     private interface EntryMatcher {
@@ -306,9 +306,12 @@ public class HeatSourceConfig {
 
     private void loadEntries(ConfigurationSection section) {
         for (Map<?, ?> raw : ConfigSectionReader.optionalMapList(section, "entries")) {
-            HeatEntry entry = parseEntry(raw, section);
-            if (entry != null) {
-                entries.add(entry);
+            try {
+                HeatEntry entry = parseEntry(raw, section);
+                if (entry != null) entries.add(entry);
+            } catch (IllegalArgumentException invalid) {
+                I18n.logWarning("plugin.config_value_invalid", "file", "config.yml",
+                        "path", section.getCurrentPath() + ".entries", "error", invalid.getMessage() + ": " + raw);
             }
         }
     }
@@ -321,7 +324,7 @@ public class HeatSourceConfig {
         Map<String, String> states = entryStates(raw);
         boolean heatSource = entryBoolean(raw, "heat-source", true);
         boolean conductor = entryBoolean(raw, "conductor", false);
-        boolean tray = entryBoolean(raw, "tray", false);
+        Boolean tray = entryBoolean(raw, "tray", null);
 
         EntryMatcher matcher = null;
         if (vanillaBlock != null) {
@@ -378,12 +381,16 @@ public class HeatSourceConfig {
         return text.isEmpty() ? null : text;
     }
 
-    private static boolean entryBoolean(Map<?, ?> raw, String key, boolean defaultValue) {
+    static Boolean entryBoolean(Map<?, ?> raw, String key, Boolean defaultValue) {
         Object value = raw.get(key);
         if (value instanceof Boolean bool) {
             return bool;
         }
-        return value == null ? defaultValue : Boolean.parseBoolean(String.valueOf(value).trim());
+        if (value == null) return defaultValue;
+        String text = String.valueOf(value).trim();
+        if (text.equalsIgnoreCase("true")) return true;
+        if (text.equalsIgnoreCase("false")) return false;
+        throw new IllegalArgumentException(key + " must be true or false");
     }
 
     private static Map<String, String> entryStates(Map<?, ?> raw) {

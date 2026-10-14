@@ -139,6 +139,33 @@ def pack_translation_keys() -> set[str]:
     return keys
 
 
+def content_language_problems(pack: Path) -> list[str]:
+    """Validate Chinese item names in both the client pack and CE's server translations."""
+    problems: list[str] = []
+    languages = pack / "resourcepack/assets/farmersdelight/lang"
+    if not languages.is_dir():
+        return problems
+    english = json.loads((languages / "en_us.json").read_text(encoding="utf-8"))
+    item_keys = {key for key in english if key.startswith(("item.farmersdelight.", "block.farmersdelight."))}
+    for locale in ("zh_cn", "zh_tw", "zh_hk"):
+        path = languages / f"{locale}.json"
+        localized = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+        for key in sorted(item_keys):
+            value = localized.get(key, "")
+            if not isinstance(value, str) or not re.search(r"[\u3400-\u9fff]", value):
+                problems.append(f"{locale}: missing Chinese item name for {key}: {value!r}")
+    translations = pack / "configuration/translations.yml"
+    if translations.is_file():
+        ce = (yaml.safe_load(translations.read_text(encoding="utf-8")) or {}).get("translations", {}).get("zh_cn", {})
+        chinese = json.loads((languages / "zh_cn.json").read_text(encoding="utf-8"))
+        for key in sorted(item_keys):
+            if key not in ce:
+                problems.append(f"CE zh_cn: missing item name for {key}")
+            elif ce[key] != chinese.get(key):
+                problems.append(f"CE zh_cn: item name differs from client pack for {key}")
+    return problems
+
+
 def literal_candidates(en: dict[str, object], zh: dict[str, object]) -> dict[str, str]:
     """Dotted lowercase literals that look like keys but have no language entry (key or console. form)."""
     defined = set(en) | set(zh) | pack_translation_keys()
@@ -182,6 +209,11 @@ def main() -> int:
                     if key not in static and not key.endswith(".i18n")
                     and ".i18n." not in key)
     problems += len(missing) + len(only_en) + len(only_zh) + len(blank)
+
+    content_problems = content_language_problems(ROOT / "src/main/resources/craftengine/farmersdelight")
+    problems += len(content_problems)
+    for problem in content_problems:
+        print(f"   CONTENT LANGUAGE: {problem}")
 
     print(f"== Farmersdelight-Plugin-Pro: referenced={len(static)} defined en={len(en)} zh={len(zh)} "
           f"missing={len(missing)} only_en={len(only_en)} only_zh={len(only_zh)} "

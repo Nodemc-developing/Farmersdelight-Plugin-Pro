@@ -3,7 +3,6 @@ package com.huidu.farmersdelight;
 import com.huidu.farmersdelight.config.PetFoodConfig;
 import com.huidu.farmersdelight.pack.PackSections;
 import com.huidu.farmersdelight.registry.BehaviorRegistrar;
-import com.huidu.farmersdelight.resource.ResourceInstaller;
 import com.huidu.farmersdelight.tool.ToolRegistry;
 import com.huidu.farmersdelight.util.CommonTagResolver;
 import com.huidu.farmersdelight.util.compat.ProtectionCompat;
@@ -36,7 +35,6 @@ final class LoadPhaseRegistrar {
         // Load before CraftEngine's dependent plugins begin their enable phase, so recipes and advancements
         // read the same family-wide tag map.
         CommonTagResolver.reload(plugin);
-        new ResourceInstaller(plugin, plugin.pluginJarFile()).installCraftEngineResourcesOnce();
 
         BehaviorRegistrar.registerBlockBehaviors(plugin);
         BehaviorRegistrar.registerItemBehaviors(plugin);

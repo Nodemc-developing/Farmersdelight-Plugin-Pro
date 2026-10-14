@@ -83,7 +83,8 @@ class BlockStateMappingPriorityTest {
         var error = assertThrows(IllegalStateException.class, () -> ConfigPriorityFilter.filterBlockStateMappings(
                 List.of(section(first, "one", Map.of("source_first", "target_one")),
                         section(second, "two", Map.of("source_second", "target_two"))),
-                source -> 42, ownership, new ContentConflicts(reportPath)));
+                source -> source.equals("target_one") ? 43 : source.equals("target_two") ? 44 : 42,
+                ownership, new ContentConflicts(reportPath)));
         assertTrue(error.getMessage().contains("one.yml"));
         assertTrue(error.getMessage().contains("two.yml"));
         String report = Files.readString(reportPath);
@@ -104,12 +105,28 @@ class BlockStateMappingPriorityTest {
         var result = ConfigPriorityFilter.filterBlockStateMappings(List.of(own, imported), source -> {
             seen.add(source); return source.equals("native_source") ? 84 : null;
         }, ownership, new ContentConflicts(directory.resolve("conflicts.json")));
-        assertEquals(List.of("native_source", "${source}"), seen);
+        assertEquals(List.of("native_source", "own_target", "${source}", "external_target"), seen);
         assertEquals(List.of(ownPath, importedPath), result.configs().stream().map(CachedConfigSection::path).toList());
         assertEquals("own_target", result.configs().getFirst().config().get("native_source"));
         assertEquals("external_target", result.configs().getLast().config().get("${source}"));
         assertEquals(1, arguments.size());
         assertNotSame(imported.arguments(), result.configs().getLast().arguments());
+    }
+
+    @Test void equivalentExternalNativeMappingsCombineWithoutHidingRealConflicts() throws Exception {
+        Path first = file("internal.yml"), second = file("manual-pack.yml");
+        var ownership = new BundledContentManifest(directory.resolve("ownership.json"));
+        var internal = section(first, "internal", Map.of("source", "target"));
+        var manual = section(second, "food", Map.of("minecraft:source", "minecraft:target"));
+        Map<String, Integer> states = Map.of("source", 1, "minecraft:source", 1, "target", 2, "minecraft:target", 2);
+        for (var input : List.of(List.of(internal, manual), List.of(manual, internal))) {
+            var result = ConfigPriorityFilter.filterBlockStateMappings(input, states::get, ownership,
+                    new ContentConflicts(directory.resolve("conflicts.json")));
+            assertEquals(1, result.configs().size());
+            assertEquals(input.getFirst().path(), result.configs().getFirst().path());
+            assertEquals(1, input.getLast().config().keySet().size());
+        }
+        assertTrue(Files.readString(directory.resolve("conflicts.json")).contains("identical native state mapping combined"));
     }
 
     private Path file(String name) throws Exception {

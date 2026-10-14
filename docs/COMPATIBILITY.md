@@ -1,6 +1,6 @@
 # Minecraft compatibility
 
-This version targets **Minecraft 1.21 through 26.3 on Paper and Folia** with CraftEngine **26.9.2** or **26.10** with the required APIs. Install the compatible FluidCore build supplied in `libs/` for fluids and UltimateAdvancementAPI **2.8.1-pro.3** for advancements. Upgrading FD alone does not replace those plugins. UltimateAdvancementAPI is independent of CraftEngine.
+This version targets **Minecraft 1.21 through 26.3 on Paper and Folia** with CraftEngine **26.9.2** or the **26.10 snapshot** with the required APIs. Install the compatible FluidCore build supplied in `libs/` for fluids and UltimateAdvancementAPI **2.8.1-pro.3** for advancements. Upgrading FD alone does not replace those plugins. UltimateAdvancementAPI is independent of CraftEngine.
 
 | Server version | Java runtime | Gameplay and menus |
 | --- | --- | --- |
@@ -9,7 +9,7 @@ This version targets **Minecraft 1.21 through 26.3 on Paper and Folia** with Cra
 | 1.21.4–1.21.11 | 21 | Sparrow virtual menus and modern item models |
 | 26.1 / 26.1.1 / 26.1.2 / 26.2 / 26.3 | 25 | Modern menus/models; version-specific native advancement adapters |
 
-Folia support applies to available official server builds. Paper 1.21.2 and 26.1, and Folia 26.3, were unavailable from the official download service during this verification; those exact builds must not be described as tested.
+Folia support applies to available official server builds. Folia 26.3 was not tested in this revision. Paper 1.21.2 and 26.1, and Folia 26.3, were unavailable from the official download service during the historical verification below; that records availability at the time, rather than their current download status. Those exact builds must not be described as tested.
 
 ## Presentation differences on old clients
 
@@ -28,9 +28,9 @@ Recipes using newer vanilla materials require the material to exist and its feat
 
 FD gameplay compiles against **Paper 1.21** and emits Java 21 bytecode. FluidCore also compiles against the earliest API and emits Java 21 bytecode. Both supported CraftEngine versions run on Java 21 and supply the version-specific component codecs and block entities.
 
-CraftEngine 26.10 uses its native sleeping ticker list. CraftEngine 26.9.2 uses a compatible ticker that skips sleeping business work; it still receives the host's ticker callback. FluidCore substitutes indexed chunk-load notifications for the newer native subscription API. These differences are selected during initialization, without reflection in each gameplay tick.
+The CraftEngine 26.10 snapshot uses its native sleeping ticker list. CraftEngine 26.9.2 uses a compatible ticker that skips sleeping business work; it still receives the host's ticker callback. FluidCore substitutes indexed chunk-load notifications for the newer native subscription API. These differences are selected during initialization, without reflection in each gameplay tick.
 
-Startup accepts CE 26.9.2 and its build suffixes based on plugin version metadata and required APIs, and retains the 26.10 adapter. It does not read or hash the CE JAR, so Paper remapping or a same-version rebuild does not create a compatibility rejection. Missing loading APIs or incompatible parser/resource structures are reported directly. Artifact digests in historical verification records identify the tested files; they are not installation requirements.
+Startup accepts CE 26.9.2 and its build suffixes based on plugin version metadata and required APIs, and retains the 26.10 snapshot adapter. It does not read or hash the CE JAR, so Paper remapping or a same-version rebuild does not create a compatibility rejection. Missing loading APIs or incompatible parser/resource structures are reported directly. Artifact digests in historical verification records identify the tested files; they are not installation requirements.
 
 Native villager food access links once against either package name. Item metadata and enchantment differences use cached method handles. Inventory packets select the version's real native format. No new per-tick reflection, inventory-wide refresh or benchmark instrumentation is included in the plugin.
 
@@ -40,14 +40,29 @@ Early food components keep nutrition, effects and the complete `using_converts_t
 
 Exact runs and their limitations are recorded with the local verification results. This compatibility revision does not make a new performance comparison claim.
 
-## Native-format verification — 1.2.2, 2026-10-05
+## Current native verification — 1.2.8, 2026-10-11
+
+The frozen 1.2.8 JAR and matching manually installed content pack passed **181 native checks across four configurations**. The Java suite passed **1000 tests**, with no failures, errors or skipped tests. Static-checker regression tests also passed **4 language failure cases** and **31 content failure cases**.
+
+| Server | Exact core build | Java | CraftEngine | Passed checks |
+| --- | --- | --- | --- | --- |
+| Paper 26.3 | 140 / `977da0d` | 25 | 26.9.2 | 45 / 45 |
+| Paper 26.3 | 140 / `977da0d` | 25 | 26.10 snapshot | 46 / 46 |
+| Paper 1.21.8 | 60 / `29c8822` | 21 | 26.9.2 | 45 / 45 |
+| Folia 26.2 | 7 / `14b7fee` | 25 | 26.9.2 | 45 / 45 |
+
+These runs checked manual content installation, restored items, mushroom visual pools and generation, basket storage/redstone/reload preservation, native water states, pie comparator signals, crop growth events, rope connections and wet-rope visual allocation, and skillet heat-source support. The 26.10 snapshot run also replayed a historical cache with its kelp visual pool full: all 32 wet-rope variants registered using one shared visual state. The [results](../verification/mod-alignment-2026-10-11/results.json) retain the individual checks, exact reports, static content results and hosted Chinese resource-pack validation. See the [review notes](../verification/mod-alignment-2026-10-11/README.zh-CN.md) for the remaining interactive checks.
+
+This revision did not repeat the full historical version matrix or performance benchmarks. Native crop tests used real blocks and cancellable events with controlled input guards, rather than a player clicking bone meal. Real-client rope climbing and outlines, basket/fence appearance, protection-plugin combinations, physical hopper transfers and player break/drop interactions remain outside these runs. The shrub dispenser bone-meal entry is not implemented in this revision. Earlier failed diagnostic reports are retained, and each final run restored its original plugin configuration.
+
+## Historical native-format verification — 1.2.2, 2026-10-05
 
 FD 1.2.2 uses the native `farmersdelight_recipes` root and configuration version 4. Its 836-test full suite passed against the supplied stable CE API and the default Maven compile API. After the final FluidCore dependency refresh, all 65 FD fluid tests passed. The refreshed FluidCore platform suite passed 221 tests; its unchanged core retains the recorded 73-test result.
 
 | Server | Exact build | CE | Result |
 | --- | --- | --- | --- |
 | Paper 26.3 | 140 / `977da0d` | 26.9.2 | 19 native + 2 loading checks passed |
-| Folia 26.2 | 7 / `14b7fee` | 26.10-20260929.192451-4 | 19 native + 2 loading checks passed |
+| Folia 26.2 | 7 / `14b7fee` | 26.10 snapshot (`26.10-20260929.192451-4`) | 19 native + 2 loading checks passed |
 
 Both runs used the same FD JAR, SHA-256 `b9c892f3df897965a408399f20b772737ca7b5884d4c9af98b4389265d6155b1`, and FluidCore SHA-256 `ae4c584cf18c1c11d716fed395bb8cdcdf05a204d1fcb68b784128220933f04a`. The UAA JAR remained unchanged. Actual native loading confirmed configuration version 4, the independent recipe root, exactly 28/107/24 workstation recipes and absence of the removed compatibility registrations. Source data for all 159 bundled recipes was compared without changing item IDs or gameplay rules.
 

@@ -63,9 +63,13 @@ public final class BehaviorRegistrar {
         registerBehavior(Constants.BEHAVIOR_TATAMI, TatamiPairingBehavior.factory(plugin));
         registerBehavior(Constants.BEHAVIOR_WILD_RICE, WildRiceBlockBehavior.FACTORY);
         registerBehavior(Constants.BEHAVIOR_ROPE, RopeBlockBehavior.FACTORY);
+        registerBehavior("farmersdelight:rope_fence", com.huidu.farmersdelight.block.behavior.RopeFenceBlockBehavior.FACTORY);
+        registerBehavior("farmersdelight:rope_fence_gate", com.huidu.farmersdelight.block.behavior.RopeFenceGateBlockBehavior.FACTORY);
         registerBehavior(Constants.BEHAVIOR_MUSHROOM_COLONY, MushroomColonyBehavior.FACTORY);
         registerBehavior(Constants.BEHAVIOR_WILD_PLANT, WildPlantBlockBehavior.FACTORY);
-        registerBehavior(Constants.BEHAVIOR_TOMATO_VINE, TomatoVineBlockBehavior.FACTORY);
+        registerBehavior("farmersdelight:sandy_shrub", com.huidu.farmersdelight.block.behavior.SandyShrubBlockBehavior.factory(plugin));
+        registerBehavior(Constants.BEHAVIOR_TOMATO_VINE, TomatoVineBlockBehavior.factory(plugin));
+        registerBehavior("farmersdelight:tomato_growth", com.huidu.farmersdelight.block.behavior.TomatoGrowthBlockBehavior.factory(plugin));
         registerBehavior(Constants.BEHAVIOR_ORGANIC_COMPOST, OrganicCompostBlockBehavior.FACTORY);
         registerBehavior(Constants.BEHAVIOR_RICH_SOIL, RichSoilBlockBehavior.FACTORY);
         registerBehavior(Constants.BEHAVIOR_RICH_SOIL_FARMLAND, RichSoilFarmlandBlockBehavior.factory(plugin));

@@ -1,0 +1,50 @@
+farmersdelight_recipes:
+  wooden_basket:
+    station: cutting_board
+    input:
+      item: farmersdelight:wooden_basket
+      tools:
+      - '#minecraft:axes'
+    output:
+    - item: farmersdelight:canvas
+    - item: minecraft:stick
+  bamboo_basket:
+    station: cutting_board
+    input:
+      item: farmersdelight:bamboo_basket
+      tools:
+      - '#minecraft:axes'
+    output:
+    - item: farmersdelight:canvas
+    - item: minecraft:bamboo
+  wild_carrots:
+    station: cutting_board
+    input:
+      item: farmersdelight:wild_carrots
+      tools:
+      - '#farmersdelight:tools/knives'
+    output:
+    - item: minecraft:carrot
+    - item: minecraft:light_gray_dye
+      count: 2
+      chance: 0.5
+  wild_potatoes:
+    station: cutting_board
+    input:
+      item: farmersdelight:wild_potatoes
+      tools:
+      - '#farmersdelight:tools/knives'
+    output:
+    - item: minecraft:potato
+    - item: minecraft:purple_dye
+      count: 2
+      chance: 0.5
+  wild_beetroots:
+    station: cutting_board
+    input:
+      item: farmersdelight:wild_beetroots
+      tools:
+      - '#farmersdelight:tools/knives'
+    output:
+    - item: minecraft:beetroot_seeds
+    - item: minecraft:red_dye

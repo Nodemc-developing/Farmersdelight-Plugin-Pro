@@ -7,7 +7,7 @@ Three checks that enforce the machine-checkable half of this project's maintenan
 | --- | --- |
 | `strip_ce_comments.py --check` | Shipped CraftEngine configuration under `src/main/resources/craftengine/**/configuration/` carries no comments. Field references live in the wiki, not in the data files. |
 | `meal_icons.py --check` | Every `configuration/meal_icons.yml` entry corresponds to a `farmersdelight_recipes` cooking-pot output, and every such output has an entry with a resolvable 16x16 texture. |
-| `check_lang_keys.py` | Every language key the Java sources reference is defined in both `lang/en_us.yml` and `lang/zh_cn.yml`, the two locales stay symmetric, and no value is blank. |
+| `check_lang_keys.py` | Java language keys exist in both plugin locales. Chinese item names exist in the three client Chinese locales and agree with CE's Chinese translations. English fallback values do not count as Chinese translations. |
 
 All three are read-only with `--check` / `--quiet` and exit non-zero on a real problem, so no separate assertion
 is needed. They need PyYAML (`python -m pip install pyyaml`).
@@ -18,9 +18,33 @@ python tools/meal_icons.py --check
 python tools/check_lang_keys.py --quiet
 ```
 
+`python tools/test_lang_keys.py -q` verifies untranslated item names, missing client keys and conflicting server translations are rejected.
+
 `python tools/test_meal_icons.py` checks station filtering, suffixed recipe roots and custom cooking-pot groups.
 `generate-fluid-content.py` generates tank item/block definitions only; it leaves workstation recipes in
 `farmersdelight_fluids/configuration/fluid_recipes.yml` untouched.
+
+`python tools/check_content_pack.py --quiet` checks the reviewed independent content delivery contract in
+`content-pack-contract.json` at each recorded Minecraft version boundary. Required player IDs must have
+item definitions, custom visuals, reachable category entries (including CraftEngine item-category
+injection), required block definitions and acquisition recipe outputs. Internal GUI, renderer and fluid
+level IDs are checked as dependencies but do not count as contracted player items. The contract is reviewed
+data; the check never regenerates it from the files being checked, so deleting an entire feature cannot
+silently shrink the expected inventory.
+
+The check resolves local templates and arguments, both `block` and `blocks`, `config_factory` instances,
+version comparisons/ranges/fallbacks, CE recipe outputs and native workstation recipes. Models and textures
+are resolved across the two delivery packs, including inherited model parents and generated models.
+Vanilla resources are client dependencies rather than files that must be copied into our packs. Unknown
+configuration sections, templates, item/model/recipe fields and ingredient shapes fail explicitly.
+CraftEngine's general settings, behaviors and world-generation semantics still require native runtime
+validation; this tool does not claim to reproduce their full parser or verify client rendering.
+
+`python tools/test_content_pack.py` exercises successful closure and failure fixtures for a removed whole
+feature, missing blocks/recipes/parent models/textures, unreachable categories, malformed matching/output
+fields, model/template cycles, duplicate YAML keys and version-gated category injection. Source recipe
+files are checked in the source checkout or at their packaged `farmersdelight/configuration` locations.
+Use `--root` to check extracted delivery packs, `--version` for one boundary, or `--json` for a detailed report.
 
 Without `--check`, `strip_ce_comments.py` and `meal_icons.py` rewrite the files instead of reporting. That is
 the intended way to fix what they find; both keep existing order and only add, prune or de-comment.

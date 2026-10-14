@@ -46,4 +46,12 @@ public final class VanillaCropGrowth {
     public static boolean passes(float growthSpeed, float roll) {
         return roll < chance(growthSpeed);
     }
+
+    public static float chance(float growthSpeed, float rateMultiplier) {
+        return Math.min(1.0F, chance(growthSpeed) * Math.max(0.0F, rateMultiplier));
+    }
+
+    public static boolean sufficientLight(int sky, int blocks, int requirement) {
+        return Math.max(sky, blocks) >= requirement;
+    }
 }

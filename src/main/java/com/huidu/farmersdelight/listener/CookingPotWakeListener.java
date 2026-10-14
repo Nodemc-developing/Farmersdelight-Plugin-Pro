@@ -16,6 +16,7 @@ public final class CookingPotWakeListener implements Listener {
     public CookingPotWakeListener(FarmersDelightPlugin plugin) { this.plugin = plugin; }
 
     private void changed(Block block) {
+        if (plugin.getTrayManager() != null) plugin.getTrayManager().syncAroundSupportChange(block.getLocation());
         if (plugin.getTickManager() != null) {
             plugin.getTickManager().wakePotsAbove(block.getWorld(), new BlockPosKey(block.getX(), block.getY(), block.getZ()));
         }
@@ -35,6 +36,10 @@ public final class CookingPotWakeListener implements Listener {
     public void onBurn(BlockBurnEvent event) { changed(event.getBlock()); }
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onIgnite(BlockIgniteEvent event) { changed(event.getBlock()); }
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onInteract(org.bukkit.event.player.PlayerInteractEvent event) {
+        if (event.getClickedBlock() != null) changed(event.getClickedBlock());
+    }
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onFlow(BlockFromToEvent event) { changed(event.getToBlock()); }
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

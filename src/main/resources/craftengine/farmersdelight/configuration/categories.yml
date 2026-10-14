@@ -53,6 +53,8 @@ categories:
     hidden: true
     icon: farmersdelight:minced_beef
     list:
+    - farmersdelight:meat_skewer
+    - farmersdelight:vegetable_skewer
     - farmersdelight:fried_egg
     - farmersdelight:wheat_dough
     - farmersdelight:raw_pasta
@@ -78,6 +80,8 @@ categories:
     hidden: true
     icon: farmersdelight:hamburger
     list:
+    - farmersdelight:cooked_meat_skewer
+    - farmersdelight:cooked_vegetable_skewer
     - farmersdelight:apple_cider
     - farmersdelight:melon_juice
     - farmersdelight:hot_cocoa
@@ -153,6 +157,20 @@ categories:
     hidden: true
     icon: farmersdelight:tatami
     list:
+    - farmersdelight:wooden_basket
+    - farmersdelight:bamboo_basket
+    - farmersdelight:egg_carton
+    - farmersdelight:rope_fence
+    - farmersdelight:rope_fence_gate
+    - farmersdelight:cocoa_beans_bag
+    - farmersdelight:glow_berries_bag
+    - farmersdelight:sweet_berries_bag
+    - farmersdelight:apple_crate
+    - farmersdelight:chorus_fruit_crate
+    - farmersdelight:brown_mushroom_crate
+    - farmersdelight:red_mushroom_crate
+    - farmersdelight:golden_apple_crate
+    - farmersdelight:golden_carrot_crate
     - farmersdelight:basket
     - farmersdelight:tray
     - farmersdelight:rope
@@ -190,6 +208,10 @@ categories:
     hidden: true
     icon: farmersdelight:wild_onions
     list:
+    - farmersdelight:wild_carrots
+    - farmersdelight:wild_potatoes
+    - farmersdelight:wild_beetroots
+    - farmersdelight:sandy_shrub
     - farmersdelight:wild_cabbages
     - farmersdelight:wild_onions
     - farmersdelight:wild_rice

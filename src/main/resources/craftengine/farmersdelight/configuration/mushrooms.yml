@@ -124,7 +124,7 @@ blocks:
           auto_state: higher_tripwire
           model: farmersdelight:block/brown_mushroom_colony_stage2
         age=3:
-          auto_state: sugar_cane
+          auto_state: sapling
           model: farmersdelight:block/brown_mushroom_colony_stage3
       variants:
         age=0:
@@ -219,7 +219,7 @@ blocks:
           auto_state: higher_tripwire
           model: farmersdelight:block/red_mushroom_colony_stage2
         age=3:
-          auto_state: sugar_cane
+          auto_state: sapling
           model: farmersdelight:block/red_mushroom_colony_stage3
       variants:
         age=0:

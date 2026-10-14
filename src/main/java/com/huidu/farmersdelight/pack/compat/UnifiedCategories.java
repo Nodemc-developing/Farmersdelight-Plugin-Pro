@@ -65,6 +65,8 @@ final class UnifiedCategories {
             }
         }
         appendRegistered(output, "decoration", "farmersdelight:glass_jug", emptyGroups, registeredItem);
+        appendRegistered(output, "decoration", "farmersdelight:wooden_basket", emptyGroups, registeredItem);
+        appendRegistered(output, "decoration", "farmersdelight:bamboo_basket", emptyGroups, registeredItem);
         appendRegistered(output, "decoration", "farmersdelight:basket", emptyGroups, registeredItem);
         appendRegistered(output, "decoration", "farmersdelight:tray", emptyGroups, registeredItem);
         appendRegistered(output, "foods", "farmersdelight:barbecue_stick", emptyGroups, registeredItem);
@@ -75,6 +77,14 @@ final class UnifiedCategories {
             if (!registeredItem.test(legacy)) continue;
             if (registeredItem.test(standard)) compatibility.add(legacy);
             else append(output, "decoration", legacy, emptyGroups);
+        }
+        // Keep existing basket items usable while the browser shows the two distinct basket materials.
+        if (registeredItem.test(PREFIX + "bamboo_basket") && registeredItem.test(PREFIX + "basket")) {
+            Map<String, Object> decoration = body(output.get(PREFIX + "decoration"));
+            if (decoration != null && decoration.get("list") instanceof List<?> members) {
+                decoration.put("list", members.stream().filter(member -> !(PREFIX + "basket").equals(member)).toList());
+            }
+            compatibility.add(PREFIX + "basket");
         }
         if (!compatibility.isEmpty() && !input.containsKey(PREFIX + "compatibility")) {
             Map<String, Object> hidden = new LinkedHashMap<>();

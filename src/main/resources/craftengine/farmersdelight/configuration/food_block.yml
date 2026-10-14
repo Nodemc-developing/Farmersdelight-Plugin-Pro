@@ -1,5 +1,10 @@
 templates:
   farmersdelight:sliceable_pie_states:
+    behavior:
+      type: farmersdelight:integer_comparator
+      property: bites
+      mode: remaining
+      total: 4
     states:
       properties:
         bites:
@@ -208,9 +213,7 @@ templates:
         conditions:
           - type: test_flag
             flag: interact
-          - type: match_item
-            item: "farmersdelight:.*_knife"
-            regex: true
+          - type: farmersdelight:is_knife
           - type: match_block_property
             properties:
               bites: 0
@@ -238,9 +241,7 @@ templates:
         conditions:
           - type: test_flag
             flag: interact
-          - type: match_item
-            item: "farmersdelight:.*_knife"
-            regex: true
+          - type: farmersdelight:is_knife
           - type: match_block_property
             properties:
               bites: 1
@@ -268,9 +269,7 @@ templates:
         conditions:
           - type: test_flag
             flag: interact
-          - type: match_item
-            item: "farmersdelight:.*_knife"
-            regex: true
+          - type: farmersdelight:is_knife
           - type: match_block_property
             properties:
               bites: 2
@@ -298,9 +297,7 @@ templates:
         conditions:
           - type: test_flag
             flag: interact
-          - type: match_item
-            item: "farmersdelight:.*_knife"
-            regex: true
+          - type: farmersdelight:is_knife
           - type: match_block_property
             properties:
               bites: 3
@@ -333,9 +330,7 @@ templates:
             expression: "<arg:player.food> < 20"
           - type: inverted
             term:
-              type: match_item
-              item: "farmersdelight:.*_knife"
-              regex: true
+              type: farmersdelight:is_knife
           - type: match_block_property
             properties:
               bites: 0
@@ -343,11 +338,11 @@ templates:
           - type: update_interaction_tick
           - type: set_food
             target: self
-            food: 6
+            food: 3
             add: true
           - type: set_saturation
             target: self
-            saturation: 3
+            saturation: 1.8
             add: true
           - type: update_block_property
             properties:
@@ -369,9 +364,7 @@ templates:
             expression: "<arg:player.food> < 20"
           - type: inverted
             term:
-              type: match_item
-              item: "farmersdelight:.*_knife"
-              regex: true
+              type: farmersdelight:is_knife
           - type: match_block_property
             properties:
               bites: 1
@@ -379,11 +372,11 @@ templates:
           - type: update_interaction_tick
           - type: set_food
             target: self
-            food: 6
+            food: 3
             add: true
           - type: set_saturation
             target: self
-            saturation: 3
+            saturation: 1.8
             add: true
           - type: update_block_property
             properties:
@@ -405,9 +398,7 @@ templates:
             expression: "<arg:player.food> < 20"
           - type: inverted
             term:
-              type: match_item
-              item: "farmersdelight:.*_knife"
-              regex: true
+              type: farmersdelight:is_knife
           - type: match_block_property
             properties:
               bites: 2
@@ -415,11 +406,11 @@ templates:
           - type: update_interaction_tick
           - type: set_food
             target: self
-            food: 6
+            food: 3
             add: true
           - type: set_saturation
             target: self
-            saturation: 4
+            saturation: 1.8
             add: true
           - type: update_block_property
             properties:
@@ -441,9 +432,7 @@ templates:
             expression: "<arg:player.food> < 20"
           - type: inverted
             term:
-              type: match_item
-              item: "farmersdelight:.*_knife"
-              regex: true
+              type: farmersdelight:is_knife
           - type: match_block_property
             properties:
               bites: 3
@@ -451,11 +440,11 @@ templates:
           - type: update_interaction_tick
           - type: set_food
             target: self
-            food: 6
+            food: 3
             add: true
           - type: set_saturation
             target: self
-            saturation: 4
+            saturation: 1.8
             add: true
           - type: break_block
             x: <arg:position.block_x>

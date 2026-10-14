@@ -1,0 +1,415 @@
+{
+  "version": "1.2.7",
+  "unit_tests": {
+    "26.9.2": {
+      "errors": 0,
+      "failures": 0,
+      "tests": 932,
+      "skipped": 0
+    }
+  },
+  "native_profiles": [
+    {
+      "environment": "paper-26.3",
+      "craft_engine": "26.9.2",
+      "status": "PASS",
+      "report": ".local/version-compatibility/reports/content-recovery-20261011T033427Z/paper-26.3-ce-26.9.2",
+      "checks": {
+        "initial_no_auto_pack": {
+          "status": "PASS",
+          "detail": "No extracted pack, implicit skillet definition or JAR asset fallback"
+        },
+        "reload_no_auto_pack": {
+          "status": "PASS",
+          "detail": "No extracted pack, implicit skillet definition or JAR asset fallback"
+        },
+        "manual_install": {
+          "status": "PASS",
+          "detail": "Standalone content ZIP loads through CE reload"
+        },
+        "pressure_pool": {
+          "status": "PASS",
+          "detail": "Sugar cane 14/15; both pressure blocks and mature sapling visuals registered"
+        },
+        "mushroom_worldgen": {
+          "status": "PASS",
+          "detail": "Both brown/red colonies and both placed features decode on the native server"
+        },
+        "recovered_player_items": {
+          "status": "PASS",
+          "detail": "22 unconditional recovered items build with their correct CE IDs without the previous external pack"
+        },
+        "copper_version_gate": {
+          "status": "PASS",
+          "detail": "Copper knife available on 26.3"
+        },
+        "basket_properties_preserve_storage_wooden_basket": {
+          "status": "PASS",
+          "detail": "All six orientations and waterlogged/enabled property transitions preserve the same 27-slot storage and seven diamonds"
+        },
+        "basket_native_redstone_wooden_basket": {
+          "status": "PASS",
+          "detail": "A real redstone block immediately toggles enabled in both directions without recreating storage or losing its seven items"
+        },
+        "basket_properties_preserve_storage_bamboo_basket": {
+          "status": "PASS",
+          "detail": "All six orientations and waterlogged/enabled property transitions preserve the same 27-slot storage and seven diamonds"
+        },
+        "basket_native_redstone_bamboo_basket": {
+          "status": "PASS",
+          "detail": "A real redstone block immediately toggles enabled in both directions without recreating storage or losing its seven items"
+        },
+        "basket_properties_preserve_storage_basket": {
+          "status": "PASS",
+          "detail": "All six orientations and waterlogged/enabled property transitions preserve the same 27-slot storage and seven diamonds"
+        },
+        "basket_native_redstone_basket": {
+          "status": "PASS",
+          "detail": "A real redstone block immediately toggles enabled in both directions without recreating storage or losing its seven items"
+        },
+        "manual_assets": {
+          "status": "PASS",
+          "detail": "Installed skillet texture included"
+        },
+        "campfire_support": {
+          "status": "PASS",
+          "detail": "Shipped config creates tray on a lit campfire with omitted tray flag"
+        },
+        "extinguish_preserves_input": {
+          "status": "PASS",
+          "detail": "Physics update clears tray without losing the three ingredients"
+        },
+        "reignite_coalesced": {
+          "status": "PASS",
+          "detail": "Twenty notifications coalesce; tray returns and items remain"
+        },
+        "shape_and_air": {
+          "status": "PASS",
+          "detail": "Full magma block and air do not produce a tray"
+        },
+        "chunk_load_refresh": {
+          "status": "PASS",
+          "detail": "FD chunk-load handler repairs stale support without losing ingredients (existing loaded CE chunk)"
+        },
+        "intentional_deletion": {
+          "status": "PASS",
+          "detail": "CE and FD reload preserve deleted recipe/texture; JAR does not backfill assets"
+        },
+        "wild_worldgen_native_log": {
+          "status": "PASS",
+          "detail": "No custom wild-block Unknown registry key errors in actual native load log"
+        },
+        "bundled_native_load_errors": {
+          "status": "PASS",
+          "detail": "No bundled item/block/placed-feature errors reported by the actual CE parser"
+        },
+        "no_premature_recipe_warning": {
+          "status": "PASS",
+          "detail": "No missing-section warning while CE packs have not yet loaded"
+        }
+      },
+      "original_plugins_restored": true,
+      "finished": "2026-10-11T03:35:04.732569+00:00",
+      "ce_config_restored": true
+    },
+    {
+      "environment": "paper-26.3",
+      "craft_engine": "26.10",
+      "status": "PASS",
+      "report": ".local/version-compatibility/reports/content-recovery-20261011T033608Z/paper-26.3-ce-26.10",
+      "checks": {
+        "initial_no_auto_pack": {
+          "detail": "No extracted pack, implicit skillet definition or JAR asset fallback",
+          "status": "PASS"
+        },
+        "reload_no_auto_pack": {
+          "detail": "No extracted pack, implicit skillet definition or JAR asset fallback",
+          "status": "PASS"
+        },
+        "manual_install": {
+          "detail": "Standalone content ZIP loads through CE reload",
+          "status": "PASS"
+        },
+        "pressure_pool": {
+          "detail": "Sugar cane 14/15; both pressure blocks and mature sapling visuals registered",
+          "status": "PASS"
+        },
+        "mushroom_worldgen": {
+          "detail": "Both brown/red colonies and both placed features decode on the native server",
+          "status": "PASS"
+        },
+        "recovered_player_items": {
+          "detail": "22 unconditional recovered items build with their correct CE IDs without the previous external pack",
+          "status": "PASS"
+        },
+        "copper_version_gate": {
+          "detail": "Copper knife available on 26.3",
+          "status": "PASS"
+        },
+        "basket_properties_preserve_storage_wooden_basket": {
+          "detail": "All six orientations and waterlogged/enabled property transitions preserve the same 27-slot storage and seven diamonds",
+          "status": "PASS"
+        },
+        "basket_native_redstone_wooden_basket": {
+          "detail": "A real redstone block immediately toggles enabled in both directions without recreating storage or losing its seven items",
+          "status": "PASS"
+        },
+        "basket_properties_preserve_storage_bamboo_basket": {
+          "detail": "All six orientations and waterlogged/enabled property transitions preserve the same 27-slot storage and seven diamonds",
+          "status": "PASS"
+        },
+        "basket_native_redstone_bamboo_basket": {
+          "detail": "A real redstone block immediately toggles enabled in both directions without recreating storage or losing its seven items",
+          "status": "PASS"
+        },
+        "basket_properties_preserve_storage_basket": {
+          "detail": "All six orientations and waterlogged/enabled property transitions preserve the same 27-slot storage and seven diamonds",
+          "status": "PASS"
+        },
+        "basket_native_redstone_basket": {
+          "detail": "A real redstone block immediately toggles enabled in both directions without recreating storage or losing its seven items",
+          "status": "PASS"
+        },
+        "manual_assets": {
+          "detail": "Installed skillet texture included",
+          "status": "PASS"
+        },
+        "campfire_support": {
+          "detail": "Shipped config creates tray on a lit campfire with omitted tray flag",
+          "status": "PASS"
+        },
+        "extinguish_preserves_input": {
+          "detail": "Physics update clears tray without losing the three ingredients",
+          "status": "PASS"
+        },
+        "reignite_coalesced": {
+          "detail": "Twenty notifications coalesce; tray returns and items remain",
+          "status": "PASS"
+        },
+        "shape_and_air": {
+          "detail": "Full magma block and air do not produce a tray",
+          "status": "PASS"
+        },
+        "chunk_load_refresh": {
+          "detail": "FD chunk-load handler repairs stale support without losing ingredients (existing loaded CE chunk)",
+          "status": "PASS"
+        },
+        "intentional_deletion": {
+          "detail": "CE and FD reload preserve deleted recipe/texture; JAR does not backfill assets",
+          "status": "PASS"
+        },
+        "wild_worldgen_native_log": {
+          "status": "PASS",
+          "detail": "No custom wild-block Unknown registry key errors in actual native load log"
+        },
+        "bundled_native_load_errors": {
+          "status": "PASS",
+          "detail": "No bundled item/block/placed-feature errors reported by the actual CE parser"
+        },
+        "no_premature_recipe_warning": {
+          "status": "PASS",
+          "detail": "No missing-section warning while CE packs have not yet loaded"
+        }
+      },
+      "original_plugins_restored": true,
+      "finished": "2026-10-11T03:36:38.572375+00:00",
+      "ce_config_restored": true
+    },
+    {
+      "environment": "paper-1.21.8",
+      "craft_engine": "26.9.2",
+      "status": "PASS",
+      "report": ".local/version-compatibility/reports/content-recovery-20261011T033735Z/paper-1.21.8-ce-26.9.2",
+      "checks": {
+        "initial_no_auto_pack": {
+          "status": "PASS",
+          "detail": "No extracted pack, implicit skillet definition or JAR asset fallback"
+        },
+        "reload_no_auto_pack": {
+          "status": "PASS",
+          "detail": "No extracted pack, implicit skillet definition or JAR asset fallback"
+        },
+        "manual_install": {
+          "status": "PASS",
+          "detail": "Standalone content ZIP loads through CE reload"
+        },
+        "pressure_pool": {
+          "status": "PASS",
+          "detail": "Sugar cane 14/15; both pressure blocks and mature sapling visuals registered"
+        },
+        "mushroom_worldgen": {
+          "status": "PASS",
+          "detail": "Both brown/red colonies and both placed features decode on the native server"
+        },
+        "recovered_player_items": {
+          "status": "PASS",
+          "detail": "22 unconditional recovered items build with their correct CE IDs without the previous external pack"
+        },
+        "copper_version_gate": {
+          "status": "PASS",
+          "detail": "Copper knife excluded on 1.21.8"
+        },
+        "basket_properties_preserve_storage_wooden_basket": {
+          "status": "PASS",
+          "detail": "All six orientations and waterlogged/enabled property transitions preserve the same 27-slot storage and seven diamonds"
+        },
+        "basket_native_redstone_wooden_basket": {
+          "status": "PASS",
+          "detail": "A real redstone block immediately toggles enabled in both directions without recreating storage or losing its seven items"
+        },
+        "basket_properties_preserve_storage_bamboo_basket": {
+          "status": "PASS",
+          "detail": "All six orientations and waterlogged/enabled property transitions preserve the same 27-slot storage and seven diamonds"
+        },
+        "basket_native_redstone_bamboo_basket": {
+          "status": "PASS",
+          "detail": "A real redstone block immediately toggles enabled in both directions without recreating storage or losing its seven items"
+        },
+        "basket_properties_preserve_storage_basket": {
+          "status": "PASS",
+          "detail": "All six orientations and waterlogged/enabled property transitions preserve the same 27-slot storage and seven diamonds"
+        },
+        "basket_native_redstone_basket": {
+          "status": "PASS",
+          "detail": "A real redstone block immediately toggles enabled in both directions without recreating storage or losing its seven items"
+        },
+        "manual_assets": {
+          "status": "PASS",
+          "detail": "Installed skillet texture included"
+        },
+        "campfire_support": {
+          "status": "PASS",
+          "detail": "Shipped config creates tray on a lit campfire with omitted tray flag"
+        },
+        "extinguish_preserves_input": {
+          "status": "PASS",
+          "detail": "Physics update clears tray without losing the three ingredients"
+        },
+        "reignite_coalesced": {
+          "status": "PASS",
+          "detail": "Twenty notifications coalesce; tray returns and items remain"
+        },
+        "shape_and_air": {
+          "status": "PASS",
+          "detail": "Full magma block and air do not produce a tray"
+        },
+        "chunk_load_refresh": {
+          "status": "PASS",
+          "detail": "FD chunk-load handler repairs stale support without losing ingredients (existing loaded CE chunk)"
+        },
+        "intentional_deletion": {
+          "status": "PASS",
+          "detail": "CE and FD reload preserve deleted recipe/texture; JAR does not backfill assets"
+        },
+        "wild_worldgen_native_log": {
+          "status": "PASS",
+          "detail": "No custom wild-block Unknown registry key errors in actual native load log"
+        },
+        "bundled_native_load_errors": {
+          "status": "PASS",
+          "detail": "No bundled item/block/placed-feature errors reported by the actual CE parser"
+        },
+        "no_premature_recipe_warning": {
+          "status": "PASS",
+          "detail": "No missing-section warning while CE packs have not yet loaded"
+        }
+      },
+      "original_plugins_restored": true,
+      "finished": "2026-10-11T03:38:11.875798+00:00",
+      "ce_config_restored": true
+    }
+  ],
+  "static_content_contract": [
+    {
+      "version": "1.21",
+      "player_items": 166,
+      "contract_player_items": 167,
+      "items": 356,
+      "blocks": 85,
+      "recipes": 361,
+      "model_visits": 859,
+      "texture_checks": 2436,
+      "errors": []
+    },
+    {
+      "version": "1.21.8",
+      "player_items": 166,
+      "contract_player_items": 167,
+      "items": 356,
+      "blocks": 85,
+      "recipes": 366,
+      "model_visits": 859,
+      "texture_checks": 2436,
+      "errors": []
+    },
+    {
+      "version": "1.21.9",
+      "player_items": 167,
+      "contract_player_items": 167,
+      "items": 357,
+      "blocks": 85,
+      "recipes": 367,
+      "model_visits": 860,
+      "texture_checks": 2437,
+      "errors": []
+    },
+    {
+      "version": "1.21.11",
+      "player_items": 167,
+      "contract_player_items": 167,
+      "items": 357,
+      "blocks": 85,
+      "recipes": 367,
+      "model_visits": 860,
+      "texture_checks": 2437,
+      "errors": []
+    },
+    {
+      "version": "26.1",
+      "player_items": 167,
+      "contract_player_items": 167,
+      "items": 357,
+      "blocks": 85,
+      "recipes": 367,
+      "model_visits": 860,
+      "texture_checks": 2437,
+      "errors": []
+    },
+    {
+      "version": "26.2",
+      "player_items": 167,
+      "contract_player_items": 167,
+      "items": 357,
+      "blocks": 85,
+      "recipes": 367,
+      "model_visits": 860,
+      "texture_checks": 2437,
+      "errors": []
+    },
+    {
+      "version": "26.3",
+      "player_items": 167,
+      "contract_player_items": 167,
+      "items": 357,
+      "blocks": 85,
+      "recipes": 367,
+      "model_visits": 860,
+      "texture_checks": 2437,
+      "errors": []
+    }
+  ],
+  "content_checker_failure_fixtures": 31,
+  "restored_player_items": 23,
+  "new_ce_recipes": 40,
+  "new_cutting_recipes": 5,
+  "limitations": [
+    "Static checks cover version boundaries; this revision did not rerun the full historical version matrix.",
+    "Native profiles in this revision are Paper only; no new Folia native run is claimed.",
+    "Basket native tests cover three IDs, six directions, water/enabled properties, actual redstone and same inventory/controller identity with component-bearing marker stacks.",
+    "Physical hopper transfer, normal player breaking/drop behavior, real chunk unload/reload and client visuals still require manual acceptance.",
+    "The skillet tray regression does not replace a separate cooking-pot placement test.",
+    "Fence client visuals and model collision outline must be checked with the real resource pack.",
+    "No performance benchmark or comparative server run was performed.",
+    "Remaining mod-alignment work is described in the private local implementation plan."
+  ]
+}

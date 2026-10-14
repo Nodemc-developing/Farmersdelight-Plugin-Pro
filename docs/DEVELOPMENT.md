@@ -41,7 +41,7 @@ The build produces the plugin JAR and an API-only JAR for addon compilation. The
 
 Recipes load from enabled CraftEngine content packs. Editing saves to the original file, root node and recipe ID while preserving unmanaged fields.
 
-External content takes precedence; bundled content fills missing definitions. Duplicate category/full-ID definitions between external packs are reported. Models and textures are selected by resource path; language JSON is merged by key. Generated resources use a managed overlay without rewriting external asset directories.
+Build the standalone pack with `contentPackZip` and extract it manually into `plugins/CraftEngine/resources/`. Startup and reload never extract or inject JAR content, assets or recipes; only enabled packs are loaded. Historical ownership records retain their file-priority meaning. Duplicate category/full-ID definitions between external packs are reported. Models and textures are selected by resource path; language JSON is merged by key. Generated resources use a managed overlay without rewriting external asset directories.
 
 Standard browsing categories use one root with nine groups: tools, ingredients, crops, processed food, food, feasts, decorations, wild plants and pet food. Loaded items are combined without duplicates; normal and glass tanks have separate entries. Set `craftengine-resources.unified-categories: false` to retain the original category trees. This changes the loading copy rather than source-pack files.
 

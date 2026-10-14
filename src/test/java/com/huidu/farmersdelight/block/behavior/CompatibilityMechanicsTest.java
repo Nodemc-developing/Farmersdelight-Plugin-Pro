@@ -40,6 +40,25 @@ class CompatibilityMechanicsTest {
         assertEquals(6, CropBehaviorOptions.incrementAge(6, -100, 7));
         assertEquals(0, CropBehaviorOptions.incrementAge(-10, 0, 7));
     }
+    @Test void cropsDefaultToVanillaLightAndUnmodifiedGrowthRate() {
+        var value = CropBehaviorOptions.parse(crop(Map.of()), 7);
+        assertEquals(1, value.speed());
+        assertEquals(1, value.randomGrowthChance());
+        assertEquals(9, value.light());
+        assertEquals(8, value.spawnLight());
+        assertEquals(7, value.upperSpawnAge());
+    }
+    @Test void highCropSettingsKeepBothHalvesAtTheSameAge() {
+        var value = CropBehaviorOptions.parse(crop(Map.of("sync-ages", true, "upper-independent", false,
+                "upper-spawn-age", 3, "requires-upper-space", true, "reset-on-upper-removal", false)), 4);
+        assertTrue(value.synchronizeAges());
+        assertFalse(value.upperIndependent());
+        assertEquals(3, value.upperSpawnAge());
+        assertTrue(value.requiresUpperSpace());
+        assertFalse(value.resetLowerAfterUpperRemoval());
+        assertThrows(IllegalArgumentException.class, () -> CropBehaviorOptions.parse(crop(Map.of("upper-spawn-age", 5)), 4));
+        assertThrows(IllegalArgumentException.class, () -> CropBehaviorOptions.parse(crop(Map.of("random-growth-chance", 2)), 4));
+    }
     @Test void translatedGroupedSettingsReachTheActualBehaviorReader() {
         Map<String, Object> original = new LinkedHashMap<>(Map.of("activator_multiplier", .7,
                 "activator", Map.of("radius", 3), "water_bonus", .8, "light_threshold", 11));
@@ -77,5 +96,12 @@ class CompatibilityMechanicsTest {
         assertEquals(7, ManagedFarmlandBlockBehavior.nextMoisture(0, 7, true));
         assertEquals(0, ManagedFarmlandBlockBehavior.nextMoisture(0, 7, false));
         assertEquals(6, ManagedFarmlandBlockBehavior.nextMoisture(7, 7, false));
+    }
+    @Test void pieComparatorCountsTheRemainingSlicesWithoutScalingToFifteen() {
+        for (int consumed = 0; consumed <= 4; consumed++) {
+            assertEquals(4 - consumed, IntegerComparatorBlockBehavior.remainingSignal(consumed, 4));
+        }
+        assertEquals(0, IntegerComparatorBlockBehavior.remainingSignal(Integer.MAX_VALUE, 4));
+        assertEquals(15, IntegerComparatorBlockBehavior.remainingSignal(Integer.MIN_VALUE, 4));
     }
 }

@@ -28,6 +28,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Farmland;
+import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.Map;
@@ -140,13 +141,12 @@ public final class ManagedCropBlockBehavior extends FarmersDelightBlockBehavior 
     }
     public boolean isMature(ImmutableBlockState state) { return same(state) && state.get(age) >= maximum(state); }
     public ImmutableBlockState resetState(ImmutableBlockState state) { return state.with(age, 0); }
-    public boolean canPlantAt(Block target) { return resident(target) && soil(target.getRelative(BlockFace.DOWN)) != null && target.getLightLevel() >= options.spawnLight(); }
+    public boolean canPlantAt(Block target) { return resident(target) && soil(target.getRelative(BlockFace.DOWN)) != null && CropGrowthCommit.brightness(target) >= options.spawnLight(); }
     private boolean same(ImmutableBlockState state) { return state != null && !state.isEmpty() && state.owner().value().id().equals(block().id()); }
     private boolean upper(ImmutableBlockState state) { return half != null && "upper".equalsIgnoreCase(String.valueOf(state.getNullable(half))); }
     private int maximum(ImmutableBlockState state) { return upper(state) ? options.upperMaximumAge() : options.maximumAge(); }
     private boolean resident(Block block) {
-        return block.getWorld().isChunkLoaded(block.getX() >> 4, block.getZ() >> 4)
-                && (plugin == null || plugin.scheduler().isOwnedByCurrentRegion(block.getLocation()));
+        return CropGrowthCommit.resident(plugin, block);
     }
     private Soil soil(Block target) {
         if (!resident(target)) return null;
@@ -191,12 +191,12 @@ public final class ManagedCropBlockBehavior extends FarmersDelightBlockBehavior 
         ImmutableBlockState state = BlockStateUtils.getOptionalCustomBlockState(arguments[0]).orElse(null);
         if (world == null || pos == null || !canRandomlyTick(state)) return;
         Block target = world.getBlockAt(pos.x(), pos.y(), pos.z());
-        if (!resident(target) || target.getLightLevel() < options.light()) return;
+        if (!resident(target) || CropGrowthCommit.brightness(target) < options.light()) return;
         Soil row = soil(root(target, state).getRelative(BlockFace.DOWN));
         if (row == null) return;
         if (upper(state) && !options.upperIndependent()) return;
-        float chance = row.options().growthModifier() < 0 ? VanillaCropGrowth.chance(vanillaSpeed(target))
-                : Math.min(1, options.speed() * row.options().growthModifier());
+        float chance = row.options().growthModifier() == 0 ? 0
+                : VanillaCropGrowth.chance(vanillaSpeed(target), options.speed()) * options.randomGrowthChance();
         ThreadLocalRandom random = ThreadLocalRandom.current();
         if (row.options().bonemealChance() > 0 && random.nextFloat() < row.options().bonemealChance())
             grow(target, state, Math.max(1, bonemealBonus.getInt()));
@@ -208,7 +208,12 @@ public final class ManagedCropBlockBehavior extends FarmersDelightBlockBehavior 
         for (int index = 0; index < 9; ++index) {
             int dx = index / 3 - 1, dz = index % 3 - 1;
             Block below = target.getWorld().getBlockAt(target.getX() + dx, target.getY() - 1, target.getZ() + dz);
-            if (soil(below) != null) factors[index] = below.getBlockData() instanceof Farmland farm && farm.getMoisture() > 0 ? 3 : 1;
+            Soil configured = soil(below);
+            if (configured != null) {
+                float base = soilMoisture(below) > 0 ? 3 : 1;
+                float multiplier = configured.options().growthModifier();
+                factors[index] = base * (multiplier < 0 ? 1 : multiplier);
+            }
             if (dx == 0 && dz == 0) continue;
             Block neighbor = below.getRelative(BlockFace.UP);
             if (!resident(neighbor) || !same(CraftEngineBlocks.getCustomBlockState(neighbor))) continue;
@@ -218,32 +223,48 @@ public final class ManagedCropBlockBehavior extends FarmersDelightBlockBehavior 
         }
         return VanillaCropGrowth.growthSpeed(factors, horizontal, vertical, diagonal);
     }
+    private int soilMoisture(Block block) {
+        ImmutableBlockState custom = CraftEngineBlocks.getCustomBlockState(block);
+        if (custom != null && !custom.isEmpty()) {
+            Property<Integer> property = BlockBehaviorFactory.getOptionalProperty(custom.owner().value(), "moisture", Integer.class);
+            return property == null ? 0 : custom.get(property, 0);
+        }
+        return block.getBlockData() instanceof Farmland farm ? farm.getMoisture() : 0;
+    }
     private boolean grow(Block target, ImmutableBlockState current, int bonus) {
+        return grow(target, current, bonus, null, false);
+    }
+    private boolean grow(Block target, ImmutableBlockState current, int bonus, Player player, boolean fertilizing) {
+        return grow(target, current, bonus, player, fertilizing, () -> true);
+    }
+    private boolean grow(Block target, ImmutableBlockState current, int bonus, Player player, boolean fertilizing,
+                         java.util.function.BooleanSupplier guard) {
         if (!resident(target) || !same(current)) return false;
+        if (CraftEngineBlocks.getCustomBlockState(target) != current) return false;
         int before = current.get(age), next = CropBehaviorOptions.incrementAge(before, bonus, maximum(current));
-        boolean changed = next != before;
         ImmutableBlockState updated = current.with(age, next);
-        if (changed && !CraftEngineBlocks.place(target.getLocation(), updated, false)) return false;
+        Map<Block, ImmutableBlockState> changes = new java.util.LinkedHashMap<>();
+        if (next != before) changes.put(target, updated);
         if (shape == Shape.DOUBLE && options.synchronizeAges()) {
             Block other = target.getRelative(upper(current) ? BlockFace.DOWN : BlockFace.UP);
             if (resident(other)) {
                 ImmutableBlockState otherState = CraftEngineBlocks.getCustomBlockState(other);
-                if (same(otherState)) CraftEngineBlocks.place(other.getLocation(), otherState.with(age,
-                        Math.min(maximum(otherState), next)), false);
+                if (same(otherState)) changes.put(other, otherState.with(age, Math.min(maximum(otherState), next)));
             }
         }
-        if (shape == Shape.DOUBLE && !upper(current) && next >= options.maximumAge()) {
+        if (shape == Shape.DOUBLE && !upper(current) && next >= options.upperSpawnAge()) {
             Block top = target.getRelative(BlockFace.UP);
-            if (!resident(top)) return changed;
+            if (!resident(top)) return false;
             ImmutableBlockState topState = CraftEngineBlocks.getCustomBlockState(top);
             if (top.getType().isAir()) {
-                int initial = Math.min(options.upperMaximumAge(), Math.max(0, options.upperMinimumAge()));
+                int initial = Math.min(options.upperMaximumAge(), options.synchronizeAges() ? next : Math.max(0, options.upperMinimumAge()));
                 topState = ImmutableBlockState.with(updated.with(age, initial), half, half.valueByName("upper"));
-                boolean added = CraftEngineBlocks.place(top.getLocation(), topState, false);
-                changed |= added;
-                if (added && support != null) CraftEngineBlocks.place(target.getLocation(), updated.with(support, true), false);
+                changes.put(top, topState);
+                if (support != null) changes.put(target, updated.with(support, true));
             } else if (same(topState) && !options.synchronizeAges() && !options.upperIndependent()) {
-                changed |= grow(top, topState, bonus);
+                changes.put(top, topState.with(age, CropBehaviorOptions.incrementAge(topState.get(age), bonus, maximum(topState))));
+            } else if (!same(topState) && options.requiresUpperSpace()) {
+                return false;
             }
         } else if (shape == Shape.ROPE && next >= options.ropeMinimumAge()) {
             Block top = target.getRelative(BlockFace.UP);
@@ -251,22 +272,24 @@ public final class ManagedCropBlockBehavior extends FarmersDelightBlockBehavior 
             if (resident(top) && target.getY() - bottom.getY() + 1 < options.ropeMaximumHeight()) {
                 ImmutableBlockState rope = CraftEngineBlocks.getCustomBlockState(top);
                 if (rope != null && !rope.isEmpty() && options.ropeBlock().equals(rope.owner().value().id().toString())) {
-                    changed |= CraftEngineBlocks.place(top.getLocation(), block().defaultState().with(age,
-                            Math.min(options.maximumAge(), Math.max(0, options.ropeAge()))).with(support, true), false);
+                    changes.put(top, block().defaultState().with(age,
+                            Math.min(options.maximumAge(), Math.max(0, options.ropeAge()))).with(support, true));
                 }
             }
         }
-        return changed;
+        return CropGrowthCommit.apply(plugin, changes, player, fertilizing ? target : null, guard);
     }
     @Override public InteractionResult useOnBlock(UseOnContext context, ImmutableBlockState state) {
         if (context.getPlayer() == null || !(context.getPlayer().platformPlayer() instanceof org.bukkit.entity.Player player)) return InteractionResult.PASS;
         var held = ItemUtils.getItemInHand(player, context.getHand());
         if (held == null || held.getType() != Material.BONE_MEAL || !options.bonemeal()) return InteractionResult.PASS;
+        CropBoneMealUse use = CropBoneMealUse.capture(plugin, context);
+        if (use == null) return InteractionResult.FAIL;
         BlockPos pos = context.getClickedPos();
         Block target = player.getWorld().getBlockAt(pos.x(), pos.y(), pos.z());
         if (!ProtectionCompat.canBuild(player, target, (String) null)) return InteractionResult.FAIL;
-        if (!grow(target, state, bonemealBonus.getInt())) return InteractionResult.PASS;
-        if (player.getGameMode() != GameMode.CREATIVE) held.setAmount(held.getAmount() - 1);
+        if (!grow(target, state, bonemealBonus.getInt(), player, true, use)) return InteractionResult.FAIL;
+        use.consume();
         playBonemealEffect(player.getWorld(), pos.x(), pos.y(), pos.z());
         return InteractionResult.SUCCESS_AND_CANCEL;
     }
@@ -335,6 +358,10 @@ public final class ManagedCropBlockBehavior extends FarmersDelightBlockBehavior 
             if (resident(lower)) {
                 ImmutableBlockState lowerState = CraftEngineBlocks.getCustomBlockState(lower);
                 if (same(lowerState)) {
+                    if (!options.resetLowerAfterUpperRemoval()) {
+                        CraftEngineBlocks.remove(lower);
+                        return;
+                    }
                     lowerState = lowerState.with(age, Math.max(0, options.maximumAge() - 1));
                     if (support != null) lowerState = lowerState.with(support, false);
                     CraftEngineBlocks.place(lower.getLocation(), lowerState, false);

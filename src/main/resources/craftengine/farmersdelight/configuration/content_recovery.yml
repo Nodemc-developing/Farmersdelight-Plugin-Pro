@@ -1,0 +1,1460 @@
+templates:
+  farmersdelight:storage_basket:
+    loot:
+      template: default:loot_table/self
+    settings:
+      hardness: 1.5
+      resistance: 1.5
+      push-reaction: block
+      is-randomly-ticking: false
+      tags:
+      - minecraft:mineable/axe
+      sounds:
+        break: minecraft:block.${basket_sound}.break
+        fall: minecraft:block.${basket_sound}.fall
+        hit: minecraft:block.${basket_sound}.hit
+        place: minecraft:block.${basket_sound}.place
+        step: minecraft:block.${basket_sound}.step
+    behaviors:
+    - type: simple_storage_block
+      title: <!i><lang:container.farmersdelight.basket>
+      rows: 3
+      allow-input: true
+      allow-output: true
+    - type: farmersdelight:basket
+      transfer-cooldown: 8
+      redstone-lock: true
+      eject: false
+    states:
+      properties:
+        facing:
+          type: direction
+          default: up
+        waterlogged:
+          type: boolean
+          default: false
+        enabled:
+          type: boolean
+          default: true
+      appearances:
+        up_dry:
+          model:
+            path: ${basket_model}
+          state: ${basket_outline_state}
+        up_wet:
+          model:
+            path: ${basket_model}
+          auto_state: waterlogged_non_tintable_leaves
+        down_dry:
+          model:
+            path: ${basket_model}
+            x: 180
+          auto_state: non_tintable_leaves
+        down_wet:
+          model:
+            path: ${basket_model}
+            x: 180
+          auto_state: waterlogged_non_tintable_leaves
+        north_dry:
+          model:
+            path: ${basket_model}
+            x: 90
+          auto_state: non_tintable_leaves
+        north_wet:
+          model:
+            path: ${basket_model}
+            x: 90
+          auto_state: waterlogged_non_tintable_leaves
+        south_dry:
+          model:
+            path: ${basket_model}
+            x: 270
+          auto_state: non_tintable_leaves
+        south_wet:
+          model:
+            path: ${basket_model}
+            x: 270
+          auto_state: waterlogged_non_tintable_leaves
+        east_dry:
+          model:
+            path: ${basket_model}
+            x: 90
+            y: 90
+          auto_state: non_tintable_leaves
+        east_wet:
+          model:
+            path: ${basket_model}
+            x: 90
+            y: 90
+          auto_state: waterlogged_non_tintable_leaves
+        west_dry:
+          model:
+            path: ${basket_model}
+            x: 90
+            y: 270
+          auto_state: non_tintable_leaves
+        west_wet:
+          model:
+            path: ${basket_model}
+            x: 90
+            y: 270
+          auto_state: waterlogged_non_tintable_leaves
+      variants:
+        waterlogged=true:
+          settings:
+            fluid_state: water
+        facing=up,waterlogged=false,enabled=false:
+          appearance: up_dry
+        facing=up,waterlogged=false,enabled=true:
+          appearance: up_dry
+        facing=up,waterlogged=true,enabled=false:
+          appearance: up_wet
+        facing=up,waterlogged=true,enabled=true:
+          appearance: up_wet
+        facing=down,waterlogged=false,enabled=false:
+          appearance: down_dry
+        facing=down,waterlogged=false,enabled=true:
+          appearance: down_dry
+        facing=down,waterlogged=true,enabled=false:
+          appearance: down_wet
+        facing=down,waterlogged=true,enabled=true:
+          appearance: down_wet
+        facing=north,waterlogged=false,enabled=false:
+          appearance: north_dry
+        facing=north,waterlogged=false,enabled=true:
+          appearance: north_dry
+        facing=north,waterlogged=true,enabled=false:
+          appearance: north_wet
+        facing=north,waterlogged=true,enabled=true:
+          appearance: north_wet
+        facing=south,waterlogged=false,enabled=false:
+          appearance: south_dry
+        facing=south,waterlogged=false,enabled=true:
+          appearance: south_dry
+        facing=south,waterlogged=true,enabled=false:
+          appearance: south_wet
+        facing=south,waterlogged=true,enabled=true:
+          appearance: south_wet
+        facing=east,waterlogged=false,enabled=false:
+          appearance: east_dry
+        facing=east,waterlogged=false,enabled=true:
+          appearance: east_dry
+        facing=east,waterlogged=true,enabled=false:
+          appearance: east_wet
+        facing=east,waterlogged=true,enabled=true:
+          appearance: east_wet
+        facing=west,waterlogged=false,enabled=false:
+          appearance: west_dry
+        facing=west,waterlogged=false,enabled=true:
+          appearance: west_dry
+        facing=west,waterlogged=true,enabled=false:
+          appearance: west_wet
+        facing=west,waterlogged=true,enabled=true:
+          appearance: west_wet
+items:
+  farmersdelight:wooden_basket:
+    data:
+      item-name: <!i><lang:block.farmersdelight.wooden_basket>
+    model: farmersdelight:block/wooden_basket
+    behavior:
+      type: block_item
+      block: farmersdelight:wooden_basket
+  farmersdelight:bamboo_basket:
+    data:
+      item-name: <!i><lang:block.farmersdelight.bamboo_basket>
+    model: farmersdelight:block/bamboo_basket
+    behavior:
+      type: block_item
+      block: farmersdelight:bamboo_basket
+  farmersdelight:egg_carton:
+    data:
+      item-name: <!i><lang:block.farmersdelight.egg_carton>
+    model: farmersdelight:block/egg_carton
+    behavior:
+      type: block_item
+      block: farmersdelight:egg_carton
+  farmersdelight:meat_skewer:
+    material: golden_carrot
+    model: farmersdelight:item/meat_skewer
+    data:
+      item-name: <!i><lang:item.farmersdelight.meat_skewer>
+      food:
+        nutrition: 4
+        saturation: 3.2
+        can-always-eat: false
+    behavior:
+      type: farmersdelight:skewer_item
+      cooking-proxy: farmersdelight:meat_skewer_cooking
+      result: farmersdelight:cooked_meat_skewer
+      cook-ticks: 120
+  farmersdelight:cooked_meat_skewer:
+    material: golden_carrot
+    model: farmersdelight:item/cooked_meat_skewer
+    data:
+      item-name: <!i><lang:item.farmersdelight.cooked_meat_skewer>
+      food:
+        nutrition: 8
+        saturation: 14.4
+        can-always-eat: false
+  farmersdelight:meat_skewer_cooking:
+    material: stick
+    model: farmersdelight:item/meat_skewer
+    data:
+      item-name: <!i>
+  farmersdelight:vegetable_skewer:
+    material: golden_carrot
+    model: farmersdelight:item/vegetable_skewer
+    data:
+      item-name: <!i><lang:item.farmersdelight.vegetable_skewer>
+      food:
+        nutrition: 4
+        saturation: 3.2
+        can-always-eat: false
+    behavior:
+      type: farmersdelight:skewer_item
+      cooking-proxy: farmersdelight:vegetable_skewer_cooking
+      result: farmersdelight:cooked_vegetable_skewer
+      cook-ticks: 120
+  farmersdelight:cooked_vegetable_skewer:
+    material: golden_carrot
+    model: farmersdelight:item/cooked_vegetable_skewer
+    data:
+      item-name: <!i><lang:item.farmersdelight.cooked_vegetable_skewer>
+      food:
+        nutrition: 8
+        saturation: 14.4
+        can-always-eat: false
+  farmersdelight:vegetable_skewer_cooking:
+    material: stick
+    model: farmersdelight:item/vegetable_skewer
+    data:
+      item-name: <!i>
+  $$>=1.21.9:
+    farmersdelight:copper_knife:
+      category: farmersdelight:tools
+      material: nether_brick
+      model:
+        type: minecraft:model
+        path: farmersdelight:item/copper_knife
+        tints:
+        - type: minecraft:constant
+          value: 13073232
+      data:
+        item-name: <!i><lang:item.farmersdelight.copper_knife>
+        max-stack-size: 1
+        hide-tooltip:
+        - attribute_modifiers
+        attribute-modifiers:
+        - type: minecraft:attack_damage
+          slot: mainhand
+          amount: 1.5
+          operation: add_value
+        - type: minecraft:attack_speed
+          slot: mainhand
+          amount: -2.0
+          operation: add_value
+      settings:
+        farmersdelight:sword:
+          max-durability: 190
+          enchantability: 13
+          attack-sound: minecraft:entity.player.attack.sweep
+        tags:
+        - farmersdelight:tools/knives
+  farmersdelight:apple_crate:
+    data:
+      item-name: <!i><lang:block.farmersdelight.apple_crate>
+    model: farmersdelight:block/apple_crate
+    behavior:
+      type: block_item
+      block: farmersdelight:apple_crate
+  farmersdelight:chorus_fruit_crate:
+    data:
+      item-name: <!i><lang:block.farmersdelight.chorus_fruit_crate>
+    model: farmersdelight:block/chorus_fruit_crate
+    behavior:
+      type: block_item
+      block: farmersdelight:chorus_fruit_crate
+  farmersdelight:brown_mushroom_crate:
+    data:
+      item-name: <!i><lang:block.farmersdelight.brown_mushroom_crate>
+    model: farmersdelight:block/brown_mushroom_crate
+    behavior:
+      type: block_item
+      block: farmersdelight:brown_mushroom_crate
+  farmersdelight:red_mushroom_crate:
+    data:
+      item-name: <!i><lang:block.farmersdelight.red_mushroom_crate>
+    model: farmersdelight:block/red_mushroom_crate
+    behavior:
+      type: block_item
+      block: farmersdelight:red_mushroom_crate
+  farmersdelight:golden_apple_crate:
+    data:
+      item-name: <!i><lang:block.farmersdelight.golden_apple_crate>
+    model: farmersdelight:block/golden_apple_crate
+    behavior:
+      type: block_item
+      block: farmersdelight:golden_apple_crate
+  farmersdelight:golden_carrot_crate:
+    data:
+      item-name: <!i><lang:block.farmersdelight.golden_carrot_crate>
+    model: farmersdelight:block/golden_carrot_crate
+    behavior:
+      type: block_item
+      block: farmersdelight:golden_carrot_crate
+  farmersdelight:cocoa_beans_bag:
+    data:
+      item-name: <!i><lang:block.farmersdelight.cocoa_beans_bag>
+    model: farmersdelight:block/cocoa_beans_bag
+    behavior:
+      type: block_item
+      block: farmersdelight:cocoa_beans_bag
+  farmersdelight:glow_berries_bag:
+    data:
+      item-name: <!i><lang:block.farmersdelight.glow_berries_bag>
+    model: farmersdelight:block/glow_berries_bag
+    behavior:
+      type: block_item
+      block: farmersdelight:glow_berries_bag
+  farmersdelight:sweet_berries_bag:
+    data:
+      item-name: <!i><lang:block.farmersdelight.sweet_berries_bag>
+    model: farmersdelight:block/sweet_berries_bag
+    behavior:
+      type: block_item
+      block: farmersdelight:sweet_berries_bag
+  farmersdelight:wild_carrots:
+    data:
+      item-name: <!i><lang:block.farmersdelight.wild_carrots>
+    model: farmersdelight:item/wild_carrots
+    behaviors:
+    - type: block_item
+      block: farmersdelight:wild_carrots
+    - type: compostable_item
+      chance: 0.65
+  farmersdelight:wild_potatoes:
+    data:
+      item-name: <!i><lang:block.farmersdelight.wild_potatoes>
+    model: farmersdelight:item/wild_potatoes
+    behaviors:
+    - type: block_item
+      block: farmersdelight:wild_potatoes
+    - type: compostable_item
+      chance: 0.65
+  farmersdelight:wild_beetroots:
+    data:
+      item-name: <!i><lang:block.farmersdelight.wild_beetroots>
+    model: farmersdelight:item/wild_beetroots
+    behaviors:
+    - type: block_item
+      block: farmersdelight:wild_beetroots
+    - type: compostable_item
+      chance: 0.65
+  farmersdelight:sandy_shrub:
+    data:
+      item-name: <!i><lang:block.farmersdelight.sandy_shrub>
+    model: farmersdelight:item/sandy_shrub
+    behaviors:
+    - type: block_item
+      block: farmersdelight:sandy_shrub
+    - type: compostable_item
+      chance: 0.65
+  farmersdelight:rope_fence:
+    data:
+      item-name: <!i><lang:block.farmersdelight.rope_fence>
+    model: farmersdelight:block/rope_fence_inventory
+    behavior:
+      type: block_item
+      block: farmersdelight:rope_fence
+  farmersdelight:entity_renderer/rope_fence_post:
+    material: paper
+    model: farmersdelight:block/rope_fence_post
+  farmersdelight:entity_renderer/rope_fence_side:
+    material: paper
+    model: farmersdelight:block/rope_fence_side
+  farmersdelight:rope_fence_gate:
+    data:
+      item-name: <!i><lang:block.farmersdelight.rope_fence_gate>
+    model: farmersdelight:block/rope_fence_gate
+    behavior:
+      type: block_item
+      block: farmersdelight:rope_fence_gate
+blocks:
+  farmersdelight:wooden_basket:
+    template: farmersdelight:storage_basket
+    arguments:
+      basket_model: farmersdelight:block/wooden_basket
+      basket_sound: wood
+      basket_outline_state: composter[level=1]
+  farmersdelight:bamboo_basket:
+    template: farmersdelight:storage_basket
+    arguments:
+      basket_model: farmersdelight:block/bamboo_basket
+      basket_sound: scaffolding
+      basket_outline_state: composter[level=2]
+  farmersdelight:egg_carton:
+    settings:
+      hardness: 0.8
+      resistance: 0.8
+      burnable: true
+      burn_chance: 30
+      fire_spread_chance: 60
+      tags:
+      - minecraft:mineable/hoe
+      - minecraft:slabs
+      sounds:
+        break: minecraft:block.wool.break
+        fall: minecraft:block.wool.fall
+        hit: minecraft:block.wool.hit
+        place: minecraft:block.wool.place
+        step: minecraft:block.wool.step
+    behaviors:
+    - type: slab_block
+    loot:
+      template: default:loot_table/slab
+    states:
+      template: default:block_state/slab
+      arguments:
+        slab_base_block: oxidized_cut_copper_slab
+        slab_model: farmersdelight:block/egg_carton
+        planks_model: farmersdelight:block/egg_carton_double
+        slab_texture_bottom: farmersdelight:block/egg_carton_bottom
+        slab_texture_side: farmersdelight:block/egg_carton_side
+        slab_texture_top: farmersdelight:block/egg_carton_top
+  farmersdelight:apple_crate:
+    settings:
+      hardness: 2.0
+      resistance: 3.0
+      tags:
+      - minecraft:mineable/axe
+      sounds:
+        break: minecraft:block.wood.break
+        fall: minecraft:block.wood.fall
+        hit: minecraft:block.wood.hit
+        place: minecraft:block.wood.place
+        step: minecraft:block.wood.step
+    loot:
+      template: default:loot_table/self
+    state:
+      auto_state: mushroom_stem
+      model:
+        path: farmersdelight:block/apple_crate
+  farmersdelight:chorus_fruit_crate:
+    settings:
+      hardness: 2.0
+      resistance: 3.0
+      tags:
+      - minecraft:mineable/axe
+      sounds:
+        break: minecraft:block.wood.break
+        fall: minecraft:block.wood.fall
+        hit: minecraft:block.wood.hit
+        place: minecraft:block.wood.place
+        step: minecraft:block.wood.step
+    loot:
+      template: default:loot_table/self
+    state:
+      auto_state: mushroom_stem
+      model:
+        path: farmersdelight:block/chorus_fruit_crate
+  farmersdelight:brown_mushroom_crate:
+    settings:
+      hardness: 2.0
+      resistance: 3.0
+      tags:
+      - minecraft:mineable/axe
+      sounds:
+        break: minecraft:block.wood.break
+        fall: minecraft:block.wood.fall
+        hit: minecraft:block.wood.hit
+        place: minecraft:block.wood.place
+        step: minecraft:block.wood.step
+    loot:
+      template: default:loot_table/self
+    state:
+      auto_state: mushroom_stem
+      model:
+        path: farmersdelight:block/brown_mushroom_crate
+  farmersdelight:red_mushroom_crate:
+    settings:
+      hardness: 2.0
+      resistance: 3.0
+      tags:
+      - minecraft:mineable/axe
+      sounds:
+        break: minecraft:block.wood.break
+        fall: minecraft:block.wood.fall
+        hit: minecraft:block.wood.hit
+        place: minecraft:block.wood.place
+        step: minecraft:block.wood.step
+    loot:
+      template: default:loot_table/self
+    state:
+      auto_state: mushroom_stem
+      model:
+        path: farmersdelight:block/red_mushroom_crate
+  farmersdelight:golden_apple_crate:
+    settings:
+      hardness: 2.0
+      resistance: 3.0
+      tags:
+      - minecraft:mineable/axe
+      sounds:
+        break: minecraft:block.wood.break
+        fall: minecraft:block.wood.fall
+        hit: minecraft:block.wood.hit
+        place: minecraft:block.wood.place
+        step: minecraft:block.wood.step
+    loot:
+      template: default:loot_table/self
+    state:
+      auto_state: mushroom_stem
+      model:
+        path: farmersdelight:block/golden_apple_crate
+  farmersdelight:golden_carrot_crate:
+    settings:
+      hardness: 2.0
+      resistance: 3.0
+      tags:
+      - minecraft:mineable/axe
+      sounds:
+        break: minecraft:block.wood.break
+        fall: minecraft:block.wood.fall
+        hit: minecraft:block.wood.hit
+        place: minecraft:block.wood.place
+        step: minecraft:block.wood.step
+    loot:
+      template: default:loot_table/self
+    state:
+      auto_state: mushroom_stem
+      model:
+        path: farmersdelight:block/golden_carrot_crate
+  farmersdelight:cocoa_beans_bag:
+    settings:
+      hardness: 0.5
+      resistance: 0.5
+      tags:
+      - minecraft:mineable/hoe
+      sounds:
+        break: minecraft:block.wool.break
+        fall: minecraft:block.wool.fall
+        hit: minecraft:block.wool.hit
+        place: minecraft:block.wool.place
+        step: minecraft:block.wool.step
+    loot:
+      template: default:loot_table/self
+    state:
+      auto_state: mushroom_stem
+      model:
+        path: farmersdelight:block/cocoa_beans_bag
+  farmersdelight:glow_berries_bag:
+    settings:
+      hardness: 0.5
+      resistance: 0.5
+      tags:
+      - minecraft:mineable/hoe
+      sounds:
+        break: minecraft:block.wool.break
+        fall: minecraft:block.wool.fall
+        hit: minecraft:block.wool.hit
+        place: minecraft:block.wool.place
+        step: minecraft:block.wool.step
+    loot:
+      template: default:loot_table/self
+    state:
+      auto_state: mushroom_stem
+      model:
+        path: farmersdelight:block/glow_berries_bag
+  farmersdelight:sweet_berries_bag:
+    settings:
+      hardness: 0.5
+      resistance: 0.5
+      tags:
+      - minecraft:mineable/hoe
+      sounds:
+        break: minecraft:block.wool.break
+        fall: minecraft:block.wool.fall
+        hit: minecraft:block.wool.hit
+        place: minecraft:block.wool.place
+        step: minecraft:block.wool.step
+    loot:
+      template: default:loot_table/self
+    state:
+      auto_state: mushroom_stem
+      model:
+        path: farmersdelight:block/sweet_berries_bag
+  farmersdelight:wild_carrots:
+    settings:
+      hardness: 0
+      resistance: 0
+      push-reaction: destroy
+      is-randomly-ticking: false
+      tags:
+      - minecraft:flowers
+      - minecraft:sword_efficient
+      - farmersdelight:wild_crops
+      - farmersdelight:unaffected_by_rich_soil
+      sounds:
+        break: minecraft:block.grass.break
+        fall: minecraft:block.grass.fall
+        hit: minecraft:block.grass.hit
+        place: minecraft:block.grass.place
+        step: minecraft:block.grass.step
+    behaviors:
+    - type: liquid_flowable_block
+    - type: bush_block
+      bottom-block-tags:
+      - minecraft:dirt
+      - minecraft:sand
+    - type: farmersdelight:wild_plant
+      bone-meal:
+        is-target: true
+        success-chance: 0.8
+      bottom-block-tags:
+      - minecraft:dirt
+      - minecraft:sand
+      spread-limit: 10
+    state:
+      auto_state: higher_tripwire
+      model:
+        path: farmersdelight:block/wild_carrots
+    loot:
+      pools:
+      - rolls: 1
+        entries:
+        - type: alternatives
+          children:
+          - type: item
+            item: farmersdelight:wild_carrots
+            conditions:
+            - type: match_item
+              item: minecraft:shears
+          - type: item
+            item: minecraft:carrot
+            functions:
+            - type: explosion_decay
+            - type: apply_bonus
+              enchantment: minecraft:fortune
+              formula:
+                type: ore_drops
+  farmersdelight:wild_potatoes:
+    settings:
+      hardness: 0
+      resistance: 0
+      push-reaction: destroy
+      is-randomly-ticking: false
+      tags:
+      - minecraft:flowers
+      - minecraft:sword_efficient
+      - farmersdelight:wild_crops
+      - farmersdelight:unaffected_by_rich_soil
+      sounds:
+        break: minecraft:block.grass.break
+        fall: minecraft:block.grass.fall
+        hit: minecraft:block.grass.hit
+        place: minecraft:block.grass.place
+        step: minecraft:block.grass.step
+    behaviors:
+    - type: liquid_flowable_block
+    - type: bush_block
+      bottom-block-tags:
+      - minecraft:dirt
+      - minecraft:sand
+    - type: farmersdelight:wild_plant
+      bone-meal:
+        is-target: true
+        success-chance: 0.8
+      bottom-block-tags:
+      - minecraft:dirt
+      - minecraft:sand
+      spread-limit: 10
+    state:
+      auto_state: higher_tripwire
+      model:
+        path: farmersdelight:block/wild_potatoes
+    loot:
+      pools:
+      - rolls: 1
+        entries:
+        - type: alternatives
+          children:
+          - type: item
+            item: farmersdelight:wild_potatoes
+            conditions:
+            - type: match_item
+              item: minecraft:shears
+          - type: item
+            item: minecraft:potato
+            functions:
+            - type: explosion_decay
+            - type: apply_bonus
+              enchantment: minecraft:fortune
+              formula:
+                type: ore_drops
+  farmersdelight:wild_beetroots:
+    settings:
+      hardness: 0
+      resistance: 0
+      push-reaction: destroy
+      is-randomly-ticking: false
+      tags:
+      - minecraft:flowers
+      - minecraft:sword_efficient
+      - farmersdelight:wild_crops
+      - farmersdelight:unaffected_by_rich_soil
+      sounds:
+        break: minecraft:block.grass.break
+        fall: minecraft:block.grass.fall
+        hit: minecraft:block.grass.hit
+        place: minecraft:block.grass.place
+        step: minecraft:block.grass.step
+    behaviors:
+    - type: liquid_flowable_block
+    - type: bush_block
+      bottom-block-tags:
+      - minecraft:dirt
+      - minecraft:sand
+    - type: farmersdelight:wild_plant
+      bone-meal:
+        is-target: true
+        success-chance: 0.8
+      bottom-block-tags:
+      - minecraft:dirt
+      - minecraft:sand
+      spread-limit: 10
+    state:
+      auto_state: higher_tripwire
+      model:
+        path: farmersdelight:block/wild_beetroots
+    loot:
+      pools:
+      - rolls: 1
+        entries:
+        - type: alternatives
+          children:
+          - type: item
+            item: farmersdelight:wild_beetroots
+            conditions:
+            - type: match_item
+              item: minecraft:shears
+          - type: item
+            item: minecraft:beetroot
+            functions:
+            - type: explosion_decay
+            - type: apply_bonus
+              enchantment: minecraft:fortune
+              formula:
+                type: ore_drops
+  farmersdelight:sandy_shrub:
+    settings:
+      hardness: 0
+      resistance: 0
+      push-reaction: destroy
+      is-randomly-ticking: false
+      tags:
+      - minecraft:flowers
+      - minecraft:sword_efficient
+      - farmersdelight:wild_crops
+      - farmersdelight:unaffected_by_rich_soil
+      sounds:
+        break: minecraft:block.grass.break
+        fall: minecraft:block.grass.fall
+        hit: minecraft:block.grass.hit
+        place: minecraft:block.grass.place
+        step: minecraft:block.grass.step
+    behaviors:
+    - type: liquid_flowable_block
+    - type: bush_block
+      bottom-block-tags:
+      - minecraft:sand
+    - type: farmersdelight:sandy_shrub
+      patch:
+        attempts: 32
+        horizontal-range: 2
+        vertical-range: 3
+      bottom-block-tags:
+      - minecraft:sand
+    state:
+      auto_state: higher_tripwire
+      model:
+        path: farmersdelight:block/sandy_shrub
+    loot:
+      pools:
+      - rolls: 1
+        entries:
+        - type: alternatives
+          children:
+          - type: item
+            item: farmersdelight:sandy_shrub
+            conditions:
+            - type: match_item
+              item: minecraft:shears
+          - type: item
+            item: minecraft:stick
+            functions:
+            - type: explosion_decay
+            count:
+              type: uniform
+              min: 1
+              max: 2
+  farmersdelight:rope_fence:
+    settings:
+      hardness: 1.0
+      resistance: 2.0
+      push-reaction: block
+      is-suffocating: false
+      is-redstone-conductor: false
+      tags:
+      - minecraft:fences
+      - minecraft:mineable/axe
+      - farmersdelight:rope_fence
+      sounds:
+        break: minecraft:block.wood.break
+        fall: minecraft:block.wood.fall
+        hit: minecraft:block.wood.hit
+        place: minecraft:block.wood.place
+        step: minecraft:block.wood.step
+    behaviors:
+    - type: farmersdelight:rope_fence
+      connectable-block-tag: farmersdelight:rope_fence
+      can-leash: true
+    loot:
+      template: default:loot_table/self
+    states:
+      template: default:block_state/fence
+      arguments:
+        fence_base_block: bamboo_fence
+        fence_post_item: farmersdelight:entity_renderer/rope_fence_post
+        fence_side_item: farmersdelight:entity_renderer/rope_fence_side
+  farmersdelight:rope_fence_gate:
+    settings:
+      hardness: 1.0
+      resistance: 2.0
+      push-reaction: block
+      is-suffocating: false
+      is-redstone-conductor: false
+      tags:
+      - minecraft:fence_gates
+      - minecraft:mineable/axe
+      sounds:
+        break: minecraft:block.wood.break
+        fall: minecraft:block.wood.fall
+        hit: minecraft:block.wood.hit
+        place: minecraft:block.wood.place
+        step: minecraft:block.wood.step
+    behaviors:
+    - type: farmersdelight:rope_fence_gate
+      can-open-with-hand: true
+      sounds:
+        open: minecraft:block.fence_gate.open
+        close: minecraft:block.fence_gate.close
+    loot:
+      template: default:loot_table/self
+    states:
+      properties:
+        facing:
+          type: 4-direction
+          default: north
+        in_wall:
+          type: boolean
+          default: false
+        open:
+          type: boolean
+          default: false
+        powered:
+          type: boolean
+          default: false
+      appearances:
+        north_ground_closed:
+          state: spruce_fence_gate[facing=north,in_wall=false,open=false,powered=true]
+          model:
+            path: farmersdelight:block/rope_fence_gate
+            y: 180
+        north_ground_open:
+          state: spruce_fence_gate[facing=north,in_wall=false,open=true,powered=true]
+          model:
+            path: farmersdelight:block/rope_fence_gate_open
+            y: 180
+        north_wall_closed:
+          state: spruce_fence_gate[facing=north,in_wall=true,open=false,powered=true]
+          model:
+            path: farmersdelight:block/rope_fence_gate_wall
+            y: 180
+        north_wall_open:
+          state: spruce_fence_gate[facing=north,in_wall=true,open=true,powered=true]
+          model:
+            path: farmersdelight:block/rope_fence_gate_wall_open
+            y: 180
+        east_ground_closed:
+          state: spruce_fence_gate[facing=east,in_wall=false,open=false,powered=true]
+          model:
+            path: farmersdelight:block/rope_fence_gate
+            y: 270
+        east_ground_open:
+          state: spruce_fence_gate[facing=east,in_wall=false,open=true,powered=true]
+          model:
+            path: farmersdelight:block/rope_fence_gate_open
+            y: 270
+        east_wall_closed:
+          state: spruce_fence_gate[facing=east,in_wall=true,open=false,powered=true]
+          model:
+            path: farmersdelight:block/rope_fence_gate_wall
+            y: 270
+        east_wall_open:
+          state: spruce_fence_gate[facing=east,in_wall=true,open=true,powered=true]
+          model:
+            path: farmersdelight:block/rope_fence_gate_wall_open
+            y: 270
+        south_ground_closed:
+          state: spruce_fence_gate[facing=south,in_wall=false,open=false,powered=true]
+          model:
+            path: farmersdelight:block/rope_fence_gate
+            y: 0
+        south_ground_open:
+          state: spruce_fence_gate[facing=south,in_wall=false,open=true,powered=true]
+          model:
+            path: farmersdelight:block/rope_fence_gate_open
+            y: 0
+        south_wall_closed:
+          state: spruce_fence_gate[facing=south,in_wall=true,open=false,powered=true]
+          model:
+            path: farmersdelight:block/rope_fence_gate_wall
+            y: 0
+        south_wall_open:
+          state: spruce_fence_gate[facing=south,in_wall=true,open=true,powered=true]
+          model:
+            path: farmersdelight:block/rope_fence_gate_wall_open
+            y: 0
+        west_ground_closed:
+          state: spruce_fence_gate[facing=west,in_wall=false,open=false,powered=true]
+          model:
+            path: farmersdelight:block/rope_fence_gate
+            y: 90
+        west_ground_open:
+          state: spruce_fence_gate[facing=west,in_wall=false,open=true,powered=true]
+          model:
+            path: farmersdelight:block/rope_fence_gate_open
+            y: 90
+        west_wall_closed:
+          state: spruce_fence_gate[facing=west,in_wall=true,open=false,powered=true]
+          model:
+            path: farmersdelight:block/rope_fence_gate_wall
+            y: 90
+        west_wall_open:
+          state: spruce_fence_gate[facing=west,in_wall=true,open=true,powered=true]
+          model:
+            path: farmersdelight:block/rope_fence_gate_wall_open
+            y: 90
+      variants:
+        facing=north,in_wall=false,open=false,powered=false:
+          appearance: north_ground_closed
+        facing=north,in_wall=false,open=false,powered=true:
+          appearance: north_ground_closed
+        facing=north,in_wall=false,open=true,powered=false:
+          appearance: north_ground_open
+        facing=north,in_wall=false,open=true,powered=true:
+          appearance: north_ground_open
+        facing=north,in_wall=true,open=false,powered=false:
+          appearance: north_wall_closed
+        facing=north,in_wall=true,open=false,powered=true:
+          appearance: north_wall_closed
+        facing=north,in_wall=true,open=true,powered=false:
+          appearance: north_wall_open
+        facing=north,in_wall=true,open=true,powered=true:
+          appearance: north_wall_open
+        facing=east,in_wall=false,open=false,powered=false:
+          appearance: east_ground_closed
+        facing=east,in_wall=false,open=false,powered=true:
+          appearance: east_ground_closed
+        facing=east,in_wall=false,open=true,powered=false:
+          appearance: east_ground_open
+        facing=east,in_wall=false,open=true,powered=true:
+          appearance: east_ground_open
+        facing=east,in_wall=true,open=false,powered=false:
+          appearance: east_wall_closed
+        facing=east,in_wall=true,open=false,powered=true:
+          appearance: east_wall_closed
+        facing=east,in_wall=true,open=true,powered=false:
+          appearance: east_wall_open
+        facing=east,in_wall=true,open=true,powered=true:
+          appearance: east_wall_open
+        facing=south,in_wall=false,open=false,powered=false:
+          appearance: south_ground_closed
+        facing=south,in_wall=false,open=false,powered=true:
+          appearance: south_ground_closed
+        facing=south,in_wall=false,open=true,powered=false:
+          appearance: south_ground_open
+        facing=south,in_wall=false,open=true,powered=true:
+          appearance: south_ground_open
+        facing=south,in_wall=true,open=false,powered=false:
+          appearance: south_wall_closed
+        facing=south,in_wall=true,open=false,powered=true:
+          appearance: south_wall_closed
+        facing=south,in_wall=true,open=true,powered=false:
+          appearance: south_wall_open
+        facing=south,in_wall=true,open=true,powered=true:
+          appearance: south_wall_open
+        facing=west,in_wall=false,open=false,powered=false:
+          appearance: west_ground_closed
+        facing=west,in_wall=false,open=false,powered=true:
+          appearance: west_ground_closed
+        facing=west,in_wall=false,open=true,powered=false:
+          appearance: west_ground_open
+        facing=west,in_wall=false,open=true,powered=true:
+          appearance: west_ground_open
+        facing=west,in_wall=true,open=false,powered=false:
+          appearance: west_wall_closed
+        facing=west,in_wall=true,open=false,powered=true:
+          appearance: west_wall_closed
+        facing=west,in_wall=true,open=true,powered=false:
+          appearance: west_wall_open
+        facing=west,in_wall=true,open=true,powered=true:
+          appearance: west_wall_open
+recipes:
+  farmersdelight:wooden_basket:
+    type: shaped
+    category: misc
+    pattern:
+    - S S
+    - C C
+    - SCS
+    ingredients:
+      S: minecraft:stick
+      C: farmersdelight:canvas
+    result:
+      id: farmersdelight:wooden_basket
+      count: 1
+  farmersdelight:rope_fence:
+    type: shaped
+    category: misc
+    pattern:
+    - RSR
+    - RSR
+    ingredients:
+      S: minecraft:stick
+      R: farmersdelight:rope
+    result:
+      id: farmersdelight:rope_fence
+      count: 3
+  farmersdelight:rope_fence_gate:
+    type: shaped
+    category: misc
+    pattern:
+    - SRS
+    - SRS
+    ingredients:
+      S: minecraft:stick
+      R: farmersdelight:rope
+    result:
+      id: farmersdelight:rope_fence_gate
+      count: 1
+  farmersdelight:egg_carton:
+    type: shaped
+    category: misc
+    pattern:
+    - EEE
+    - EEE
+    - EEE
+    ingredients:
+      E: minecraft:egg
+    result:
+      id: farmersdelight:egg_carton
+      count: 1
+  farmersdelight:apple_crate:
+    type: shaped
+    category: misc
+    pattern:
+    - CCC
+    - CCC
+    - CCC
+    ingredients:
+      C: minecraft:apple
+    result:
+      id: farmersdelight:apple_crate
+      count: 1
+  farmersdelight:unpack_apple_crate:
+    type: shapeless
+    category: misc
+    ingredients:
+    - farmersdelight:apple_crate
+    result:
+      id: minecraft:apple
+      count: 9
+  farmersdelight:chorus_fruit_crate:
+    type: shaped
+    category: misc
+    pattern:
+    - CCC
+    - CCC
+    - CCC
+    ingredients:
+      C: minecraft:chorus_fruit
+    result:
+      id: farmersdelight:chorus_fruit_crate
+      count: 1
+  farmersdelight:unpack_chorus_fruit_crate:
+    type: shapeless
+    category: misc
+    ingredients:
+    - farmersdelight:chorus_fruit_crate
+    result:
+      id: minecraft:chorus_fruit
+      count: 9
+  farmersdelight:brown_mushroom_crate:
+    type: shaped
+    category: misc
+    pattern:
+    - CCC
+    - CCC
+    - CCC
+    ingredients:
+      C: minecraft:brown_mushroom
+    result:
+      id: farmersdelight:brown_mushroom_crate
+      count: 1
+  farmersdelight:unpack_brown_mushroom_crate:
+    type: shapeless
+    category: misc
+    ingredients:
+    - farmersdelight:brown_mushroom_crate
+    result:
+      id: minecraft:brown_mushroom
+      count: 9
+  farmersdelight:red_mushroom_crate:
+    type: shaped
+    category: misc
+    pattern:
+    - CCC
+    - CCC
+    - CCC
+    ingredients:
+      C: minecraft:red_mushroom
+    result:
+      id: farmersdelight:red_mushroom_crate
+      count: 1
+  farmersdelight:unpack_red_mushroom_crate:
+    type: shapeless
+    category: misc
+    ingredients:
+    - farmersdelight:red_mushroom_crate
+    result:
+      id: minecraft:red_mushroom
+      count: 9
+  farmersdelight:golden_apple_crate:
+    type: shaped
+    category: misc
+    pattern:
+    - CCC
+    - CCC
+    - CCC
+    ingredients:
+      C: minecraft:golden_apple
+    result:
+      id: farmersdelight:golden_apple_crate
+      count: 1
+  farmersdelight:unpack_golden_apple_crate:
+    type: shapeless
+    category: misc
+    ingredients:
+    - farmersdelight:golden_apple_crate
+    result:
+      id: minecraft:golden_apple
+      count: 9
+  farmersdelight:golden_carrot_crate:
+    type: shaped
+    category: misc
+    pattern:
+    - CCC
+    - CCC
+    - CCC
+    ingredients:
+      C: minecraft:golden_carrot
+    result:
+      id: farmersdelight:golden_carrot_crate
+      count: 1
+  farmersdelight:unpack_golden_carrot_crate:
+    type: shapeless
+    category: misc
+    ingredients:
+    - farmersdelight:golden_carrot_crate
+    result:
+      id: minecraft:golden_carrot
+      count: 9
+  farmersdelight:cocoa_beans_bag:
+    type: shaped
+    category: misc
+    pattern:
+    - CCC
+    - CCC
+    - CCC
+    ingredients:
+      C: minecraft:cocoa_beans
+    result:
+      id: farmersdelight:cocoa_beans_bag
+      count: 1
+  farmersdelight:unpack_cocoa_beans_bag:
+    type: shapeless
+    category: misc
+    ingredients:
+    - farmersdelight:cocoa_beans_bag
+    result:
+      id: minecraft:cocoa_beans
+      count: 9
+  farmersdelight:glow_berries_bag:
+    type: shaped
+    category: misc
+    pattern:
+    - CCC
+    - CCC
+    - CCC
+    ingredients:
+      C: minecraft:glow_berries
+    result:
+      id: farmersdelight:glow_berries_bag
+      count: 1
+  farmersdelight:unpack_glow_berries_bag:
+    type: shapeless
+    category: misc
+    ingredients:
+    - farmersdelight:glow_berries_bag
+    result:
+      id: minecraft:glow_berries
+      count: 9
+  farmersdelight:sweet_berries_bag:
+    type: shaped
+    category: misc
+    pattern:
+    - CCC
+    - CCC
+    - CCC
+    ingredients:
+      C: minecraft:sweet_berries
+    result:
+      id: farmersdelight:sweet_berries_bag
+      count: 1
+  farmersdelight:unpack_sweet_berries_bag:
+    type: shapeless
+    category: misc
+    ingredients:
+    - farmersdelight:sweet_berries_bag
+    result:
+      id: minecraft:sweet_berries
+      count: 9
+  farmersdelight:unpack_egg_carton:
+    type: shapeless
+    ingredients:
+    - farmersdelight:egg_carton
+    result:
+      id: minecraft:egg
+      count: 9
+  farmersdelight:basket_to_bamboo_basket:
+    type: shapeless
+    ingredients:
+    - farmersdelight:basket
+    result:
+      id: farmersdelight:bamboo_basket
+      count: 1
+  farmersdelight:bamboo_basket_to_basket:
+    type: shapeless
+    ingredients:
+    - farmersdelight:bamboo_basket
+    result:
+      id: farmersdelight:basket
+      count: 1
+  farmersdelight:meat_skewer:
+    type: shapeless
+    category: misc
+    ingredients:
+    - minecraft:stick
+    - items: &id001
+      - minecraft:beef
+      - minecraft:porkchop
+      - minecraft:chicken
+      - minecraft:rabbit
+      - minecraft:mutton
+      - minecraft:cod
+      - minecraft:salmon
+      - minecraft:tropical_fish
+      - farmersdelight:chicken_cuts
+      - farmersdelight:minced_beef
+      - farmersdelight:mutton_chops
+      - farmersdelight:bacon
+      - farmersdelight:cod_slice
+      - farmersdelight:salmon_slice
+    - items: *id001
+    result:
+      id: farmersdelight:meat_skewer
+      count: 1
+  farmersdelight:meat_skewer_smelting:
+    type: smelting
+    ingredient: farmersdelight:meat_skewer
+    time: 200
+    experience: 0.35
+    result:
+      id: farmersdelight:cooked_meat_skewer
+      count: 1
+  farmersdelight:meat_skewer_smoking:
+    type: smoking
+    ingredient: farmersdelight:meat_skewer
+    time: 100
+    experience: 0.35
+    result:
+      id: farmersdelight:cooked_meat_skewer
+      count: 1
+  farmersdelight:meat_skewer_campfire_cooking:
+    type: campfire_cooking
+    ingredient: farmersdelight:meat_skewer
+    time: 600
+    experience: 0.35
+    result:
+      id: farmersdelight:cooked_meat_skewer
+      count: 1
+  farmersdelight:vegetable_skewer:
+    type: shapeless
+    category: misc
+    ingredients:
+    - minecraft:stick
+    - items: &id002
+      - minecraft:carrot
+      - minecraft:golden_carrot
+      - minecraft:potato
+      - minecraft:beetroot
+      - minecraft:brown_mushroom
+      - minecraft:red_mushroom
+      - farmersdelight:onion
+      - farmersdelight:tomato
+    - items: *id002
+    result:
+      id: farmersdelight:vegetable_skewer
+      count: 1
+  farmersdelight:vegetable_skewer_smelting:
+    type: smelting
+    ingredient: farmersdelight:vegetable_skewer
+    time: 200
+    experience: 0.35
+    result:
+      id: farmersdelight:cooked_vegetable_skewer
+      count: 1
+  farmersdelight:vegetable_skewer_smoking:
+    type: smoking
+    ingredient: farmersdelight:vegetable_skewer
+    time: 100
+    experience: 0.35
+    result:
+      id: farmersdelight:cooked_vegetable_skewer
+      count: 1
+  farmersdelight:vegetable_skewer_campfire_cooking:
+    type: campfire_cooking
+    ingredient: farmersdelight:vegetable_skewer
+    time: 600
+    experience: 0.35
+    result:
+      id: farmersdelight:cooked_vegetable_skewer
+      count: 1
+  farmersdelight:assemble_cooked_meat_skewer:
+    type: shapeless
+    category: misc
+    ingredients:
+    - minecraft:stick
+    - items: &id003
+      - minecraft:cooked_beef
+      - minecraft:cooked_porkchop
+      - minecraft:cooked_chicken
+      - minecraft:cooked_rabbit
+      - minecraft:cooked_mutton
+      - minecraft:cooked_cod
+      - minecraft:cooked_salmon
+      - farmersdelight:cooked_chicken_cuts
+      - farmersdelight:cooked_bacon
+      - farmersdelight:beef_patty
+      - farmersdelight:cooked_mutton_chops
+      - farmersdelight:cooked_cod_slice
+      - farmersdelight:cooked_salmon_slice
+    - items: *id003
+    result:
+      id: farmersdelight:cooked_meat_skewer
+      count: 1
+  $$>=1.21.9:
+    farmersdelight:copper_knife:
+      type: shaped
+      category: equipment
+      pattern:
+      - C
+      - S
+      ingredients:
+        C: minecraft:copper_ingot
+        S: minecraft:stick
+      result:
+        id: farmersdelight:copper_knife
+        count: 1
+  $$>=1.21.5:
+    farmersdelight:mixed_eggs_smelting:
+      type: smelting
+      ingredient: '#minecraft:eggs'
+      time: 200
+      experience: 0.35
+      result:
+        id: farmersdelight:fried_egg
+        count: 1
+    farmersdelight:mixed_eggs_smoking:
+      type: smoking
+      ingredient: '#minecraft:eggs'
+      time: 100
+      experience: 0.35
+      result:
+        id: farmersdelight:fried_egg
+        count: 1
+    farmersdelight:mixed_eggs_campfire_cooking:
+      type: campfire_cooking
+      ingredient: '#minecraft:eggs'
+      time: 600
+      experience: 0.35
+      result:
+        id: farmersdelight:fried_egg
+        count: 1
+    farmersdelight:mixed_egg_dough:
+      type: shapeless
+      category: misc
+      ingredients:
+      - '#minecraft:eggs'
+      - minecraft:wheat
+      - minecraft:wheat
+      - minecraft:wheat
+      result:
+        id: farmersdelight:wheat_dough
+        count: 3
+    farmersdelight:mixed_egg_cake:
+      type: shaped
+      category: misc
+      group: cake
+      pattern:
+      - MMM
+      - SES
+      - WWW
+      ingredients:
+        M:
+        - minecraft:milk_bucket
+        - farmersdelight:milk_bottle
+        S: minecraft:sugar
+        E: '#minecraft:eggs'
+        W: minecraft:wheat
+      result:
+        id: minecraft:cake
+        count: 1
+block-state-mappings:
+  spruce_fence_gate[facing=north,in_wall=false,open=false,powered=true]: spruce_fence_gate[facing=north,in_wall=false,open=false,powered=false]
+  spruce_fence_gate[facing=north,in_wall=false,open=true,powered=true]: spruce_fence_gate[facing=north,in_wall=false,open=true,powered=false]
+  spruce_fence_gate[facing=north,in_wall=true,open=false,powered=true]: spruce_fence_gate[facing=north,in_wall=true,open=false,powered=false]
+  spruce_fence_gate[facing=north,in_wall=true,open=true,powered=true]: spruce_fence_gate[facing=north,in_wall=true,open=true,powered=false]
+  spruce_fence_gate[facing=east,in_wall=false,open=false,powered=true]: spruce_fence_gate[facing=east,in_wall=false,open=false,powered=false]
+  spruce_fence_gate[facing=east,in_wall=false,open=true,powered=true]: spruce_fence_gate[facing=east,in_wall=false,open=true,powered=false]
+  spruce_fence_gate[facing=east,in_wall=true,open=false,powered=true]: spruce_fence_gate[facing=east,in_wall=true,open=false,powered=false]
+  spruce_fence_gate[facing=east,in_wall=true,open=true,powered=true]: spruce_fence_gate[facing=east,in_wall=true,open=true,powered=false]
+  spruce_fence_gate[facing=south,in_wall=false,open=false,powered=true]: spruce_fence_gate[facing=south,in_wall=false,open=false,powered=false]
+  spruce_fence_gate[facing=south,in_wall=false,open=true,powered=true]: spruce_fence_gate[facing=south,in_wall=false,open=true,powered=false]
+  spruce_fence_gate[facing=south,in_wall=true,open=false,powered=true]: spruce_fence_gate[facing=south,in_wall=true,open=false,powered=false]
+  spruce_fence_gate[facing=south,in_wall=true,open=true,powered=true]: spruce_fence_gate[facing=south,in_wall=true,open=true,powered=false]
+  spruce_fence_gate[facing=west,in_wall=false,open=false,powered=true]: spruce_fence_gate[facing=west,in_wall=false,open=false,powered=false]
+  spruce_fence_gate[facing=west,in_wall=false,open=true,powered=true]: spruce_fence_gate[facing=west,in_wall=false,open=true,powered=false]
+  spruce_fence_gate[facing=west,in_wall=true,open=false,powered=true]: spruce_fence_gate[facing=west,in_wall=true,open=false,powered=false]
+  spruce_fence_gate[facing=west,in_wall=true,open=true,powered=true]: spruce_fence_gate[facing=west,in_wall=true,open=true,powered=false]

@@ -10,10 +10,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,10 +23,9 @@ public final class SpecialRecipeLoader {
     // Cards the CraftEngine pack layer registered, with the exact instance it registered, so a later pass can
     // replace or drop them again without touching entries an addon or the plugin file owns under the same id.
     private static final Map<String, SpecialRecipeInfo> PACK_REGISTERED = new LinkedHashMap<>();
-    // Cards this loader registered from the operator's file and from the bundled defaults, tracked separately
+    // Cards this loader registered from the operator's file, tracked separately
     // so a reload can withdraw exactly the entries that vanished from their source and nothing else.
     private static final Map<String, SpecialRecipeInfo> FILE_REGISTERED = new LinkedHashMap<>();
-    private static final Map<String, SpecialRecipeInfo> BACKFILL_REGISTERED = new LinkedHashMap<>();
 
     private SpecialRecipeLoader() {
     }
@@ -39,14 +34,11 @@ public final class SpecialRecipeLoader {
     public static Runnable captureReloadRollback() {
         Map<String, SpecialRecipeInfo> packs = new LinkedHashMap<>(PACK_REGISTERED);
         Map<String, SpecialRecipeInfo> files = new LinkedHashMap<>(FILE_REGISTERED);
-        Map<String, SpecialRecipeInfo> bundled = new LinkedHashMap<>(BACKFILL_REGISTERED);
         return () -> {
             PACK_REGISTERED.clear();
             PACK_REGISTERED.putAll(packs);
             FILE_REGISTERED.clear();
             FILE_REGISTERED.putAll(files);
-            BACKFILL_REGISTERED.clear();
-            BACKFILL_REGISTERED.putAll(bundled);
         };
     }
 
@@ -54,11 +46,10 @@ public final class SpecialRecipeLoader {
         Map<String, SpecialRecipeInfo> fileEntries = new LinkedHashMap<>();
         YamlConfiguration config = loadConfig(plugin);
         if (config == null) return;
-        if (config != null) {
-            parseInto(fileEntries, config, FILE_NAME);
-            if (config.getConfigurationSection(ROOT_KEY) == null) {
-                I18n.logWarning("recipe.special_recipe_missing_root", "file", FILE_NAME);
-            }
+        parseInto(fileEntries, config, FILE_NAME);
+        // Empty documents also represent absent/disabled packs before CE's delayed initial load.
+        if (!config.getKeys(false).isEmpty() && config.getConfigurationSection(ROOT_KEY) == null) {
+            I18n.logWarning("recipe.special_recipe_missing_section", "file", RecipePackFiles.file(plugin, FILE_NAME));
         }
         // Deleting a card from the file has to disable it, so entries this loader registered are withdrawn as
         // soon as the file stops defining them (a later addon registration under the same id is left alone).
@@ -70,32 +61,6 @@ public final class SpecialRecipeLoader {
         FILE_REGISTERED.putAll(fileEntries);
         I18n.logDetail("recipe", "recipe.special_recipe_loaded", "count", fileEntries.size());
 
-        // Backfill bundled recipes the on-disk file does not define, so servers with an older file still gain
-        // newly bundled entries. Gated by the same switch as the other recipe files: an entry the operator
-        // deliberately deleted from the file must not come back on every reload.
-        YamlConfiguration bundled = loadBundled(plugin);
-        boolean backfillBundled = bundled != null && ConfigSectionReader.optionalBoolean(
-                plugin.getConfig(), RecipeFileLoader.MERGE_MISSING_SETTING, false);
-        if (backfillBundled) {
-            Map<String, SpecialRecipeInfo> bundledEntries = new LinkedHashMap<>();
-            parseInto(bundledEntries, bundled, FILE_NAME);
-            withdrawVanished(registry, BACKFILL_REGISTERED, bundledEntries);
-            BACKFILL_REGISTERED.clear();
-            int backfilled = 0;
-            for (Map.Entry<String, SpecialRecipeInfo> entry : bundledEntries.entrySet()) {
-                if (registry.get(entry.getKey()) == null) {
-                    registry.register(entry.getValue());
-                    BACKFILL_REGISTERED.put(entry.getKey(), entry.getValue());
-                    backfilled++;
-                }
-            }
-            if (backfilled > 0) {
-                I18n.logDetail("recipe", "recipe.special_recipe_backfilled", "count", backfilled);
-            }
-        } else {
-            withdrawVanished(registry, BACKFILL_REGISTERED, Map.of());
-            BACKFILL_REGISTERED.clear();
-        }
         loadPackSections(plugin, registry);
     }
 
@@ -113,7 +78,7 @@ public final class SpecialRecipeLoader {
 
     /**
      * Applies the cards a CraftEngine pack declares under special_recipes. They lose to everything already
-     * registered (the plugin file, the bundled defaults, addon registrations), so only ids the pack layer
+     * registered (the default pack file and addon registrations), so only ids the pack layer
      * itself owns are refreshed or removed when a pack changes; see PackSections.
      */
     private static void loadPackSections(FarmersDelightPlugin plugin, SpecialRecipeRegistry registry) {
@@ -163,19 +128,6 @@ public final class SpecialRecipeLoader {
 
     private static YamlConfiguration loadConfig(FarmersDelightPlugin plugin) {
         return RecipeFileLoader.loadRecipeFile(plugin, FILE_NAME);
-    }
-
-    private static YamlConfiguration loadBundled(FarmersDelightPlugin plugin) {
-        try (Reader reader = new BufferedReader(
-                new InputStreamReader(plugin.getResource(FILE_NAME), StandardCharsets.UTF_8), 8192)) {
-            YamlConfiguration yaml = new YamlConfiguration();
-            yaml.load(reader);
-            return yaml;
-        } catch (Exception e) {
-            I18n.logWarning("recipe.special_recipe_load_failed",
-                    "file", FILE_NAME, "error", e.getMessage());
-            return null;
-        }
     }
 
     /** Parses one special-recipe config entry into a SpecialRecipeInfo; exposed so addons can drive their

@@ -1,0 +1,906 @@
+{
+  "version": "1.2.8",
+  "publication": "1.2.8 release verification",
+  "unit_tests": {
+    "skipped": 0,
+    "errors": 0,
+    "tests": 1000,
+    "failures": 0
+  },
+  "language_failure_tests": 4,
+  "content_failure_tests": 31,
+  "native_profiles": [
+    {
+      "environment": "paper-26.3",
+      "craft_engine": "26.9.2",
+      "status": "PASS",
+      "report": "mod-alignment-20261011T045347Z-7488/paper-26.3-ce-26.9.2",
+      "checks": {
+        "initial_no_auto_pack": {
+          "detail": "No extracted pack, implicit skillet definition or JAR asset fallback",
+          "status": "PASS"
+        },
+        "reload_no_auto_pack": {
+          "detail": "No extracted pack, implicit skillet definition or JAR asset fallback",
+          "status": "PASS"
+        },
+        "manual_install": {
+          "detail": "Standalone content ZIP loads through CE reload",
+          "status": "PASS"
+        },
+        "pressure_pool": {
+          "detail": "Sugar cane 14/15; both pressure blocks and mature sapling visuals registered",
+          "status": "PASS"
+        },
+        "mushroom_worldgen": {
+          "detail": "Both brown/red colonies and both placed features decode on the native server",
+          "status": "PASS"
+        },
+        "recovered_player_items": {
+          "detail": "22 unconditional recovered items build with their correct CE IDs without the previous external pack",
+          "status": "PASS"
+        },
+        "copper_version_gate": {
+          "detail": "Copper knife available on 26.3",
+          "status": "PASS"
+        },
+        "basket_properties_preserve_storage_wooden_basket": {
+          "detail": "All six orientations and waterlogged/enabled property transitions preserve the same 27-slot storage and seven diamonds",
+          "status": "PASS"
+        },
+        "basket_native_redstone_wooden_basket": {
+          "detail": "A real redstone block immediately toggles enabled in both directions without recreating storage or losing its seven items",
+          "status": "PASS"
+        },
+        "basket_properties_preserve_storage_bamboo_basket": {
+          "detail": "All six orientations and waterlogged/enabled property transitions preserve the same 27-slot storage and seven diamonds",
+          "status": "PASS"
+        },
+        "basket_native_redstone_bamboo_basket": {
+          "detail": "A real redstone block immediately toggles enabled in both directions without recreating storage or losing its seven items",
+          "status": "PASS"
+        },
+        "basket_properties_preserve_storage_basket": {
+          "detail": "All six orientations and waterlogged/enabled property transitions preserve the same 27-slot storage and seven diamonds",
+          "status": "PASS"
+        },
+        "basket_native_redstone_basket": {
+          "detail": "A real redstone block immediately toggles enabled in both directions without recreating storage or losing its seven items",
+          "status": "PASS"
+        },
+        "wet_baskets_and_safety_net": {
+          "detail": "All three basket IDs and the safety net have native water only in their wet states",
+          "status": "PASS"
+        },
+        "pie_remaining_signal": {
+          "detail": "Four pies produce comparator strength 4, 3, 2, 1 through their registered native behavior",
+          "status": "PASS"
+        },
+        "aligned_behavior_bindings": {
+          "detail": "Native definitions bind independent shrub/rope/fence/gate behaviors; wet and bell-tied states exist",
+          "status": "PASS"
+        },
+        "crop_single_grow_cancel": {
+          "detail": "A native BlockGrowEvent cancellation leaves the original CE cabbage age and emits one event",
+          "status": "PASS"
+        },
+        "crop_single_grow_commit": {
+          "detail": "Successful native event retains the CE cabbage identity and installs its proposed age exactly once",
+          "status": "PASS"
+        },
+        "crop_pitcher_upper_cancel": {
+          "detail": "Real ManagedCrop 2-to-3 growth previews both native events and preserves both cells when the upper event is cancelled",
+          "status": "PASS"
+        },
+        "crop_native_structure_guard": {
+          "detail": "A native grow listener changing the planned upper half into lower is rejected without installing either cell",
+          "status": "PASS"
+        },
+        "crop_native_input_guard": {
+          "detail": "A real grow event invalidating a controlled input guard blocks both writes; this is not a physical player-hand test",
+          "status": "PASS"
+        },
+        "crop_fertilize_event_cancel": {
+          "detail": "An explicit null-player native fertilize event rejects the whole two-cell plan before any grow event or write; no hand consumption is tested",
+          "status": "PASS"
+        },
+        "crop_pitcher_blocked_upper": {
+          "detail": "A solid upper cell rejects real 2-to-3 growth without events or partial lower advancement",
+          "status": "PASS"
+        },
+        "crop_pitcher_two_cell_commit": {
+          "detail": "Real ManagedCrop growth installs the lower and upper age-three halves after exactly two growth events",
+          "status": "PASS"
+        },
+        "crop_pitcher_upper_to_mature": {
+          "detail": "Growing a real upper age-three half matures both synchronized halves to four with one event per changed cell",
+          "status": "PASS"
+        },
+        "crop_event_version_guard": {
+          "detail": "An event listener changing the lower cell rejects the full native plan and preserves that external change without placing the upper half",
+          "status": "PASS"
+        },
+        "crop_torchflower_native_maturity": {
+          "detail": "The mature vanilla torchflower appearance round-trips through the CE grow-event proposal and retains custom age two",
+          "status": "PASS"
+        },
+        "rope_direct_bell": {
+          "detail": "Only the rope directly under a bell is tied, tie renderer exists, and removing the bell clears it; click-to-ring range requires player interaction",
+          "status": "PASS"
+        },
+        "rope_connectors": {
+          "detail": "Programmatic restricted rope connects to bars, walls and its rope family, while excluding ordinary stone",
+          "status": "PASS"
+        },
+        "rope_waterlogged": {
+          "detail": "Wet rope retains its property and water in both actual native and client visual states; dry rope remains empty",
+          "status": "PASS"
+        },
+        "rope_wet_visual_budget": {
+          "detail": "All 32 wet variants share one kelp visual with one shape renderer and optional bell tie; ordinary dry ropes keep block-model rendering",
+          "status": "PASS"
+        },
+        "rope_fence_family": {
+          "detail": "Rope fence joins its own family and a full solid side, but neither an oak fence nor an oak gate",
+          "status": "PASS"
+        },
+        "rope_gate_two_walls": {
+          "detail": "Rope gate lowers only between two walls and returns when either is removed",
+          "status": "PASS"
+        },
+        "rope_gate_connection_axis": {
+          "detail": "Rope fence joins only the post axis of its own gate",
+          "status": "PASS"
+        },
+        "basket_live_content_reload": {
+          "detail": "All three placed baskets survive CE content reload, accept old-state redstone updates, and preserve seven tagged diamonds",
+          "status": "PASS"
+        },
+        "manual_assets": {
+          "detail": "Installed skillet texture included",
+          "status": "PASS"
+        },
+        "campfire_support": {
+          "detail": "Shipped config creates tray on a lit campfire with omitted tray flag",
+          "status": "PASS"
+        },
+        "extinguish_preserves_input": {
+          "detail": "Physics update clears tray without losing the three ingredients",
+          "status": "PASS"
+        },
+        "reignite_coalesced": {
+          "detail": "Twenty notifications coalesce; tray returns and items remain",
+          "status": "PASS"
+        },
+        "shape_and_air": {
+          "detail": "Full magma block and air do not produce a tray",
+          "status": "PASS"
+        },
+        "chunk_load_refresh": {
+          "detail": "FD chunk-load handler repairs stale support without losing ingredients (existing loaded CE chunk)",
+          "status": "PASS"
+        },
+        "intentional_deletion": {
+          "detail": "CE and FD reload preserve deleted recipe/texture; JAR does not backfill assets",
+          "status": "PASS"
+        },
+        "wild_worldgen_native_log": {
+          "status": "PASS",
+          "detail": "No custom wild-block Unknown registry key errors in actual native load log"
+        },
+        "bundled_native_load_errors": {
+          "status": "PASS",
+          "detail": "No bundled item/block/placed-feature errors reported by the actual CE parser"
+        },
+        "no_premature_recipe_warning": {
+          "status": "PASS",
+          "detail": "No missing-section warning while CE packs have not yet loaded"
+        }
+      },
+      "original_plugins_restored": true,
+      "finished": "2026-10-11T04:54:27.421565+00:00",
+      "shared_visual_cache_pressure_fixture": false
+    },
+    {
+      "environment": "paper-26.3",
+      "craft_engine": "26.10",
+      "status": "PASS",
+      "report": "mod-alignment-20261011T045046Z/paper-26.3-ce-26.10",
+      "checks": {
+        "initial_no_auto_pack": {
+          "status": "PASS",
+          "detail": "No extracted pack, implicit skillet definition or JAR asset fallback"
+        },
+        "reload_no_auto_pack": {
+          "status": "PASS",
+          "detail": "No extracted pack, implicit skillet definition or JAR asset fallback"
+        },
+        "manual_install": {
+          "status": "PASS",
+          "detail": "Standalone content ZIP loads through CE reload"
+        },
+        "historical_full_visual_pool": {
+          "status": "PASS",
+          "detail": "Actual historical cache retains all 25 kelp slots; rope still registers with a reused single visual"
+        },
+        "pressure_pool": {
+          "status": "PASS",
+          "detail": "Sugar cane 15/15; both pressure blocks and mature sapling visuals registered"
+        },
+        "mushroom_worldgen": {
+          "status": "PASS",
+          "detail": "Both brown/red colonies and both placed features decode on the native server"
+        },
+        "recovered_player_items": {
+          "status": "PASS",
+          "detail": "22 unconditional recovered items build with their correct CE IDs without the previous external pack"
+        },
+        "copper_version_gate": {
+          "status": "PASS",
+          "detail": "Copper knife available on 26.3"
+        },
+        "basket_properties_preserve_storage_wooden_basket": {
+          "status": "PASS",
+          "detail": "All six orientations and waterlogged/enabled property transitions preserve the same 27-slot storage and seven diamonds"
+        },
+        "basket_native_redstone_wooden_basket": {
+          "status": "PASS",
+          "detail": "A real redstone block immediately toggles enabled in both directions without recreating storage or losing its seven items"
+        },
+        "basket_properties_preserve_storage_bamboo_basket": {
+          "status": "PASS",
+          "detail": "All six orientations and waterlogged/enabled property transitions preserve the same 27-slot storage and seven diamonds"
+        },
+        "basket_native_redstone_bamboo_basket": {
+          "status": "PASS",
+          "detail": "A real redstone block immediately toggles enabled in both directions without recreating storage or losing its seven items"
+        },
+        "basket_properties_preserve_storage_basket": {
+          "status": "PASS",
+          "detail": "All six orientations and waterlogged/enabled property transitions preserve the same 27-slot storage and seven diamonds"
+        },
+        "basket_native_redstone_basket": {
+          "status": "PASS",
+          "detail": "A real redstone block immediately toggles enabled in both directions without recreating storage or losing its seven items"
+        },
+        "wet_baskets_and_safety_net": {
+          "status": "PASS",
+          "detail": "All three basket IDs and the safety net have native water only in their wet states"
+        },
+        "pie_remaining_signal": {
+          "status": "PASS",
+          "detail": "Four pies produce comparator strength 4, 3, 2, 1 through their registered native behavior"
+        },
+        "aligned_behavior_bindings": {
+          "status": "PASS",
+          "detail": "Native definitions bind independent shrub/rope/fence/gate behaviors; wet and bell-tied states exist"
+        },
+        "crop_single_grow_cancel": {
+          "status": "PASS",
+          "detail": "A native BlockGrowEvent cancellation leaves the original CE cabbage age and emits one event"
+        },
+        "crop_single_grow_commit": {
+          "status": "PASS",
+          "detail": "Successful native event retains the CE cabbage identity and installs its proposed age exactly once"
+        },
+        "crop_pitcher_upper_cancel": {
+          "status": "PASS",
+          "detail": "Real ManagedCrop 2-to-3 growth previews both native events and preserves both cells when the upper event is cancelled"
+        },
+        "crop_native_structure_guard": {
+          "status": "PASS",
+          "detail": "A native grow listener changing the planned upper half into lower is rejected without installing either cell"
+        },
+        "crop_native_input_guard": {
+          "status": "PASS",
+          "detail": "A real grow event invalidating a controlled input guard blocks both writes; this is not a physical player-hand test"
+        },
+        "crop_fertilize_event_cancel": {
+          "status": "PASS",
+          "detail": "An explicit null-player native fertilize event rejects the whole two-cell plan before any grow event or write; no hand consumption is tested"
+        },
+        "crop_pitcher_blocked_upper": {
+          "status": "PASS",
+          "detail": "A solid upper cell rejects real 2-to-3 growth without events or partial lower advancement"
+        },
+        "crop_pitcher_two_cell_commit": {
+          "status": "PASS",
+          "detail": "Real ManagedCrop growth installs the lower and upper age-three halves after exactly two growth events"
+        },
+        "crop_pitcher_upper_to_mature": {
+          "status": "PASS",
+          "detail": "Growing a real upper age-three half matures both synchronized halves to four with one event per changed cell"
+        },
+        "crop_event_version_guard": {
+          "status": "PASS",
+          "detail": "An event listener changing the lower cell rejects the full native plan and preserves that external change without placing the upper half"
+        },
+        "crop_torchflower_native_maturity": {
+          "status": "PASS",
+          "detail": "The mature vanilla torchflower appearance round-trips through the CE grow-event proposal and retains custom age two"
+        },
+        "rope_direct_bell": {
+          "status": "PASS",
+          "detail": "Only the rope directly under a bell is tied, tie renderer exists, and removing the bell clears it; click-to-ring range requires player interaction"
+        },
+        "rope_connectors": {
+          "status": "PASS",
+          "detail": "Programmatic restricted rope connects to bars, walls and its rope family, while excluding ordinary stone"
+        },
+        "rope_waterlogged": {
+          "status": "PASS",
+          "detail": "Wet rope retains its property and water in both actual native and client visual states; dry rope remains empty"
+        },
+        "rope_wet_visual_budget": {
+          "status": "PASS",
+          "detail": "All 32 wet variants share one kelp visual with one shape renderer and optional bell tie; ordinary dry ropes keep block-model rendering"
+        },
+        "rope_fence_family": {
+          "status": "PASS",
+          "detail": "Rope fence joins its own family and a full solid side, but neither an oak fence nor an oak gate"
+        },
+        "rope_gate_two_walls": {
+          "status": "PASS",
+          "detail": "Rope gate lowers only between two walls and returns when either is removed"
+        },
+        "rope_gate_connection_axis": {
+          "status": "PASS",
+          "detail": "Rope fence joins only the post axis of its own gate"
+        },
+        "basket_live_content_reload": {
+          "status": "PASS",
+          "detail": "All three placed baskets survive CE content reload, accept old-state redstone updates, and preserve seven tagged diamonds"
+        },
+        "manual_assets": {
+          "status": "PASS",
+          "detail": "Installed skillet texture included"
+        },
+        "campfire_support": {
+          "status": "PASS",
+          "detail": "Shipped config creates tray on a lit campfire with omitted tray flag"
+        },
+        "extinguish_preserves_input": {
+          "status": "PASS",
+          "detail": "Physics update clears tray without losing the three ingredients"
+        },
+        "reignite_coalesced": {
+          "status": "PASS",
+          "detail": "Twenty notifications coalesce; tray returns and items remain"
+        },
+        "shape_and_air": {
+          "status": "PASS",
+          "detail": "Full magma block and air do not produce a tray"
+        },
+        "chunk_load_refresh": {
+          "status": "PASS",
+          "detail": "FD chunk-load handler repairs stale support without losing ingredients (existing loaded CE chunk)"
+        },
+        "intentional_deletion": {
+          "status": "PASS",
+          "detail": "CE and FD reload preserve deleted recipe/texture; JAR does not backfill assets"
+        },
+        "wild_worldgen_native_log": {
+          "status": "PASS",
+          "detail": "No custom wild-block Unknown registry key errors in actual native load log"
+        },
+        "bundled_native_load_errors": {
+          "status": "PASS",
+          "detail": "No bundled item/block/placed-feature errors reported by the actual CE parser"
+        },
+        "no_premature_recipe_warning": {
+          "status": "PASS",
+          "detail": "No missing-section warning while CE packs have not yet loaded"
+        }
+      },
+      "original_plugins_restored": true,
+      "finished": "2026-10-11T04:51:21.663589+00:00",
+      "shared_visual_cache_pressure_fixture": true
+    },
+    {
+      "environment": "paper-1.21.8",
+      "craft_engine": "26.9.2",
+      "status": "PASS",
+      "report": "mod-alignment-20261011T045427Z-9164/paper-1.21.8-ce-26.9.2",
+      "checks": {
+        "initial_no_auto_pack": {
+          "detail": "No extracted pack, implicit skillet definition or JAR asset fallback",
+          "status": "PASS"
+        },
+        "reload_no_auto_pack": {
+          "detail": "No extracted pack, implicit skillet definition or JAR asset fallback",
+          "status": "PASS"
+        },
+        "manual_install": {
+          "detail": "Standalone content ZIP loads through CE reload",
+          "status": "PASS"
+        },
+        "pressure_pool": {
+          "detail": "Sugar cane 14/15; both pressure blocks and mature sapling visuals registered",
+          "status": "PASS"
+        },
+        "mushroom_worldgen": {
+          "detail": "Both brown/red colonies and both placed features decode on the native server",
+          "status": "PASS"
+        },
+        "recovered_player_items": {
+          "detail": "22 unconditional recovered items build with their correct CE IDs without the previous external pack",
+          "status": "PASS"
+        },
+        "copper_version_gate": {
+          "detail": "Copper knife excluded on 1.21.8",
+          "status": "PASS"
+        },
+        "basket_properties_preserve_storage_wooden_basket": {
+          "detail": "All six orientations and waterlogged/enabled property transitions preserve the same 27-slot storage and seven diamonds",
+          "status": "PASS"
+        },
+        "basket_native_redstone_wooden_basket": {
+          "detail": "A real redstone block immediately toggles enabled in both directions without recreating storage or losing its seven items",
+          "status": "PASS"
+        },
+        "basket_properties_preserve_storage_bamboo_basket": {
+          "detail": "All six orientations and waterlogged/enabled property transitions preserve the same 27-slot storage and seven diamonds",
+          "status": "PASS"
+        },
+        "basket_native_redstone_bamboo_basket": {
+          "detail": "A real redstone block immediately toggles enabled in both directions without recreating storage or losing its seven items",
+          "status": "PASS"
+        },
+        "basket_properties_preserve_storage_basket": {
+          "detail": "All six orientations and waterlogged/enabled property transitions preserve the same 27-slot storage and seven diamonds",
+          "status": "PASS"
+        },
+        "basket_native_redstone_basket": {
+          "detail": "A real redstone block immediately toggles enabled in both directions without recreating storage or losing its seven items",
+          "status": "PASS"
+        },
+        "wet_baskets_and_safety_net": {
+          "detail": "All three basket IDs and the safety net have native water only in their wet states",
+          "status": "PASS"
+        },
+        "pie_remaining_signal": {
+          "detail": "Four pies produce comparator strength 4, 3, 2, 1 through their registered native behavior",
+          "status": "PASS"
+        },
+        "aligned_behavior_bindings": {
+          "detail": "Native definitions bind independent shrub/rope/fence/gate behaviors; wet and bell-tied states exist",
+          "status": "PASS"
+        },
+        "crop_single_grow_cancel": {
+          "detail": "A native BlockGrowEvent cancellation leaves the original CE cabbage age and emits one event",
+          "status": "PASS"
+        },
+        "crop_single_grow_commit": {
+          "detail": "Successful native event retains the CE cabbage identity and installs its proposed age exactly once",
+          "status": "PASS"
+        },
+        "crop_pitcher_upper_cancel": {
+          "detail": "Real ManagedCrop 2-to-3 growth previews both native events and preserves both cells when the upper event is cancelled",
+          "status": "PASS"
+        },
+        "crop_native_structure_guard": {
+          "detail": "A native grow listener changing the planned upper half into lower is rejected without installing either cell",
+          "status": "PASS"
+        },
+        "crop_native_input_guard": {
+          "detail": "A real grow event invalidating a controlled input guard blocks both writes; this is not a physical player-hand test",
+          "status": "PASS"
+        },
+        "crop_fertilize_event_cancel": {
+          "detail": "An explicit null-player native fertilize event rejects the whole two-cell plan before any grow event or write; no hand consumption is tested",
+          "status": "PASS"
+        },
+        "crop_pitcher_blocked_upper": {
+          "detail": "A solid upper cell rejects real 2-to-3 growth without events or partial lower advancement",
+          "status": "PASS"
+        },
+        "crop_pitcher_two_cell_commit": {
+          "detail": "Real ManagedCrop growth installs the lower and upper age-three halves after exactly two growth events",
+          "status": "PASS"
+        },
+        "crop_pitcher_upper_to_mature": {
+          "detail": "Growing a real upper age-three half matures both synchronized halves to four with one event per changed cell",
+          "status": "PASS"
+        },
+        "crop_event_version_guard": {
+          "detail": "An event listener changing the lower cell rejects the full native plan and preserves that external change without placing the upper half",
+          "status": "PASS"
+        },
+        "crop_torchflower_native_maturity": {
+          "detail": "The mature vanilla torchflower appearance round-trips through the CE grow-event proposal and retains custom age two",
+          "status": "PASS"
+        },
+        "rope_direct_bell": {
+          "detail": "Only the rope directly under a bell is tied, tie renderer exists, and removing the bell clears it; click-to-ring range requires player interaction",
+          "status": "PASS"
+        },
+        "rope_connectors": {
+          "detail": "Programmatic restricted rope connects to bars, walls and its rope family, while excluding ordinary stone",
+          "status": "PASS"
+        },
+        "rope_waterlogged": {
+          "detail": "Wet rope retains its property and water in both actual native and client visual states; dry rope remains empty",
+          "status": "PASS"
+        },
+        "rope_wet_visual_budget": {
+          "detail": "All 32 wet variants share one kelp visual with one shape renderer and optional bell tie; ordinary dry ropes keep block-model rendering",
+          "status": "PASS"
+        },
+        "rope_fence_family": {
+          "detail": "Rope fence joins its own family and a full solid side, but neither an oak fence nor an oak gate",
+          "status": "PASS"
+        },
+        "rope_gate_two_walls": {
+          "detail": "Rope gate lowers only between two walls and returns when either is removed",
+          "status": "PASS"
+        },
+        "rope_gate_connection_axis": {
+          "detail": "Rope fence joins only the post axis of its own gate",
+          "status": "PASS"
+        },
+        "basket_live_content_reload": {
+          "detail": "All three placed baskets survive CE content reload, accept old-state redstone updates, and preserve seven tagged diamonds",
+          "status": "PASS"
+        },
+        "manual_assets": {
+          "detail": "Installed skillet texture included",
+          "status": "PASS"
+        },
+        "campfire_support": {
+          "detail": "Shipped config creates tray on a lit campfire with omitted tray flag",
+          "status": "PASS"
+        },
+        "extinguish_preserves_input": {
+          "detail": "Physics update clears tray without losing the three ingredients",
+          "status": "PASS"
+        },
+        "reignite_coalesced": {
+          "detail": "Twenty notifications coalesce; tray returns and items remain",
+          "status": "PASS"
+        },
+        "shape_and_air": {
+          "detail": "Full magma block and air do not produce a tray",
+          "status": "PASS"
+        },
+        "chunk_load_refresh": {
+          "detail": "FD chunk-load handler repairs stale support without losing ingredients (existing loaded CE chunk)",
+          "status": "PASS"
+        },
+        "intentional_deletion": {
+          "detail": "CE and FD reload preserve deleted recipe/texture; JAR does not backfill assets",
+          "status": "PASS"
+        },
+        "wild_worldgen_native_log": {
+          "status": "PASS",
+          "detail": "No custom wild-block Unknown registry key errors in actual native load log"
+        },
+        "bundled_native_load_errors": {
+          "status": "PASS",
+          "detail": "No bundled item/block/placed-feature errors reported by the actual CE parser"
+        },
+        "no_premature_recipe_warning": {
+          "status": "PASS",
+          "detail": "No missing-section warning while CE packs have not yet loaded"
+        }
+      },
+      "original_plugins_restored": true,
+      "finished": "2026-10-11T04:55:14.243102+00:00",
+      "shared_visual_cache_pressure_fixture": false
+    },
+    {
+      "environment": "folia-26.2",
+      "craft_engine": "26.9.2",
+      "status": "PASS",
+      "report": "mod-alignment-20261011T045302Z-34588/folia-26.2-ce-26.9.2",
+      "checks": {
+        "initial_no_auto_pack": {
+          "status": "PASS",
+          "detail": "No extracted pack, implicit skillet definition or JAR asset fallback"
+        },
+        "reload_no_auto_pack": {
+          "status": "PASS",
+          "detail": "No extracted pack, implicit skillet definition or JAR asset fallback"
+        },
+        "manual_install": {
+          "status": "PASS",
+          "detail": "Standalone content ZIP loads through CE reload"
+        },
+        "pressure_pool": {
+          "status": "PASS",
+          "detail": "Sugar cane 14/15; both pressure blocks and mature sapling visuals registered"
+        },
+        "mushroom_worldgen": {
+          "status": "PASS",
+          "detail": "Both brown/red colonies and both placed features decode on the native server"
+        },
+        "recovered_player_items": {
+          "status": "PASS",
+          "detail": "22 unconditional recovered items build with their correct CE IDs without the previous external pack"
+        },
+        "copper_version_gate": {
+          "status": "PASS",
+          "detail": "Copper knife available on 26.2"
+        },
+        "basket_properties_preserve_storage_wooden_basket": {
+          "status": "PASS",
+          "detail": "All six orientations and waterlogged/enabled property transitions preserve the same 27-slot storage and seven diamonds"
+        },
+        "basket_native_redstone_wooden_basket": {
+          "status": "PASS",
+          "detail": "A real redstone block immediately toggles enabled in both directions without recreating storage or losing its seven items"
+        },
+        "basket_properties_preserve_storage_bamboo_basket": {
+          "status": "PASS",
+          "detail": "All six orientations and waterlogged/enabled property transitions preserve the same 27-slot storage and seven diamonds"
+        },
+        "basket_native_redstone_bamboo_basket": {
+          "status": "PASS",
+          "detail": "A real redstone block immediately toggles enabled in both directions without recreating storage or losing its seven items"
+        },
+        "basket_properties_preserve_storage_basket": {
+          "status": "PASS",
+          "detail": "All six orientations and waterlogged/enabled property transitions preserve the same 27-slot storage and seven diamonds"
+        },
+        "basket_native_redstone_basket": {
+          "status": "PASS",
+          "detail": "A real redstone block immediately toggles enabled in both directions without recreating storage or losing its seven items"
+        },
+        "wet_baskets_and_safety_net": {
+          "status": "PASS",
+          "detail": "All three basket IDs and the safety net have native water only in their wet states"
+        },
+        "pie_remaining_signal": {
+          "status": "PASS",
+          "detail": "Four pies produce comparator strength 4, 3, 2, 1 through their registered native behavior"
+        },
+        "aligned_behavior_bindings": {
+          "status": "PASS",
+          "detail": "Native definitions bind independent shrub/rope/fence/gate behaviors; wet and bell-tied states exist"
+        },
+        "crop_single_grow_cancel": {
+          "status": "PASS",
+          "detail": "A native BlockGrowEvent cancellation leaves the original CE cabbage age and emits one event"
+        },
+        "crop_single_grow_commit": {
+          "status": "PASS",
+          "detail": "Successful native event retains the CE cabbage identity and installs its proposed age exactly once"
+        },
+        "crop_pitcher_upper_cancel": {
+          "status": "PASS",
+          "detail": "Real ManagedCrop 2-to-3 growth previews both native events and preserves both cells when the upper event is cancelled"
+        },
+        "crop_native_structure_guard": {
+          "status": "PASS",
+          "detail": "A native grow listener changing the planned upper half into lower is rejected without installing either cell"
+        },
+        "crop_native_input_guard": {
+          "status": "PASS",
+          "detail": "A real grow event invalidating a controlled input guard blocks both writes; this is not a physical player-hand test"
+        },
+        "crop_fertilize_event_cancel": {
+          "status": "PASS",
+          "detail": "An explicit null-player native fertilize event rejects the whole two-cell plan before any grow event or write; no hand consumption is tested"
+        },
+        "crop_pitcher_blocked_upper": {
+          "status": "PASS",
+          "detail": "A solid upper cell rejects real 2-to-3 growth without events or partial lower advancement"
+        },
+        "crop_pitcher_two_cell_commit": {
+          "status": "PASS",
+          "detail": "Real ManagedCrop growth installs the lower and upper age-three halves after exactly two growth events"
+        },
+        "crop_pitcher_upper_to_mature": {
+          "status": "PASS",
+          "detail": "Growing a real upper age-three half matures both synchronized halves to four with one event per changed cell"
+        },
+        "crop_event_version_guard": {
+          "status": "PASS",
+          "detail": "An event listener changing the lower cell rejects the full native plan and preserves that external change without placing the upper half"
+        },
+        "crop_torchflower_native_maturity": {
+          "status": "PASS",
+          "detail": "The mature vanilla torchflower appearance round-trips through the CE grow-event proposal and retains custom age two"
+        },
+        "rope_direct_bell": {
+          "status": "PASS",
+          "detail": "Only the rope directly under a bell is tied, tie renderer exists, and removing the bell clears it; click-to-ring range requires player interaction"
+        },
+        "rope_connectors": {
+          "status": "PASS",
+          "detail": "Programmatic restricted rope connects to bars, walls and its rope family, while excluding ordinary stone"
+        },
+        "rope_waterlogged": {
+          "status": "PASS",
+          "detail": "Wet rope retains its property and water in both actual native and client visual states; dry rope remains empty"
+        },
+        "rope_wet_visual_budget": {
+          "status": "PASS",
+          "detail": "All 32 wet variants share one kelp visual with one shape renderer and optional bell tie; ordinary dry ropes keep block-model rendering"
+        },
+        "rope_fence_family": {
+          "status": "PASS",
+          "detail": "Rope fence joins its own family and a full solid side, but neither an oak fence nor an oak gate"
+        },
+        "rope_gate_two_walls": {
+          "status": "PASS",
+          "detail": "Rope gate lowers only between two walls and returns when either is removed"
+        },
+        "rope_gate_connection_axis": {
+          "status": "PASS",
+          "detail": "Rope fence joins only the post axis of its own gate"
+        },
+        "basket_live_content_reload": {
+          "status": "PASS",
+          "detail": "All three placed baskets survive CE content reload, accept old-state redstone updates, and preserve seven tagged diamonds"
+        },
+        "manual_assets": {
+          "status": "PASS",
+          "detail": "Installed skillet texture included"
+        },
+        "campfire_support": {
+          "status": "PASS",
+          "detail": "Shipped config creates tray on a lit campfire with omitted tray flag"
+        },
+        "extinguish_preserves_input": {
+          "status": "PASS",
+          "detail": "Physics update clears tray without losing the three ingredients"
+        },
+        "reignite_coalesced": {
+          "status": "PASS",
+          "detail": "Twenty notifications coalesce; tray returns and items remain"
+        },
+        "shape_and_air": {
+          "status": "PASS",
+          "detail": "Full magma block and air do not produce a tray"
+        },
+        "chunk_load_refresh": {
+          "status": "PASS",
+          "detail": "FD chunk-load handler repairs stale support without losing ingredients (existing loaded CE chunk)"
+        },
+        "intentional_deletion": {
+          "status": "PASS",
+          "detail": "CE and FD reload preserve deleted recipe/texture; JAR does not backfill assets"
+        },
+        "wild_worldgen_native_log": {
+          "status": "PASS",
+          "detail": "No custom wild-block Unknown registry key errors in actual native load log"
+        },
+        "bundled_native_load_errors": {
+          "status": "PASS",
+          "detail": "No bundled item/block/placed-feature errors reported by the actual CE parser"
+        },
+        "no_premature_recipe_warning": {
+          "status": "PASS",
+          "detail": "No missing-section warning while CE packs have not yet loaded"
+        }
+      },
+      "original_plugins_restored": true,
+      "finished": "2026-10-11T04:53:38.823500+00:00",
+      "shared_visual_cache_pressure_fixture": false
+    }
+  ],
+  "static_content_contract": [
+    {
+      "version": "1.21",
+      "player_items": 166,
+      "contract_player_items": 167,
+      "items": 375,
+      "blocks": 87,
+      "recipes": 361,
+      "model_visits": 892,
+      "texture_checks": 2502,
+      "errors": []
+    },
+    {
+      "version": "1.21.8",
+      "player_items": 166,
+      "contract_player_items": 167,
+      "items": 375,
+      "blocks": 87,
+      "recipes": 366,
+      "model_visits": 892,
+      "texture_checks": 2502,
+      "errors": []
+    },
+    {
+      "version": "1.21.9",
+      "player_items": 167,
+      "contract_player_items": 167,
+      "items": 376,
+      "blocks": 87,
+      "recipes": 367,
+      "model_visits": 893,
+      "texture_checks": 2503,
+      "errors": []
+    },
+    {
+      "version": "1.21.11",
+      "player_items": 167,
+      "contract_player_items": 167,
+      "items": 376,
+      "blocks": 87,
+      "recipes": 367,
+      "model_visits": 893,
+      "texture_checks": 2503,
+      "errors": []
+    },
+    {
+      "version": "26.1",
+      "player_items": 167,
+      "contract_player_items": 167,
+      "items": 376,
+      "blocks": 87,
+      "recipes": 367,
+      "model_visits": 893,
+      "texture_checks": 2503,
+      "errors": []
+    },
+    {
+      "version": "26.2",
+      "player_items": 167,
+      "contract_player_items": 167,
+      "items": 376,
+      "blocks": 87,
+      "recipes": 367,
+      "model_visits": 893,
+      "texture_checks": 2503,
+      "errors": []
+    },
+    {
+      "version": "26.3",
+      "player_items": 167,
+      "contract_player_items": 167,
+      "items": 376,
+      "blocks": 87,
+      "recipes": 367,
+      "model_visits": 893,
+      "texture_checks": 2503,
+      "errors": []
+    }
+  ],
+  "daily_server_deployment": {
+    "version": "1.2.8",
+    "time_utc": "20261011T045358Z",
+    "entry": "shared-server:paper-26.3",
+    "backup": "shared-server:paper-26.3/disabled/fd-1.2.8-mod-alignment-20261011T045358Z",
+    "updated_content_files": [
+      "farmersdelight/configuration/rope.yml"
+    ],
+    "worlds_players_databases_preserved": true,
+    "operator_configuration_preserved": true,
+    "runtime_unlisted_files_preserved": true
+  },
+  "hosted_resource_pack": {
+    "status": "PASS",
+    "hosted_pack": "shared-server:paper-26.3/plugins/CraftEngine/cache/hosted/default/resource_pack.zip",
+    "locales": [
+      {
+        "locale": "zh_cn",
+        "verified_item_block_names": 175,
+        "red_mushroom_crate": "红色蘑菇箱"
+      },
+      {
+        "locale": "zh_tw",
+        "verified_item_block_names": 175,
+        "red_mushroom_crate": "紅色蘑菇箱"
+      },
+      {
+        "locale": "zh_hk",
+        "verified_item_block_names": 175,
+        "red_mushroom_crate": "紅色蘑菇箱"
+      }
+    ],
+    "wet_rope_item_models": 16,
+    "bell_tie_model": true
+  },
+  "limitations": [
+    "The historical full Minecraft compatibility matrix is preserved as baseline; these four native profiles are the runs performed for this revision.",
+    "Native crop tests use real blocks and cancellable events with controlled input guards, not an actual player clicking fertilizer.",
+    "Cake and shrub rule/transaction tests do not replace real-client interactions with protection plugins installed.",
+    "The shrub native dispenser fertilizer entry is not implemented in this revision.",
+    "Client climbing, rope outlines, basket/fence visuals, physical hopper transfer and player break/drop interactions still require manual acceptance.",
+    "Native no-player fixtures hold temporary plugin chunk tickets and restore their test cells and release their tickets.",
+    "Earlier failed native reports remain available; they found missing native water settings and a dry-rope visual-allocation upgrade issue, plus corrected unsupported bell and unloading test fixtures.",
+    "No performance benchmark or comparative performance claim is made."
+  ]
+}

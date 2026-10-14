@@ -191,13 +191,15 @@ public final class ExternalContentCoordinator implements AutoCloseable, Listener
             catch (IllegalArgumentException invalid) { return false; }
         };
         ownership = BundledContentManifest.load(plugin);
-        ownership.adoptMatching(plugin);
-        currentDefaults = new BundledPackOverlay(plugin);
+        // Only explicitly registered addon defaults participate. FD content is installed by the operator.
+        currentDefaults = new BundledPackOverlay(Map.of());
         Path cache = plugin.getDataFolder().toPath().resolve("content-cache").toAbsolutePath().normalize();
         worldgenReport = cache.resolve("worldgen-adaptations.json");
         commonTagReport = cache.resolve("common-tag-export.json");
         report = new ContentConflicts(cache.resolve("conflicts.json"));
-        resourceLayer = new ManagedResourceLayer(cache.resolve("resource-layers"), ownership, report);
+        resourceLayer = new ManagedResourceLayer(cache.resolve("resource-layers"), ownership, report,
+                () -> new HostResourcePolicy(net.momirealms.craftengine.core.plugin.config.Config.resolutions(),
+                        net.momirealms.craftengine.core.plugin.config.Config.excludeFileExtensions(), plugin.getLogger()::warning));
         emptyRoot = cache.resolve("empty-resources");
         Files.createDirectories(emptyRoot);
         routes = (Map<String, ConfigParser>) typedField(manager.getClass(), "sectionParsers", Map.class).get(manager);
@@ -452,7 +454,6 @@ public final class ExternalContentCoordinator implements AutoCloseable, Listener
         }
         for (Path path : event.cacheData().externalFolders()) sources.add(new ManagedResourceLayer.Source(path, false));
         for (Path path : event.cacheData().externalZips()) sources.add(new ManagedResourceLayer.Source(path, true));
-        sources.addAll(currentDefaults.assets());
         try {
             for (ManagedResourceLayer.Source source : sources) {
                 if (source.prefix().isEmpty() && !source.currentDefault())
@@ -699,6 +700,9 @@ public final class ExternalContentCoordinator implements AutoCloseable, Listener
                     ready = unifyCategories(ready);
                 raw.clear(); raw.addAll(ready.configs());
                 if (pending != null) { delayed.clear(); delayed.addAll(ready.pending()); }
+                if (java.util.Arrays.stream(sectionId()).anyMatch(section -> section.equals("block") || section.equals("blocks")))
+                    com.huidu.farmersdelight.block.behavior.RopeVisualStateAliases.install(
+                            BukkitCraftEngine.instance().blockManager().visualBlockStateAllocator());
                 try { delegate.loadAll(); }
                 finally {
                     raw.clear(); raw.addAll(original);

@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.huidu.farmersdelight"
-version = "1.2.3"
+version = "1.2.8"
 
 repositories {
     mavenCentral()
@@ -293,3 +293,21 @@ tasks.register<Jar>("apiJar") {
 tasks.build {
     dependsOn(tasks.shadowJar)
 }
+
+// Content is installed by the operator; startup/reload never unpack these files.
+val contentPackZip = tasks.register<Zip>("contentPackZip") {
+    group = "build"
+    description = "Builds the manually installed CraftEngine content packs."
+    archiveBaseName.set(pluginArchiveBaseName)
+    archiveClassifier.set("content-pack")
+    destinationDirectory.set(layout.buildDirectory.dir("libs"))
+    duplicatesStrategy = DuplicatesStrategy.FAIL
+    from("src/main/resources/craftengine")
+    from("LICENSE") { into("farmersdelight"); rename { "PLUGIN-LICENSE-AGPL-3.0.txt" } }
+    from("src/main/resources/NOTICE.txt") { into("farmersdelight") }
+    from("src/main/resources/recipes") {
+        include("cooking_pot_recipes.yml", "cutting_board_recipes.yml", "food_groups.yml", "special_recipes.yml")
+        into("farmersdelight/configuration/recipes")
+    }
+}
+tasks.build { dependsOn(contentPackZip) }

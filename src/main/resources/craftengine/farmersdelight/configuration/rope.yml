@@ -8,19 +8,70 @@ items:
       block: farmersdelight:rope
     settings:
       fuel_time: 200
+  farmersdelight:entity_renderer/rope_bell_tie:
+    material: paper
+    model: farmersdelight:block/rope_bell_tie
+  farmersdelight:entity_renderer/rope_wet_0:
+    material: paper
+    model: ${__NAMESPACE__}:block/rope_post
+  farmersdelight:entity_renderer/rope_wet_1:
+    material: paper
+    model: ${__NAMESPACE__}:block/rope_north_side
+  farmersdelight:entity_renderer/rope_wet_2:
+    material: paper
+    model: ${__NAMESPACE__}:block/rope_east_side
+  farmersdelight:entity_renderer/rope_wet_3:
+    material: paper
+    model: ${__NAMESPACE__}:block/rope_south_side
+  farmersdelight:entity_renderer/rope_wet_4:
+    material: paper
+    model: ${__NAMESPACE__}:block/rope_west_side
+  farmersdelight:entity_renderer/rope_wet_5:
+    material: paper
+    model: ${__NAMESPACE__}:block/rope_north_south_side
+  farmersdelight:entity_renderer/rope_wet_6:
+    material: paper
+    model: ${__NAMESPACE__}:block/rope_east_west_side
+  farmersdelight:entity_renderer/rope_wet_7:
+    material: paper
+    model: ${__NAMESPACE__}:block/rope_east_north_side
+  farmersdelight:entity_renderer/rope_wet_8:
+    material: paper
+    model: ${__NAMESPACE__}:block/rope_east_south_side
+  farmersdelight:entity_renderer/rope_wet_9:
+    material: paper
+    model: ${__NAMESPACE__}:block/rope_south_west_side
+  farmersdelight:entity_renderer/rope_wet_10:
+    material: paper
+    model: ${__NAMESPACE__}:block/rope_north_west_side
+  farmersdelight:entity_renderer/rope_wet_11:
+    material: paper
+    model: ${__NAMESPACE__}:block/rope_east_north_south_side
+  farmersdelight:entity_renderer/rope_wet_12:
+    material: paper
+    model: ${__NAMESPACE__}:block/rope_north_south_west_side
+  farmersdelight:entity_renderer/rope_wet_13:
+    material: paper
+    model: ${__NAMESPACE__}:block/rope_east_south_west_side
+  farmersdelight:entity_renderer/rope_wet_14:
+    material: paper
+    model: ${__NAMESPACE__}:block/rope_east_north_west_side
+  farmersdelight:entity_renderer/rope_wet_15:
+    material: paper
+    model: ${__NAMESPACE__}:block/rope_all_side
 blocks:
   farmersdelight:rope:
     settings:
       hardness: 0.2
       resistance: 0.2
       tags:
-        - minecraft:mineable/shears
-        - minecraft:sword_efficient
-        - minecraft:climbable
-        - minecraft:fall_damage_resetting
-        - farmersdelight:ropes
-        - farmersdelight:straw_blocks
-        - farmersdelight:mineable/knife
+      - minecraft:mineable/shears
+      - minecraft:sword_efficient
+      - minecraft:climbable
+      - minecraft:fall_damage_resetting
+      - farmersdelight:ropes
+      - farmersdelight:straw_blocks
+      - farmersdelight:mineable/knife
       sounds:
         break: minecraft:block.wool.break
         fall: minecraft:block.wool.fall
@@ -28,9 +79,9 @@ blocks:
         place: minecraft:block.wool.place
         step: minecraft:block.wool.step
     behaviors:
-      - type: farmersdelight:rope
-        placement-mode: vanilla
-        connection-mode: restricted
+    - type: farmersdelight:rope
+      placement-mode: vanilla
+      connection-mode: restricted
     states:
       properties:
         north:
@@ -45,104 +96,801 @@ blocks:
         west:
           type: boolean
           default: false
+        waterlogged:
+          type: boolean
+          default: false
+        tied_to_bell:
+          type: boolean
+          default: false
       appearances:
-        east=false,north=false,south=false,west=false:
-          auto_state: twisting_vines
+        east=false,north=false,south=false,west=false,waterlogged=false,tied_to_bell=false:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_0
           model:
             path: ${__NAMESPACE__}:block/rope_post
-        east=false,north=true,south=false,west=false:
-          auto_state: twisting_vines
+        east=false,north=false,south=false,west=false,waterlogged=false,tied_to_bell=true:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_0
+          model:
+            path: ${__NAMESPACE__}:block/rope_post
+          entity_renderer:
+            item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=false,north=true,south=false,west=false,waterlogged=false,tied_to_bell=false:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_1
           model:
             path: ${__NAMESPACE__}:block/rope_north_side
-        east=true,north=false,south=false,west=false:
-          auto_state: twisting_vines
+        east=false,north=true,south=false,west=false,waterlogged=false,tied_to_bell=true:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_1
+          model:
+            path: ${__NAMESPACE__}:block/rope_north_side
+          entity_renderer:
+            item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=true,north=false,south=false,west=false,waterlogged=false,tied_to_bell=false:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_2
           model:
             path: ${__NAMESPACE__}:block/rope_east_side
-        east=false,north=false,south=true,west=false:
-          auto_state: twisting_vines
+        east=true,north=false,south=false,west=false,waterlogged=false,tied_to_bell=true:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_2
+          model:
+            path: ${__NAMESPACE__}:block/rope_east_side
+          entity_renderer:
+            item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=false,north=false,south=true,west=false,waterlogged=false,tied_to_bell=false:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_3
           model:
             path: ${__NAMESPACE__}:block/rope_south_side
-        east=false,north=false,south=false,west=true:
-          auto_state: twisting_vines
+        east=false,north=false,south=true,west=false,waterlogged=false,tied_to_bell=true:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_3
+          model:
+            path: ${__NAMESPACE__}:block/rope_south_side
+          entity_renderer:
+            item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=false,north=false,south=false,west=true,waterlogged=false,tied_to_bell=false:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_4
           model:
             path: ${__NAMESPACE__}:block/rope_west_side
-        east=false,north=true,south=true,west=false:
-          auto_state: twisting_vines
+        east=false,north=false,south=false,west=true,waterlogged=false,tied_to_bell=true:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_4
+          model:
+            path: ${__NAMESPACE__}:block/rope_west_side
+          entity_renderer:
+            item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=false,north=true,south=true,west=false,waterlogged=false,tied_to_bell=false:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_5
           model:
             path: ${__NAMESPACE__}:block/rope_north_south_side
-        east=true,north=false,south=false,west=true:
-          auto_state: twisting_vines
+        east=false,north=true,south=true,west=false,waterlogged=false,tied_to_bell=true:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_5
+          model:
+            path: ${__NAMESPACE__}:block/rope_north_south_side
+          entity_renderer:
+            item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=true,north=false,south=false,west=true,waterlogged=false,tied_to_bell=false:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_6
           model:
             path: ${__NAMESPACE__}:block/rope_east_west_side
-        east=true,north=true,south=false,west=false:
-          auto_state: twisting_vines
+        east=true,north=false,south=false,west=true,waterlogged=false,tied_to_bell=true:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_6
+          model:
+            path: ${__NAMESPACE__}:block/rope_east_west_side
+          entity_renderer:
+            item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=true,north=true,south=false,west=false,waterlogged=false,tied_to_bell=false:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_7
           model:
             path: ${__NAMESPACE__}:block/rope_east_north_side
-        east=true,north=false,south=true,west=false:
-          auto_state: twisting_vines
+        east=true,north=true,south=false,west=false,waterlogged=false,tied_to_bell=true:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_7
+          model:
+            path: ${__NAMESPACE__}:block/rope_east_north_side
+          entity_renderer:
+            item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=true,north=false,south=true,west=false,waterlogged=false,tied_to_bell=false:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_8
           model:
             path: ${__NAMESPACE__}:block/rope_east_south_side
-        east=false,north=false,south=true,west=true:
-          auto_state: twisting_vines
+        east=true,north=false,south=true,west=false,waterlogged=false,tied_to_bell=true:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_8
+          model:
+            path: ${__NAMESPACE__}:block/rope_east_south_side
+          entity_renderer:
+            item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=false,north=false,south=true,west=true,waterlogged=false,tied_to_bell=false:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_9
           model:
             path: ${__NAMESPACE__}:block/rope_south_west_side
-        east=false,north=true,south=false,west=true:
-          auto_state: twisting_vines
+        east=false,north=false,south=true,west=true,waterlogged=false,tied_to_bell=true:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_9
+          model:
+            path: ${__NAMESPACE__}:block/rope_south_west_side
+          entity_renderer:
+            item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=false,north=true,south=false,west=true,waterlogged=false,tied_to_bell=false:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_10
           model:
             path: ${__NAMESPACE__}:block/rope_north_west_side
-        east=true,north=true,south=true,west=false:
-          auto_state: twisting_vines
+        east=false,north=true,south=false,west=true,waterlogged=false,tied_to_bell=true:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_10
+          model:
+            path: ${__NAMESPACE__}:block/rope_north_west_side
+          entity_renderer:
+            item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=true,north=true,south=true,west=false,waterlogged=false,tied_to_bell=false:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_11
           model:
             path: ${__NAMESPACE__}:block/rope_east_north_south_side
-        east=false,north=true,south=true,west=true:
-          auto_state: twisting_vines
+        east=true,north=true,south=true,west=false,waterlogged=false,tied_to_bell=true:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_11
+          model:
+            path: ${__NAMESPACE__}:block/rope_east_north_south_side
+          entity_renderer:
+            item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=false,north=true,south=true,west=true,waterlogged=false,tied_to_bell=false:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_12
           model:
             path: ${__NAMESPACE__}:block/rope_north_south_west_side
-        east=true,north=false,south=true,west=true:
-          auto_state: twisting_vines
+        east=false,north=true,south=true,west=true,waterlogged=false,tied_to_bell=true:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_12
+          model:
+            path: ${__NAMESPACE__}:block/rope_north_south_west_side
+          entity_renderer:
+            item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=true,north=false,south=true,west=true,waterlogged=false,tied_to_bell=false:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_13
           model:
             path: ${__NAMESPACE__}:block/rope_east_south_west_side
-        east=true,north=true,south=false,west=true:
-          auto_state: twisting_vines
+        east=true,north=false,south=true,west=true,waterlogged=false,tied_to_bell=true:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_13
+          model:
+            path: ${__NAMESPACE__}:block/rope_east_south_west_side
+          entity_renderer:
+            item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=true,north=true,south=false,west=true,waterlogged=false,tied_to_bell=false:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_14
           model:
             path: ${__NAMESPACE__}:block/rope_east_north_west_side
-        east=true,north=true,south=true,west=true:
-          auto_state: twisting_vines
+        east=true,north=true,south=false,west=true,waterlogged=false,tied_to_bell=true:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_14
+          model:
+            path: ${__NAMESPACE__}:block/rope_east_north_west_side
+          entity_renderer:
+            item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=true,north=true,south=true,west=true,waterlogged=false,tied_to_bell=false:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_15
           model:
             path: ${__NAMESPACE__}:block/rope_all_side
+        east=true,north=true,south=true,west=true,waterlogged=false,tied_to_bell=true:
+          auto_state:
+            type: twisting_vines
+            id: farmersdelight:rope/appearance_15
+          model:
+            path: ${__NAMESPACE__}:block/rope_all_side
+          entity_renderer:
+            item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=false,north=false,south=false,west=false,waterlogged=true,tied_to_bell=false:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+            type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_0
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+        east=false,north=false,south=false,west=false,waterlogged=true,tied_to_bell=true:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+          - type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_0
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+          - item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=false,north=true,south=false,west=false,waterlogged=true,tied_to_bell=false:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+            type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_1
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+        east=false,north=true,south=false,west=false,waterlogged=true,tied_to_bell=true:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+          - type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_1
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+          - item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=true,north=false,south=false,west=false,waterlogged=true,tied_to_bell=false:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+            type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_2
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+        east=true,north=false,south=false,west=false,waterlogged=true,tied_to_bell=true:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+          - type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_2
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+          - item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=false,north=false,south=true,west=false,waterlogged=true,tied_to_bell=false:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+            type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_3
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+        east=false,north=false,south=true,west=false,waterlogged=true,tied_to_bell=true:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+          - type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_3
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+          - item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=false,north=false,south=false,west=true,waterlogged=true,tied_to_bell=false:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+            type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_4
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+        east=false,north=false,south=false,west=true,waterlogged=true,tied_to_bell=true:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+          - type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_4
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+          - item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=false,north=true,south=true,west=false,waterlogged=true,tied_to_bell=false:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+            type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_5
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+        east=false,north=true,south=true,west=false,waterlogged=true,tied_to_bell=true:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+          - type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_5
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+          - item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=true,north=false,south=false,west=true,waterlogged=true,tied_to_bell=false:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+            type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_6
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+        east=true,north=false,south=false,west=true,waterlogged=true,tied_to_bell=true:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+          - type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_6
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+          - item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=true,north=true,south=false,west=false,waterlogged=true,tied_to_bell=false:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+            type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_7
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+        east=true,north=true,south=false,west=false,waterlogged=true,tied_to_bell=true:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+          - type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_7
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+          - item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=true,north=false,south=true,west=false,waterlogged=true,tied_to_bell=false:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+            type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_8
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+        east=true,north=false,south=true,west=false,waterlogged=true,tied_to_bell=true:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+          - type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_8
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+          - item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=false,north=false,south=true,west=true,waterlogged=true,tied_to_bell=false:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+            type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_9
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+        east=false,north=false,south=true,west=true,waterlogged=true,tied_to_bell=true:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+          - type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_9
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+          - item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=false,north=true,south=false,west=true,waterlogged=true,tied_to_bell=false:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+            type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_10
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+        east=false,north=true,south=false,west=true,waterlogged=true,tied_to_bell=true:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+          - type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_10
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+          - item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=true,north=true,south=true,west=false,waterlogged=true,tied_to_bell=false:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+            type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_11
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+        east=true,north=true,south=true,west=false,waterlogged=true,tied_to_bell=true:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+          - type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_11
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+          - item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=false,north=true,south=true,west=true,waterlogged=true,tied_to_bell=false:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+            type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_12
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+        east=false,north=true,south=true,west=true,waterlogged=true,tied_to_bell=true:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+          - type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_12
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+          - item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=true,north=false,south=true,west=true,waterlogged=true,tied_to_bell=false:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+            type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_13
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+        east=true,north=false,south=true,west=true,waterlogged=true,tied_to_bell=true:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+          - type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_13
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+          - item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=true,north=true,south=false,west=true,waterlogged=true,tied_to_bell=false:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+            type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_14
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+        east=true,north=true,south=false,west=true,waterlogged=true,tied_to_bell=true:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+          - type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_14
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+          - item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
+        east=true,north=true,south=true,west=true,waterlogged=true,tied_to_bell=false:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+            type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_15
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+        east=true,north=true,south=true,west=true,waterlogged=true,tied_to_bell=true:
+          auto_state:
+            type: kelp
+            id: farmersdelight:rope/waterlogged
+          transparent: true
+          entity_renderer:
+          - type: item_display
+            item: farmersdelight:entity_renderer/rope_wet_15
+            display_transform: none
+            rotation: 0
+            scale: 1,1,1
+          - item: farmersdelight:entity_renderer/rope_bell_tie
+            rotation: 0
+            scale: 1,1,1
       variants:
-        east=false,north=false,south=false,west=false:
-          appearance: east=false,north=false,south=false,west=false
-        east=false,north=true,south=false,west=false:
-          appearance: east=false,north=true,south=false,west=false
-        east=true,north=false,south=false,west=false:
-          appearance: east=true,north=false,south=false,west=false
-        east=false,north=false,south=true,west=false:
-          appearance: east=false,north=false,south=true,west=false
-        east=false,north=false,south=false,west=true:
-          appearance: east=false,north=false,south=false,west=true
-        east=false,north=true,south=true,west=false:
-          appearance: east=false,north=true,south=true,west=false
-        east=true,north=false,south=false,west=true:
-          appearance: east=true,north=false,south=false,west=true
-        east=true,north=true,south=false,west=false:
-          appearance: east=true,north=true,south=false,west=false
-        east=true,north=false,south=true,west=false:
-          appearance: east=true,north=false,south=true,west=false
-        east=false,north=false,south=true,west=true:
-          appearance: east=false,north=false,south=true,west=true
-        east=false,north=true,south=false,west=true:
-          appearance: east=false,north=true,south=false,west=true
-        east=true,north=true,south=true,west=false:
-          appearance: east=true,north=true,south=true,west=false
-        east=false,north=true,south=true,west=true:
-          appearance: east=false,north=true,south=true,west=true
-        east=true,north=false,south=true,west=true:
-          appearance: east=true,north=false,south=true,west=true
-        east=true,north=true,south=false,west=true:
-          appearance: east=true,north=true,south=false,west=true
-        east=true,north=true,south=true,west=true:
-          appearance: east=true,north=true,south=true,west=true
+        waterlogged=true:
+          settings:
+            fluid_state: water
+        east=false,north=false,south=false,west=false,waterlogged=false,tied_to_bell=false:
+          appearance: east=false,north=false,south=false,west=false,waterlogged=false,tied_to_bell=false
+        east=false,north=false,south=false,west=false,waterlogged=false,tied_to_bell=true:
+          appearance: east=false,north=false,south=false,west=false,waterlogged=false,tied_to_bell=true
+        east=false,north=true,south=false,west=false,waterlogged=false,tied_to_bell=false:
+          appearance: east=false,north=true,south=false,west=false,waterlogged=false,tied_to_bell=false
+        east=false,north=true,south=false,west=false,waterlogged=false,tied_to_bell=true:
+          appearance: east=false,north=true,south=false,west=false,waterlogged=false,tied_to_bell=true
+        east=true,north=false,south=false,west=false,waterlogged=false,tied_to_bell=false:
+          appearance: east=true,north=false,south=false,west=false,waterlogged=false,tied_to_bell=false
+        east=true,north=false,south=false,west=false,waterlogged=false,tied_to_bell=true:
+          appearance: east=true,north=false,south=false,west=false,waterlogged=false,tied_to_bell=true
+        east=false,north=false,south=true,west=false,waterlogged=false,tied_to_bell=false:
+          appearance: east=false,north=false,south=true,west=false,waterlogged=false,tied_to_bell=false
+        east=false,north=false,south=true,west=false,waterlogged=false,tied_to_bell=true:
+          appearance: east=false,north=false,south=true,west=false,waterlogged=false,tied_to_bell=true
+        east=false,north=false,south=false,west=true,waterlogged=false,tied_to_bell=false:
+          appearance: east=false,north=false,south=false,west=true,waterlogged=false,tied_to_bell=false
+        east=false,north=false,south=false,west=true,waterlogged=false,tied_to_bell=true:
+          appearance: east=false,north=false,south=false,west=true,waterlogged=false,tied_to_bell=true
+        east=false,north=true,south=true,west=false,waterlogged=false,tied_to_bell=false:
+          appearance: east=false,north=true,south=true,west=false,waterlogged=false,tied_to_bell=false
+        east=false,north=true,south=true,west=false,waterlogged=false,tied_to_bell=true:
+          appearance: east=false,north=true,south=true,west=false,waterlogged=false,tied_to_bell=true
+        east=true,north=false,south=false,west=true,waterlogged=false,tied_to_bell=false:
+          appearance: east=true,north=false,south=false,west=true,waterlogged=false,tied_to_bell=false
+        east=true,north=false,south=false,west=true,waterlogged=false,tied_to_bell=true:
+          appearance: east=true,north=false,south=false,west=true,waterlogged=false,tied_to_bell=true
+        east=true,north=true,south=false,west=false,waterlogged=false,tied_to_bell=false:
+          appearance: east=true,north=true,south=false,west=false,waterlogged=false,tied_to_bell=false
+        east=true,north=true,south=false,west=false,waterlogged=false,tied_to_bell=true:
+          appearance: east=true,north=true,south=false,west=false,waterlogged=false,tied_to_bell=true
+        east=true,north=false,south=true,west=false,waterlogged=false,tied_to_bell=false:
+          appearance: east=true,north=false,south=true,west=false,waterlogged=false,tied_to_bell=false
+        east=true,north=false,south=true,west=false,waterlogged=false,tied_to_bell=true:
+          appearance: east=true,north=false,south=true,west=false,waterlogged=false,tied_to_bell=true
+        east=false,north=false,south=true,west=true,waterlogged=false,tied_to_bell=false:
+          appearance: east=false,north=false,south=true,west=true,waterlogged=false,tied_to_bell=false
+        east=false,north=false,south=true,west=true,waterlogged=false,tied_to_bell=true:
+          appearance: east=false,north=false,south=true,west=true,waterlogged=false,tied_to_bell=true
+        east=false,north=true,south=false,west=true,waterlogged=false,tied_to_bell=false:
+          appearance: east=false,north=true,south=false,west=true,waterlogged=false,tied_to_bell=false
+        east=false,north=true,south=false,west=true,waterlogged=false,tied_to_bell=true:
+          appearance: east=false,north=true,south=false,west=true,waterlogged=false,tied_to_bell=true
+        east=true,north=true,south=true,west=false,waterlogged=false,tied_to_bell=false:
+          appearance: east=true,north=true,south=true,west=false,waterlogged=false,tied_to_bell=false
+        east=true,north=true,south=true,west=false,waterlogged=false,tied_to_bell=true:
+          appearance: east=true,north=true,south=true,west=false,waterlogged=false,tied_to_bell=true
+        east=false,north=true,south=true,west=true,waterlogged=false,tied_to_bell=false:
+          appearance: east=false,north=true,south=true,west=true,waterlogged=false,tied_to_bell=false
+        east=false,north=true,south=true,west=true,waterlogged=false,tied_to_bell=true:
+          appearance: east=false,north=true,south=true,west=true,waterlogged=false,tied_to_bell=true
+        east=true,north=false,south=true,west=true,waterlogged=false,tied_to_bell=false:
+          appearance: east=true,north=false,south=true,west=true,waterlogged=false,tied_to_bell=false
+        east=true,north=false,south=true,west=true,waterlogged=false,tied_to_bell=true:
+          appearance: east=true,north=false,south=true,west=true,waterlogged=false,tied_to_bell=true
+        east=true,north=true,south=false,west=true,waterlogged=false,tied_to_bell=false:
+          appearance: east=true,north=true,south=false,west=true,waterlogged=false,tied_to_bell=false
+        east=true,north=true,south=false,west=true,waterlogged=false,tied_to_bell=true:
+          appearance: east=true,north=true,south=false,west=true,waterlogged=false,tied_to_bell=true
+        east=true,north=true,south=true,west=true,waterlogged=false,tied_to_bell=false:
+          appearance: east=true,north=true,south=true,west=true,waterlogged=false,tied_to_bell=false
+        east=true,north=true,south=true,west=true,waterlogged=false,tied_to_bell=true:
+          appearance: east=true,north=true,south=true,west=true,waterlogged=false,tied_to_bell=true
+        east=false,north=false,south=false,west=false,waterlogged=true,tied_to_bell=false:
+          appearance: east=false,north=false,south=false,west=false,waterlogged=true,tied_to_bell=false
+        east=false,north=false,south=false,west=false,waterlogged=true,tied_to_bell=true:
+          appearance: east=false,north=false,south=false,west=false,waterlogged=true,tied_to_bell=true
+        east=false,north=true,south=false,west=false,waterlogged=true,tied_to_bell=false:
+          appearance: east=false,north=true,south=false,west=false,waterlogged=true,tied_to_bell=false
+        east=false,north=true,south=false,west=false,waterlogged=true,tied_to_bell=true:
+          appearance: east=false,north=true,south=false,west=false,waterlogged=true,tied_to_bell=true
+        east=true,north=false,south=false,west=false,waterlogged=true,tied_to_bell=false:
+          appearance: east=true,north=false,south=false,west=false,waterlogged=true,tied_to_bell=false
+        east=true,north=false,south=false,west=false,waterlogged=true,tied_to_bell=true:
+          appearance: east=true,north=false,south=false,west=false,waterlogged=true,tied_to_bell=true
+        east=false,north=false,south=true,west=false,waterlogged=true,tied_to_bell=false:
+          appearance: east=false,north=false,south=true,west=false,waterlogged=true,tied_to_bell=false
+        east=false,north=false,south=true,west=false,waterlogged=true,tied_to_bell=true:
+          appearance: east=false,north=false,south=true,west=false,waterlogged=true,tied_to_bell=true
+        east=false,north=false,south=false,west=true,waterlogged=true,tied_to_bell=false:
+          appearance: east=false,north=false,south=false,west=true,waterlogged=true,tied_to_bell=false
+        east=false,north=false,south=false,west=true,waterlogged=true,tied_to_bell=true:
+          appearance: east=false,north=false,south=false,west=true,waterlogged=true,tied_to_bell=true
+        east=false,north=true,south=true,west=false,waterlogged=true,tied_to_bell=false:
+          appearance: east=false,north=true,south=true,west=false,waterlogged=true,tied_to_bell=false
+        east=false,north=true,south=true,west=false,waterlogged=true,tied_to_bell=true:
+          appearance: east=false,north=true,south=true,west=false,waterlogged=true,tied_to_bell=true
+        east=true,north=false,south=false,west=true,waterlogged=true,tied_to_bell=false:
+          appearance: east=true,north=false,south=false,west=true,waterlogged=true,tied_to_bell=false
+        east=true,north=false,south=false,west=true,waterlogged=true,tied_to_bell=true:
+          appearance: east=true,north=false,south=false,west=true,waterlogged=true,tied_to_bell=true
+        east=true,north=true,south=false,west=false,waterlogged=true,tied_to_bell=false:
+          appearance: east=true,north=true,south=false,west=false,waterlogged=true,tied_to_bell=false
+        east=true,north=true,south=false,west=false,waterlogged=true,tied_to_bell=true:
+          appearance: east=true,north=true,south=false,west=false,waterlogged=true,tied_to_bell=true
+        east=true,north=false,south=true,west=false,waterlogged=true,tied_to_bell=false:
+          appearance: east=true,north=false,south=true,west=false,waterlogged=true,tied_to_bell=false
+        east=true,north=false,south=true,west=false,waterlogged=true,tied_to_bell=true:
+          appearance: east=true,north=false,south=true,west=false,waterlogged=true,tied_to_bell=true
+        east=false,north=false,south=true,west=true,waterlogged=true,tied_to_bell=false:
+          appearance: east=false,north=false,south=true,west=true,waterlogged=true,tied_to_bell=false
+        east=false,north=false,south=true,west=true,waterlogged=true,tied_to_bell=true:
+          appearance: east=false,north=false,south=true,west=true,waterlogged=true,tied_to_bell=true
+        east=false,north=true,south=false,west=true,waterlogged=true,tied_to_bell=false:
+          appearance: east=false,north=true,south=false,west=true,waterlogged=true,tied_to_bell=false
+        east=false,north=true,south=false,west=true,waterlogged=true,tied_to_bell=true:
+          appearance: east=false,north=true,south=false,west=true,waterlogged=true,tied_to_bell=true
+        east=true,north=true,south=true,west=false,waterlogged=true,tied_to_bell=false:
+          appearance: east=true,north=true,south=true,west=false,waterlogged=true,tied_to_bell=false
+        east=true,north=true,south=true,west=false,waterlogged=true,tied_to_bell=true:
+          appearance: east=true,north=true,south=true,west=false,waterlogged=true,tied_to_bell=true
+        east=false,north=true,south=true,west=true,waterlogged=true,tied_to_bell=false:
+          appearance: east=false,north=true,south=true,west=true,waterlogged=true,tied_to_bell=false
+        east=false,north=true,south=true,west=true,waterlogged=true,tied_to_bell=true:
+          appearance: east=false,north=true,south=true,west=true,waterlogged=true,tied_to_bell=true
+        east=true,north=false,south=true,west=true,waterlogged=true,tied_to_bell=false:
+          appearance: east=true,north=false,south=true,west=true,waterlogged=true,tied_to_bell=false
+        east=true,north=false,south=true,west=true,waterlogged=true,tied_to_bell=true:
+          appearance: east=true,north=false,south=true,west=true,waterlogged=true,tied_to_bell=true
+        east=true,north=true,south=false,west=true,waterlogged=true,tied_to_bell=false:
+          appearance: east=true,north=true,south=false,west=true,waterlogged=true,tied_to_bell=false
+        east=true,north=true,south=false,west=true,waterlogged=true,tied_to_bell=true:
+          appearance: east=true,north=true,south=false,west=true,waterlogged=true,tied_to_bell=true
+        east=true,north=true,south=true,west=true,waterlogged=true,tied_to_bell=false:
+          appearance: east=true,north=true,south=true,west=true,waterlogged=true,tied_to_bell=false
+        east=true,north=true,south=true,west=true,waterlogged=true,tied_to_bell=true:
+          appearance: east=true,north=true,south=true,west=true,waterlogged=true,tied_to_bell=true
     loot:
       template: default:loot_table/self
 recipes:
@@ -150,10 +898,10 @@ recipes:
     type: shaped
     category: building
     pattern:
-      - "S"
-      - "S"
+    - S
+    - S
     ingredients:
-      S: "farmersdelight:straw"
+      S: farmersdelight:straw
     result:
       id: farmersdelight:rope
       count: 4

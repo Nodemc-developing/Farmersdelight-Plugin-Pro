@@ -35,8 +35,8 @@ jobs:
         run: ./gradlew test --no-daemon --stacktrace
 
       # The addon repos compile against this jar, so a failure here breaks all five of them.
-      - name: Build the api jar addons compile against
-        run: ./gradlew apiJar --no-daemon --stacktrace
+      - name: Build the addon API and manual content pack
+        run: ./gradlew apiJar contentPackZip --no-daemon --stacktrace
 
       - name: Upload test report
         if: always()
@@ -72,8 +72,17 @@ jobs:
       - name: Meal icons match the cooking pot recipes
         run: python tools/meal_icons.py --check
 
+      - name: Independent content pack contains its player items and dependencies
+        run: python tools/check_content_pack.py --quiet
+
+      - name: Content checker rejects incomplete deliveries
+        run: python tools/test_content_pack.py -q
+
       - name: Language keys are defined in both locales
         run: python tools/check_lang_keys.py --quiet
+
+      - name: Content language checker rejects untranslated names
+        run: python tools/test_lang_keys.py -q
 
       # The whole addon split rests on this rule: an addon may only compile against api.**, never against
       # Farmersdelight-Plugin-Pro's internals. It was convention (and a jar-layout audit) until now; this makes a

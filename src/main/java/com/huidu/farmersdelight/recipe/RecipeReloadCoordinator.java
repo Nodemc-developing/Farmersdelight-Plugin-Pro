@@ -42,7 +42,7 @@ public final class RecipeReloadCoordinator {
             public long generation() { return plugin.configurationGeneration(); }
             public boolean mergeMissing() {
                 roots = RecipePackFiles.configurationRoots(plugin);
-                return plugin.getConfigBoolean(false, "recipes.merge-missing-bundled");
+                return false;
             }
             public Batch prepare(boolean merge) throws Exception { return PreparedRecipeFiles.read(plugin, merge, roots); }
             public void publish() { plugin.publishEditedRecipes(); }

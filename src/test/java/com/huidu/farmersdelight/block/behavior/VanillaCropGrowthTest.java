@@ -57,4 +57,18 @@ class VanillaCropGrowthTest {
         assertTrue(VanillaCropGrowth.passes(2.0F, 1.0F / 14.0F));
         assertFalse(VanillaCropGrowth.passes(2.0F, 1.0F / 12.0F));
     }
+
+    @Test
+    void aRateMultiplierDoesNotBypassSoilOrIncreaseTheRollAboveOne() {
+        assertEquals(VanillaCropGrowth.chance(4) * 2, VanillaCropGrowth.chance(4, 2));
+        assertEquals(0, VanillaCropGrowth.chance(4, 0));
+        assertEquals(1, VanillaCropGrowth.chance(10, 100));
+    }
+
+    @Test
+    void cropLightUsesUnreducedSkyAndBlockBrightness() {
+        assertFalse(VanillaCropGrowth.sufficientLight(8, 8, 9));
+        assertTrue(VanillaCropGrowth.sufficientLight(15, 0, 9));
+        assertTrue(VanillaCropGrowth.sufficientLight(0, 9, 9));
+    }
 }

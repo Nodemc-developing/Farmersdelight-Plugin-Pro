@@ -18,6 +18,10 @@ import net.momirealms.craftengine.core.block.property.Property;
 import net.momirealms.craftengine.core.util.Key;
 import net.momirealms.craftengine.core.world.BlockPos;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import com.huidu.farmersdelight.util.ItemUtils;
+import net.momirealms.craftengine.core.world.context.UseOnContext;
+import net.momirealms.craftengine.core.entity.player.InteractionResult;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
@@ -53,94 +57,106 @@ public class TomatoVineBlockBehavior extends FarmersDelightBlockBehavior impleme
         return true;
     }
 
-    @Override
-    public void performBonemeal(Object thisBlock, Object[] args) {
-        // CE passes level, random, position and state as args[0..3].
-        // Budding crops own their age increment and transition into ground tomatoes on overflow.
-        // Hanging and immature ground crops already receive the sibling crop behavior's age increment
-        // and may climb. Mature ground crops advance the hanging crop above or attempt to climb.
-        if (args == null || args.length < 3) return;
-        World world = CraftEngineAdapter.toWorld(args[0]);
-        BlockPos pos = CraftEngineAdapter.toBlockPos(args[2]);
-        if (world == null || pos == null) return;
-
-        Block atPos = world.getBlockAt(pos.x(), pos.y(), pos.z());
-        ImmutableBlockState atState = CraftEngineBlocks.getCustomBlockState(atPos);
-        if (atState == null || atState.isEmpty()) return;
-        Key currentBlockId = atState.owner().value().id();
-
-        if (currentBlockId.equals(config.buddingBlockId())) {
-            performBuddingBonemeal(world, pos, atState);
-            return;
-        }
-
-        if (currentBlockId.equals(config.cropOnRopeBlockId())) {
-            if (ThreadLocalRandom.current().nextFloat() < config.bonemealClimbChance()) {
-                tryClimb(world, pos);
-            }
-            return;
-        }
-
-        if (!currentBlockId.equals(config.tomatoesBlockId())) return;
-
-        Property<Integer> ageProp = BlockBehaviorFactory.getOptionalProperty(
-                atState.owner().value(), AGE_PROPERTY, Integer.class);
-        if (ageProp == null) return;
-        Integer currentAge = atState.get(ageProp);
-        if (currentAge == null) return;
-
-        if (currentAge < config.tomatoesMaxAge()) {
-            if (ThreadLocalRandom.current().nextFloat() < config.bonemealClimbChance()) {
-                tryClimb(world, pos);
-            }
-            return;
-        }
-
-        Block aboveBlock = world.getBlockAt(pos.x(), pos.y() + 1, pos.z());
-        ImmutableBlockState aboveState = CraftEngineBlocks.getCustomBlockState(aboveBlock);
-        if (aboveState != null && !aboveState.isEmpty()
-                && aboveState.owner().value().id().equals(config.cropOnRopeBlockId())) {
-            Property<Integer> aboveAgeProp = BlockBehaviorFactory.getOptionalProperty(
-                    aboveState.owner().value(), AGE_PROPERTY, Integer.class);
-            if (aboveAgeProp != null) {
-                Integer aboveAge = aboveState.get(aboveAgeProp);
-                if (aboveAge != null && aboveAge < config.hangingMaxAge()) {
-                    ImmutableBlockState newAboveState = aboveState.with(aboveAgeProp, aboveAge + 1);
-                    Location aboveLoc = new Location(world,
-                            aboveBlock.getX() + 0.5, aboveBlock.getY(), aboveBlock.getZ() + 0.5);
-                    CraftEngineBlocks.place(aboveLoc, newAboveState, false);
-                    return;
-                }
-            }
-        }
-        tryClimb(world, pos);
+    @Override public InteractionResult useOnBlock(UseOnContext context, ImmutableBlockState state) {
+        if (context.getPlayer() == null || !(context.getPlayer().platformPlayer() instanceof org.bukkit.entity.Player player)) return InteractionResult.PASS;
+        var item = ItemUtils.getItemInHand(player, context.getHand());
+        if (item == null || item.getType() != Material.BONE_MEAL) return InteractionResult.PASS;
+        CropBoneMealUse use = CropBoneMealUse.capture(plugin, context);
+        if (use == null) return InteractionResult.FAIL;
+        BlockPos pos = context.getClickedPos();
+        Block target = player.getWorld().getBlockAt(pos.x(), pos.y(), pos.z());
+        if (!applyBonemeal(target, state, use)) return InteractionResult.FAIL;
+        use.consume();
+        refreshColumn(target);
+        playBonemealEffect(player.getWorld(), pos.x(), pos.y(), pos.z());
+        ItemUtils.swingHand(player, context.getHand());
+        return InteractionResult.SUCCESS_AND_CANCEL;
     }
 
-    private void performBuddingBonemeal(World world, BlockPos pos, ImmutableBlockState state) {
-        Property<Integer> ageProp = BlockBehaviorFactory.getOptionalProperty(
-                state.owner().value(), AGE_PROPERTY, Integer.class);
-        if (ageProp == null) return;
-        Integer currentAge = state.get(ageProp);
-        if (currentAge == null) return;
-        int bonusRange = Math.max(1, config.bonemealBonusMax() - config.bonemealBonusMin() + 1);
-        int bonusAge = config.bonemealBonusMin() + ThreadLocalRandom.current().nextInt(bonusRange);
-        int newAge = currentAge + bonusAge;
-        Location loc = new Location(world, pos.x() + 0.5, pos.y(), pos.z() + 0.5);
-        if (newAge <= config.buddingMaxAge()) {
-            ImmutableBlockState updated = state.with(ageProp, newAge);
-            CraftEngineBlocks.place(loc, updated, false);
-            return;
+    @Override public void performBonemeal(Object block, Object[] args) {
+        if (args == null || args.length < 4) return;
+        World world = CraftEngineAdapter.toWorld(args[0]);
+        BlockPos pos = CraftEngineAdapter.toBlockPos(args[2]);
+        ImmutableBlockState state = BlockStateUtils.getOptionalCustomBlockState(args[3]).orElse(null);
+        if (world == null || pos == null || state == null) return;
+        Block target = world.getBlockAt(pos.x(), pos.y(), pos.z());
+        if (applyBonemeal(target, state, null)) refreshColumn(target);
+    }
+
+    private boolean applyBonemeal(Block target, ImmutableBlockState state, CropBoneMealUse use) {
+        if (!resident(target) || CraftEngineBlocks.getCustomBlockState(target) != state) return false;
+        int range = Math.max(1, config.bonemealBonusMax() - config.bonemealBonusMin() + 1);
+        int bonus = config.bonemealBonusMin() + ThreadLocalRandom.current().nextInt(range);
+        Map<Block, ImmutableBlockState> changes = new java.util.LinkedHashMap<>();
+        Key id = state.owner().value().id();
+        Property<Integer> age = BlockBehaviorFactory.getOptionalProperty(state.owner().value(), AGE_PROPERTY, Integer.class);
+        if (age == null || bonus < 1) return false;
+        int current = state.get(age);
+        if (id.equals(config.buddingBlockId())) {
+            int next = CropBehaviorOptions.incrementAge(current, bonus, Integer.MAX_VALUE);
+            if (next <= config.buddingMaxAge()) changes.put(target, state.with(age, next));
+            else {
+                BlockDefinition tomatoes = CraftEngineBlocks.byId(config.tomatoesBlockId());
+                if (tomatoes == null) return false;
+                Property<Integer> newAge = BlockBehaviorFactory.getOptionalProperty(tomatoes, AGE_PROPERTY, Integer.class);
+                if (newAge == null) return false;
+                changes.put(target, tomatoes.defaultState().with(newAge,
+                        Math.min(config.tomatoesMaxAge(), next - config.buddingMaxAge() - 1)));
+            }
+        } else if (id.equals(config.tomatoesBlockId()) || id.equals(config.cropOnRopeBlockId())) {
+            int maximum = id.equals(config.tomatoesBlockId()) ? config.tomatoesMaxAge() : config.hangingMaxAge();
+            int next = CropBehaviorOptions.incrementAge(current, bonus, maximum);
+            if (next != current) {
+                ImmutableBlockState updated = state.with(age, next);
+                changes.put(target, updated);
+                if (current + (long) bonus > maximum || ThreadLocalRandom.current().nextFloat() < config.bonemealClimbChance())
+                    proposeClimb(target, updated, changes);
+            } else {
+                Block cursor = target;
+                ImmutableBlockState cursorState = state;
+                for (int height = 0; height < effectiveMaxStackHeight(); height++) {
+                    Block above = cursor.getRelative(org.bukkit.block.BlockFace.UP);
+                    if (!resident(above)) return false;
+                    ImmutableBlockState value = CraftEngineBlocks.getCustomBlockState(above);
+                    if (value == null || value.isEmpty() || !config.cropOnRopeBlockId().equals(value.owner().value().id())) {
+                        proposeClimb(cursor, cursorState, changes);
+                        break;
+                    }
+                    Property<Integer> aboveAge = BlockBehaviorFactory.getOptionalProperty(value.owner().value(), AGE_PROPERTY, Integer.class);
+                    if (aboveAge == null) return false;
+                    if (value.get(aboveAge) < config.hangingMaxAge()) {
+                        changes.put(above, value.with(aboveAge, CropBehaviorOptions.incrementAge(value.get(aboveAge), bonus, config.hangingMaxAge())));
+                        break;
+                    }
+                    cursor = above;
+                    cursorState = value;
+                }
+            }
+        } else return false;
+        boolean committed = CropGrowthCommit.apply(plugin, changes, use == null ? null : use.player(),
+                use == null ? null : target, use == null ? () -> true : use);
+        return committed;
+    }
+
+    private void refreshColumn(Block target) {
+        for (int height = 0; height <= effectiveMaxStackHeight(); height++) {
+            Block cell = target.getRelative(org.bukkit.block.BlockFace.UP, height);
+            if (!resident(cell)) return;
+            RopeBlockBehavior.refreshAdjacentRopes(cell.getWorld(), new BlockPos(cell.getX(), cell.getY(), cell.getZ()));
         }
-        BlockDefinition tomatoes = CraftEngineBlocks.byId(config.tomatoesBlockId());
-        if (tomatoes == null) return;
-        int tomatoesAgeValue = Math.min(config.tomatoesMaxAge(), Math.max(0, newAge - (config.buddingMaxAge() + 1)));
-        ImmutableBlockState newState = tomatoes.defaultState();
-        Property<Integer> tomatoesAgeProp = BlockBehaviorFactory.getOptionalProperty(
-                tomatoes, AGE_PROPERTY, Integer.class);
-        if (tomatoesAgeProp != null) {
-            newState = newState.with(tomatoesAgeProp, tomatoesAgeValue);
-        }
-        CraftEngineBlocks.place(loc, newState, true);
+    }
+
+    private void proposeClimb(Block target, ImmutableBlockState state, Map<Block, ImmutableBlockState> changes) {
+        if (!resident(target) || CropGrowthCommit.brightness(target) < config.minLight()) return;
+        Property<Integer> age = BlockBehaviorFactory.getOptionalProperty(state.owner().value(), AGE_PROPERTY, Integer.class);
+        if (age == null || state.get(age) < config.matureAge()) return;
+        if (countSameIdHeightBelow(target.getWorld(), new BlockPos(target.getX(), target.getY(), target.getZ()), state.owner().value().id()) >= effectiveMaxStackHeight()) return;
+        Block above = target.getRelative(org.bukkit.block.BlockFace.UP);
+        if (!resident(above) || !CustomBlockUtils.hasBehavior(above, RopeBlockBehavior.class)) return;
+        BlockDefinition hanging = CraftEngineBlocks.byId(config.cropOnRopeBlockId());
+        if (hanging == null) return;
+        Property<Integer> hangingAge = BlockBehaviorFactory.getOptionalProperty(hanging, AGE_PROPERTY, Integer.class);
+        if (hangingAge != null) changes.put(above, hanging.defaultState().with(hangingAge, 0));
     }
 
     public static final String AGE_PROPERTY = "age";
@@ -177,9 +193,10 @@ public class TomatoVineBlockBehavior extends FarmersDelightBlockBehavior impleme
         this.config = config;
     }
 
-    public static final BlockBehaviorFactory<TomatoVineBlockBehavior> FACTORY = (BlockDefinition block, ConfigSection section) -> {
-        // Runs while CraftEngine parses the pack, which is always after this plugin enabled.
-        FarmersDelightPlugin plugin = FarmersDelightPlugin.getInstance();
+    public static final BlockBehaviorFactory<TomatoVineBlockBehavior> FACTORY = factory(null);
+
+    public static BlockBehaviorFactory<TomatoVineBlockBehavior> factory(FarmersDelightPlugin plugin) {
+        return (BlockDefinition block, ConfigSection section) -> {
         Map<String, Object> arguments = section != null ? section.values() : Map.of();
         // Every stage of the vine is driven by the age of the block the behavior sits on: budding
         // transitions at max age, the ground and hanging blocks gate climbing and harvesting on it.
@@ -206,7 +223,8 @@ public class TomatoVineBlockBehavior extends FarmersDelightBlockBehavior impleme
         ));
         BEHAVIORS.put(block.id(), behavior);
         return behavior;
-    };
+        };
+    }
 
     public static TomatoVineBlockBehavior getBehavior(Key blockId) {
         return blockId == null ? null : BEHAVIORS.get(blockId);
@@ -247,6 +265,7 @@ public class TomatoVineBlockBehavior extends FarmersDelightBlockBehavior impleme
         BlockPos pos = CraftEngineAdapter.toBlockPos(args[2]);
         if (world == null || pos == null) return;
         Block atPos = world.getBlockAt(pos.x(), pos.y(), pos.z());
+        if (!resident(atPos)) return;
         ImmutableBlockState atState = CraftEngineBlocks.getCustomBlockState(atPos);
         if (atState == null || atState.isEmpty()) return;
         Key currentBlockId = atState.owner().value().id();
@@ -258,7 +277,7 @@ public class TomatoVineBlockBehavior extends FarmersDelightBlockBehavior impleme
     }
 
     private void tryGrowPastMaxAge(World world, BlockPos pos, ImmutableBlockState state, Block atPos) {
-        if (atPos.getLightLevel() < config.minLight()) return;
+        if (CropGrowthCommit.brightness(atPos) < config.minLight()) return;
         Property<Integer> ageProp = BlockBehaviorFactory.getOptionalProperty(
                 state.owner().value(), AGE_PROPERTY, Integer.class);
         if (ageProp == null) return;
@@ -273,12 +292,13 @@ public class TomatoVineBlockBehavior extends FarmersDelightBlockBehavior impleme
             newState = newState.with(tomatoesAge, 0);
         }
         Location loc = new Location(world, pos.x() + 0.5, pos.y(), pos.z() + 0.5);
-        CraftEngineBlocks.place(loc, newState, true);
+        CropGrowthCommit.apply(plugin, world.getBlockAt(pos.x(), pos.y(), pos.z()), newState);
     }
 
     public void tryClimb(World world, BlockPos pos) {
         if (world == null || pos == null) return;
         Block atPos = world.getBlockAt(pos.x(), pos.y(), pos.z());
+        if (!resident(atPos)) return;
         ImmutableBlockState atState = CraftEngineBlocks.getCustomBlockState(atPos);
         if (atState == null || atState.isEmpty()) return;
         Key currentBlockId = atState.owner().value().id();
@@ -290,12 +310,13 @@ public class TomatoVineBlockBehavior extends FarmersDelightBlockBehavior impleme
                 if (currentAge != null && currentAge < config.matureAge()) return;
             }
         }
-        if (atPos.getLightLevel() < config.minLight()) return;
+        if (CropGrowthCommit.brightness(atPos) < config.minLight()) return;
 
         int height = countSameIdHeightBelow(world, pos, currentBlockId);
         if (height >= effectiveMaxStackHeight()) return;
 
         Block aboveTop = world.getBlockAt(pos.x(), pos.y() + 1, pos.z());
+        if (!resident(aboveTop)) return;
         if (!CustomBlockUtils.hasBehavior(aboveTop, RopeBlockBehavior.class)) return;
 
         BlockDefinition cropOnRope = CraftEngineBlocks.byId(config.cropOnRopeBlockId());
@@ -309,7 +330,7 @@ public class TomatoVineBlockBehavior extends FarmersDelightBlockBehavior impleme
 
         Location placeLoc = new Location(world,
                 aboveTop.getX() + 0.5, aboveTop.getY(), aboveTop.getZ() + 0.5);
-        boolean placed = CraftEngineBlocks.place(placeLoc, newState, true);
+        boolean placed = CropGrowthCommit.apply(plugin, aboveTop, newState);
         if (placed) {
             RopeBlockBehavior.refreshAdjacentRopes(world,
                     new BlockPos(aboveTop.getX(), aboveTop.getY(), aboveTop.getZ()));
@@ -333,6 +354,7 @@ public class TomatoVineBlockBehavior extends FarmersDelightBlockBehavior impleme
 
         Location placeLoc = new Location(world, pos.x() + 0.5, pos.y(), pos.z() + 0.5);
         Runnable placeRope = () -> {
+            if (!resident(world.getBlockAt(pos.x(), pos.y(), pos.z()))) return;
             ImmutableBlockState connected = RopeBlockBehavior.computeConnectionState(
                     ropeBlock.defaultState(), world, pos);
             CraftEngineBlocks.place(placeLoc, connected, true);
@@ -373,7 +395,9 @@ public class TomatoVineBlockBehavior extends FarmersDelightBlockBehavior impleme
         int count = 1;
         int y = pos.y() - 1;
         while (y >= world.getMinHeight()) {
-            ImmutableBlockState bs = CraftEngineBlocks.getCustomBlockState(world.getBlockAt(pos.x(), y, pos.z()));
+            Block lower = world.getBlockAt(pos.x(), y, pos.z());
+            if (!resident(lower)) break;
+            ImmutableBlockState bs = CraftEngineBlocks.getCustomBlockState(lower);
             if (bs == null || bs.isEmpty()) break;
             if (!bs.owner().value().id().equals(currentBlockId)) break;
             count++;
@@ -382,4 +406,5 @@ public class TomatoVineBlockBehavior extends FarmersDelightBlockBehavior impleme
         return count;
     }
 
+    private boolean resident(Block block) { return CropGrowthCommit.resident(plugin, block); }
 }

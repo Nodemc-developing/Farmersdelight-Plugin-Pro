@@ -35,6 +35,18 @@ items:
       rules:
         - target: farmersdelight:rich_soil_farmland
           block: farmersdelight:pumpkin_stem
+  minecraft:torchflower_seeds:
+    behavior:
+      type: farmersdelight:conditional_block_planting
+      rules:
+        - target: farmersdelight:rich_soil_farmland
+          block: farmersdelight:torchflower_crop
+  minecraft:pitcher_pod:
+    behavior:
+      type: farmersdelight:conditional_block_planting
+      rules:
+        - target: farmersdelight:rich_soil_farmland
+          block: farmersdelight:pitcher_crop
 
 blocks:
   farmersdelight:wheat:
@@ -52,14 +64,17 @@ blocks:
         - minecraft:maintains_farmland
     behaviors:
       - type: liquid_flowable_block
-      - type: crop_block
-        grow-speed: 1.0
+      - type: farmersdelight:advanced_crop
+        growth-rate-multiplier: 1.0
+        soils:
+          - block: minecraft:farmland
+          - block: farmersdelight:rich_soil_farmland
         light-requirement: 9
         is-bone-meal-target: true
         bone_meal_age_bonus:
           type: uniform
-          min: 1
-          max: 3
+          min: 2
+          max: 5
       - type: bush_block
         bottom-blocks:
           - minecraft:farmland
@@ -126,8 +141,12 @@ blocks:
         - minecraft:maintains_farmland
     behaviors:
       - type: liquid_flowable_block
-      - type: crop_block
-        grow-speed: 1.0
+      - type: farmersdelight:advanced_crop
+        growth-rate-multiplier: 1.0
+        random-growth-chance: 0.33333334
+        soils:
+          - block: minecraft:farmland
+          - block: farmersdelight:rich_soil_farmland
         light-requirement: 9
         is-bone-meal-target: true
         bone_meal_age_bonus:
@@ -184,14 +203,17 @@ blocks:
         - minecraft:maintains_farmland
     behaviors:
       - type: liquid_flowable_block
-      - type: crop_block
-        grow-speed: 1.0
+      - type: farmersdelight:advanced_crop
+        growth-rate-multiplier: 1.0
+        soils:
+          - block: minecraft:farmland
+          - block: farmersdelight:rich_soil_farmland
         light-requirement: 9
         is-bone-meal-target: true
         bone_meal_age_bonus:
           type: uniform
-          min: 1
-          max: 3
+          min: 2
+          max: 5
       - type: bush_block
         bottom-blocks:
           - minecraft:farmland
@@ -258,14 +280,17 @@ blocks:
         - minecraft:maintains_farmland
     behaviors:
       - type: liquid_flowable_block
-      - type: crop_block
-        grow-speed: 1.0
+      - type: farmersdelight:advanced_crop
+        growth-rate-multiplier: 1.0
+        soils:
+          - block: minecraft:farmland
+          - block: farmersdelight:rich_soil_farmland
         light-requirement: 9
         is-bone-meal-target: true
         bone_meal_age_bonus:
           type: uniform
-          min: 1
-          max: 3
+          min: 2
+          max: 5
       - type: bush_block
         bottom-blocks:
           - minecraft:farmland
@@ -574,3 +599,154 @@ blocks:
           entries:
             - type: item
               item: minecraft:pumpkin_seeds
+
+  farmersdelight:torchflower_crop:
+    settings:
+      template:
+      - default:hardness/none
+      - default:sound/grass
+      overrides:
+        item: minecraft:torchflower_seeds
+        push-reaction: destroy
+        is-randomly-ticking: true
+      tags:
+      - minecraft:bee_growables
+      - minecraft:crops
+      - minecraft:maintains_farmland
+    behaviors:
+    - type: liquid_flowable_block
+    - type: farmersdelight:advanced_crop
+      growth-rate-multiplier: 1.0
+      light-requirement: 9
+      spawn-light-requirement: 8
+      soils:
+      - block: minecraft:farmland
+      - block: farmersdelight:rich_soil_farmland
+      bone-meal-age-bonus: 1
+      random-growth-chance: 0.33333334
+    states:
+      properties:
+        age:
+          type: int
+          default: 0
+          range: 0~2
+      appearances:
+        age=0:
+          state: torchflower_crop[age=0]
+        age=1:
+          state: torchflower_crop[age=1]
+        age=2:
+          state: torchflower
+      variants:
+        age=0:
+          appearance: age=0
+        age=1:
+          appearance: age=1
+        age=2:
+          appearance: age=2
+    loot:
+      pools:
+      - rolls: 1
+        entries:
+        - type: alternatives
+          children:
+          - type: item
+            item: minecraft:torchflower
+            conditions:
+            - type: match_block_property
+              properties:
+                age: 2
+          - type: item
+            item: minecraft:torchflower_seeds
+  farmersdelight:pitcher_crop:
+    settings:
+      template:
+      - default:hardness/none
+      - default:sound/grass
+      overrides:
+        item: minecraft:pitcher_pod
+        push-reaction: destroy
+        is-randomly-ticking: true
+      tags:
+      - minecraft:bee_growables
+      - minecraft:crops
+      - minecraft:maintains_farmland
+    behaviors:
+    - type: liquid_flowable_block
+    - type: farmersdelight:double_crop
+      growth-rate-multiplier: 1.0
+      light-requirement: 9
+      spawn-light-requirement: 8
+      soils:
+      - block: minecraft:farmland
+      - block: farmersdelight:rich_soil_farmland
+      bone-meal-age-bonus:
+        type: uniform
+        min: 2
+        max: 5
+      max-age: 4
+      upper-max-age: 4
+      upper-spawn-age: 3
+      sync-ages: true
+      upper-independent: false
+      requires-upper-space: true
+      reset-on-upper-removal: false
+    states:
+      properties:
+        age:
+          type: int
+          default: 0
+          range: 0~4
+        half:
+          type: double_block_half
+          default: lower
+      appearances:
+        age=0,half=lower:
+          state: pitcher_crop[age=0,half=lower]
+        age=1,half=lower:
+          state: pitcher_crop[age=1,half=lower]
+        age=2,half=lower:
+          state: pitcher_crop[age=2,half=lower]
+        age=3,half=lower:
+          state: pitcher_crop[age=3,half=lower]
+        age=4,half=lower:
+          state: pitcher_crop[age=4,half=lower]
+        age=3,half=upper:
+          state: pitcher_crop[age=3,half=upper]
+        age=4,half=upper:
+          state: pitcher_crop[age=4,half=upper]
+      variants:
+        age=0,half=lower:
+          appearance: age=0,half=lower
+        age=1,half=lower:
+          appearance: age=1,half=lower
+        age=2,half=lower:
+          appearance: age=2,half=lower
+        age=3,half=lower:
+          appearance: age=3,half=lower
+        age=4,half=lower:
+          appearance: age=4,half=lower
+        age=0,half=upper:
+          appearance: age=3,half=upper
+        age=1,half=upper:
+          appearance: age=3,half=upper
+        age=2,half=upper:
+          appearance: age=3,half=upper
+        age=3,half=upper:
+          appearance: age=3,half=upper
+        age=4,half=upper:
+          appearance: age=4,half=upper
+    loot:
+      pools:
+      - rolls: 1
+        entries:
+        - type: alternatives
+          children:
+          - type: item
+            item: minecraft:pitcher_plant
+            conditions:
+            - type: match_block_property
+              properties:
+                age: 4
+          - type: item
+            item: minecraft:pitcher_pod

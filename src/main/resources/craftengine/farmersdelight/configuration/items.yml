@@ -2059,7 +2059,7 @@ recipes:
   farmersdelight:smoked_ham:
     type: smoking
     experience: 0.35
-    time: 100
+    time: 200
     ingredient: "farmersdelight:ham"
     result:
       id: farmersdelight:smoked_ham

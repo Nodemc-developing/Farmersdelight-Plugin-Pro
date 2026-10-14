@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class HeatSourceConfigTest {
 
@@ -76,17 +77,36 @@ class HeatSourceConfigTest {
         assertNull(config.trayRequirement(stone()));
     }
 
+    @Test
+    void omittedTrayKeepsAutomaticSupportInsteadOfDisablingIt() {
+        HeatSourceConfig config = new HeatSourceConfig();
+        addEntry(config, Material.CAMPFIRE, Map.of(), true);
+        assertTrue(config.isHeatSource(campfire(true)));
+        assertNull(config.trayRequirement(campfire(true)));
+        assertNull(HeatSourceConfig.entryBoolean(Map.of("heat-source", true), "tray", null));
+        assertFalse(HeatSourceConfig.entryBoolean(Map.of("tray", false), "tray", null));
+        assertTrue(HeatSourceConfig.entryBoolean(Map.of("tray", "true"), "tray", null));
+    }
+
+    @Test
+    void misspelledBooleansDoNotSilentlyDisableHeatOrSupport() {
+        assertThrows(IllegalArgumentException.class,
+                () -> HeatSourceConfig.entryBoolean(Map.of("tray", "flase"), "tray", null));
+        assertThrows(IllegalArgumentException.class,
+                () -> HeatSourceConfig.entryBoolean(Map.of("heat-source", 1), "heat-source", true));
+    }
+
     // The entry types are private implementation details, so the test builds them reflectively instead of
     // widening their visibility. A rename or signature change surfaces here as a clear failure.
     @SuppressWarnings("unchecked")
     private static void addEntry(HeatSourceConfig config, Material material, Map<String, String> states,
                                  boolean heatSource) {
-        addEntry(config, material, states, heatSource, false);
+        addEntry(config, material, states, heatSource, null);
     }
 
     @SuppressWarnings("unchecked")
     private static void addEntry(HeatSourceConfig config, Material material, Map<String, String> states,
-                                 boolean heatSource, boolean tray) {
+                                 boolean heatSource, Boolean tray) {
         try {
             Class<?> matcherType = Class.forName(
                     "com.huidu.farmersdelight.config.HeatSourceConfig$VanillaBlockMatcher");
@@ -98,7 +118,7 @@ class HeatSourceConfigTest {
                     "com.huidu.farmersdelight.config.HeatSourceConfig$EntryMatcher");
             Class<?> entryType = Class.forName("com.huidu.farmersdelight.config.HeatSourceConfig$HeatEntry");
             Constructor<?> entryConstructor = entryType.getDeclaredConstructor(
-                    entryMatcherType, boolean.class, boolean.class, boolean.class);
+                    entryMatcherType, boolean.class, boolean.class, Boolean.class);
             entryConstructor.setAccessible(true);
             Object entry = entryConstructor.newInstance(matcher, heatSource, false, tray);
 

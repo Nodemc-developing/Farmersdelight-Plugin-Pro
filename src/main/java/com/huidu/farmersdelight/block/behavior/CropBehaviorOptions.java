@@ -5,15 +5,18 @@ import java.util.List;
 import java.util.Map;
 
 /** Immutable, validated growth settings shared by ordinary, double and supported crops. */
-public record CropBehaviorOptions(float speed, int light, int spawnLight, boolean bonemeal,
+public record CropBehaviorOptions(float speed, float randomGrowthChance, int light, int spawnLight, boolean bonemeal,
         boolean villageHarvest, boolean villagePlant, boolean water, boolean upperIndependent,
-        boolean synchronizeAges, int maximumAge, int upperMaximumAge, int upperMinimumAge,
+        boolean synchronizeAges, boolean requiresUpperSpace, boolean resetLowerAfterUpperRemoval,
+        int maximumAge, int upperMaximumAge, int upperMinimumAge, int upperSpawnAge,
         int ropeAge, int ropeMinimumAge, int ropeMaximumHeight, String ropeBlock, List<Soil> soils) {
     public record Soil(String block, float growthModifier, float bonemealChance) { }
 
     public static CropBehaviorOptions parse(Map<String, Object> source, int availableMaxAge) {
-        float speed = decimal(source, "grow_speed", .125f);
-        int light = integer(source, "light_requirement", 6);
+        float speed = get(source, "growth_rate_multiplier") == null
+                ? decimal(source, "grow_speed", 1) : decimal(source, "growth_rate_multiplier", 1);
+        float randomChance = decimal(source, "random_growth_chance", 1);
+        int light = integer(source, "light_requirement", 9);
         int max = integer(source, "max_age", availableMaxAge);
         int upper = integer(source, "upper_max_age", max);
         List<Soil> soils = new ArrayList<>();
@@ -30,20 +33,24 @@ public record CropBehaviorOptions(float speed, int light, int spawnLight, boolea
             if (!Float.isFinite(chance) || chance < 0 || chance > 1) throw new IllegalArgumentException("bonemeal_chance must be in [0, 1]");
             soils.add(new Soil(descriptor, modifier, chance));
         }
-        int spawn = integer(source, "spawn_light_requirement", light);
+        int spawn = integer(source, "spawn_light_requirement", Math.max(0, light - 1));
         int height = integer(source, "ropelogged_max_height", 3);
         int upperMin = integer(source, "upper_min_age", 0);
+        int upperSpawnAge = integer(source, "upper_spawn_age", max);
         int ropeAge = integer(source, "ropelogged_age", Math.min(3, max));
         int ropeMin = integer(source, "ropelogged_min_age", Math.min(4, max));
-        if (!Float.isFinite(speed) || speed < 0 || light < 0 || light > 15 || spawn < 0 || spawn > 15
+        if (!Float.isFinite(speed) || speed < 0 || !Float.isFinite(randomChance) || randomChance < 0 || randomChance > 1
+                || light < 0 || light > 15 || spawn < 0 || spawn > 15
                 || max < 0 || max > availableMaxAge || upper < 0 || upper > availableMaxAge || height < 1 || height > 256
-                || upperMin < 0 || upperMin > upper || ropeAge < 0 || ropeAge > max || ropeMin < 0 || ropeMin > max) {
+                || upperMin < 0 || upperMin > upper || upperSpawnAge < 0 || upperSpawnAge > max
+                || ropeAge < 0 || ropeAge > max || ropeMin < 0 || ropeMin > max) {
             throw new IllegalArgumentException("Invalid crop speed, light, age or height");
         }
-        return new CropBehaviorOptions(speed, light, spawn, flag(source, "is_bone_meal_target", true),
+        return new CropBehaviorOptions(speed, randomChance, light, spawn, flag(source, "is_bone_meal_target", true),
                 flag(source, "can_harvest_by_villagers", false), flag(source, "can_replant_by_villagers", false),
                 flag(source, "plant_in_water", false), flag(source, "upper_independent", true),
-                flag(source, "sync_ages", false), max, upper, upperMin, ropeAge, ropeMin, height,
+                flag(source, "sync_ages", false), flag(source, "requires_upper_space", false),
+                flag(source, "reset_on_upper_removal", true), max, upper, upperMin, upperSpawnAge, ropeAge, ropeMin, height,
                 String.valueOf(source.getOrDefault("ropelogged_rope_block", source.getOrDefault("ropelogged-rope-block", "farmersdelight:rope"))), List.copyOf(soils));
     }
 

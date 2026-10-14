@@ -1,9 +1,7 @@
 package com.huidu.farmersdelight.recipe;
 
 import com.huidu.farmersdelight.FarmersDelightPlugin;
-import com.huidu.farmersdelight.api.config.ConfigFileUpdater;
 import com.huidu.farmersdelight.config.PlainYamlDocuments;
-import com.huidu.farmersdelight.config.YamlFileTransactions;
 import com.huidu.farmersdelight.pack.PackSection;
 import com.huidu.farmersdelight.pack.PackSections;
 import net.momirealms.craftengine.bukkit.plugin.BukkitCraftEngine;
@@ -11,7 +9,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -46,34 +43,6 @@ public final class RecipePackFiles {
         return configurationFolder(plugin).resolve(name).normalize();
     }
 
-    /** Installs native defaults once; existing operator documents are never converted or replaced. */
-    public static void installDefaults(FarmersDelightPlugin plugin) throws Exception {
-        Path marker = plugin.getDataFolder().toPath().resolve(".native-recipe-defaults-installed");
-        boolean fresh = !Files.exists(marker);
-        for (String name : MANAGED_FILES) {
-            YamlConfiguration document;
-            try (InputStream input = plugin.getResource(name)) {
-                if (input == null) throw new IOException("Bundled recipe file missing: " + name);
-                document = PlainYamlDocuments.parse(new String(input.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8), true);
-            }
-            Path target = file(plugin, name);
-            if (installDefaultDocument(target, document, fresh)) {
-                com.huidu.farmersdelight.pack.compat.ExternalContentCoordinator.recordInstalledDefault(plugin, target);
-            }
-            com.huidu.farmersdelight.pack.compat.ExternalContentCoordinator.registerDefaultDocument(plugin, target, document.saveToString());
-        }
-        if (fresh) ConfigFileUpdater.writeStringAtomically(marker, "Native recipes are maintained in CraftEngine content packs.\n", true);
-    }
-
-    static boolean installDefaultDocument(Path target, YamlConfiguration document, boolean fresh) throws Exception {
-        if (!fresh) return false;
-        return YamlFileTransactions.execute(target, () -> {
-            if (Files.exists(target)) return false;
-            ConfigFileUpdater.writeStringAtomically(target, document.saveToString(), true);
-            return true;
-        });
-    }
-
     /** Snapshot CE's enabled configuration folders on the owning server thread, before worker I/O. */
     public static List<Path> configurationRoots(FarmersDelightPlugin plugin) {
         Set<Path> roots = new LinkedHashSet<>();
@@ -87,10 +56,6 @@ public final class RecipePackFiles {
                     namespaces.put(root, pack.namespace());
                 }
             }
-        }
-        if (defaultPackEnabled(plugin)) {
-            roots.add(configurationFolder(plugin));
-            namespaces.putIfAbsent(configurationFolder(plugin), "farmersdelight");
         }
         packNamespaces = Map.copyOf(namespaces);
         List<PackSections.Section> generated = new ArrayList<>();
@@ -130,7 +95,7 @@ public final class RecipePackFiles {
             Path folder = configurationFolder(plugin).getParent();
             for (var pack : engine.packManager().loadedPacks()) if (pack.folder().toAbsolutePath().normalize().equals(folder)) return pack.enabled();
         }
-        return true;
+        return false;
     }
 
     public static List<Path> files(List<Path> roots) throws IOException {

@@ -48,13 +48,13 @@ Folia-aware scheduling, sleeping block tickers, asynchronous file/database work 
 
 ## 🧩 Requirements
 
-**1.2.2** uses native configuration and recipe formats. Older workstation recipe formats are no longer loaded; use the new templates when upgrading. See the [release notes](RELEASE-NOTES-1.2.2.zh-CN.md) and [recipe guide](CONFIGURATION-RECIPES.zh-CN.md).
+**1.2.8** restores missing content and improves crops, ropes, baskets and Chinese names. Install the content pack manually; startup and reload do not extract or update it. The native recipe format introduced in 1.2.2 remains in use. See the [release notes](RELEASE-NOTES-1.2.8.zh-CN.md) and [recipe guide](CONFIGURATION-RECIPES.zh-CN.md).
 
 | Component | Version | Needed for |
 | --- | --- | --- |
 | Paper or Folia | **Minecraft 1.21–26.3** | [Version coverage & limitations](docs/COMPATIBILITY.md); Folia needs an available official build |
 | Java | **21 for 1.21.x; 25 for 26.x** | Server runtime; JDK 25 builds the plugin |
-| [CraftEngine](https://github.com/Xiao-MoMi/craft-engine) | **26.9.2 / 26.10** | Required; [versions and APIs](docs/DEVELOPMENT.md#supported-environment) |
+| [CraftEngine](https://github.com/Xiao-MoMi/craft-engine) | **26.9.2 / 26.10 snapshot** | Required; [versions and APIs](docs/DEVELOPMENT.md#supported-environment) |
 | [FluidCore](https://github.com/Nodemc-developing/FluidCore) | Compatible 0.1.0-SNAPSHOT from `libs/` | Fluid recipes and tanks; use the supplied Java 21 build |
 | [UltimateAdvancementAPI](https://github.com/Nodemc-developing/UltimateAdvancementAPI) | 2.8.1-pro.3 from `libs/` | Advancements across the supported version range |
 | [PlaceholderAPI](https://github.com/PlaceholderAPI/PlaceholderAPI) | Optional | Statistics placeholders |
@@ -63,7 +63,8 @@ Folia-aware scheduling, sleeping block tickers, asynchronous file/database work 
 
 1. Download the [server bundle](https://github.com/Nodemc-developing/Farmersdelight-Plugin-Pro/releases/latest) or the plugin JAR.
 2. Install a supported CraftEngine build and put this plugin plus the optional dependencies you need into `plugins/`.
-3. Start the server and accept its resource pack. Bundled content fills missing definitions; your external packs take priority.
+3. Extract the matching `*-content-pack.zip` into `plugins/CraftEngine/resources/`, with `farmersdelight/` and `farmersdelight_fluids/` directly inside that directory.
+4. Start the server, generate and accept the CraftEngine resource pack. Content installation is manual: startup and reload never extract, update or restore pack files. Back up your edits before updating.
 
 Recipes live in enabled CraftEngine content packs. Old fluid-library world/item data is **not migrated**. See the [setup guide](CONFIGURATION-RECIPES.zh-CN.md) before upgrading an existing server.
 
@@ -88,7 +89,7 @@ Editing, reloading and runtime statistics require administrator permissions.
 - [Kaleidoscope integration & flexible recipes](KALEIDOSCOPE-COMPAT.zh-CN.md)
 - [Dependencies & corresponding sources](libs/README.md) · [Build & technical notes](docs/DEVELOPMENT.md)
 - [Integrated villager features and switches](VILLAGER.zh-CN.md)
-- [1.2.2 changes & verification scope](RELEASE-NOTES-1.2.2.zh-CN.md) · [Original wiki](https://github.com/IOVEYOUMC0/FarmersdelightPluginWiKi)
+- [1.2.8 changes & verification scope](RELEASE-NOTES-1.2.8.zh-CN.md) · [Original wiki](https://github.com/IOVEYOUMC0/FarmersdelightPluginWiKi)
 
 ## 🙏 Credits & license
 

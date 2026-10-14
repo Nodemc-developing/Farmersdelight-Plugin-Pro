@@ -1,0 +1,23 @@
+{
+  "status": "PASS",
+  "hosted_pack": "shared-server:paper-26.3/plugins/CraftEngine/cache/hosted/default/resource_pack.zip",
+  "locales": [
+    {
+      "locale": "zh_cn",
+      "verified_item_block_names": 175,
+      "red_mushroom_crate": "红色蘑菇箱"
+    },
+    {
+      "locale": "zh_tw",
+      "verified_item_block_names": 175,
+      "red_mushroom_crate": "紅色蘑菇箱"
+    },
+    {
+      "locale": "zh_hk",
+      "verified_item_block_names": 175,
+      "red_mushroom_crate": "紅色蘑菇箱"
+    }
+  ],
+  "wet_rope_item_models": 16,
+  "bell_tie_model": true
+}

@@ -14,14 +14,17 @@ blocks:
         - minecraft:maintains_farmland
     behaviors:
       - type: liquid_flowable_block
-      - type: crop_block
-        grow-speed: 0.25
+      - type: farmersdelight:advanced_crop
+        growth-rate-multiplier: 1.0
+        soils:
+          - block: minecraft:farmland
+          - block: farmersdelight:rich_soil_farmland
         light-requirement: 9
         is-bone-meal-target: true
         bone_meal_age_bonus:
           type: uniform
-          min: 1
-          max: 3
+          min: 2
+          max: 5
       - type: bush_block
         bottom-blocks:
           - minecraft:farmland
@@ -96,7 +99,7 @@ blocks:
       - type: farmersdelight:tall_crop
         extra_planting_items:
           - farmersdelight:rice_panicle
-        grow-speed: 0.25
+        grow-speed: 0.33333334
         light:
           requirement: 6
         bone-meal:
@@ -250,14 +253,17 @@ blocks:
         - minecraft:maintains_farmland
     behaviors:
       - type: liquid_flowable_block
-      - type: crop_block
-        grow-speed: 0.25
+      - type: farmersdelight:advanced_crop
+        growth-rate-multiplier: 1.0
+        soils:
+          - block: minecraft:farmland
+          - block: farmersdelight:rich_soil_farmland
         light-requirement: 9
         is-bone-meal-target: true
         bone_meal_age_bonus:
           type: uniform
-          min: 1
-          max: 3
+          min: 2
+          max: 5
       - type: bush_block
         bottom-blocks:
           - minecraft:farmland
@@ -364,21 +370,22 @@ blocks:
         - minecraft:crops
         - minecraft:maintains_farmland
     behaviors:
-      - type: liquid_flowable_block
-      - type: crop_block
-        grow-speed: 0.25
-        light-requirement: 9
-        is-bone-meal-target: false
-        bone-meal-age-bonus: 0
-      - type: bush_block
-        bottom-blocks:
-          - minecraft:farmland
-          - farmersdelight:rich_soil_farmland
       - type: farmersdelight:tomato_vine
         blocks:
           budding: farmersdelight:budding_tomatoes
           tomatoes: farmersdelight:tomatoes
           crop-on-rope: farmersdelight:tomato_crop_on_rope
+      - type: liquid_flowable_block
+      - type: farmersdelight:tomato_growth
+        bottom-blocks:
+          - minecraft:farmland
+          - farmersdelight:rich_soil_farmland
+        grow-speed: 0.16666667
+        light-requirement: 9
+      - type: bush_block
+        bottom-blocks:
+          - minecraft:farmland
+          - farmersdelight:rich_soil_farmland
     states:
       properties:
         age:
@@ -429,24 +436,22 @@ blocks:
         - minecraft:crops
         - minecraft:maintains_farmland
     behaviors:
-      - type: liquid_flowable_block
-      - type: crop_block
-        grow-speed: 0.25
-        light-requirement: 9
-        is-bone-meal-target: true
-        bone_meal_age_bonus:
-          type: uniform
-          min: 1
-          max: 2
-      - type: bush_block
-        bottom-blocks:
-          - minecraft:farmland
-          - farmersdelight:rich_soil_farmland
       - type: farmersdelight:tomato_vine
         blocks:
           budding: farmersdelight:budding_tomatoes
           tomatoes: farmersdelight:tomatoes
           crop-on-rope: farmersdelight:tomato_crop_on_rope
+      - type: liquid_flowable_block
+      - type: farmersdelight:tomato_growth
+        bottom-blocks:
+          - minecraft:farmland
+          - farmersdelight:rich_soil_farmland
+        grow-speed: 0.16666667
+        light-requirement: 9
+      - type: bush_block
+        bottom-blocks:
+          - minecraft:farmland
+          - farmersdelight:rich_soil_farmland
     states:
       properties:
         age:
@@ -565,26 +570,24 @@ blocks:
         - minecraft:crops
         - minecraft:climbable
     behaviors:
-      - type: crop_block
-        grow-speed: 0.25
-        light-requirement: 9
-        is-bone-meal-target: true
-        bone_meal_age_bonus:
-          type: uniform
-          min: 1
-          max: 2
-      - type: bush_block
-        bottom-blocks:
-          - farmersdelight:tomatoes
-        stackable: true
-        max-height: 3
-        delay: 1
       - type: farmersdelight:tomato_vine
         blocks:
           budding: farmersdelight:budding_tomatoes
           tomatoes: farmersdelight:tomatoes
           crop-on-rope: farmersdelight:tomato_crop_on_rope
         mature-age: 0
+      - type: farmersdelight:tomato_growth
+        bottom-blocks:
+          - farmersdelight:tomatoes
+          - farmersdelight:tomato_crop_on_rope
+        grow-speed: 0.16666667
+        light-requirement: 9
+      - type: bush_block
+        bottom-blocks:
+          - farmersdelight:tomatoes
+        stackable: true
+        max-height: 3
+        delay: 1
     states:
       properties:
         age:

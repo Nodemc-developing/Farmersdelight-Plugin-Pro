@@ -16,16 +16,10 @@ class RecipePackFilesTest {
     @TempDir Path directory;
     private YamlConfiguration yaml(String text) throws Exception { return PlainYamlDocuments.parse(text, true); }
 
-    @Test void installsOnlyMissingDefaultsAndNeverRestoresIntentionalDeletions() throws Exception {
-        Path target = directory.resolve("recipes/pot.yml");
-        var bundled = yaml("farmersdelight_recipes: {meal: {station: cooking_pot, input: {items: [minecraft:carrot]}, output: {item: minecraft:carrot}}}\n");
-        assertTrue(RecipePackFiles.installDefaultDocument(target, bundled, true));
-        Files.writeString(target, "farmersdelight_recipes: {}\n");
-        assertFalse(RecipePackFiles.installDefaultDocument(target, bundled, true));
-        assertTrue(PlainYamlDocuments.readLiteral(target).getConfigurationSection(NativeRecipeSchema.ROOT).getKeys(false).isEmpty());
-        Files.delete(target);
-        assertFalse(RecipePackFiles.installDefaultDocument(target, bundled, false));
-        assertFalse(Files.exists(target));
+    @Test void scanningMissingManualPackDoesNotCreateIt() throws Exception {
+        Path pack = directory.resolve("absent/configuration");
+        assertTrue(RecipePackFiles.files(List.of(pack)).isEmpty());
+        assertFalse(Files.exists(pack));
     }
 
     @Test void routesNativeStationsPreservingSuffixLiteralIdsAndPackNamespace() throws Exception {

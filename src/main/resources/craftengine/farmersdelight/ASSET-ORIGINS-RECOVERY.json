@@ -1,0 +1,2082 @@
+{
+  "source_repository": "https://github.com/vectorwing/FarmersDelight",
+  "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+  "source_branch": "feature-1.21/jug",
+  "license_file": "FARMERSDELIGHT-MIT-LICENSE.txt",
+  "license_sha256": "3ff766f3ab1fd7dad26e8f176c5e4af6bcbf8bb1208d26f573d77b48b13188ac",
+  "change": "Restore official missing models and textures without modifying upstream bytes or credits; no foreign plugin code or configuration is imported.",
+  "version_scope": "Baskets, rope fences and wild plants also exist in the checked official 1.21 and 26.1 branches. Egg cartons, skewers and the recovered expanded crates/bags belong to this fixed experimental feature snapshot; do not describe them as stable mod parity.",
+  "stable_revisions": {
+    "1.21": "dd8b9b0bfec916a2da88a6d64e3a37f4a02c3259",
+    "26.1": "22fe987639a9813f5b5474579518571ce91ed5d5"
+  },
+  "files": [
+    {
+      "path": "models/block/apple_crate.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/block/apple_crate.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/apple_crate.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/apple_crate.json",
+      "sha256": "20931f60e84f0619a07b3b4fce52efdcb34fe6a947e7197fb06534d4fe56c060",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "models/block/bamboo_basket.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/block/bamboo_basket.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/bamboo_basket.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/bamboo_basket.json",
+      "sha256": "99b50815077d00559adbe5376668de58f6628a30dec404d594440f1350373f17",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "models/block/brown_mushroom_crate.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/block/brown_mushroom_crate.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/brown_mushroom_crate.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/brown_mushroom_crate.json",
+      "sha256": "c6c296dfac52e019fda66cfb98cc690182e9906840c53f8e8da2f40331ef69e9",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "models/block/chorus_fruit_crate.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/block/chorus_fruit_crate.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/chorus_fruit_crate.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/chorus_fruit_crate.json",
+      "sha256": "dbb16724c0be98b3057d9239b5d50ca6e1db256926e9452a3a4eafa57a545b80",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "models/block/cocoa_beans_bag.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/block/cocoa_beans_bag.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/cocoa_beans_bag.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/cocoa_beans_bag.json",
+      "sha256": "a8da99b0d94ee098d4e9d77ca3c0bf06fd9ad76b7fba8536eea23d1001e80aaa",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "models/block/egg_carton.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/block/egg_carton.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/egg_carton.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/egg_carton.json",
+      "sha256": "111d0b2c0cdaccbcbd63594b3ba94f2414a23e02e22ca1717aa6cb7e734b8b99",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "models/block/egg_carton_double.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/block/egg_carton_double.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/egg_carton_double.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/egg_carton_double.json",
+      "sha256": "f197a40820f3e0a6ac71c28e45834dadd7ed545875a72e3a6044e33d4c019ca1",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "models/block/egg_carton_top.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/block/egg_carton_top.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/egg_carton_top.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/egg_carton_top.json",
+      "sha256": "a403f98e4eeddf6c55863964fe44ed16d475ae2a29e6cd771eabb8ff686819ba",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "models/block/glow_berries_bag.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/block/glow_berries_bag.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/glow_berries_bag.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/glow_berries_bag.json",
+      "sha256": "25845afe3ecb9dbad305e2664ee5020a344eba66a36b6f6fc29e0332702da0ed",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "models/block/golden_apple_crate.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/block/golden_apple_crate.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/golden_apple_crate.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/golden_apple_crate.json",
+      "sha256": "cf286c7b6ee54bba99c7bf074dddb52c5647bb40f6ff651edb8e7daf1b4ff59e",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "models/block/golden_carrot_crate.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/block/golden_carrot_crate.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/golden_carrot_crate.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/golden_carrot_crate.json",
+      "sha256": "68e121e2900a93fa57e22d6f88df973850560c490f155cd9c2197df9a13a76b0",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "models/block/red_mushroom_crate.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/block/red_mushroom_crate.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/red_mushroom_crate.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/red_mushroom_crate.json",
+      "sha256": "cb6a0db676a46e2dfb7f4ebce47e875deeb0abc44843e4e2e5e694fd994d2914",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "models/block/sandy_shrub.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/block/sandy_shrub.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/sandy_shrub.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/sandy_shrub.json",
+      "sha256": "fe88c4d156edac3c0fe498180fe1c648d1c9e2a257cdb9dd99f6e4e2851e91fc",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "models/block/sweet_berries_bag.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/block/sweet_berries_bag.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/sweet_berries_bag.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/sweet_berries_bag.json",
+      "sha256": "c66112b6421139a4baa492383377d0cf5c8d3f306f4e4d8775faa3831d0049ba",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "models/block/wild_beetroots.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/block/wild_beetroots.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/wild_beetroots.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/wild_beetroots.json",
+      "sha256": "89ba9dc18eb833b6d9d0c69e38287b4e6603bae0da582b74c121ba6512501efe",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "models/block/wild_carrots.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/block/wild_carrots.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/wild_carrots.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/wild_carrots.json",
+      "sha256": "569c9e2e7b5cdf5bf47a587d38af1d6e70959d7136c409018b4acb67c0a9a3c9",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "models/block/wild_potatoes.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/block/wild_potatoes.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/wild_potatoes.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/wild_potatoes.json",
+      "sha256": "60fb3a62518b4b8c4c61fbf4ea76e1c659b8ae0ba2606bdfa369fe691d8c00ee",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "models/block/wooden_basket.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/block/wooden_basket.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/wooden_basket.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/block/wooden_basket.json",
+      "sha256": "f213495c54ff35afacdb588e52997b3763fbda67db37960539bb975881a6b02d",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "models/item/apple_crate.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/item/apple_crate.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/apple_crate.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/apple_crate.json",
+      "sha256": "8dcbd1e754e59fc40113eaaa34d5153f62bb0bc2b2636a905794ad59e15c3b95",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "models/item/bamboo_basket.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/item/bamboo_basket.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/bamboo_basket.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/bamboo_basket.json",
+      "sha256": "838bd477622be9d0def416d77f548c83a78a7667e3d0306f7e4e49973dec4197",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "models/item/brown_mushroom_crate.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/item/brown_mushroom_crate.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/brown_mushroom_crate.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/brown_mushroom_crate.json",
+      "sha256": "2a54ed1aae586005c492f1122b43c9f0479b1739365fa5fbf9421afb0c2659ba",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "models/item/chorus_fruit_crate.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/item/chorus_fruit_crate.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/chorus_fruit_crate.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/chorus_fruit_crate.json",
+      "sha256": "d6fe6e5325fd8e5f754aa1f75df93ff22a151d680918eb0fe8555c67a3b2cd07",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "models/item/cocoa_beans_bag.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/item/cocoa_beans_bag.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/cocoa_beans_bag.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/cocoa_beans_bag.json",
+      "sha256": "89cdf9f8369176a3aa2767403b0dd9d826ccdc71ea7605cde2196285bcb5c977",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "models/item/cooked_meat_skewer.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/item/cooked_meat_skewer.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/cooked_meat_skewer.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/cooked_meat_skewer.json",
+      "sha256": "998439a6f94f9eb773217f16f83dd0f274ef1214ea09590cce0439f8d938b7e7",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "models/item/cooked_vegetable_skewer.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/item/cooked_vegetable_skewer.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/cooked_vegetable_skewer.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/cooked_vegetable_skewer.json",
+      "sha256": "7b97416b2cf8f80f06794c0c074b08a3a646b69110a754befa605a07181ef618",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "models/item/egg_carton.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/item/egg_carton.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/egg_carton.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/egg_carton.json",
+      "sha256": "f538854683b4f0277d625d190335c466b9eed9069b0932b06ffa0d2114f364d2",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "models/item/glow_berries_bag.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/item/glow_berries_bag.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/glow_berries_bag.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/glow_berries_bag.json",
+      "sha256": "5644ff5af2f8ae68f42e4bd31a2cd818cb21781dcf31a8601ce91c761384fa42",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "models/item/golden_apple_crate.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/item/golden_apple_crate.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/golden_apple_crate.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/golden_apple_crate.json",
+      "sha256": "c27cb2192d95fd4ddb65172078559855415f24b3b75b31969d0c6852332cbfcb",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "models/item/golden_carrot_crate.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/item/golden_carrot_crate.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/golden_carrot_crate.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/golden_carrot_crate.json",
+      "sha256": "af8cee6820b79023b86cf5f95eaab06207620f4296fb7d74882a9263d70e18a7",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "models/item/meat_skewer.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/item/meat_skewer.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/meat_skewer.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/meat_skewer.json",
+      "sha256": "f161309dd6cb79b11c30d61104f9c7d6e3e592b0eba06e093b46990eea088a93",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "models/item/red_mushroom_crate.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/item/red_mushroom_crate.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/red_mushroom_crate.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/red_mushroom_crate.json",
+      "sha256": "26d98bbe6a0efc2332ae8d404d21fde58937d8a7caae06b6d805ae9988236dc0",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "models/item/rope_fence.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/item/rope_fence.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/rope_fence.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/rope_fence.json",
+      "sha256": "065a935840d52cc2faa032c86cef514fb6b765aad2ca65655fa76bf5347bf6a2",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "models/item/rope_fence_gate.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/item/rope_fence_gate.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/rope_fence_gate.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/rope_fence_gate.json",
+      "sha256": "ebfd8ab009990ffa7fa9276092376cd8b454c12ac259ebb27f544a4bc3538be5",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "models/item/sandy_shrub.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/item/sandy_shrub.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/sandy_shrub.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/sandy_shrub.json",
+      "sha256": "088201e9d4346f40cca84d0f4ce6205afcede175399ecf4f9a47f7aa2f79a2cc",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "models/item/sweet_berries_bag.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/item/sweet_berries_bag.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/sweet_berries_bag.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/sweet_berries_bag.json",
+      "sha256": "4928c445ec7c0543188458121476ec2358750c67790ab8ff14ed7875683517e4",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "models/item/vegetable_skewer.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/item/vegetable_skewer.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/vegetable_skewer.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/vegetable_skewer.json",
+      "sha256": "27caa49c025f1b9c56f9ce81b1b19e9af66ef9775c138750928f5b9b17d29ad5",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "models/item/wild_beetroots.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/item/wild_beetroots.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/wild_beetroots.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/wild_beetroots.json",
+      "sha256": "798a0168efe935cf4f7a1b4e3a3e702ec6e3aa6d366cc73acac9967b3ab6897a",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "models/item/wild_carrots.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/item/wild_carrots.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/wild_carrots.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/wild_carrots.json",
+      "sha256": "bb513adfae0ee47cabc7802482387242e82476032cc416c1bb355b340ce388cc",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "models/item/wild_potatoes.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/item/wild_potatoes.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/wild_potatoes.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/wild_potatoes.json",
+      "sha256": "29b2806cf8f7d86bda6065b06c667561ce56686510d114279c6f95269af874c4",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "models/item/wooden_basket.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/generated/resources/assets/farmersdelight/models/item/wooden_basket.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/wooden_basket.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/generated/resources/assets/farmersdelight/models/item/wooden_basket.json",
+      "sha256": "3943a1bf96c4dd9db8677e199d362bb575e096d707b8e7b96c937ad7d5fbecf9",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "models/block/rope_fence_gate.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/models/block/rope_fence_gate.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/models/block/rope_fence_gate.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/models/block/rope_fence_gate.json",
+      "sha256": "acb211b2d2f2a28296a2be6bc3b2ae6a2ab38e383ba97916e58cb429620257b2",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "models/block/rope_fence_gate_open.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/models/block/rope_fence_gate_open.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/models/block/rope_fence_gate_open.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/models/block/rope_fence_gate_open.json",
+      "sha256": "068f2f054a468a61f9071f449de5bc6479e8568be6896e7fa3b96ff221f962bc",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "models/block/rope_fence_gate_wall.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/models/block/rope_fence_gate_wall.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/models/block/rope_fence_gate_wall.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/models/block/rope_fence_gate_wall.json",
+      "sha256": "d6cef4dbf602f6bc6f1b9e298636e1bc798ca04b738aa1fd741114c3af741abc",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "models/block/rope_fence_gate_wall_open.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/models/block/rope_fence_gate_wall_open.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/models/block/rope_fence_gate_wall_open.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/models/block/rope_fence_gate_wall_open.json",
+      "sha256": "1710d0b3eabe7d0a43f95cc201b65949726852058b32b243931eddcbbabc36b3",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "models/block/rope_fence_inventory.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/models/block/rope_fence_inventory.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/models/block/rope_fence_inventory.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/models/block/rope_fence_inventory.json",
+      "sha256": "4b5ca89348c1c236126dcab9c65593d395cf4b3aaac52b47929bd2718e7e41ae",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "models/block/rope_fence_post.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/models/block/rope_fence_post.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/models/block/rope_fence_post.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/models/block/rope_fence_post.json",
+      "sha256": "9ed0164f4295ee673b0877aa48fb9c8b714c32e2bb730a76ced6920fb8881601",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "models/block/rope_fence_side.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/models/block/rope_fence_side.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/models/block/rope_fence_side.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/models/block/rope_fence_side.json",
+      "sha256": "1b9573dc26e34091b45ad22baa85922103b6c3e940f7c223a2f90ffec8b411d3",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "models/block/rope_fence_side_alt.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/models/block/rope_fence_side_alt.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/models/block/rope_fence_side_alt.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/models/block/rope_fence_side_alt.json",
+      "sha256": "e4bb44cef831e920c4707ed2855125cfe5a290d0da037cdb650fdf243be58077",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "models/block/template_basket.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/models/block/template_basket.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/models/block/template_basket.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/models/block/template_basket.json",
+      "sha256": "94c8108295b6a7998ccf6f93404070929e7f28ddaf791c63cc7c7a213f480181",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "textures/block/apple_crate_side.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/apple_crate_side.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/apple_crate_side.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/apple_crate_side.png",
+      "sha256": "51138365c2bbe698bab7515e7335d26c1c4738383e0f38a9e8c2560af299e637",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/block/apple_crate_top.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/apple_crate_top.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/apple_crate_top.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/apple_crate_top.png",
+      "sha256": "5685837232860342cf2d462a554d54b5e8558c7fb47e4fbc894f28021e1723e5",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/block/bag_bottom.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/bag_bottom.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/bag_bottom.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/bag_bottom.png",
+      "sha256": "ce71cd4bd6778cbedd60790ac5885bd59b581fc088a673cc7a7a4c31a3ceac99",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/block/bag_side_tied.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/bag_side_tied.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/bag_side_tied.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/bag_side_tied.png",
+      "sha256": "46defa03e79935efdb10cca4c525a421a951211f7e0db3dbe750a0c8c6bfcaaa",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/block/bamboo_basket_bottom.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/bamboo_basket_bottom.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/bamboo_basket_bottom.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/bamboo_basket_bottom.png",
+      "sha256": "674b8d01d17230c59953c2e725a41fe72a56b17f0d14e48155ada842b999758e",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "textures/block/bamboo_basket_handle.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/bamboo_basket_handle.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/bamboo_basket_handle.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/bamboo_basket_handle.png",
+      "sha256": "4f1c529fe63c4f301be441193df83028e2ff90787a550cd0082f66f0875f5935",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "textures/block/bamboo_basket_side.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/bamboo_basket_side.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/bamboo_basket_side.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/bamboo_basket_side.png",
+      "sha256": "8c6a56fac6a997efd498cbeb70684f2a313e50312f7b0ca0e7748f2a2c3408ca",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "textures/block/bamboo_basket_top.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/bamboo_basket_top.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/bamboo_basket_top.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/bamboo_basket_top.png",
+      "sha256": "d6f973bb7ab6bd8bb525575e6df704eab98b38c3951a881ffe0e137310c2548a",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "textures/block/brown_mushroom_crate_side.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/brown_mushroom_crate_side.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/brown_mushroom_crate_side.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/brown_mushroom_crate_side.png",
+      "sha256": "0114e39dab37d890dca9274da5201dfdad2d73e2b337933bcacafcfb071e21fe",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/block/brown_mushroom_crate_top.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/brown_mushroom_crate_top.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/brown_mushroom_crate_top.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/brown_mushroom_crate_top.png",
+      "sha256": "19a220b23800099a01164d30031d8822cce24a8a992265c985ac14a39821dd41",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/block/chorus_fruit_crate_side.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/chorus_fruit_crate_side.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/chorus_fruit_crate_side.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/chorus_fruit_crate_side.png",
+      "sha256": "c6a87ad49f00fff43701fe182cdc5cb2845a0d43c174f1a4105e5402c9ead0e5",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/block/chorus_fruit_crate_top.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/chorus_fruit_crate_top.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/chorus_fruit_crate_top.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/chorus_fruit_crate_top.png",
+      "sha256": "473a9fbac1eee5d1b9f7ed65530c7c583107c786f2f61d1b69df46093132e0a2",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/block/cocoa_beans_bag_side.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/cocoa_beans_bag_side.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/cocoa_beans_bag_side.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/cocoa_beans_bag_side.png",
+      "sha256": "cf173e5459b8175a46257f477ed3cf49e7866c5272a02410359264c589f0f63a",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/block/cocoa_beans_bag_top.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/cocoa_beans_bag_top.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/cocoa_beans_bag_top.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/cocoa_beans_bag_top.png",
+      "sha256": "d4984d8937ae95087ae4a2637386309823790c019c98f79982369f653539c5c2",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/block/crate_bottom.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/crate_bottom.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/crate_bottom.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/crate_bottom.png",
+      "sha256": "0548a6838339c960842ddfcc0324ef2d3f107e4fcf75cccfaa32c1edf903696d",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "textures/block/egg_carton_bottom.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/egg_carton_bottom.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/egg_carton_bottom.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/egg_carton_bottom.png",
+      "sha256": "178abaed559bdd65d5f4bd8c4d08d866e79011ac111176e4dc8fd2260deb5cbf",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/block/egg_carton_side.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/egg_carton_side.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/egg_carton_side.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/egg_carton_side.png",
+      "sha256": "61f31aa04a03c8644ed66f0de0c7c59b355c791b3c9ccc1c5be9603a6921f3dc",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/block/egg_carton_top.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/egg_carton_top.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/egg_carton_top.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/egg_carton_top.png",
+      "sha256": "2f090ed0a9ac065ea3b279fbb0152d2b9dfad0bc3b799482c028f1ffa0bee795",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/block/glow_berries_bag_bottom.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/glow_berries_bag_bottom.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/glow_berries_bag_bottom.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/glow_berries_bag_bottom.png",
+      "sha256": "1a9fd68015d57825bd12bc731f09b324132c56d97ec5960dd500264c2a4bfb62",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/block/glow_berries_bag_side.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/glow_berries_bag_side.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/glow_berries_bag_side.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/glow_berries_bag_side.png",
+      "sha256": "ca8b5121fad27c9ca151e587d482b96c3417f6a630306c5a1eda9452edced41a",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/block/glow_berries_bag_side_tied.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/glow_berries_bag_side_tied.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/glow_berries_bag_side_tied.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/glow_berries_bag_side_tied.png",
+      "sha256": "8b6f30e480b530ca9031c4269baa023675cec2b63d8e59bdbd3621a05e774d98",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/block/glow_berries_bag_top.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/glow_berries_bag_top.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/glow_berries_bag_top.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/glow_berries_bag_top.png",
+      "sha256": "57f6b9f8a3a7c004b3bcbc8f90d941827471ff3335a0e50f5655362d4dffb2d1",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/block/golden_apple_crate_side.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/golden_apple_crate_side.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/golden_apple_crate_side.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/golden_apple_crate_side.png",
+      "sha256": "de759dc991b94f7d554c9118df08469885d66737b1b1c4b500ab242f172a748a",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/block/golden_apple_crate_top.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/golden_apple_crate_top.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/golden_apple_crate_top.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/golden_apple_crate_top.png",
+      "sha256": "d23fab7d72d3d42ad6b73b545b625ef5c2faffa2a534f5530b0d1deee5921671",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/block/golden_carrot_crate_side.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/golden_carrot_crate_side.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/golden_carrot_crate_side.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/golden_carrot_crate_side.png",
+      "sha256": "ac3b8a9bb04ba34140ff364281f71e5870599c5e5f294a3222db5e64351e7006",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/block/golden_carrot_crate_top.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/golden_carrot_crate_top.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/golden_carrot_crate_top.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/golden_carrot_crate_top.png",
+      "sha256": "8f56625714c0d27cdfaaaff72bda56e24529e20190ca1175b1109c10f0b42477",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/block/red_mushroom_crate_side.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/red_mushroom_crate_side.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/red_mushroom_crate_side.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/red_mushroom_crate_side.png",
+      "sha256": "4a39c29551e94fffd213c943a54b7605c2252703617d136117765adfd51d0a8e",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/block/red_mushroom_crate_top.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/red_mushroom_crate_top.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/red_mushroom_crate_top.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/red_mushroom_crate_top.png",
+      "sha256": "168a72e6f7581c72d3376d82569a170c653a814e16c8c03e2d2205a921078db8",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/block/rope_fence.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/rope_fence.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/rope_fence.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/rope_fence.png",
+      "sha256": "23f47044bb184bfdd9010bcf82398eab28de7287a3305b6da7f3f13474b4066c",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "textures/block/rope_fence_gate.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/rope_fence_gate.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/rope_fence_gate.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/rope_fence_gate.png",
+      "sha256": "6fb0ffcad7a2830055c72d2054016a2fd650d94f5e04e18a1beac26d36cdcb82",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "textures/block/rope_fence_gate_open.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/rope_fence_gate_open.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/rope_fence_gate_open.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/rope_fence_gate_open.png",
+      "sha256": "07e1bb680f265bf530ecc8825febadac9a387b4aa14a699e109c74eec711fe86",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "textures/block/rope_fence_gate_wall.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/rope_fence_gate_wall.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/rope_fence_gate_wall.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/rope_fence_gate_wall.png",
+      "sha256": "883cab63866ee54fee1b0ee8f5e5eb9df3e5a6f0513dec7c7ef405b6b0c02f87",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "textures/block/sandy_shrub.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/sandy_shrub.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/sandy_shrub.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/sandy_shrub.png",
+      "sha256": "6969afe5d33b2d9821d5ac2362fbb6714bdfb15f26012683f92bd8460a25f219",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "textures/block/sweet_berries_bag_bottom.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/sweet_berries_bag_bottom.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/sweet_berries_bag_bottom.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/sweet_berries_bag_bottom.png",
+      "sha256": "e1b4cf893fd9dbce5c66fe778c368518768cf8bdbb22692964fcfb24d6af48cd",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/block/sweet_berries_bag_side.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/sweet_berries_bag_side.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/sweet_berries_bag_side.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/sweet_berries_bag_side.png",
+      "sha256": "054a1631f8d3b9c4a4ca87281be57ad0ddbfc54536c690bfc1c89159ce0977f5",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/block/sweet_berries_bag_side_tied.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/sweet_berries_bag_side_tied.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/sweet_berries_bag_side_tied.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/sweet_berries_bag_side_tied.png",
+      "sha256": "1f7f8fbf6ba928d774693894164ad09b9228f97b91fe7a4b13651a5314254aff",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/block/sweet_berries_bag_top.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/sweet_berries_bag_top.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/sweet_berries_bag_top.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/sweet_berries_bag_top.png",
+      "sha256": "764ededbcef1302973f7142ad9b2a7a608fb35ef42f54c9d57ef5bf9a8bf35ff",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/block/wild_beetroots.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/wild_beetroots.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/wild_beetroots.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/wild_beetroots.png",
+      "sha256": "c69673c6229b6bf7d04616335913a2059caca885778eba0bddf9329f1939c533",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "textures/block/wild_carrots.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/wild_carrots.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/wild_carrots.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/wild_carrots.png",
+      "sha256": "f82f89395179fb7afbc9c47d4a07e9c3eb0102addd6a87ba9d20d1351c53f4d3",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "textures/block/wild_potatoes.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/wild_potatoes.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/wild_potatoes.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/wild_potatoes.png",
+      "sha256": "95dee82bfe1fee8a5c28b7b4d7a2ff2e66bedf0ec5cef16b19f979088a4d7eb4",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "textures/block/wooden_basket_bottom.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/wooden_basket_bottom.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/wooden_basket_bottom.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/wooden_basket_bottom.png",
+      "sha256": "07eaf5aeed56e4ed59a4ade40c01222544c888dda80622fc42949231191fec58",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "textures/block/wooden_basket_handle.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/wooden_basket_handle.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/wooden_basket_handle.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/wooden_basket_handle.png",
+      "sha256": "94426512c30d61162c20d9531b78fb3aa7518cfd88f33d592ce7a708b6357aad",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "textures/block/wooden_basket_side.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/wooden_basket_side.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/wooden_basket_side.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/wooden_basket_side.png",
+      "sha256": "bcfeef93ce4bb86b6906dcbc096fed2bf0d35375a770bfb212924f8db21110f8",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "textures/block/wooden_basket_top.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/block/wooden_basket_top.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/wooden_basket_top.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/block/wooden_basket_top.png",
+      "sha256": "da57210bf19f686fadf19a347c254a178255c0a1f81326cabc6f4058b43361ef",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": true,
+          "identical_git_blob": true
+        },
+        "26.1": {
+          "present": true,
+          "identical_git_blob": true
+        }
+      }
+    },
+    {
+      "path": "textures/item/cooked_meat_skewer.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/item/cooked_meat_skewer.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/item/cooked_meat_skewer.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/item/cooked_meat_skewer.png",
+      "sha256": "48700d2eb71c8c69c858aba73d4a403d604bae764ec7f572ec08bf790487def2",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/item/cooked_vegetable_skewer.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/item/cooked_vegetable_skewer.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/item/cooked_vegetable_skewer.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/item/cooked_vegetable_skewer.png",
+      "sha256": "71008f10d64b547b1101b298ccdb670b3982b4b54e174e83867f4cb71a9b2c34",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/item/meat_skewer.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/item/meat_skewer.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/item/meat_skewer.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/item/meat_skewer.png",
+      "sha256": "626f4755a7d2ef122ce22e3aa7b7fd31db73c047de94dff4275641d9dc2bc7dd",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "textures/item/vegetable_skewer.png",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+      "source_path": "src/main/resources/assets/farmersdelight/textures/item/vegetable_skewer.png",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/item/vegetable_skewer.png",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/item/vegetable_skewer.png",
+      "sha256": "3574e60462234c37798f5152fefccdd6e7fef717de0335753651c95d8dcd84ee",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing",
+      "stable_branch_presence": {
+        "1.21": {
+          "present": false,
+          "identical_git_blob": false
+        },
+        "26.1": {
+          "present": false,
+          "identical_git_blob": false
+        }
+      }
+    },
+    {
+      "path": "models/block/rope_bell_tie.json",
+      "source_repository": "https://github.com/vectorwing/FarmersDelight",
+      "source_commit": "dd8b9b0bfec916a2da88a6d64e3a37f4a02c3259",
+      "source_path": "src/main/resources/assets/farmersdelight/models/block/rope_bell_tie.json",
+      "source_url": "https://github.com/vectorwing/FarmersDelight/blob/dd8b9b0bfec916a2da88a6d64e3a37f4a02c3259/src/main/resources/assets/farmersdelight/models/block/rope_bell_tie.json",
+      "download_url": "https://raw.githubusercontent.com/vectorwing/FarmersDelight/dd8b9b0bfec916a2da88a6d64e3a37f4a02c3259/src/main/resources/assets/farmersdelight/models/block/rope_bell_tie.json",
+      "sha256": "3c6f4abeefe169081ec79e233efb534f71d400778142f74fb51d688f48ea61a1",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 vectorwing"
+    }
+  ],
+  "independent_extensions": [
+    {
+      "path": "models/item/copper_knife.json",
+      "author": "ydxc2009",
+      "definition": "Independently defined handheld item model; uses the existing verified official iron_knife texture with a copper constant tint configured by this project. No copper bitmap is imported.",
+      "sha256": "3d5bd4d1638e2f9bd509747bcc195a91fa79636827faca18aff1e25beba52b69",
+      "license": "AGPL-3.0-only",
+      "texture_dependency": {
+        "path": "textures/item/iron_knife.png",
+        "source_commit": "0b424c370dc48197a9231771d55f0dcc3a36844e",
+        "source_path": "src/main/resources/assets/farmersdelight/textures/item/iron_knife.png",
+        "source_url": "https://github.com/vectorwing/FarmersDelight/blob/0b424c370dc48197a9231771d55f0dcc3a36844e/src/main/resources/assets/farmersdelight/textures/item/iron_knife.png",
+        "sha256": "17387bcb656d0a11a910d9b651dcc94dea6499914f2de7915d2e410f1aaa0caa",
+        "license": "MIT",
+        "copyright": "Copyright (c) 2020 vectorwing"
+      },
+      "version_scope": "Plugin extension enabled from Minecraft 1.21.9; not present in any of the three audited official branches."
+    }
+  ]
+}

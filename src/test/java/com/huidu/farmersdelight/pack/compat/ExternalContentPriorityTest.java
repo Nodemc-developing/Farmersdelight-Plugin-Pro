@@ -94,14 +94,16 @@ class ExternalContentPriorityTest {
         assertTrue(Files.readString(directory.resolve("conflicts.json")).contains("external resource takes precedence"));
     }
 
-    @Test void differingExternalAssetsFailAndZipTraversalIsRejected() throws IOException {
+    @Test void unhandledExternalAssetsRetainHostOrderAndZipTraversalIsRejected() throws IOException {
         Path first = directory.resolve("first"); Path second = directory.resolve("second");
         write(first, "assets/food/models/item/plate.json", "{\"a\":1}");
         write(second, "assets/food/models/item/plate.json", "{\"a\":2}");
         var builder = new ManagedResourceLayer(directory.resolve("cache"),
                 new BundledContentManifest(directory.resolve("manifest.json")), new ContentConflicts(directory.resolve("conflicts.json")));
-        assertThrows(IOException.class, () -> builder.build(List.of(new ManagedResourceLayer.Source(first, false),
-                new ManagedResourceLayer.Source(second, false))));
+        Path layer = builder.build(List.of(new ManagedResourceLayer.Source(first, false),
+                new ManagedResourceLayer.Source(second, false)));
+        assertEquals("{\"a\":1}", Files.readString(layer.resolve("assets/food/models/item/plate.json")));
+        assertTrue(Files.readString(directory.resolve("conflicts.json")).contains("no host resolution"));
         Path zip = directory.resolve("unsafe.zip");
         try (var output = new ZipOutputStream(Files.newOutputStream(zip))) {
             output.putNextEntry(new ZipEntry("../escaped.json")); output.write(new byte[]{1}); output.closeEntry();

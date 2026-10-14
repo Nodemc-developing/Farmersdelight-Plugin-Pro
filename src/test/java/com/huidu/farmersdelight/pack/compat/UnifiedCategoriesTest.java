@@ -12,6 +12,17 @@ import static org.junit.jupiter.api.Assertions.*;
 class UnifiedCategoriesTest {
     private static final String PREFIX = "farmersdelight:";
 
+    @Test void restoredBasketMaterialsHaveSeparateEntriesWithoutDuplicatingTheExistingBambooAlias() {
+        Map<String, Object> source = bothRoots();
+        source.put(PREFIX + "decoration", category(List.of(PREFIX + "basket", PREFIX + "wooden_basket")));
+        Set<String> available = Set.of(PREFIX + "basket", PREFIX + "wooden_basket", PREFIX + "bamboo_basket");
+        Map<String, Object> result = UnifiedCategories.merge(source, available::contains);
+        assertEquals(List.of(PREFIX + "wooden_basket", PREFIX + "bamboo_basket"), members(result, "decoration"));
+        assertEquals(List.of(PREFIX + "basket"), members(result, "compatibility"));
+        assertFalse(members(result, "default").contains("#" + PREFIX + "compatibility"));
+        assertEquals(List.of(PREFIX + "basket", PREFIX + "wooden_basket"), members(source, "decoration"));
+    }
+
     @Test void theTwoStandardRootsBecomeOneVisibleRootWithNineGroups() {
         Map<String, Object> source = bothRoots();
         source.put(PREFIX + "gui", category(List.of(PREFIX + "0")));

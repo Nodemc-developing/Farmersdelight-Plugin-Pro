@@ -1,0 +1,387 @@
+{
+  "version": "1.2.4",
+  "unit_tests": {
+    "26.9.2": {
+      "errors": 0,
+      "skipped": 0,
+      "failures": 0,
+      "tests": 924
+    },
+    "26.10": {
+      "skipped": 0,
+      "failures": 0,
+      "tests": 924,
+      "errors": 0
+    }
+  },
+  "native": [
+    {
+      "environment": "paper-26.3",
+      "craft_engine": "26.9.2",
+      "status": "PASS",
+      "checks": {
+        "cache_0_icon": {
+          "status": "PASS",
+          "detail": "Preferred folder icon retained against ZIP icon"
+        },
+        "cache_0_font": {
+          "status": "PASS",
+          "detail": "Folder and ZIP font providers occur exactly once"
+        },
+        "cache_0_language": {
+          "status": "PASS",
+          "detail": "Both language sources preserved; ZIP override matches host order"
+        },
+        "cache_0_sounds": {
+          "status": "PASS",
+          "detail": "Both sound events preserved"
+        },
+        "cache_0_metadata": {
+          "status": "PASS",
+          "detail": "Both pack metadata overlays preserved"
+        },
+        "cache_0_exclude": {
+          "status": "PASS",
+          "detail": "Host excluded extension stays excluded"
+        },
+        "browser_0": {
+          "status": "PASS",
+          "detail": "CE browser title initialized"
+        },
+        "generated_0_icon": {
+          "status": "PASS",
+          "detail": "Preferred folder icon retained against ZIP icon"
+        },
+        "generated_0_font": {
+          "status": "PASS",
+          "detail": "Folder and ZIP font providers occur exactly once"
+        },
+        "generated_0_language": {
+          "status": "PASS",
+          "detail": "Both language sources preserved; ZIP override matches host order"
+        },
+        "generated_0_sounds": {
+          "status": "PASS",
+          "detail": "Both sound events preserved"
+        },
+        "generated_0_metadata": {
+          "status": "PASS",
+          "detail": "Both pack metadata overlays preserved"
+        },
+        "generated_0_exclude": {
+          "status": "PASS",
+          "detail": "Host excluded extension stays excluded"
+        },
+        "reload_1": {
+          "status": "PASS",
+          "detail": "CE configuration/resource reload completed"
+        },
+        "cache_1_icon": {
+          "status": "PASS",
+          "detail": "Preferred folder icon retained against ZIP icon"
+        },
+        "cache_1_font": {
+          "status": "PASS",
+          "detail": "Folder and ZIP font providers occur exactly once"
+        },
+        "cache_1_language": {
+          "status": "PASS",
+          "detail": "Both language sources preserved; ZIP override matches host order"
+        },
+        "cache_1_sounds": {
+          "status": "PASS",
+          "detail": "Both sound events preserved"
+        },
+        "cache_1_metadata": {
+          "status": "PASS",
+          "detail": "Both pack metadata overlays preserved"
+        },
+        "cache_1_exclude": {
+          "status": "PASS",
+          "detail": "Host excluded extension stays excluded"
+        },
+        "browser_1": {
+          "status": "PASS",
+          "detail": "CE browser title initialized"
+        },
+        "generated_1_icon": {
+          "status": "PASS",
+          "detail": "Preferred folder icon retained against ZIP icon"
+        },
+        "generated_1_font": {
+          "status": "PASS",
+          "detail": "Folder and ZIP font providers occur exactly once"
+        },
+        "generated_1_language": {
+          "status": "PASS",
+          "detail": "Both language sources preserved; ZIP override matches host order"
+        },
+        "generated_1_sounds": {
+          "status": "PASS",
+          "detail": "Both sound events preserved"
+        },
+        "generated_1_metadata": {
+          "status": "PASS",
+          "detail": "Both pack metadata overlays preserved"
+        },
+        "generated_1_exclude": {
+          "status": "PASS",
+          "detail": "Host excluded extension stays excluded"
+        },
+        "reload_2": {
+          "status": "PASS",
+          "detail": "CE configuration/resource reload completed"
+        },
+        "cache_2_icon": {
+          "status": "PASS",
+          "detail": "Preferred folder icon retained against ZIP icon"
+        },
+        "cache_2_font": {
+          "status": "PASS",
+          "detail": "Folder and ZIP font providers occur exactly once"
+        },
+        "cache_2_language": {
+          "status": "PASS",
+          "detail": "Both language sources preserved; ZIP override matches host order"
+        },
+        "cache_2_sounds": {
+          "status": "PASS",
+          "detail": "Both sound events preserved"
+        },
+        "cache_2_metadata": {
+          "status": "PASS",
+          "detail": "Both pack metadata overlays preserved"
+        },
+        "cache_2_exclude": {
+          "status": "PASS",
+          "detail": "Host excluded extension stays excluded"
+        },
+        "browser_2": {
+          "status": "PASS",
+          "detail": "CE browser title initialized"
+        },
+        "generated_2_icon": {
+          "status": "PASS",
+          "detail": "Preferred folder icon retained against ZIP icon"
+        },
+        "generated_2_font": {
+          "status": "PASS",
+          "detail": "Folder and ZIP font providers occur exactly once"
+        },
+        "generated_2_language": {
+          "status": "PASS",
+          "detail": "Both language sources preserved; ZIP override matches host order"
+        },
+        "generated_2_sounds": {
+          "status": "PASS",
+          "detail": "Both sound events preserved"
+        },
+        "generated_2_metadata": {
+          "status": "PASS",
+          "detail": "Both pack metadata overlays preserved"
+        },
+        "generated_2_exclude": {
+          "status": "PASS",
+          "detail": "Host excluded extension stays excluded"
+        },
+        "wild_worldgen_native_log": {
+          "status": "PASS",
+          "detail": "No custom wild-block Unknown registry key errors in actual native load log"
+        },
+        "bundled_native_load_errors": {
+          "status": "PASS",
+          "detail": "No bundled item/block/placed-feature errors reported by the actual CE parser"
+        }
+      },
+      "fixture_sources_unchanged": true,
+      "original_plugins_restored": true,
+      "original_ce_config_restored": true,
+      "fd_configuration_and_cache_restored": true
+    },
+    {
+      "environment": "paper-1.21.8",
+      "craft_engine": "26.9.2",
+      "status": "PASS",
+      "checks": {
+        "cache_0_icon": {
+          "status": "PASS",
+          "detail": "Preferred folder icon retained against ZIP icon"
+        },
+        "cache_0_font": {
+          "status": "PASS",
+          "detail": "Folder and ZIP font providers occur exactly once"
+        },
+        "cache_0_language": {
+          "status": "PASS",
+          "detail": "Both language sources preserved; ZIP override matches host order"
+        },
+        "cache_0_sounds": {
+          "status": "PASS",
+          "detail": "Both sound events preserved"
+        },
+        "cache_0_metadata": {
+          "status": "PASS",
+          "detail": "Both pack metadata overlays preserved"
+        },
+        "cache_0_exclude": {
+          "status": "PASS",
+          "detail": "Host excluded extension stays excluded"
+        },
+        "browser_0": {
+          "status": "PASS",
+          "detail": "CE browser title initialized"
+        },
+        "generated_0_icon": {
+          "status": "PASS",
+          "detail": "Preferred folder icon retained against ZIP icon"
+        },
+        "generated_0_font": {
+          "status": "PASS",
+          "detail": "Folder and ZIP font providers occur exactly once"
+        },
+        "generated_0_language": {
+          "status": "PASS",
+          "detail": "Both language sources preserved; ZIP override matches host order"
+        },
+        "generated_0_sounds": {
+          "status": "PASS",
+          "detail": "Both sound events preserved"
+        },
+        "generated_0_metadata": {
+          "status": "PASS",
+          "detail": "Both pack metadata overlays preserved"
+        },
+        "generated_0_exclude": {
+          "status": "PASS",
+          "detail": "Host excluded extension stays excluded"
+        },
+        "reload_1": {
+          "status": "PASS",
+          "detail": "CE configuration/resource reload completed"
+        },
+        "cache_1_icon": {
+          "status": "PASS",
+          "detail": "Preferred folder icon retained against ZIP icon"
+        },
+        "cache_1_font": {
+          "status": "PASS",
+          "detail": "Folder and ZIP font providers occur exactly once"
+        },
+        "cache_1_language": {
+          "status": "PASS",
+          "detail": "Both language sources preserved; ZIP override matches host order"
+        },
+        "cache_1_sounds": {
+          "status": "PASS",
+          "detail": "Both sound events preserved"
+        },
+        "cache_1_metadata": {
+          "status": "PASS",
+          "detail": "Both pack metadata overlays preserved"
+        },
+        "cache_1_exclude": {
+          "status": "PASS",
+          "detail": "Host excluded extension stays excluded"
+        },
+        "browser_1": {
+          "status": "PASS",
+          "detail": "CE browser title initialized"
+        },
+        "generated_1_icon": {
+          "status": "PASS",
+          "detail": "Preferred folder icon retained against ZIP icon"
+        },
+        "generated_1_font": {
+          "status": "PASS",
+          "detail": "Folder and ZIP font providers occur exactly once"
+        },
+        "generated_1_language": {
+          "status": "PASS",
+          "detail": "Both language sources preserved; ZIP override matches host order"
+        },
+        "generated_1_sounds": {
+          "status": "PASS",
+          "detail": "Both sound events preserved"
+        },
+        "generated_1_metadata": {
+          "status": "PASS",
+          "detail": "Both pack metadata overlays preserved"
+        },
+        "generated_1_exclude": {
+          "status": "PASS",
+          "detail": "Host excluded extension stays excluded"
+        },
+        "reload_2": {
+          "status": "PASS",
+          "detail": "CE configuration/resource reload completed"
+        },
+        "cache_2_icon": {
+          "status": "PASS",
+          "detail": "Preferred folder icon retained against ZIP icon"
+        },
+        "cache_2_font": {
+          "status": "PASS",
+          "detail": "Folder and ZIP font providers occur exactly once"
+        },
+        "cache_2_language": {
+          "status": "PASS",
+          "detail": "Both language sources preserved; ZIP override matches host order"
+        },
+        "cache_2_sounds": {
+          "status": "PASS",
+          "detail": "Both sound events preserved"
+        },
+        "cache_2_metadata": {
+          "status": "PASS",
+          "detail": "Both pack metadata overlays preserved"
+        },
+        "cache_2_exclude": {
+          "status": "PASS",
+          "detail": "Host excluded extension stays excluded"
+        },
+        "browser_2": {
+          "status": "PASS",
+          "detail": "CE browser title initialized"
+        },
+        "generated_2_icon": {
+          "status": "PASS",
+          "detail": "Preferred folder icon retained against ZIP icon"
+        },
+        "generated_2_font": {
+          "status": "PASS",
+          "detail": "Folder and ZIP font providers occur exactly once"
+        },
+        "generated_2_language": {
+          "status": "PASS",
+          "detail": "Both language sources preserved; ZIP override matches host order"
+        },
+        "generated_2_sounds": {
+          "status": "PASS",
+          "detail": "Both sound events preserved"
+        },
+        "generated_2_metadata": {
+          "status": "PASS",
+          "detail": "Both pack metadata overlays preserved"
+        },
+        "generated_2_exclude": {
+          "status": "PASS",
+          "detail": "Host excluded extension stays excluded"
+        },
+        "wild_worldgen_native_log": {
+          "status": "PASS",
+          "detail": "No custom wild-block Unknown registry key errors in actual native load log"
+        },
+        "bundled_native_load_errors": {
+          "status": "PASS",
+          "detail": "No bundled item/block/placed-feature errors reported by the actual CE parser"
+        }
+      },
+      "fixture_sources_unchanged": true,
+      "original_plugins_restored": true,
+      "original_ce_config_restored": true,
+      "fd_configuration_and_cache_restored": true
+    }
+  ],
+  "contract_checks": 5,
+  "source_state": "uncommitted local fix; base 3280b54f71ed86a0bd6de36d8ac93d1fdd7c4b96"
+}

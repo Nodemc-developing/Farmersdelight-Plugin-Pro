@@ -449,7 +449,7 @@ console:
     special_recipe_loaded: "已加载 {count} 个特殊配方"
     special_recipe_pack_loaded: "已从 CraftEngine 数据包读取 {count} 个特殊配方"
     special_recipe_backfilled: "已补全 {count} 个内置特殊配方（磁盘配置缺失）"
-    special_recipe_missing_root: "特殊配方文件 {file} 缺少 'special_recipes' 段，已跳过。请补上该段，或删除该文件以恢复内置默认值。"
+    special_recipe_missing_section: "特殊配方文件 {file} 缺少 'special_recipes' 段，已跳过。请补上该段，或从对应版本的手动内容包中恢复此文件；删除文件不会自动恢复默认配方。"
     special_recipe_parse_failed: "解析特殊配方 '{id}' 失败：{error}"
     special_recipe_save_failed: "写入特殊配方文件 {file} 失败：{error}"
     special_recipe_load_failed: "无法把特殊配方文件 {file} 按 UTF-8 YAML 读取：{error}"

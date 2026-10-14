@@ -41,7 +41,7 @@ git clone https://github.com/IOVEYOUMC0/FarmersdelightPluginWiKi.git wiki
 
 配方从已启用的 CraftEngine 内容包加载。编辑时按原文件、根节点与配方 ID 保存，并保留不受管理的扩展字段。
 
-外部内容包优先，自带内容只补缺。外部包之间同类别、同完整 ID 的冲突会明确报错；模型与纹理按资源路径选择，语言 JSON 按键合并。资源生成使用受管理覆盖层，不改写外部素材目录。
+内容包通过 `contentPackZip` 构建，手动解压到 `plugins/CraftEngine/resources/`。启动和重载不释放或补入 JAR 中的定义、资源及配方；只处理已启用的内容包。历史安装清单仅保留文件优先级识别。外部包之间同类别、同完整 ID 的配置定义冲突会明确报错。资源文件之间的冲突使用 CE 当前的 `resource-pack.duplicated-files-handler` 规则，保留 CE 输入顺序和文件扩展名排除设置；没有匹配规则时，保留首个外部文件并报告来源。资源生成使用受管理覆盖层，不改写外部素材目录。
 
 标准浏览分类合并为一个入口，包含工具、食材、农作物、加工食品、食物、盛宴、装饰、野生植物和宠物食物九类。已加载物品去重并集，普通罐与玻璃罐分别提供入口。设置 `craftengine-resources.unified-categories: false` 可保留原分类树；该处理仅修改加载副本，不改写原内容包。
 

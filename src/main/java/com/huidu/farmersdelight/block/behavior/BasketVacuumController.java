@@ -27,10 +27,8 @@ import java.util.Map;
 public final class BasketVacuumController extends BlockEntityController {
 
     private static final int NO_OP_COOLDOWN = 10;
-    // Idle baskets re-poll the redstone signal at this cadence. Once a signal is observed the poll tightens
-    // to every tick so the basket resumes promptly when the signal drops; the cached state turns the hot
-    // isBlockIndirectlyPowered (6-neighbour signal scan) from a per-cooldown-expiry call into ~1/s per
-    // idle basket regardless of the configured transfer cooldown.
+    // Neighbour notifications update the signal immediately. Polling repairs saved state after loading
+    // or a writer that deliberately suppresses physics notifications.
     private static final int REDSTONE_POLL_INTERVAL = 20;
     private final FarmersDelightPlugin plugin;
     private final int transferCooldownTicks;
@@ -72,12 +70,13 @@ public final class BasketVacuumController extends BlockEntityController {
     }
 
     private void vacuum(BlockPos pos, ImmutableBlockState state) {
-        if (propertyOwner != state.owner().value()) {
+        if (propertyOwner != state.owner().value()
+                || (enabled != null && !state.contains(enabled))
+                || (direction != null && !state.contains(direction))) {
             propertyOwner = state.owner().value();
-            enabled = net.momirealms.craftengine.core.block.behavior.BlockBehaviorFactory.getOptionalProperty(propertyOwner, enabledProperty, Boolean.class);
-            direction = propertyOwner.getProperty(facingProperty);
+            enabled = state.getProperty(enabledProperty);
+            direction = state.getProperty(facingProperty);
         }
-        if (enabled != null && !Boolean.TRUE.equals(state.get(enabled))) return;
         this.transferCooldown--;
         // Count native callbacks even during a transfer cooldown.
         boolean pollRedstone = redstoneLock
@@ -93,13 +92,17 @@ public final class BasketVacuumController extends BlockEntityController {
         // Check periodically when unpowered and every tick while powered,
         // so collection resumes promptly without continuous idle neighbor scans.
         if (pollRedstone) {
-            this.redstonePollTicks = 0;
-            this.poweredByRedstone = world.getBlockAt(pos.x(), pos.y(), pos.z()).isBlockIndirectlyPowered();
+            redstoneChanged(world.getBlockAt(pos.x(), pos.y(), pos.z()).isBlockIndirectlyPowered());
+            BasketBlockBehavior.syncEnabled(new Location(world, pos.x(), pos.y(), pos.z()), state,
+                    enabledProperty, this.poweredByRedstone);
         }
         if (redstoneLock && this.poweredByRedstone) {
             this.transferCooldown = 0;
             return;
         }
+        // Redstone-owned state has just been checked above, even if a persisted enabled value was stale.
+        // With redstone locking disabled, enabled remains an explicit configuration-controlled switch.
+        if (!redstoneLock && enabled != null && !Boolean.TRUE.equals(state.get(enabled))) return;
         if (this.transferCooldown > 0) return;
         this.transferCooldown = 0;
 
@@ -159,6 +162,12 @@ public final class BasketVacuumController extends BlockEntityController {
         }
     }
 
+    void redstoneChanged(boolean powered) {
+        if (this.poweredByRedstone && !powered) this.transferCooldown = 0;
+        this.poweredByRedstone = powered;
+        this.redstonePollTicks = 0;
+    }
+
     private static Inventory facedContainerInventory(World world, int x, int y, int z) {
         if (y < world.getMinHeight() || y >= world.getMaxHeight() || !world.isChunkLoaded(x >> 4, z >> 4)) return null;
         BlockState facedState = world.getBlockAt(x, y, z).getState(false);
@@ -168,7 +177,7 @@ public final class BasketVacuumController extends BlockEntityController {
         return null;
     }
 
-    private static boolean ejectOneItem(Inventory source, Inventory target) {
+    static boolean ejectOneItem(Inventory source, Inventory target) {
         ItemStack[] contents = source.getStorageContents();
         for (int slot = 0; slot < contents.length; slot++) {
             ItemStack stack = contents[slot];
@@ -243,8 +252,8 @@ public final class BasketVacuumController extends BlockEntityController {
         BoundingBox box = new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
         int firstChunkX = (int) Math.floor(minX) >> 4;
         int firstChunkZ = (int) Math.floor(minZ) >> 4;
-        int lastChunkX = (int) Math.floor(maxX) >> 4;
-        int lastChunkZ = (int) Math.floor(maxZ) >> 4;
+        int lastChunkX = (int) Math.floor(Math.nextDown(maxX)) >> 4;
+        int lastChunkZ = (int) Math.floor(Math.nextDown(maxZ)) >> 4;
         for (int chunkX = firstChunkX; chunkX <= lastChunkX; chunkX++) {
             for (int chunkZ = firstChunkZ; chunkZ <= lastChunkZ; chunkZ++) {
                 if (!Bukkit.isOwnedByCurrentRegion(world, chunkX, chunkZ)) return false;
@@ -271,17 +280,23 @@ public final class BasketVacuumController extends BlockEntityController {
             if (eloc.getX() < minX || eloc.getX() > maxX
                     || eloc.getY() < minY || eloc.getY() > maxY
                     || eloc.getZ() < minZ || eloc.getZ() > maxZ) continue;
-            ItemStack stack = item.getItemStack();
-            if (stack == null || stack.getType().isAir()) {
-                continue;
-            }
-            Map<Integer, ItemStack> leftover = inventory.addItem(stack.clone());
-            if (leftover.isEmpty()) {
-                item.remove();
-                return true;
-            }
-            item.setItemStack(leftover.values().iterator().next());
+            if (collectItem(inventory, item)) return true;
         }
         return false;
+    }
+
+    static boolean collectItem(Inventory inventory, Item item) {
+        ItemStack stack = item.getItemStack();
+        if (stack == null || stack.getType().isAir()) return false;
+        int before = stack.getAmount();
+        Map<Integer, ItemStack> leftover = inventory.addItem(stack.clone());
+        if (leftover.isEmpty()) {
+            item.remove();
+            return true;
+        }
+        ItemStack remainder = leftover.values().iterator().next();
+        if (remainder.getAmount() >= before) return false;
+        item.setItemStack(remainder);
+        return true;
     }
 }

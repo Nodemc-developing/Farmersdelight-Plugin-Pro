@@ -30,7 +30,6 @@ public final class RecipeFileLoader {
 
     // Read by SpecialRecipeLoader as well: the same switch controls whether bundled entries missing from an
     // operator file are merged back, for recipes and for special-recipe cards alike.
-    static final String MERGE_MISSING_SETTING = "recipes.merge-missing-bundled";
 
     // CE/Folia readiness can invoke recipe loading twice during startup. Keep identical diagnostics
     // from flooding the console; a changed path/detail still produces a fresh warning.
@@ -101,7 +100,7 @@ public final class RecipeFileLoader {
     private static YamlConfiguration loadRecipeFileLocked(FarmersDelightPlugin plugin, String relativePath,
                                                          boolean reconcileWithBundled) {
         return readRecipeFileLocked(plugin, relativePath, reconcileWithBundled,
-                ConfigSectionReader.optionalBoolean(plugin.getConfig(), MERGE_MISSING_SETTING, false), false);
+                false, false);
     }
 
     public static YamlConfiguration loadPlainRecipeFile(FarmersDelightPlugin plugin, String relativePath) {

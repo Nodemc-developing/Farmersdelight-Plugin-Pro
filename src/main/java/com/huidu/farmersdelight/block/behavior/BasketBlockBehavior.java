@@ -1,13 +1,24 @@
 package com.huidu.farmersdelight.block.behavior;
 
 import com.huidu.farmersdelight.FarmersDelightPlugin;
+import com.huidu.farmersdelight.util.BlockPosKey;
+import com.huidu.farmersdelight.util.CustomBlockUtils;
 import com.huidu.farmersdelight.util.BehaviorArgParser;
+import com.huidu.farmersdelight.util.compat.CraftEngineAdapter;
+import net.momirealms.craftengine.bukkit.api.CraftEngineBlocks;
 import net.momirealms.craftengine.core.block.BlockDefinition;
+import net.momirealms.craftengine.core.block.ImmutableBlockState;
+import net.momirealms.craftengine.core.block.UpdateFlags;
 import net.momirealms.craftengine.core.block.behavior.BlockBehaviorFactory;
 import net.momirealms.craftengine.core.block.behavior.EntityBlock;
 import net.momirealms.craftengine.core.block.entity.BlockEntity;
 import net.momirealms.craftengine.core.block.entity.BlockEntityController;
+import net.momirealms.craftengine.core.block.property.Property;
 import net.momirealms.craftengine.core.plugin.config.ConfigSection;
+import net.momirealms.craftengine.core.world.BlockPos;
+import net.momirealms.craftengine.core.world.context.BlockPlaceContext;
+import org.bukkit.Location;
+import org.bukkit.World;
 
 import java.util.Map;
 
@@ -39,10 +50,11 @@ public class BasketBlockBehavior extends FarmersDelightBlockBehavior implements 
         // Runs while CraftEngine parses the pack, which is always after this plugin enabled.
         FarmersDelightPlugin plugin = FarmersDelightPlugin.getInstance();
         Map<String, Object> arguments = section != null ? section.values() : Map.of();
-        int cooldown = Math.max(1, BehaviorArgParser.getInt(arguments, "transfer-cooldown", DEFAULT_TRANSFER_COOLDOWN));
-        // When on, the basket pushes its contents into a container it faces; when off it only collects
-        // dropped items. Collection is always on. Defaults to on so an existing basket gains the behavior.
-        boolean eject = BehaviorArgParser.getBoolean(arguments, "eject", true);
+        String cooldownKey = BehaviorArgParser.isPresent(arguments, "transfer-cooldown") ? "transfer-cooldown" : "collect-interval";
+        int cooldown = Math.max(1, BehaviorArgParser.getInt(arguments, cooldownKey, DEFAULT_TRANSFER_COOLDOWN));
+        // Baskets collect through their opening; a hopper can take items out of the storage inventory.
+        // Direct insertion into a faced container is an optional extension.
+        boolean eject = BehaviorArgParser.getBoolean(arguments, "eject", false);
         boolean lock = BehaviorArgParser.getBoolean(arguments, "redstone-lock", true);
         String facing = BehaviorArgParser.getString(arguments, "facing-property", "facing");
         String enabled = BehaviorArgParser.getString(arguments, "enabled-property", "enabled");
@@ -56,6 +68,44 @@ public class BasketBlockBehavior extends FarmersDelightBlockBehavior implements 
 
     @Override
     public void initControllerId(int id) {
+    }
+
+    @Override
+    public ImmutableBlockState updateStateForPlacement(BlockPlaceContext context, ImmutableBlockState state) {
+        if (!redstoneLock || !(context.getLevel().platformWorld() instanceof World world)) return state;
+        BlockPos pos = context.getClickedPos();
+        return enabledState(state, enabledProperty, world.getBlockAt(pos.x(), pos.y(), pos.z()).isBlockIndirectlyPowered());
+    }
+
+    @Override
+    public void neighborChanged(Object thisBlock, Object[] args) {
+        if (!redstoneLock || args == null || args.length < 3) return;
+        World world = CraftEngineAdapter.toWorld(args[1]);
+        BlockPos pos = CraftEngineAdapter.toBlockPos(args[2]);
+        if (world == null || pos == null || !world.isChunkLoaded(pos.x() >> 4, pos.z() >> 4)) return;
+        Location location = new Location(world, pos.x(), pos.y(), pos.z());
+        if (plugin != null && !plugin.scheduler().isOwnedByCurrentRegion(location)) return;
+        ImmutableBlockState state = CustomBlockUtils.getStateIfResident(location.getBlock());
+        if (state == null || state.isEmpty() || state.owner().value() != block()) return;
+        boolean powered = location.getBlock().isBlockIndirectlyPowered();
+        CustomBlockUtils.notifyControllerChanged(world, new BlockPosKey(pos), BasketVacuumController.class, null,
+                controller -> controller.redstoneChanged(powered));
+        syncEnabled(location, state, enabledProperty, powered);
+    }
+
+    static ImmutableBlockState enabledState(ImmutableBlockState state, String property, boolean powered) {
+        // A loaded state can outlive the registry definition after a content reload.
+        // Properties belong to the immutable state, even when its holder points at a new definition.
+        Property<Boolean> enabled = state.getProperty(property);
+        return enabled == null ? state : state.with(enabled, !powered);
+    }
+
+    static void syncEnabled(Location location, ImmutableBlockState state, String property, boolean powered) {
+        ImmutableBlockState updated = enabledState(state, property, powered);
+        if (updated != state) {
+            // A property update preserves the same storage controller and contents.
+            CraftEngineBlocks.place(location, updated, UpdateFlags.UPDATE_CLIENTS, false);
+        }
     }
 
     @Override

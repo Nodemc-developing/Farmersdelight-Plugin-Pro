@@ -11,12 +11,16 @@ import java.io.FilterInputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Set;
+import java.util.function.Supplier;
 import java.util.zip.ZipFile;
 
 /** Produces one file per resource path. The source trees are never changed. */
@@ -25,7 +29,25 @@ final class ManagedResourceLayer {
         Source(Path path, boolean zip) { this(path, zip, "", false); }
     }
     @FunctionalInterface interface Reader { InputStream open() throws IOException; }
-    record Asset(String path, String source, boolean bundled, boolean currentDefault, String hash, Reader reader) {
+    @FunctionalInterface interface PathReader { OpenPath open() throws IOException; }
+    record OpenPath(Path path, FileSystem fileSystem) implements AutoCloseable {
+        @Override public void close() throws IOException { if (fileSystem != null) fileSystem.close(); }
+    }
+    record Asset(String path, String source, boolean bundled, boolean currentDefault, String hash, Reader reader,
+                 PathReader pathReader) {
+        Asset(String path, String source, boolean bundled, boolean currentDefault, String hash, Reader reader) {
+            this(path, source, bundled, currentDefault, hash, reader, null);
+        }
+        OpenPath openPath() throws IOException {
+            if (pathReader == null) throw new IOException("No original resource path for " + source);
+            return pathReader.open();
+        }
+        void verify(Path file) throws IOException {
+            try (InputStream input = Files.newInputStream(file)) {
+                if (!hash.equals(BundledContentManifest.digest(input)))
+                    throw new IOException("Resource source changed while generating the managed layer: " + source);
+            }
+        }
         byte[] bytes() throws IOException {
             byte[] content;
             try (InputStream input = reader.open()) { content = input.readAllBytes(); }
@@ -37,15 +59,23 @@ final class ManagedResourceLayer {
     private final Path root;
     private final BundledContentManifest ownership;
     private final ContentConflicts report;
+    private final Supplier<HostResourcePolicy> hostPolicy;
 
     ManagedResourceLayer(Path root, BundledContentManifest ownership, ContentConflicts report) {
+        this(root, ownership, report, () -> new HostResourcePolicy(List.of(), Set.of(), ignored -> { }));
+    }
+
+    ManagedResourceLayer(Path root, BundledContentManifest ownership, ContentConflicts report,
+                         Supplier<HostResourcePolicy> hostPolicy) {
         this.root = root.toAbsolutePath().normalize(); this.ownership = ownership; this.report = report;
+        this.hostPolicy = hostPolicy;
     }
 
     synchronized Path build(List<Source> sources) throws IOException {
         Map<String, List<Asset>> inputs = new TreeMap<>();
-        // Sorting makes diagnostics reproducible; it never acts as a tie breaker for differing externals.
-        for (Source source : sources.stream().distinct().sorted(Comparator.comparing(s -> s.path() + "!/" + s.prefix())).toList()) {
+        HostResourcePolicy policy = hostPolicy.get();
+        // External order is the host's order: pack folders, event folders, then event ZIPs.
+        for (Source source : sources.stream().distinct().toList()) {
             if (source.zip()) {
                 if (!Files.isRegularFile(source.path())) continue;
                 try (ZipFile zip = new ZipFile(source.path().toFile())) {
@@ -54,11 +84,15 @@ final class ManagedResourceLayer {
                         var entry = entries.nextElement();
                         if (entry.isDirectory() || !entry.getName().startsWith(source.prefix())) continue;
                         String relative = safeRelative(entry.getName().substring(source.prefix().length()));
+                        if (policy.excludes(relative)) continue;
                         String hash;
                         try (InputStream stream = zip.getInputStream(entry)) { hash = BundledContentManifest.digest(stream); }
                         String entryName = entry.getName();
                         add(inputs, new Asset(relative, source.path() + "!/" + entry.getName(), source.currentDefault(), source.currentDefault(), hash,
-                                () -> openZipEntry(source.path(), entryName)));
+                                () -> openZipEntry(source.path(), entryName), () -> {
+                                    FileSystem fs = FileSystems.newFileSystem(source.path());
+                                    return new OpenPath(fs.getPath("/" + entryName), fs);
+                                }));
                     }
                 }
             } else if (Files.isDirectory(source.path())) {
@@ -67,31 +101,36 @@ final class ManagedResourceLayer {
                         // Following external symlinks could import data outside the declared resource root.
                         if (Files.isSymbolicLink(file)) throw new IOException("Symbolic resource file requires an explicit source root: " + file);
                         String relative = safeRelative(source.path().relativize(file).toString().replace('\\', '/'));
+                        if (policy.excludes(relative)) continue;
                         String hash;
                         try (InputStream input = Files.newInputStream(file)) { hash = BundledContentManifest.digest(input); }
                         add(inputs, new Asset(relative, file.toString(), ownership.isBundledHash(file, hash), false, hash,
-                                () -> Files.newInputStream(file)));
+                                () -> Files.newInputStream(file), () -> new OpenPath(file, null)));
                     }
                 }
             }
         }
         Map<String, Asset> outputs = new TreeMap<>();
         Map<String, Object> index = new LinkedHashMap<>();
+        Files.createDirectories(root);
+        Path scratch = Files.createTempDirectory(root, ".merge-");
         try {
             for (var entry : inputs.entrySet()) {
-                Asset output;
-                if (isLanguage(entry.getKey())) {
-                    byte[] merged = mergeLanguage(entry.getKey(), entry.getValue());
-                    output = new Asset(entry.getKey(), "merged language", false, false, BundledContentManifest.digest(merged),
-                            () -> new ByteArrayInputStream(merged));
-                } else output = choose(entry.getKey(), entry.getValue());
+                Asset output = resolve(entry.getKey(), entry.getValue(), policy, scratch);
                 outputs.put(entry.getKey(), output);
                 Map<String, Object> sourceIndex = new LinkedHashMap<>();
                 sourceIndex.put("sha256", output.hash());
                 sourceIndex.put("sources", entry.getValue().stream().map(Asset::source).toList());
                 index.put(entry.getKey(), sourceIndex);
             }
-        } finally { report.save(); }
+        } finally {
+            try { report.save(); }
+            finally {
+                try (var files = Files.walk(scratch)) {
+                    for (Path file : files.sorted(Comparator.reverseOrder()).toList()) Files.delete(file);
+                }
+            }
+        }
         String generation = BundledContentManifest.digest(new GsonBuilder().create().toJson(index).getBytes(StandardCharsets.UTF_8));
         Path destination = root.resolve(generation);
         Path complete = destination.resolveSibling(generation + ".complete");
@@ -111,6 +150,29 @@ final class ManagedResourceLayer {
 
     private static void add(Map<String, List<Asset>> inputs, Asset asset) {
         inputs.computeIfAbsent(asset.path(), ignored -> new ArrayList<>()).add(asset);
+    }
+
+    private Asset resolve(String path, List<Asset> assets, HostResourcePolicy policy, Path scratch) throws IOException {
+        List<Asset> external = assets.stream().filter(asset -> !asset.bundled()).toList();
+        List<Asset> defaults = assets.stream().filter(Asset::bundled).toList();
+        if (external.isEmpty()) {
+            return isLanguage(path) ? generated(path, "merged bundled language", mergeLanguage(path, defaults))
+                    : choose(path, defaults);
+        }
+        Asset result = external.size() == 1 ? external.getFirst()
+                : generated(path, "host-resolved external resources", policy.merge(path, external, scratch, report));
+        for (Asset fallback : defaults)
+            report.add("asset", path, result.source(), fallback.source(), "external resource takes precedence");
+        if (isLanguage(path) && !defaults.isEmpty()) {
+            List<Asset> languages = new ArrayList<>(defaults);
+            languages.add(result);
+            result = generated(path, "external language with bundled fallback", mergeLanguage(path, languages));
+        }
+        return result;
+    }
+
+    private static Asset generated(String path, String source, byte[] bytes) {
+        return new Asset(path, source, false, false, BundledContentManifest.digest(bytes), () -> new ByteArrayInputStream(bytes));
     }
 
     private Asset choose(String path, List<Asset> assets) throws IOException {

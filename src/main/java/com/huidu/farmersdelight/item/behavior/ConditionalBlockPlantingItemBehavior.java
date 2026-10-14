@@ -1,5 +1,7 @@
 package com.huidu.farmersdelight.item.behavior;
 
+import com.huidu.farmersdelight.FarmersDelightPlugin;
+import com.huidu.farmersdelight.block.behavior.ManagedCropBlockBehavior;
 import com.huidu.farmersdelight.util.CustomBlockUtils;
 import com.huidu.farmersdelight.util.compat.ProtectionCompat;
 import com.huidu.farmersdelight.util.VanillaAdvancements;
@@ -49,6 +51,10 @@ public final class ConditionalBlockPlantingItemBehavior extends ItemBehavior {
         World world = (World) context.getLevel().platformWorld();
         BlockPos clickedPos = context.getClickedPos();
         Block clickedBlock = world.getBlockAt(clickedPos.x(), clickedPos.y(), clickedPos.z());
+        FarmersDelightPlugin plugin = FarmersDelightPlugin.getInstance();
+        if (!world.isChunkLoaded(clickedPos.x() >> 4, clickedPos.z() >> 4)
+                || (plugin == null ? !org.bukkit.Bukkit.isOwnedByCurrentRegion(clickedBlock.getLocation())
+                : !plugin.scheduler().isOwnedByCurrentRegion(clickedBlock.getLocation()))) return InteractionResult.FAIL;
 
         Key clickedId = identifyBlock(clickedBlock);
         Key blockToPlace = rules.get(clickedId);
@@ -69,6 +75,8 @@ public final class ConditionalBlockPlantingItemBehavior extends ItemBehavior {
         if (!target.getType().isAir()) {
             return InteractionResult.PASS;
         }
+        ManagedCropBlockBehavior crop = ManagedCropBlockBehavior.byId(blockToPlace);
+        if (crop != null && !crop.canPlantAt(target)) return InteractionResult.FAIL;
 
         // This path places directly through CraftEngineBlocks.place and cancels native interaction.
         // Check canBuild here because native placement protection will not run.

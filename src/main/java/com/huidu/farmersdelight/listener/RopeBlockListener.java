@@ -1,13 +1,17 @@
 package com.huidu.farmersdelight.listener;
 
-import com.huidu.farmersdelight.api.util.ItemDelivery;
 import com.huidu.farmersdelight.FarmersDelightPlugin;
 import com.huidu.farmersdelight.block.behavior.RopeBlockBehavior;
+import com.huidu.farmersdelight.block.behavior.RopeFenceBlockBehavior;
+import com.huidu.farmersdelight.block.behavior.RopeFenceGateBlockBehavior;
+import com.huidu.farmersdelight.block.behavior.RopeOperation;
+import com.huidu.farmersdelight.block.behavior.RopeInventoryCommit;
+import com.huidu.farmersdelight.block.behavior.RopeWorldAccess;
 import com.huidu.farmersdelight.i18n.I18n;
 import com.huidu.farmersdelight.util.CustomBlockUtils;
 import com.huidu.farmersdelight.util.compat.ProtectionCompat;
 import net.momirealms.craftengine.bukkit.api.CraftEngineBlocks;
-import net.momirealms.craftengine.bukkit.api.event.CustomBlockInteractEvent;
+import net.momirealms.craftengine.bukkit.api.BukkitAdaptor;
 import net.momirealms.craftengine.bukkit.api.event.CustomBlockPlaceEvent;
 import net.momirealms.craftengine.bukkit.api.event.CustomBlockBreakEvent;
 import net.momirealms.craftengine.core.block.ImmutableBlockState;
@@ -18,6 +22,7 @@ import net.momirealms.craftengine.core.world.chunk.CEChunk;
 import net.momirealms.craftengine.core.world.chunk.CESection;
 import net.momirealms.craftengine.core.world.chunk.PalettedContainer;
 import org.bukkit.Chunk;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -34,8 +39,11 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Inventory;
 
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -127,9 +135,10 @@ public class RopeBlockListener implements Listener {
         if (listener == null) {
             return;
         }
+        if (!RopeWorldAccess.available(world, pos)) return;
         Cell cell = new Cell(world.getUID(), pos.x(), pos.y(), pos.z());
         Block block = world.getBlockAt(pos.x(), pos.y(), pos.z());
-        if (CustomBlockUtils.hasBehavior(block, RopeBlockBehavior.class)) {
+        if (trackedState(CustomBlockUtils.getStateIfResident(block))) {
             listener.addRope(cell);
         } else {
             listener.removeRope(cell);
@@ -149,6 +158,7 @@ public class RopeBlockListener implements Listener {
     }
 
     private void queueRefresh(World world, BlockPos pos) {
+        if (stopped) return;
         Cell key = new Cell(world.getUID(), pos.x(), pos.y(), pos.z());
         if (!pendingRopeRefreshes.add(key)) {
             return;
@@ -158,34 +168,35 @@ public class RopeBlockListener implements Listener {
             if (stopped) {
                 return;
             }
+            if (!RopeWorldAccess.available(world, pos)) return;
             RopeBlockBehavior.refreshAdjacentRopes(world, pos);
         }, 1L);
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onRopeRetract(CustomBlockInteractEvent event) {
-        if (event.action() != CustomBlockInteractEvent.Action.RIGHT_CLICK) return;
-        if (event.hand() != InteractionHand.MAIN_HAND) return;
+    public static boolean retractRope(Player player, Block block, ImmutableBlockState clickedState) {
+        RopeBlockListener listener = active;
+        return listener != null && !listener.stopped && listener.retract(player, block, clickedState);
+    }
 
-        Player player = event.player();
-        if (!player.isSneaking()) return;
+    private boolean retract(Player player, Block block, ImmutableBlockState clickedState) {
+        if (!player.isSneaking() || !RopeBlockBehavior.playerOwned(player)
+                || player.getGameMode() == GameMode.ADVENTURE || player.getGameMode() == GameMode.SPECTATOR) return false;
 
-        if (!CustomBlockUtils.hasBehavior(event.blockState(), RopeBlockBehavior.class)) return;
+        if (!CustomBlockUtils.hasBehavior(clickedState, RopeBlockBehavior.class)) return false;
 
-        Block block = event.bukkitBlock();
-        if (!ProtectionCompat.canUse(player, block, ProtectionCompat.Feature.ROPE)) return;
+        if (!RopeWorldAccess.available(block.getWorld(), new BlockPos(block.getX(), block.getY(), block.getZ()))) return false;
+        if (!ProtectionCompat.canUse(player, block, ProtectionCompat.Feature.ROPE)) return false;
 
         ItemStack mainHand = player.getInventory().getItemInMainHand();
-        if (!mainHand.getType().isAir()) return;
-
-        event.setCancelled(true);
+        if (!mainHand.getType().isAir()) return false;
 
         World world = block.getWorld();
         int bottomY = block.getY();
         int checkY = block.getY() - 1;
         while (checkY >= world.getMinHeight()) {
-            Block below = world.getBlockAt(block.getX(), checkY, block.getZ());
-            if (CustomBlockUtils.hasBehavior(below, RopeBlockBehavior.class)) {
+            Block below = RopeWorldAccess.block(world, new BlockPos(block.getX(), checkY, block.getZ()));
+            if (below == null) return false;
+            if (RopeBlockBehavior.sameRope(clickedState, CustomBlockUtils.getStateIfResident(below))) {
                 bottomY = checkY;
                 checkY--;
             } else {
@@ -194,17 +205,24 @@ public class RopeBlockListener implements Listener {
         }
 
         Block bottomBlock = world.getBlockAt(block.getX(), bottomY, block.getZ());
-        if (!ProtectionCompat.canBuild(player, bottomBlock, ProtectionCompat.Feature.ROPE)) return;
         boolean isCreative = player.getGameMode() == GameMode.CREATIVE;
-
-        if (!isCreative) {
-            ItemStack recovered = RopeBlockBehavior.createItemForRopeBlock(bottomBlock);
-            if (recovered != null) {
-                ItemDelivery.giveOrDrop(player, bottomBlock.getLocation(), recovered);
-            }
-        }
-
-        CraftEngineBlocks.remove(bottomBlock);
+        GameMode beforeMode = player.getGameMode();
+        ImmutableBlockState before = CustomBlockUtils.getStateIfResident(bottomBlock);
+        ItemStack recovered = isCreative ? null : RopeBlockBehavior.createItemForRopeBlock(bottomBlock);
+        if (!isCreative && (recovered == null || !canAccept(player.getInventory(), recovered))) return false;
+        BlockPos bottomPos = new BlockPos(bottomBlock.getX(), bottomBlock.getY(), bottomBlock.getZ());
+        boolean removed = RopeOperation.commitWithCompensation(
+                () -> permitRetract(player, bottomBlock, before),
+                () -> RopeWorldAccess.available(world, bottomPos) && CustomBlockUtils.getStateIfResident(bottomBlock) == before
+                        && RopeBlockBehavior.playerOwned(player) && player.getGameMode() == beforeMode
+                        && ProtectionCompat.canBreak(player, bottomBlock, ProtectionCompat.Feature.ROPE)
+                        && (isCreative || canAccept(player.getInventory(), recovered)),
+                () -> CraftEngineBlocks.remove(bottomBlock) && CustomBlockUtils.getStateIfResident(bottomBlock) != before,
+                () -> isCreative || RopeInventoryCommit.returnOne(player.getInventory(), recovered),
+                () -> RopeWorldAccess.available(world, bottomPos) && CustomBlockUtils.getStateIfResident(bottomBlock) == null
+                        && (bottomBlock.getType().isAir() || bottomBlock.getType() == org.bukkit.Material.WATER)
+                        && CraftEngineBlocks.place(bottomBlock.getLocation(), before, false));
+        if (!removed) return false;
         world.playSound(bottomBlock.getLocation(), Sound.BLOCK_WOOL_BREAK, 1.0f, 1.0f);
         player.swingMainHand();
 
@@ -214,6 +232,7 @@ public class RopeBlockListener implements Listener {
         removeRope(new Cell(world.getUID(), bp.x(), bp.y(), bp.z()));
         plugin.scheduler().runAt(bottomBlock.getLocation(),
                 () -> RopeBlockBehavior.refreshAdjacentRopes(world, bp));
+        return true;
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -274,6 +293,7 @@ public class RopeBlockListener implements Listener {
         if (hasRope(new Cell(worldId, x, y, z))) {
             return true;
         }
+        if (hasRope(new Cell(worldId, x, y - 1, z)) || hasRope(new Cell(worldId, x, y + 1, z))) return true;
         for (BlockFace face : HORIZONTAL_FACES) {
             if (hasRope(new Cell(worldId, x + face.getModX(), y, z + face.getModZ()))) {
                 return true;
@@ -290,18 +310,22 @@ public class RopeBlockListener implements Listener {
     public void onRopePlace(CustomBlockPlaceEvent event) {
         ImmutableBlockState state = event.blockState();
         if (state == null || state.isEmpty()) return;
-        if (!CustomBlockUtils.hasBehavior(state, RopeBlockBehavior.class)) return;
         Block b = event.bukkitBlock();
-        addRope(new Cell(b.getWorld().getUID(), b.getX(), b.getY(), b.getZ()));
+        if (trackedState(state)) {
+            addRope(new Cell(b.getWorld().getUID(), b.getX(), b.getY(), b.getZ()));
+            queueRefresh(b.getWorld(), new BlockPos(b.getX(), b.getY(), b.getZ()));
+        } else scheduleRopeRefreshIfNearby(b);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onRopeBreakCustom(CustomBlockBreakEvent event) {
         ImmutableBlockState state = event.blockState();
         if (state == null || state.isEmpty()) return;
-        if (!CustomBlockUtils.hasBehavior(state, RopeBlockBehavior.class)) return;
         Block b = event.bukkitBlock();
-        removeRope(new Cell(b.getWorld().getUID(), b.getX(), b.getY(), b.getZ()));
+        if (trackedState(state)) {
+            removeRope(new Cell(b.getWorld().getUID(), b.getX(), b.getY(), b.getZ()));
+            queueRefresh(b.getWorld(), new BlockPos(b.getX(), b.getY(), b.getZ()));
+        } else scheduleRopeRefreshIfNearby(b);
     }
 
     // Rebuild rope positions from the loading chunk's states; ropes have no block entity to enumerate.
@@ -309,7 +333,8 @@ public class RopeBlockListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onChunkLoad(ChunkLoadEvent event) {
         Chunk chunk = event.getChunk();
-        indexRopesInChunk(chunk.getWorld(), chunk.getX(), chunk.getZ());
+        plugin.scheduler().runLaterAt(new Location(chunk.getWorld(), (chunk.getX() << 4) + 8, chunk.getWorld().getMinHeight(), (chunk.getZ() << 4) + 8),
+                () -> indexRopesInChunk(chunk.getWorld(), chunk.getX(), chunk.getZ()), 1L);
     }
 
     // Chunks that were already loaded when this listener registered never fire ChunkLoadEvent, so the
@@ -331,6 +356,7 @@ public class RopeBlockListener implements Listener {
 
     @SuppressWarnings("UnstableApiUsage")
     private void indexRopesInChunk(World world, int chunkX, int chunkZ) {
+        if (stopped || !RopeWorldAccess.available(world, new BlockPos((chunkX << 4) + 8, world.getMinHeight(), (chunkZ << 4) + 8))) return;
         CEWorld ceWorld = CustomBlockUtils.getCEWorld(world);
         if (ceWorld == null) {
             return;
@@ -343,6 +369,7 @@ public class RopeBlockListener implements Listener {
         UUID worldId = world.getUID();
         int baseX = chunkX << 4;
         int baseZ = chunkZ << 4;
+        List<BlockPos> restored = new ArrayList<>();
         for (CESection section : ceChunk.sections()) {
             if (section == null || !sectionMayContainRope(section, world, chunkX, chunkZ)) {
                 continue;
@@ -350,15 +377,29 @@ public class RopeBlockListener implements Listener {
             int baseY = section.sectionY() << 4;
             for (int index = 0; index < SECTION_VOLUME; index++) {
                 ImmutableBlockState state = section.getBlockState(index);
-                if (!CustomBlockUtils.hasBehavior(state, RopeBlockBehavior.class)) {
+                if (!trackedState(state)) {
                     continue;
                 }
-                addRope(new Cell(worldId,
+                Cell cell = new Cell(worldId,
                         baseX + (index & 15),
                         baseY + ((index >> 8) & 15),
-                        baseZ + ((index >> 4) & 15)));
+                        baseZ + ((index >> 4) & 15));
+                addRope(cell);
+                restored.add(new BlockPos(cell.x(), cell.y(), cell.z()));
             }
         }
+        refreshChunkBatch(world, restored, 0);
+    }
+
+    private void refreshChunkBatch(World world, List<BlockPos> positions, int from) {
+        if (stopped || from >= positions.size()) return;
+        BlockPos first = positions.get(from);
+        plugin.scheduler().runLaterAt(new Location(world, first.x(), first.y(), first.z()), () -> {
+            if (stopped || !RopeWorldAccess.available(world, first)) return;
+            int until = Math.min(positions.size(), from + 64);
+            for (int i = from; i < until; ++i) RopeBlockBehavior.refreshAdjacentRopes(world, positions.get(i));
+            refreshChunkBatch(world, positions, until);
+        }, 1L);
     }
 
     // One-shot latch so a persistently broken world logs once instead of once per section per chunk load.
@@ -388,7 +429,7 @@ public class RopeBlockListener implements Listener {
             return false;
         }
         try {
-            return states.hasAny(state -> CustomBlockUtils.hasBehavior(state, RopeBlockBehavior.class));
+            return states.hasAny(RopeBlockListener::trackedState);
         } catch (IllegalStateException unreadablePalette) {
             // Reporting rather than swallowing: returning "no ropes here" for a section that could not
             // be read leaves its ropes outside the index, which silently reinstates the stale-index
@@ -403,6 +444,31 @@ public class RopeBlockListener implements Listener {
             }
             return false;
         }
+    }
+
+    private static boolean trackedState(ImmutableBlockState state) {
+        return CustomBlockUtils.hasBehavior(state, RopeBlockBehavior.class)
+                || CustomBlockUtils.hasBehavior(state, RopeFenceBlockBehavior.class)
+                || CustomBlockUtils.hasBehavior(state, RopeFenceGateBlockBehavior.class);
+    }
+
+    static boolean canAccept(Inventory inventory, ItemStack stack) {
+        for (ItemStack current : inventory.getStorageContents()) {
+            if (current == null || current.getAmount() == 0 || current.getType().isAir()) return true;
+            if (current.isSimilar(stack) && current.getAmount() < Math.min(current.getMaxStackSize(), inventory.getMaxStackSize())) return true;
+        }
+        return false;
+    }
+
+    private boolean permitRetract(Player player, Block block, ImmutableBlockState state) {
+        if (!ProtectionCompat.canBreak(player, block, ProtectionCompat.Feature.ROPE)) return false;
+        BlockBreakEvent nativeEvent = new BlockBreakEvent(block, player);
+        nativeEvent.setDropItems(false);
+        Bukkit.getPluginManager().callEvent(nativeEvent);
+        if (nativeEvent.isCancelled()) return false;
+        CustomBlockBreakEvent customEvent = new CustomBlockBreakEvent(BukkitAdaptor.adapt(player), block.getLocation(), block, state, false);
+        Bukkit.getPluginManager().callEvent(customEvent);
+        return !customEvent.isCancelled();
     }
 
     // Folia chunks unload without firing per-block break events, so leftover entries would linger and

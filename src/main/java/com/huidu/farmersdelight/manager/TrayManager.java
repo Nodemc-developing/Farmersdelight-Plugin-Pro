@@ -17,6 +17,7 @@ import org.bukkit.util.BoundingBox;
 public class TrayManager {
 
     private final FarmersDelightPlugin plugin;
+    private final java.util.Set<Location> pendingUpdates = java.util.concurrent.ConcurrentHashMap.newKeySet();
 
     public TrayManager(FarmersDelightPlugin plugin) {
         this.plugin = plugin;
@@ -25,7 +26,8 @@ public class TrayManager {
     // Public API retained for backward compatibility
 
     public void checkAndPlaceTray(World world, BlockPos potPos) {
-        if (world == null || potPos == null) return;
+        if (world == null || potPos == null || potPos.y() < world.getMinHeight()
+                || potPos.y() >= world.getMaxHeight() || !world.isChunkLoaded(potPos.x() >> 4, potPos.z() >> 4)) return;
         CookingPotBlockBehavior cookingPot = getCookingPotBehavior(world, potPos);
         if (cookingPot != null) {
             String current = getSupportProperty(world, potPos);
@@ -93,12 +95,30 @@ public class TrayManager {
         boolean anySkillets = skilletManager != null && skilletManager.hasTrackedSkillets();
         if (!CookingPotBlockBehavior.hasAnyBlockEntities() && !anySkillets) return;
 
-        Location above1 = supportLocation.clone().add(0, 1, 0);
-        Location above2 = supportLocation.clone().add(0, 2, 0);
-        plugin.scheduler().runLaterAt(above1, () -> {
-            checkAndPlaceTray(above1);
-            checkAndPlaceTray(above2);
-        }, 1L);
+        requestRefresh(supportLocation.clone().add(0, 1, 0));
+        requestRefresh(supportLocation.clone().add(0, 2, 0));
+    }
+
+    /** Called on the owning region; coalesces physics/interaction notifications until the next tick. */
+    public void requestRefresh(Location location) {
+        World world = location.getWorld();
+        if (world == null || location.getBlockY() < world.getMinHeight() || location.getBlockY() >= world.getMaxHeight()
+                || !world.isChunkLoaded(location.getBlockX() >> 4, location.getBlockZ() >> 4)) return;
+        BlockPos pos = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        ImmutableBlockState state = CraftEngineBlocks.getCustomBlockState(world.getBlockAt(pos.x(), pos.y(), pos.z()));
+        if (state == null || state.isEmpty() || (CustomBlockUtils.getBehavior(state, SkilletBlockBehavior.class) == null
+                && CustomBlockUtils.getBehavior(state, CookingPotBlockBehavior.class) == null)) return;
+        Location key = new Location(world, pos.x(), pos.y(), pos.z());
+        if (!pendingUpdates.add(key)) return;
+        try {
+            plugin.scheduler().runLaterAt(key, () -> {
+                pendingUpdates.remove(key);
+                checkAndPlaceTray(world, pos);
+            }, 1L);
+        } catch (RuntimeException failure) {
+            pendingUpdates.remove(key);
+            throw failure;
+        }
     }
 
     public boolean shouldHaveTray(World world, BlockPos potPos) {
@@ -113,6 +133,7 @@ public class TrayManager {
     private boolean shouldHaveTray(World world, BlockPos potPos, boolean requireNonFullSupport) {
         HeatSourceConfig heatConfig = plugin.getHeatSourceConfig();
         if (heatConfig == null) return false;
+        if (potPos.y() <= world.getMinHeight()) return false;
 
         // Handles take precedence over trays.
         HandleManager hm = plugin.getHandleManager();
@@ -125,6 +146,7 @@ public class TrayManager {
             return isValidTraySupport(blockBelow, requireNonFullSupport);
         }
         if (heatConfig.isConductor(blockBelow)) {
+            if (potPos.y() - 2 < world.getMinHeight()) return false;
             Block blockTwoBelow = world.getBlockAt(potPos.x(), potPos.y() - 2, potPos.z());
             if (!heatConfig.isHeatSource(blockTwoBelow)) return false;
             Boolean configuredTray = heatConfig.trayRequirement(blockBelow);

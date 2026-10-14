@@ -50,7 +50,7 @@ MIT 与 AGPL-3.0 兼容，第三方内容的 MIT 声明随 jar 分发，完整�
 
 修改版维护者：ydxc2009。当前项目源码地址为
 [Nodemc-developing/Farmersdelight-Plugin-Pro](https://github.com/Nodemc-developing/Farmersdelight-Plugin-Pro)。
-发布构建附带对应版本源码归档，仓库标签为 `v1.2.2`；JAR 内保留 AGPL 全文和版本说明。本地审阅构建以随附的对应源码归档为准。
+发布构建附带对应版本源码归档，当前仓库标签为 `v1.2.8`；JAR 内保留 AGPL 全文和版本说明。对应源码以该标签及随附源码归档为准。
 
 SQLite JDBC 3.53.4.0 随主 JAR 提供，其 Apache-2.0、原驱动及原生依赖声明保留于
 `META-INF/maven/org.xerial/sqlite-jdbc/`。其他打包依赖见 [THIRD_PARTY.md](THIRD_PARTY.md)。

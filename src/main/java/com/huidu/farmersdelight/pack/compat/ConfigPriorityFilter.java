@@ -28,6 +28,7 @@ final class ConfigPriorityFilter {
         List<DefinitionPriority.Definition<Location>> all = new ArrayList<>();
         Map<java.nio.file.Path, Boolean> own = new LinkedHashMap<>();
         int unresolved = 0;
+        Map<String, String> equivalentMappings = new LinkedHashMap<>();
         for (CachedConfigSection cached : configs) {
             boolean bundled = bundled(ownership, own, cached.path());
             for (String key : cached.config().keySet()) {
@@ -39,8 +40,23 @@ final class ConfigPriorityFilter {
                     // The original section parser retains responsibility for malformed states and arguments.
                 }
                 String identity = stateId != null && stateId >= 0 ? "registry:" + stateId : "unresolved:" + unresolved++;
+                String source = cached.path() + "#" + cached.config().path() + "." + key;
+                // Native mappings are aliases, not custom definitions. Two packs may independently
+                // map the same state to the same target (including CE's internal mappings).
+                Integer targetId = null;
+                Object target = cached.config().get(key);
+                if (target instanceof String text) {
+                    try { targetId = registryId.apply(text); } catch (RuntimeException invalid) { /* Native parser reports it. */ }
+                }
+                if (stateId != null && stateId >= 0 && targetId != null && targetId >= 0) {
+                    String previous = equivalentMappings.putIfAbsent(identity + "->" + targetId + ":" + bundled, source);
+                    if (previous != null) {
+                        report.add("craftengine:block_state_mapping", identity, previous, source, "identical native state mapping combined");
+                        continue;
+                    }
+                }
                 all.add(new DefinitionPriority.Definition<>(identity,
-                        cached.path() + "#" + cached.config().path() + "." + key,
+                        source,
                         bundled, new Location(cached, key, null), payload(cached, key)));
             }
         }
