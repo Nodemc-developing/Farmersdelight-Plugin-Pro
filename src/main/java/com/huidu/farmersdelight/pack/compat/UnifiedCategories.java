@@ -16,8 +16,6 @@ final class UnifiedCategories {
     static final List<String> GROUPS = List.of("tools", "ingredients", "crops", "processed", "foods",
             "feast", "decoration", "wild_plants", "pet_foods");
     private static final Set<String> LEGACY_GROUPS = Set.of("block", "item", "food", "weapon", "gui", "item_display");
-    private static final List<String> LABELS = List.of("工具", "食材", "农作物", "加工食品", "食物",
-            "盛宴", "装饰", "野生植物", "宠物食物");
     private static final List<String> ICONS = List.of("iron_knife", "straw", "cabbage", "minced_beef", "hamburger",
             "shepherds_pie_block", "tatami", "wild_onions", "dog_food");
     private static final Set<String> STATIONS = Set.of("stove", "cooking_pot", "skillet", "cutting_board");
@@ -47,7 +45,7 @@ final class UnifiedCategories {
             boolean unresolvedList = existing != null && existing.containsKey("list") && !(existing.get("list") instanceof List<?>);
             emptyGroups.put(group, explicitlyEmpty || unresolvedList);
             Map<String, Object> current = existing == null ? new LinkedHashMap<>() : copyMap(existing);
-            current.put("name", name(current.get("name"), LABELS.get(index), "gray"));
+            current.put("name", name(current.get("name"), "<lang:farmersdelight.category." + group + ">", "gray"));
             current.put("hidden", true);
             current.putIfAbsent("icon", PREFIX + ICONS.get(index));
             if (!current.containsKey("list")) current.put("list", new ArrayList<>());
@@ -88,7 +86,7 @@ final class UnifiedCategories {
         }
         if (!compatibility.isEmpty() && !input.containsKey(PREFIX + "compatibility")) {
             Map<String, Object> hidden = new LinkedHashMap<>();
-            hidden.putIfAbsent("name", "<!i><gray>兼容物品</gray>");
+            hidden.putIfAbsent("name", "<!i><gray><lang:farmersdelight.category.compatibility></gray>");
             hidden.put("hidden", true);
             hidden.putIfAbsent("icon", compatibility.getFirst());
             if (!hidden.containsKey("list") || hidden.get("list") instanceof List<?> list && !list.isEmpty())
@@ -100,7 +98,7 @@ final class UnifiedCategories {
         Map<String, Object> legacyRoot = body(input.get(LEGACY_ROOT));
         Map<String, Object> root = existingRoot != null ? copyMap(existingRoot)
                 : legacyRoot != null ? copyMap(legacyRoot) : new LinkedHashMap<>();
-        root.put("name", name(root.get("name"), "农夫乐事", "gold"));
+        root.put("name", name(root.get("name"), "<lang:farmersdelight.category.root>", "gold"));
         root.put("hidden", false);
         root.putIfAbsent("priority", 1);
         root.putIfAbsent("icon", PREFIX + "cooking_pot");

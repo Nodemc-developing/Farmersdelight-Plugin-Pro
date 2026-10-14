@@ -18,7 +18,7 @@ def model(path, index=None):
             value['tints'].append(value['tints'][0].copy())
     return value
 
-def tank(item_id, name, shell_path, glass):
+def tank(item_id, name_key, shell_path, glass):
     prefix = item_id + '_visual'
     shell = model(shell_path, 0 if glass else None)
     legacy_shell = 'farmersdelight:block/glass_jug' if glass else shell_path
@@ -47,9 +47,10 @@ def tank(item_id, name, shell_path, glass):
             variants[f'facing={facing},waterlogged={str(wet).lower()}'] = {'appearance': key}
     ITEMS[item_id] = {
         'material': 'minecraft:paper',
-        'data': {'item_name': f'<!i><white>{name}', 'lore': [
-            '<!i><gray>容量：16 桶 / 16000 mB', '<!i><gray>桶或瓶右键转移；空手打开容器',
-            '<!i><gray>输入输出支持漏斗；拆除保留流体' + ('；染料右键染色' if glass else '')], 'max_stack_size': 1},
+        'data': {'item_name': f'<!i><white><lang:{name_key}>', 'lore': [
+            '<!i><gray><lang:tooltip.farmersdelight.jug.capacity>',
+            '<!i><gray><lang:tooltip.farmersdelight.jug.use>',
+            '<!i><gray><lang:tooltip.farmersdelight.jug.' + ('glass_automation' if glass else 'automation') + '>'], 'max_stack_size': 1},
         'model': shell,
         'legacy_model': {'path': legacy_shell},
         'settings': {'fluidcore:container': {'capacity': 16000}},
@@ -67,6 +68,6 @@ def tank(item_id, name, shell_path, glass):
                            'appearances': appearances, 'variants': variants}}}]}
 
 if __name__ == '__main__':
-    tank('farmersdelight:fluid_tank', '玻璃流体储罐', 'farmersdelight:block/glass_jug_tinted', True)
-    tank('farmersdelight:fluid_jug', '流体储罐', 'farmersdelight:block/jug', False)
+    tank('farmersdelight:fluid_tank', 'block.farmersdelight.glass_jug', 'farmersdelight:block/glass_jug_tinted', True)
+    tank('farmersdelight:fluid_jug', 'block.farmersdelight.jug', 'farmersdelight:block/jug', False)
     TARGET.write_text(yaml.dump({'items': ITEMS}, Dumper=LiteralDumper, allow_unicode=True, sort_keys=False), encoding='utf-8')

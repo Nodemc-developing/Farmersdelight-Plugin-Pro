@@ -11,6 +11,14 @@ This version targets **Minecraft 1.21 through 26.3 on Paper and Folia** with Cra
 
 Folia support applies to available official server builds. Folia 26.3 was not tested in this revision. Paper 1.21.2 and 26.1, and Folia 26.3, were unavailable from the official download service during the historical verification below; that records availability at the time, rather than their current download status. Those exact builds must not be described as tested.
 
+## English localization verification — 1.2.9, 2026-10-14
+
+The English localization patch passed 1,001 Java tests, seven language-checker cases and 31 content-checker cases. Paper 26.3 build 140 / `977da0d` passed 49 native checks with CE 26.9.2 and another 49 with the CE 26.10 snapshot, using the same plugin and content-pack artifacts.
+
+Those runs exercised actual FD/CE English and Chinese lookups, English regional fallback, bound reload-message arguments, category labels and tank unit conversions. This verifies loaded translations and headless behavior, not a physical client's rendering. The original plugins, pack/config inputs and FluidCore language file were restored. See the [English verification record](../verification/english-localization-2026-10-14/README.md).
+
+For English server messages and menus, set FD `config.yml` to `language: en_us`; for carried-fluid names, set FluidCore `lang.yml` to `default-language: en`. Client item and advancement translations require the updated resource pack. Some admin messages and menus use the server language, so a client language change alone does not select every server-defined label.
+
 ## Presentation differences on old clients
 
 - Before 1.21.4, tanks retain their capacity, fluid, quantity and stored glass color, but clients lack the modern multi-color model format. Explicit legacy models retain the tank shell and all sixteen fill levels, with a fixed blue liquid texture and the original glass color. Dynamic fluid/glass tinting and generated skillet ingredient overlays are unavailable on those clients.

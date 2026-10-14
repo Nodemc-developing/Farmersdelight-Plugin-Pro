@@ -48,7 +48,9 @@ Folia-aware scheduling, sleeping block tickers, asynchronous file/database work 
 
 ## 🧩 Requirements
 
-**1.2.8** restores missing content and improves crops, ropes, baskets and Chinese names. Install the content pack manually; startup and reload do not extract or update it. The native recipe format introduced in 1.2.2 remains in use. See the [release notes](RELEASE-NOTES-1.2.8.zh-CN.md) and [recipe guide](CONFIGURATION-RECIPES.zh-CN.md).
+**1.2.9** completes English browser categories and tank descriptions, retaining the content and gameplay fixes from 1.2.8. Install the content pack manually; startup and reload do not extract or update it. See the [release notes](RELEASE-NOTES-1.2.9.en-US.md) and [recipe guide](CONFIGURATION-RECIPES.zh-CN.md).
+
+**English setup:** set `language: en_us` in `plugins/Farmersdelight-Plugin-Pro/config.yml`. For fluids, set `default-language: en` in `plugins/FluidCore/lang.yml`. Reload all FD configuration or restart, and let players accept the updated resource pack. Client item names and advancements follow the player's language; server-defined admin messages and some menus use the configured server language.
 
 | Component | Version | Needed for |
 | --- | --- | --- |
@@ -89,7 +91,7 @@ Editing, reloading and runtime statistics require administrator permissions.
 - [Kaleidoscope integration & flexible recipes](KALEIDOSCOPE-COMPAT.zh-CN.md)
 - [Dependencies & corresponding sources](libs/README.md) · [Build & technical notes](docs/DEVELOPMENT.md)
 - [Integrated villager features and switches](VILLAGER.zh-CN.md)
-- [1.2.8 changes & verification scope](RELEASE-NOTES-1.2.8.zh-CN.md) · [Original wiki](https://github.com/IOVEYOUMC0/FarmersdelightPluginWiKi)
+- [1.2.9 English localization patch](RELEASE-NOTES-1.2.9.en-US.md) · [1.2.8 changes](RELEASE-NOTES-1.2.8.zh-CN.md) · [Original wiki](https://github.com/IOVEYOUMC0/FarmersdelightPluginWiKi)
 
 ## 🙏 Credits & license
 

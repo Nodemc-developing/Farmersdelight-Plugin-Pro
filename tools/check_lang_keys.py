@@ -140,13 +140,17 @@ def pack_translation_keys() -> set[str]:
 
 
 def content_language_problems(pack: Path) -> list[str]:
-    """Validate Chinese item names in both the client pack and CE's server translations."""
+    """Validate shipped English and Chinese item names in client and CE translations."""
     problems: list[str] = []
     languages = pack / "resourcepack/assets/farmersdelight/lang"
     if not languages.is_dir():
         return problems
     english = json.loads((languages / "en_us.json").read_text(encoding="utf-8"))
     item_keys = {key for key in english if key.startswith(("item.farmersdelight.", "block.farmersdelight."))}
+    for key in sorted(item_keys):
+        value = english[key]
+        if not isinstance(value, str) or not value.strip() or re.search(r"[\u3400-\u9fff]", value):
+            problems.append(f"en_us: invalid English item name for {key}: {value!r}")
     for locale in ("zh_cn", "zh_tw", "zh_hk"):
         path = languages / f"{locale}.json"
         localized = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
@@ -156,14 +160,28 @@ def content_language_problems(pack: Path) -> list[str]:
                 problems.append(f"{locale}: missing Chinese item name for {key}: {value!r}")
     translations = pack / "configuration/translations.yml"
     if translations.is_file():
-        ce = (yaml.safe_load(translations.read_text(encoding="utf-8")) or {}).get("translations", {}).get("zh_cn", {})
+        server_languages = (yaml.safe_load(translations.read_text(encoding="utf-8")) or {}).get("translations", {})
+        ce = server_languages.get("zh_cn", {})
+        ce_english = server_languages.get("en", {})
         chinese = json.loads((languages / "zh_cn.json").read_text(encoding="utf-8"))
         for key in sorted(item_keys):
+            if key not in ce_english:
+                problems.append(f"CE en: missing item name for {key}")
+            elif ce_english[key] != english[key]:
+                problems.append(f"CE en: item name differs from client pack for {key}")
             if key not in ce:
                 problems.append(f"CE zh_cn: missing item name for {key}")
             elif ce[key] != chinese.get(key):
                 problems.append(f"CE zh_cn: item name differs from client pack for {key}")
     return problems
+
+
+def placeholder_problems(english: dict[str, object], chinese: dict[str, object]) -> list[str]:
+    """Translations of the same message must use the same named substitution arguments."""
+    named = re.compile(r"\{([A-Za-z][A-Za-z0-9_-]*)\}")
+    return [f"{key}: named placeholders differ between en_us and zh_cn"
+            for key in sorted(english.keys() & chinese.keys())
+            if set(named.findall(str(english[key]))) != set(named.findall(str(chinese[key])))]
 
 
 def literal_candidates(en: dict[str, object], zh: dict[str, object]) -> dict[str, str]:
@@ -209,6 +227,10 @@ def main() -> int:
                     if key not in static and not key.endswith(".i18n")
                     and ".i18n." not in key)
     problems += len(missing) + len(only_en) + len(only_zh) + len(blank)
+    substitutions = placeholder_problems(en, zh)
+    problems += len(substitutions)
+    for problem in substitutions:
+        print(f"   PLACEHOLDERS: {problem}")
 
     content_problems = content_language_problems(ROOT / "src/main/resources/craftengine/farmersdelight")
     problems += len(content_problems)

@@ -1,7 +1,7 @@
 categories:
   farmersdelight:default:
     priority: 1
-    name: <!i><gold>农夫乐事</gold>
+    name: <!i><gold><lang:farmersdelight.category.root></gold>
     icon: farmersdelight:cooking_pot
     list:
     - '#farmersdelight:tools'
@@ -14,7 +14,7 @@ categories:
     - '#farmersdelight:wild_plants'
     - '#farmersdelight:pet_foods'
   farmersdelight:tools:
-    name: <!i><gray>工具</gray>
+    name: <!i><gray><lang:farmersdelight.category.tools></gray>
     hidden: true
     icon: farmersdelight:iron_knife
     list:
@@ -28,7 +28,7 @@ categories:
     - farmersdelight:skillet
     - farmersdelight:cutting_board
   farmersdelight:ingredients:
-    name: <!i><gray>食材</gray>
+    name: <!i><gray><lang:farmersdelight.category.ingredients></gray>
     hidden: true
     icon: farmersdelight:straw
     list:
@@ -38,7 +38,7 @@ categories:
     - farmersdelight:rice_panicle
     - farmersdelight:rotten_tomato
   farmersdelight:crops:
-    name: <!i><gray>农作物</gray>
+    name: <!i><gray><lang:farmersdelight.category.crops></gray>
     hidden: true
     icon: farmersdelight:cabbage
     list:
@@ -49,7 +49,7 @@ categories:
     - farmersdelight:onion
     - farmersdelight:rice
   farmersdelight:processed:
-    name: <!i><gray>加工食品</gray>
+    name: <!i><gray><lang:farmersdelight.category.processed></gray>
     hidden: true
     icon: farmersdelight:minced_beef
     list:
@@ -76,7 +76,7 @@ categories:
     - farmersdelight:smoked_ham
     - farmersdelight:pie_crust
   farmersdelight:foods:
-    name: <!i><gray>食物</gray>
+    name: <!i><gray><lang:farmersdelight.category.foods></gray>
     hidden: true
     icon: farmersdelight:hamburger
     list:
@@ -134,7 +134,7 @@ categories:
     - farmersdelight:squid_ink_pasta
     - farmersdelight:grilled_salmon
   farmersdelight:feast:
-    name: <!i><gray>盛宴</gray>
+    name: <!i><gray><lang:farmersdelight.category.feast></gray>
     hidden: true
     icon: farmersdelight:shepherds_pie_block
     list:
@@ -153,7 +153,7 @@ categories:
     - farmersdelight:gleaming_salad
     - farmersdelight:rice_roll_medley_block
   farmersdelight:decoration:
-    name: <!i><gray>装饰</gray>
+    name: <!i><gray><lang:farmersdelight.category.decoration></gray>
     hidden: true
     icon: farmersdelight:tatami
     list:
@@ -204,7 +204,7 @@ categories:
     - farmersdelight:crimson_cabinet
     - farmersdelight:warped_cabinet
   farmersdelight:wild_plants:
-    name: <!i><gray>野生植物</gray>
+    name: <!i><gray><lang:farmersdelight.category.wild_plants></gray>
     hidden: true
     icon: farmersdelight:wild_onions
     list:
@@ -219,7 +219,7 @@ categories:
     - farmersdelight:brown_mushroom_colony
     - farmersdelight:red_mushroom_colony
   farmersdelight:pet_foods:
-    name: <!i><gray>宠物食物</gray>
+    name: <!i><gray><lang:farmersdelight.category.pet_foods></gray>
     hidden: true
     icon: farmersdelight:dog_food
     list:

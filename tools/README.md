@@ -7,7 +7,7 @@ Three checks that enforce the machine-checkable half of this project's maintenan
 | --- | --- |
 | `strip_ce_comments.py --check` | Shipped CraftEngine configuration under `src/main/resources/craftengine/**/configuration/` carries no comments. Field references live in the wiki, not in the data files. |
 | `meal_icons.py --check` | Every `configuration/meal_icons.yml` entry corresponds to a `farmersdelight_recipes` cooking-pot output, and every such output has an entry with a resolvable 16x16 texture. |
-| `check_lang_keys.py` | Java language keys exist in both plugin locales. Chinese item names exist in the three client Chinese locales and agree with CE's Chinese translations. English fallback values do not count as Chinese translations. |
+| `check_lang_keys.py` | Java language keys and named placeholders agree in both plugin locales. English item names and CE English translations agree; Chinese names exist in the three Chinese client locales and agree with CE's Chinese translations. English fallback values do not count as Chinese translations. |
 
 All three are read-only with `--check` / `--quiet` and exit non-zero on a real problem, so no separate assertion
 is needed. They need PyYAML (`python -m pip install pyyaml`).
@@ -18,7 +18,7 @@ python tools/meal_icons.py --check
 python tools/check_lang_keys.py --quiet
 ```
 
-`python tools/test_lang_keys.py -q` verifies untranslated item names, missing client keys and conflicting server translations are rejected.
+`python tools/test_lang_keys.py -q` includes seven cases covering untranslated item names, missing client/server keys, conflicting translations and unbound message placeholders.
 
 `python tools/test_meal_icons.py` checks station filtering, suffixed recipe roots and custom cooking-pot groups.
 `generate-fluid-content.py` generates tank item/block definitions only; it leaves workstation recipes in

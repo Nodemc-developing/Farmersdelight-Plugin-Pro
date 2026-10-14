@@ -155,7 +155,7 @@ class UnifiedCategoriesTest {
         Map<String, Object> source = bothRoots();
         source.put(PREFIX + "foods", Map.of("name", "<italic><aqua>自定义食物</aqua></italic>", "list", List.of(PREFIX + "hamburger")));
         Map<String, Object> result = UnifiedCategories.merge(source, ignored -> false);
-        assertEquals("<!i><gold>农夫乐事</gold>", body(result, "default").get("name"));
+        assertEquals("<!i><gold><lang:farmersdelight.category.root></gold>", body(result, "default").get("name"));
         assertEquals("<!i><gray>自定义食物</gray>", body(result, "foods").get("name"));
         for (String group : UnifiedCategories.GROUPS)
             assertTrue(String.valueOf(body(result, group).get("name")).startsWith("<!i><gray>"));
@@ -168,6 +168,19 @@ class UnifiedCategoriesTest {
         Map<String, Object> result = UnifiedCategories.merge(source, ignored -> true);
         assertEquals("${members}", body(result, "foods").get("list"));
         assertEquals(Map.of("key", 4), body(result, "foods").get("custom"));
+    }
+
+    @Test void generatedLabelsRemainClientTranslatableWhileOperatorNamesKeepTheirText() {
+        Map<String, Object> source = bothRoots();
+        source.put(PREFIX + "foods", Map.of("name", "Regional Meals", "list", List.of(PREFIX + "hamburger")));
+        Set<String> available = Set.of(PREFIX + "jug", PREFIX + "fluid_jug");
+        Map<String, Object> result = UnifiedCategories.merge(source, available::contains);
+
+        assertTrue(String.valueOf(body(result, "default").get("name")).contains("<lang:farmersdelight.category.root>"));
+        assertTrue(String.valueOf(body(result, "tools").get("name")).contains("<lang:farmersdelight.category.tools>"));
+        assertTrue(String.valueOf(body(result, "compatibility").get("name")).contains("<lang:farmersdelight.category.compatibility>"));
+        assertEquals("<!i><gray>Regional Meals</gray>", body(result, "foods").get("name"));
+        assertEquals("Regional Meals", body(source, "foods").get("name"));
     }
 
     private static Map<String, Object> bothRoots() {

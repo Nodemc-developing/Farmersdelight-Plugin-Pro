@@ -728,11 +728,11 @@ items:
   farmersdelight:fluid_tank:
     material: minecraft:paper
     data:
-      item_name: <!i><white>玻璃流体储罐
+      item_name: <!i><white><lang:block.farmersdelight.glass_jug>
       lore:
-      - <!i><gray>容量：16 桶 / 16000 mB
-      - <!i><gray>桶或瓶右键转移；空手打开容器
-      - <!i><gray>输入输出支持漏斗；拆除保留流体；染料右键染色
+      - <!i><gray><lang:tooltip.farmersdelight.jug.capacity>
+      - <!i><gray><lang:tooltip.farmersdelight.jug.use>
+      - <!i><gray><lang:tooltip.farmersdelight.jug.glass_automation>
       max_stack_size: 1
     model:
       type: minecraft:model
@@ -1481,11 +1481,11 @@ items:
   farmersdelight:fluid_jug:
     material: minecraft:paper
     data:
-      item_name: <!i><white>流体储罐
+      item_name: <!i><white><lang:block.farmersdelight.jug>
       lore:
-      - <!i><gray>容量：16 桶 / 16000 mB
-      - <!i><gray>桶或瓶右键转移；空手打开容器
-      - <!i><gray>输入输出支持漏斗；拆除保留流体
+      - <!i><gray><lang:tooltip.farmersdelight.jug.capacity>
+      - <!i><gray><lang:tooltip.farmersdelight.jug.use>
+      - <!i><gray><lang:tooltip.farmersdelight.jug.automation>
       max_stack_size: 1
     model:
       type: minecraft:model

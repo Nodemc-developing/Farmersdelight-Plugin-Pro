@@ -7,6 +7,8 @@
 
 config-version: 4
 
+# Set en_us for English server messages and menus; an empty value selects the server default.
+# 设置 en_us 使用英文服务端提示与菜单；留空时按服务端默认语言选择。
 language: ''
 
 craftengine-resources:
