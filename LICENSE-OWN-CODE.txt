@@ -1,0 +1,28 @@
+All Rights Reserved — Specified Independent Script Source
+
+Copyright (c) 2026 Ydxc20091. All rights reserved.
+
+Scope
+
+This notice applies only to the source of the following independent script
+in versions explicitly marked SPDX-License-Identifier: LicenseRef-ARR:
+
+- tools/generate-legacy-decoration-models.py
+
+It does not license the plugin as a whole. The plugin remains licensed under
+the GNU Affero General Public License version 3 only, as provided in LICENSE.
+
+This notice does not apply to any other code, documentation, artwork, models,
+textures, configuration, input or output files, generated or copied content,
+or third-party dependencies. Their existing licenses and attribution remain
+unchanged, including when this script reads, copies, transforms or generates them.
+
+Permissions
+
+Except as permitted by applicable law or separately authorized by the copyright
+holder, no license or permission is granted to copy, modify, redistribute,
+sublicense, or incorporate the covered script source into other works.
+
+This notice does not revoke or restrict permissions already granted for an
+earlier version under its applicable license. It does not relicense third-party
+material or change any separate permission granted by its copyright holder.
