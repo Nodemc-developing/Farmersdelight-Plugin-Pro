@@ -1,9 +1,12 @@
 # 来源与授权
 
-本仓库（Farmersdelight-Plugin-Pro）采用 **AGPL-3.0**（GNU Affero General Public License version 3）授权，
+插件主体（Farmersdelight-Plugin-Pro）继续采用 **AGPL-3.0-only**（GNU Affero General Public License version 3）授权，
 全文见 [LICENSE](LICENSE)。
 
-允许使用、修改、再分发，也允许收费分发；但再分发时必须满足 AGPL-3.0 的条件：保留版权与授权声明、
+仅 [LICENSE-OWN-CODE.txt](LICENSE-OWN-CODE.txt) 明确列出的独立脚本源码采用 **All Rights Reserved（ARR）**，
+且仅适用于带有 `LicenseRef-ARR` 标记的文件。其他代码、文档、素材、输入输出文件及依赖的现有授权不变。
+
+插件主体允许使用、修改、再分发，也允许收费分发；但再分发时必须满足 AGPL-3.0 的条件：保留版权与授权声明、
 附带完整对应源码、修改过的版本同样以 AGPL-3.0 授权。以 jar 形式散发的修改版也必须提供源码。
 AGPL 第 13 条还要求：**如果你修改后的版本通过网络对外提供服务，也要向使用者提供源码。**
 

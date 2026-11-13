@@ -92,4 +92,4 @@
 
 原插件作者：**灰度 HuiDu_OwO（IOVEYOUMC0）**；本分支维护：**ydxc2009**。感谢 **vectorwing** 与 [Farmer's Delight](https://github.com/vectorwing/FarmersDelight) 原模组贡献者提供原版玩法及 MIT 授权素材。
 
-本项目使用 **AGPL-3.0-only**。使用、修改及再分发（包括商业分发）须遵守 [LICENSE](LICENSE)。第三方素材与依赖保留各自归属和许可，见 [NOTICE](NOTICE.md) · [THIRD_PARTY](THIRD_PARTY.md)。
+插件主体继续使用 **AGPL-3.0-only**，见 [LICENSE](LICENSE)。仅 [LICENSE-OWN-CODE.txt](LICENSE-OWN-CODE.txt) 明确列出的独立脚本源码采用 **All Rights Reserved（ARR，保留所有权利）**。其他代码、文档、素材、生成或复制的文件及依赖继续保留现有协议和署名，见 [NOTICE](NOTICE.md) · [THIRD_PARTY](THIRD_PARTY.md)。
