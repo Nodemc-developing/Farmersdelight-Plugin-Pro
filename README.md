@@ -97,4 +97,4 @@ Editing, reloading and runtime statistics require administrator permissions.
 
 Original plugin: **HuiDu_OwO (IOVEYOUMC0)**. Fork maintenance: **ydxc2009**. Thanks to **vectorwing** and the [Farmer's Delight](https://github.com/vectorwing/FarmersDelight) contributors for the original mod and its MIT-licensed assets.
 
-This project uses **AGPL-3.0-only**. Use, modification and redistribution, including commercial redistribution, follow [LICENSE](LICENSE). Third-party materials keep their own licenses and attribution: [NOTICE](NOTICE.md) · [THIRD_PARTY](THIRD_PARTY.md).
+The plugin remains **AGPL-3.0-only** under [LICENSE](LICENSE). Only the source of the independent script explicitly listed in [LICENSE-OWN-CODE.txt](LICENSE-OWN-CODE.txt) is **All Rights Reserved (ARR)**. Other code, documentation, assets, generated or copied files, and dependencies retain their existing licenses and attribution: [NOTICE](NOTICE.md) · [THIRD_PARTY](THIRD_PARTY.md).

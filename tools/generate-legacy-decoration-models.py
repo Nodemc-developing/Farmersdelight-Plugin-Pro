@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: LicenseRef-ARR
+# Script source only; see ../LICENSE-OWN-CODE.txt. Generated/copied assets retain their existing licenses.
 """Create explicit pre-1.21.4 meshes without rewriting the content configuration."""
 import hashlib
 import json
